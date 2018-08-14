@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jaagro.tms.biz.mapper.PickUpAddressMapper">
+  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.PickUpAddress">
+    <id column="pick_up_address_id" jdbcType="BIGINT" property="pickUpAddressId" />
+    <result column="customer_id" jdbcType="BIGINT" property="customerId" />
+    <result column="address_code" jdbcType="VARCHAR" property="addressCode" />
+    <result column="address_name" jdbcType="VARCHAR" property="addressName" />
+    <result column="contact_person" jdbcType="VARCHAR" property="contactPerson" />
+    <result column="contact_number" jdbcType="VARCHAR" property="contactNumber" />
+    <result column="admin_region_id" jdbcType="BIGINT" property="adminRegionId" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="latitude" jdbcType="DECIMAL" property="latitude" />
+    <result column="longitude" jdbcType="DECIMAL" property="longitude" />
+    <result column="notes" jdbcType="VARCHAR" property="notes" />
+    <result column="created_date" jdbcType="TIMESTAMP" property="createdDate" />
+    <result column="created_user_id" jdbcType="BIGINT" property="createdUserId" />
+    <result column="is_deleted" jdbcType="BIT" property="isDeleted" />
+    <result column="is_active" jdbcType="BIT" property="isActive" />
+    <result column="is_default" jdbcType="BIT" property="isDefault" />
+    <result column="version" jdbcType="BIGINT" property="version" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    pick_up_address_id, customer_id, address_code, address_name, contact_person, contact_number, 
+    admin_region_id, address, latitude, longitude, notes, created_date, created_user_id, 
+    is_deleted, is_active, is_default, version
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from pick_up_address
+    where pick_up_address_id = #{pickUpAddressId,jdbcType=BIGINT}
+  </select>
+    <select id="getPickUpAddressByName" resultType="com.jaagro.tms.biz.entity.PickUpAddress">
+      select * from pick_up_address where address_name = #{addressName}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from pick_up_address
+    where pick_up_address_id = #{pickUpAddressId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.PickUpAddress">
+    insert into pick_up_address (pick_up_address_id, customer_id, address_code, 
+      address_name, contact_person, contact_number, 
+      admin_region_id, address, latitude, 
+      longitude, notes, created_date, 
+      created_user_id, is_deleted, is_active, 
+      is_default, version)
+    values (#{pickUpAddressId,jdbcType=BIGINT}, #{customerId,jdbcType=BIGINT}, #{addressCode,jdbcType=VARCHAR}, 
+      #{addressName,jdbcType=VARCHAR}, #{contactPerson,jdbcType=VARCHAR}, #{contactNumber,jdbcType=VARCHAR}, 
+      #{adminRegionId,jdbcType=BIGINT}, #{address,jdbcType=VARCHAR}, #{latitude,jdbcType=DECIMAL}, 
+      #{longitude,jdbcType=DECIMAL}, #{notes,jdbcType=VARCHAR}, #{createdDate,jdbcType=TIMESTAMP}, 
+      #{createdUserId,jdbcType=BIGINT}, #{isDeleted,jdbcType=BIT}, #{isActive,jdbcType=BIT}, 
+      #{isDefault,jdbcType=BIT}, #{version,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.PickUpAddress">
+    insert into pick_up_address
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="pickUpAddressId != null">
+        pick_up_address_id,
+      </if>
+      <if test="customerId != null">
+        customer_id,
+      </if>
+      <if test="addressCode != null">
+        address_code,
+      </if>
+      <if test="addressName != null">
+        address_name,
+      </if>
+      <if test="contactPerson != null">
+        contact_person,
+      </if>
+      <if test="contactNumber != null">
+        contact_number,
+      </if>
+      <if test="adminRegionId != null">
+        admin_region_id,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="latitude != null">
+        latitude,
+      </if>
+      <if test="longitude != null">
+        longitude,
+      </if>
+      <if test="notes != null">
+        notes,
+      </if>
+      <if test="createdDate != null">
+        created_date,
+      </if>
+      <if test="createdUserId != null">
+        created_user_id,
+      </if>
+      <if test="isDeleted != null">
+        is_deleted,
+      </if>
+      <if test="isActive != null">
+        is_active,
+      </if>
+      <if test="isDefault != null">
+        is_default,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="pickUpAddressId != null">
+        #{pickUpAddressId,jdbcType=BIGINT},
+      </if>
+      <if test="customerId != null">
+        #{customerId,jdbcType=BIGINT},
+      </if>
+      <if test="addressCode != null">
+        #{addressCode,jdbcType=VARCHAR},
+      </if>
+      <if test="addressName != null">
+        #{addressName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPerson != null">
+        #{contactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactNumber != null">
+        #{contactNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="adminRegionId != null">
+        #{adminRegionId,jdbcType=BIGINT},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        #{latitude,jdbcType=DECIMAL},
+      </if>
+      <if test="longitude != null">
+        #{longitude,jdbcType=DECIMAL},
+      </if>
+      <if test="notes != null">
+        #{notes,jdbcType=VARCHAR},
+      </if>
+      <if test="createdDate != null">
+        #{createdDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdUserId != null">
+        #{createdUserId,jdbcType=BIGINT},
+      </if>
+      <if test="isDeleted != null">
+        #{isDeleted,jdbcType=BIT},
+      </if>
+      <if test="isActive != null">
+        #{isActive,jdbcType=BIT},
+      </if>
+      <if test="isDefault != null">
+        #{isDefault,jdbcType=BIT},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.PickUpAddress">
+    update pick_up_address
+    <set>
+      <if test="customerId != null">
+        customer_id = #{customerId,jdbcType=BIGINT},
+      </if>
+      <if test="addressCode != null">
+        address_code = #{addressCode,jdbcType=VARCHAR},
+      </if>
+      <if test="addressName != null">
+        address_name = #{addressName,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPerson != null">
+        contact_person = #{contactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactNumber != null">
+        contact_number = #{contactNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="adminRegionId != null">
+        admin_region_id = #{adminRegionId,jdbcType=BIGINT},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        latitude = #{latitude,jdbcType=DECIMAL},
+      </if>
+      <if test="longitude != null">
+        longitude = #{longitude,jdbcType=DECIMAL},
+      </if>
+      <if test="notes != null">
+        notes = #{notes,jdbcType=VARCHAR},
+      </if>
+      <if test="createdDate != null">
+        created_date = #{createdDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdUserId != null">
+        created_user_id = #{createdUserId,jdbcType=BIGINT},
+      </if>
+      <if test="isDeleted != null">
+        is_deleted = #{isDeleted,jdbcType=BIT},
+      </if>
+      <if test="isActive != null">
+        is_active = #{isActive,jdbcType=BIT},
+      </if>
+      <if test="isDefault != null">
+        is_default = #{isDefault,jdbcType=BIT},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=BIGINT},
+      </if>
+    </set>
+    where pick_up_address_id = #{pickUpAddressId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.PickUpAddress">
+    update pick_up_address
+    set customer_id = #{customerId,jdbcType=BIGINT},
+      address_code = #{addressCode,jdbcType=VARCHAR},
+      address_name = #{addressName,jdbcType=VARCHAR},
+      contact_person = #{contactPerson,jdbcType=VARCHAR},
+      contact_number = #{contactNumber,jdbcType=VARCHAR},
+      admin_region_id = #{adminRegionId,jdbcType=BIGINT},
+      address = #{address,jdbcType=VARCHAR},
+      latitude = #{latitude,jdbcType=DECIMAL},
+      longitude = #{longitude,jdbcType=DECIMAL},
+      notes = #{notes,jdbcType=VARCHAR},
+      created_date = #{createdDate,jdbcType=TIMESTAMP},
+      created_user_id = #{createdUserId,jdbcType=BIGINT},
+      is_deleted = #{isDeleted,jdbcType=BIT},
+      is_active = #{isActive,jdbcType=BIT},
+      is_default = #{isDefault,jdbcType=BIT},
+      version = #{version,jdbcType=BIGINT}
+    where pick_up_address_id = #{pickUpAddressId,jdbcType=BIGINT}
+  </update>
+</mapper>

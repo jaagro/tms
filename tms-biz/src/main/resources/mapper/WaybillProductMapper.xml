@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillProductMapper">
+  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillProduct">
+    <id column="waybill_product_id" jdbcType="BIGINT" property="waybillProductId" />
+    <result column="waybill_id" jdbcType="BIGINT" property="waybillId" />
+    <result column="product_name" jdbcType="VARCHAR" property="productName" />
+    <result column="quantity" jdbcType="INTEGER" property="quantity" />
+    <result column="weight" jdbcType="DECIMAL" property="weight" />
+    <result column="chargeable_weight" jdbcType="DECIMAL" property="chargeableWeight" />
+    <result column="pickup_quantity" jdbcType="INTEGER" property="pickupQuantity" />
+    <result column="pickup_weight" jdbcType="DECIMAL" property="pickupWeight" />
+    <result column="pickup_chargeable_weight" jdbcType="DECIMAL" property="pickupChargeableWeight" />
+    <result column="signed_quantity" jdbcType="INTEGER" property="signedQuantity" />
+    <result column="signed_weight" jdbcType="DECIMAL" property="signedWeight" />
+    <result column="signed_chargeable_weight" jdbcType="DECIMAL" property="signedChargeableWeight" />
+    <result column="shipping_address" jdbcType="VARCHAR" property="shippingAddress" />
+    <result column="shipping_address_id" jdbcType="BIGINT" property="shippingAddressId" />
+    <result column="contact_person" jdbcType="VARCHAR" property="contactPerson" />
+    <result column="contact_number" jdbcType="VARCHAR" property="contactNumber" />
+    <result column="detailed_address" jdbcType="VARCHAR" property="detailedAddress" />
+    <result column="latitude" jdbcType="DECIMAL" property="latitude" />
+    <result column="longitude" jdbcType="DECIMAL" property="longitude" />
+    <result column="insurance_cost" jdbcType="DECIMAL" property="insuranceCost" />
+    <result column="required_delivery_datetime" jdbcType="TIMESTAMP" property="requiredDeliveryDatetime" />
+    <result column="pricing_method_id" jdbcType="BIGINT" property="pricingMethodId" />
+    <result column="billing_mileage" jdbcType="DECIMAL" property="billingMileage" />
+    <result column="shipping_unit_price" jdbcType="DECIMAL" property="shippingUnitPrice" />
+    <result column="shipping_cost_total" jdbcType="DECIMAL" property="shippingCostTotal" />
+    <result column="pickup_charge" jdbcType="DECIMAL" property="pickupCharge" />
+    <result column="delivery_charge" jdbcType="DECIMAL" property="deliveryCharge" />
+    <result column="insurance_charge" jdbcType="DECIMAL" property="insuranceCharge" />
+    <result column="other_charge" jdbcType="DECIMAL" property="otherCharge" />
+    <result column="notes" jdbcType="VARCHAR" property="notes" />
+    <result column="receipt_status_id" jdbcType="BIGINT" property="receiptStatusId" />
+    <result column="receipt_count" jdbcType="INTEGER" property="receiptCount" />
+    <result column="is_deleted" jdbcType="BIT" property="isDeleted" />
+    <result column="is_active" jdbcType="BIT" property="isActive" />
+    <result column="version" jdbcType="BIGINT" property="version" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    waybill_product_id, waybill_id, product_name, quantity, weight, chargeable_weight, 
+    pickup_quantity, pickup_weight, pickup_chargeable_weight, signed_quantity, signed_weight, 
+    signed_chargeable_weight, shipping_address, shipping_address_id, contact_person, 
+    contact_number, detailed_address, latitude, longitude, insurance_cost, required_delivery_datetime, 
+    pricing_method_id, billing_mileage, shipping_unit_price, shipping_cost_total, pickup_charge, 
+    delivery_charge, insurance_charge, other_charge, notes, receipt_status_id, receipt_count, 
+    is_deleted, is_active, version
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from waybill_product
+    where waybill_product_id = #{waybillProductId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from waybill_product
+    where waybill_product_id = #{waybillProductId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillProduct" useGeneratedKeys="true" keyProperty="waybillProductId" keyColumn="waybill_product_id">
+    insert into waybill_product (waybill_product_id, waybill_id, product_name, 
+      quantity, weight, chargeable_weight, 
+      pickup_quantity, pickup_weight, pickup_chargeable_weight, 
+      signed_quantity, signed_weight, signed_chargeable_weight, 
+      shipping_address, shipping_address_id, contact_person, 
+      contact_number, detailed_address, latitude, 
+      longitude, insurance_cost, required_delivery_datetime, 
+      pricing_method_id, billing_mileage, shipping_unit_price, 
+      shipping_cost_total, pickup_charge, delivery_charge, 
+      insurance_charge, other_charge, notes, 
+      receipt_status_id, receipt_count, is_deleted, 
+      is_active, version)
+    values (#{waybillProductId,jdbcType=BIGINT}, #{waybillId,jdbcType=BIGINT}, #{productName,jdbcType=VARCHAR}, 
+      #{quantity,jdbcType=INTEGER}, #{weight,jdbcType=DECIMAL}, #{chargeableWeight,jdbcType=DECIMAL}, 
+      #{pickupQuantity,jdbcType=INTEGER}, #{pickupWeight,jdbcType=DECIMAL}, #{pickupChargeableWeight,jdbcType=DECIMAL}, 
+      #{signedQuantity,jdbcType=INTEGER}, #{signedWeight,jdbcType=DECIMAL}, #{signedChargeableWeight,jdbcType=DECIMAL}, 
+      #{shippingAddress,jdbcType=VARCHAR}, #{shippingAddressId,jdbcType=BIGINT}, #{contactPerson,jdbcType=VARCHAR}, 
+      #{contactNumber,jdbcType=VARCHAR}, #{detailedAddress,jdbcType=VARCHAR}, #{latitude,jdbcType=DECIMAL}, 
+      #{longitude,jdbcType=DECIMAL}, #{insuranceCost,jdbcType=DECIMAL}, #{requiredDeliveryDatetime,jdbcType=TIMESTAMP}, 
+      #{pricingMethodId,jdbcType=BIGINT}, #{billingMileage,jdbcType=DECIMAL}, #{shippingUnitPrice,jdbcType=DECIMAL}, 
+      #{shippingCostTotal,jdbcType=DECIMAL}, #{pickupCharge,jdbcType=DECIMAL}, #{deliveryCharge,jdbcType=DECIMAL}, 
+      #{insuranceCharge,jdbcType=DECIMAL}, #{otherCharge,jdbcType=DECIMAL}, #{notes,jdbcType=VARCHAR}, 
+      #{receiptStatusId,jdbcType=BIGINT}, #{receiptCount,jdbcType=INTEGER}, #{isDeleted,jdbcType=BIT}, 
+      #{isActive,jdbcType=BIT}, #{version,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillProduct" useGeneratedKeys="true" keyProperty="waybillProductId" keyColumn="waybill_product_id">
+    insert into waybill_product
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="waybillProductId != null">
+        waybill_product_id,
+      </if>
+      <if test="waybillId != null">
+        waybill_id,
+      </if>
+      <if test="productName != null">
+        product_name,
+      </if>
+      <if test="quantity != null">
+        quantity,
+      </if>
+      <if test="weight != null">
+        weight,
+      </if>
+      <if test="chargeableWeight != null">
+        chargeable_weight,
+      </if>
+      <if test="pickupQuantity != null">
+        pickup_quantity,
+      </if>
+      <if test="pickupWeight != null">
+        pickup_weight,
+      </if>
+      <if test="pickupChargeableWeight != null">
+        pickup_chargeable_weight,
+      </if>
+      <if test="signedQuantity != null">
+        signed_quantity,
+      </if>
+      <if test="signedWeight != null">
+        signed_weight,
+      </if>
+      <if test="signedChargeableWeight != null">
+        signed_chargeable_weight,
+      </if>
+      <if test="shippingAddress != null">
+        shipping_address,
+      </if>
+      <if test="shippingAddressId != null">
+        shipping_address_id,
+      </if>
+      <if test="contactPerson != null">
+        contact_person,
+      </if>
+      <if test="contactNumber != null">
+        contact_number,
+      </if>
+      <if test="detailedAddress != null">
+        detailed_address,
+      </if>
+      <if test="latitude != null">
+        latitude,
+      </if>
+      <if test="longitude != null">
+        longitude,
+      </if>
+      <if test="insuranceCost != null">
+        insurance_cost,
+      </if>
+      <if test="requiredDeliveryDatetime != null">
+        required_delivery_datetime,
+      </if>
+      <if test="pricingMethodId != null">
+        pricing_method_id,
+      </if>
+      <if test="billingMileage != null">
+        billing_mileage,
+      </if>
+      <if test="shippingUnitPrice != null">
+        shipping_unit_price,
+      </if>
+      <if test="shippingCostTotal != null">
+        shipping_cost_total,
+      </if>
+      <if test="pickupCharge != null">
+        pickup_charge,
+      </if>
+      <if test="deliveryCharge != null">
+        delivery_charge,
+      </if>
+      <if test="insuranceCharge != null">
+        insurance_charge,
+      </if>
+      <if test="otherCharge != null">
+        other_charge,
+      </if>
+      <if test="notes != null">
+        notes,
+      </if>
+      <if test="receiptStatusId != null">
+        receipt_status_id,
+      </if>
+      <if test="receiptCount != null">
+        receipt_count,
+      </if>
+      <if test="isDeleted != null">
+        is_deleted,
+      </if>
+      <if test="isActive != null">
+        is_active,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="waybillProductId != null">
+        #{waybillProductId,jdbcType=BIGINT},
+      </if>
+      <if test="waybillId != null">
+        #{waybillId,jdbcType=BIGINT},
+      </if>
+      <if test="productName != null">
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="quantity != null">
+        #{quantity,jdbcType=INTEGER},
+      </if>
+      <if test="weight != null">
+        #{weight,jdbcType=DECIMAL},
+      </if>
+      <if test="chargeableWeight != null">
+        #{chargeableWeight,jdbcType=DECIMAL},
+      </if>
+      <if test="pickupQuantity != null">
+        #{pickupQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="pickupWeight != null">
+        #{pickupWeight,jdbcType=DECIMAL},
+      </if>
+      <if test="pickupChargeableWeight != null">
+        #{pickupChargeableWeight,jdbcType=DECIMAL},
+      </if>
+      <if test="signedQuantity != null">
+        #{signedQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="signedWeight != null">
+        #{signedWeight,jdbcType=DECIMAL},
+      </if>
+      <if test="signedChargeableWeight != null">
+        #{signedChargeableWeight,jdbcType=DECIMAL},
+      </if>
+      <if test="shippingAddress != null">
+        #{shippingAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="shippingAddressId != null">
+        #{shippingAddressId,jdbcType=BIGINT},
+      </if>
+      <if test="contactPerson != null">
+        #{contactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactNumber != null">
+        #{contactNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="detailedAddress != null">
+        #{detailedAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        #{latitude,jdbcType=DECIMAL},
+      </if>
+      <if test="longitude != null">
+        #{longitude,jdbcType=DECIMAL},
+      </if>
+      <if test="insuranceCost != null">
+        #{insuranceCost,jdbcType=DECIMAL},
+      </if>
+      <if test="requiredDeliveryDatetime != null">
+        #{requiredDeliveryDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pricingMethodId != null">
+        #{pricingMethodId,jdbcType=BIGINT},
+      </if>
+      <if test="billingMileage != null">
+        #{billingMileage,jdbcType=DECIMAL},
+      </if>
+      <if test="shippingUnitPrice != null">
+        #{shippingUnitPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="shippingCostTotal != null">
+        #{shippingCostTotal,jdbcType=DECIMAL},
+      </if>
+      <if test="pickupCharge != null">
+        #{pickupCharge,jdbcType=DECIMAL},
+      </if>
+      <if test="deliveryCharge != null">
+        #{deliveryCharge,jdbcType=DECIMAL},
+      </if>
+      <if test="insuranceCharge != null">
+        #{insuranceCharge,jdbcType=DECIMAL},
+      </if>
+      <if test="otherCharge != null">
+        #{otherCharge,jdbcType=DECIMAL},
+      </if>
+      <if test="notes != null">
+        #{notes,jdbcType=VARCHAR},
+      </if>
+      <if test="receiptStatusId != null">
+        #{receiptStatusId,jdbcType=BIGINT},
+      </if>
+      <if test="receiptCount != null">
+        #{receiptCount,jdbcType=INTEGER},
+      </if>
+      <if test="isDeleted != null">
+        #{isDeleted,jdbcType=BIT},
+      </if>
+      <if test="isActive != null">
+        #{isActive,jdbcType=BIT},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.WaybillProduct">
+    update waybill_product
+    <set>
+      <if test="waybillId != null">
+        waybill_id = #{waybillId,jdbcType=BIGINT},
+      </if>
+      <if test="productName != null">
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="quantity != null">
+        quantity = #{quantity,jdbcType=INTEGER},
+      </if>
+      <if test="weight != null">
+        weight = #{weight,jdbcType=DECIMAL},
+      </if>
+      <if test="chargeableWeight != null">
+        chargeable_weight = #{chargeableWeight,jdbcType=DECIMAL},
+      </if>
+      <if test="pickupQuantity != null">
+        pickup_quantity = #{pickupQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="pickupWeight != null">
+        pickup_weight = #{pickupWeight,jdbcType=DECIMAL},
+      </if>
+      <if test="pickupChargeableWeight != null">
+        pickup_chargeable_weight = #{pickupChargeableWeight,jdbcType=DECIMAL},
+      </if>
+      <if test="signedQuantity != null">
+        signed_quantity = #{signedQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="signedWeight != null">
+        signed_weight = #{signedWeight,jdbcType=DECIMAL},
+      </if>
+      <if test="signedChargeableWeight != null">
+        signed_chargeable_weight = #{signedChargeableWeight,jdbcType=DECIMAL},
+      </if>
+      <if test="shippingAddress != null">
+        shipping_address = #{shippingAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="shippingAddressId != null">
+        shipping_address_id = #{shippingAddressId,jdbcType=BIGINT},
+      </if>
+      <if test="contactPerson != null">
+        contact_person = #{contactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactNumber != null">
+        contact_number = #{contactNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="detailedAddress != null">
+        detailed_address = #{detailedAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        latitude = #{latitude,jdbcType=DECIMAL},
+      </if>
+      <if test="longitude != null">
+        longitude = #{longitude,jdbcType=DECIMAL},
+      </if>
+      <if test="insuranceCost != null">
+        insurance_cost = #{insuranceCost,jdbcType=DECIMAL},
+      </if>
+      <if test="requiredDeliveryDatetime != null">
+        required_delivery_datetime = #{requiredDeliveryDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pricingMethodId != null">
+        pricing_method_id = #{pricingMethodId,jdbcType=BIGINT},
+      </if>
+      <if test="billingMileage != null">
+        billing_mileage = #{billingMileage,jdbcType=DECIMAL},
+      </if>
+      <if test="shippingUnitPrice != null">
+        shipping_unit_price = #{shippingUnitPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="shippingCostTotal != null">
+        shipping_cost_total = #{shippingCostTotal,jdbcType=DECIMAL},
+      </if>
+      <if test="pickupCharge != null">
+        pickup_charge = #{pickupCharge,jdbcType=DECIMAL},
+      </if>
+      <if test="deliveryCharge != null">
+        delivery_charge = #{deliveryCharge,jdbcType=DECIMAL},
+      </if>
+      <if test="insuranceCharge != null">
+        insurance_charge = #{insuranceCharge,jdbcType=DECIMAL},
+      </if>
+      <if test="otherCharge != null">
+        other_charge = #{otherCharge,jdbcType=DECIMAL},
+      </if>
+      <if test="notes != null">
+        notes = #{notes,jdbcType=VARCHAR},
+      </if>
+      <if test="receiptStatusId != null">
+        receipt_status_id = #{receiptStatusId,jdbcType=BIGINT},
+      </if>
+      <if test="receiptCount != null">
+        receipt_count = #{receiptCount,jdbcType=INTEGER},
+      </if>
+      <if test="isDeleted != null">
+        is_deleted = #{isDeleted,jdbcType=BIT},
+      </if>
+      <if test="isActive != null">
+        is_active = #{isActive,jdbcType=BIT},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=BIGINT},
+      </if>
+    </set>
+    where waybill_product_id = #{waybillProductId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.WaybillProduct">
+    update waybill_product
+    set waybill_id = #{waybillId,jdbcType=BIGINT},
+      product_name = #{productName,jdbcType=VARCHAR},
+      quantity = #{quantity,jdbcType=INTEGER},
+      weight = #{weight,jdbcType=DECIMAL},
+      chargeable_weight = #{chargeableWeight,jdbcType=DECIMAL},
+      pickup_quantity = #{pickupQuantity,jdbcType=INTEGER},
+      pickup_weight = #{pickupWeight,jdbcType=DECIMAL},
+      pickup_chargeable_weight = #{pickupChargeableWeight,jdbcType=DECIMAL},
+      signed_quantity = #{signedQuantity,jdbcType=INTEGER},
+      signed_weight = #{signedWeight,jdbcType=DECIMAL},
+      signed_chargeable_weight = #{signedChargeableWeight,jdbcType=DECIMAL},
+      shipping_address = #{shippingAddress,jdbcType=VARCHAR},
+      shipping_address_id = #{shippingAddressId,jdbcType=BIGINT},
+      contact_person = #{contactPerson,jdbcType=VARCHAR},
+      contact_number = #{contactNumber,jdbcType=VARCHAR},
+      detailed_address = #{detailedAddress,jdbcType=VARCHAR},
+      latitude = #{latitude,jdbcType=DECIMAL},
+      longitude = #{longitude,jdbcType=DECIMAL},
+      insurance_cost = #{insuranceCost,jdbcType=DECIMAL},
+      required_delivery_datetime = #{requiredDeliveryDatetime,jdbcType=TIMESTAMP},
+      pricing_method_id = #{pricingMethodId,jdbcType=BIGINT},
+      billing_mileage = #{billingMileage,jdbcType=DECIMAL},
+      shipping_unit_price = #{shippingUnitPrice,jdbcType=DECIMAL},
+      shipping_cost_total = #{shippingCostTotal,jdbcType=DECIMAL},
+      pickup_charge = #{pickupCharge,jdbcType=DECIMAL},
+      delivery_charge = #{deliveryCharge,jdbcType=DECIMAL},
+      insurance_charge = #{insuranceCharge,jdbcType=DECIMAL},
+      other_charge = #{otherCharge,jdbcType=DECIMAL},
+      notes = #{notes,jdbcType=VARCHAR},
+      receipt_status_id = #{receiptStatusId,jdbcType=BIGINT},
+      receipt_count = #{receiptCount,jdbcType=INTEGER},
+      is_deleted = #{isDeleted,jdbcType=BIT},
+      is_active = #{isActive,jdbcType=BIT},
+      version = #{version,jdbcType=BIGINT}
+    where waybill_product_id = #{waybillProductId,jdbcType=BIGINT}
+  </update>
+</mapper>

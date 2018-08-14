@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillStatusMapper">
+  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillStatus">
+    <id column="waybill_status_id" jdbcType="BIGINT" property="waybillStatusId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="is_deleted" jdbcType="BIT" property="isDeleted" />
+    <result column="code" jdbcType="INTEGER" property="code" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    waybill_status_id, name, is_deleted, code
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from waybill_status
+    where waybill_status_id = #{waybillStatusId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from waybill_status
+    where waybill_status_id = #{waybillStatusId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillStatus">
+    insert into waybill_status (waybill_status_id, name, is_deleted, 
+      code)
+    values (#{waybillStatusId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{isDeleted,jdbcType=BIT}, 
+      #{code,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillStatus">
+    insert into waybill_status
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="waybillStatusId != null">
+        waybill_status_id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="isDeleted != null">
+        is_deleted,
+      </if>
+      <if test="code != null">
+        code,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="waybillStatusId != null">
+        #{waybillStatusId,jdbcType=BIGINT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="isDeleted != null">
+        #{isDeleted,jdbcType=BIT},
+      </if>
+      <if test="code != null">
+        #{code,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.WaybillStatus">
+    update waybill_status
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="isDeleted != null">
+        is_deleted = #{isDeleted,jdbcType=BIT},
+      </if>
+      <if test="code != null">
+        code = #{code,jdbcType=INTEGER},
+      </if>
+    </set>
+    where waybill_status_id = #{waybillStatusId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.WaybillStatus">
+    update waybill_status
+    set name = #{name,jdbcType=VARCHAR},
+      is_deleted = #{isDeleted,jdbcType=BIT},
+      code = #{code,jdbcType=INTEGER}
+    where waybill_status_id = #{waybillStatusId,jdbcType=BIGINT}
+  </update>
+</mapper>

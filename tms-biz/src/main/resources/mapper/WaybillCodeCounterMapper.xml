@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillCodeCounterMapper">
+  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillCodeCounter">
+    <id column="waybill_code_counter_id" jdbcType="BIGINT" property="waybillCodeCounterId" />
+    <result column="waybill_date" jdbcType="DATE" property="waybillDate" />
+    <result column="waybill_counter" jdbcType="INTEGER" property="waybillCounter" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    waybill_code_counter_id, waybill_date, waybill_counter
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from waybill_code_counter
+    where waybill_code_counter_id = #{waybillCodeCounterId,jdbcType=BIGINT}
+  </select>
+    <select id="getMaxCode" resultType="java.lang.Long">
+      select max(waybill_code_counter_id) from waybill_code_counter
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from waybill_code_counter
+    where waybill_code_counter_id = #{waybillCodeCounterId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillCodeCounter">
+    insert into waybill_code_counter (waybill_code_counter_id, waybill_date, waybill_counter
+      )
+    values (#{waybillCodeCounterId,jdbcType=BIGINT}, #{waybillDate,jdbcType=DATE}, #{waybillCounter,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillCodeCounter">
+    insert into waybill_code_counter
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="waybillCodeCounterId != null">
+        waybill_code_counter_id,
+      </if>
+      <if test="waybillDate != null">
+        waybill_date,
+      </if>
+      <if test="waybillCounter != null">
+        waybill_counter,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="waybillCodeCounterId != null">
+        #{waybillCodeCounterId,jdbcType=BIGINT},
+      </if>
+      <if test="waybillDate != null">
+        #{waybillDate,jdbcType=DATE},
+      </if>
+      <if test="waybillCounter != null">
+        #{waybillCounter,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.WaybillCodeCounter">
+    update waybill_code_counter
+    <set>
+      <if test="waybillDate != null">
+        waybill_date = #{waybillDate,jdbcType=DATE},
+      </if>
+      <if test="waybillCounter != null">
+        waybill_counter = #{waybillCounter,jdbcType=INTEGER},
+      </if>
+    </set>
+    where waybill_code_counter_id = #{waybillCodeCounterId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.WaybillCodeCounter">
+    update waybill_code_counter
+    set waybill_date = #{waybillDate,jdbcType=DATE},
+      waybill_counter = #{waybillCounter,jdbcType=INTEGER}
+    where waybill_code_counter_id = #{waybillCodeCounterId,jdbcType=BIGINT}
+  </update>
+</mapper>

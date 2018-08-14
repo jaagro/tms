@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillMapper">
+  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.Waybill">
+    <id column="waybill_id" jdbcType="BIGINT" property="waybillId" />
+    <result column="branch_id" jdbcType="BIGINT" property="branchId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="accepted_date" jdbcType="DATE" property="acceptedDate" />
+    <result column="created_date" jdbcType="TIMESTAMP" property="createdDate" />
+    <result column="created_user_id" jdbcType="BIGINT" property="createdUserId" />
+    <result column="waybill_code" jdbcType="VARCHAR" property="waybillCode" />
+    <result column="customer_code" jdbcType="VARCHAR" property="customerCode" />
+    <result column="customer_name" jdbcType="VARCHAR" property="customerName" />
+    <result column="customer_id" jdbcType="BIGINT" property="customerId" />
+    <result column="pick_up_address" jdbcType="VARCHAR" property="pickUpAddress" />
+    <result column="pick_up_address_id" jdbcType="BIGINT" property="pickUpAddressId" />
+    <result column="product_type_id" jdbcType="BIGINT" property="productTypeId" />
+    <result column="transportation_type_id" jdbcType="BIGINT" property="transportationTypeId" />
+    <result column="contact_person" jdbcType="VARCHAR" property="contactPerson" />
+    <result column="contact_number" jdbcType="VARCHAR" property="contactNumber" />
+    <result column="detailed_address" jdbcType="VARCHAR" property="detailedAddress" />
+    <result column="latitude" jdbcType="DECIMAL" property="latitude" />
+    <result column="longitude" jdbcType="DECIMAL" property="longitude" />
+    <result column="payment_type_id" jdbcType="BIGINT" property="paymentTypeId" />
+    <result column="required_pickup_datetime" jdbcType="TIMESTAMP" property="requiredPickupDatetime" />
+    <result column="notes" jdbcType="VARCHAR" property="notes" />
+    <result column="waybill_status_id" jdbcType="BIGINT" property="waybillStatusId" />
+    <result column="waybill_validating_status_id" jdbcType="BIGINT" property="waybillValidatingStatusId" />
+    <result column="validated_date" jdbcType="TIMESTAMP" property="validatedDate" />
+    <result column="validated_user_id" jdbcType="BIGINT" property="validatedUserId" />
+    <result column="settlement_date" jdbcType="TIMESTAMP" property="settlementDate" />
+    <result column="settlement_user_id" jdbcType="BIGINT" property="settlementUserId" />
+    <result column="shipped_quantity" jdbcType="INTEGER" property="shippedQuantity" />
+    <result column="is_deleted" jdbcType="BIT" property="isDeleted" />
+    <result column="is_active" jdbcType="BIT" property="isActive" />
+    <result column="is_urgent" jdbcType="BIT" property="isUrgent" />
+    <result column="version" jdbcType="BIGINT" property="version" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    waybill_id, branch_id, user_id, accepted_date, created_date, created_user_id, waybill_code, 
+    customer_code, customer_name, customer_id, pick_up_address, pick_up_address_id, product_type_id, 
+    transportation_type_id, contact_person, contact_number, detailed_address, latitude, 
+    longitude, payment_type_id, required_pickup_datetime, notes, waybill_status_id, waybill_validating_status_id, 
+    validated_date, validated_user_id, settlement_date, settlement_user_id, shipped_quantity, 
+    is_deleted, is_active, is_urgent, version
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from waybill
+    where waybill_id = #{waybillId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from waybill
+    where waybill_id = #{waybillId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Waybill" useGeneratedKeys="true" keyProperty="waybillId" keyColumn="waybill_id">
+    insert into waybill (waybill_id, branch_id, user_id, 
+      accepted_date, created_date, created_user_id, 
+      waybill_code, customer_code, customer_name, 
+      customer_id, pick_up_address, pick_up_address_id, 
+      product_type_id, transportation_type_id, contact_person, 
+      contact_number, detailed_address, latitude, 
+      longitude, payment_type_id, required_pickup_datetime, 
+      notes, waybill_status_id, waybill_validating_status_id, 
+      validated_date, validated_user_id, settlement_date, 
+      settlement_user_id, shipped_quantity, is_deleted, 
+      is_active, is_urgent, version)
+    values (#{waybillId,jdbcType=BIGINT}, #{branchId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, 
+      #{acceptedDate,jdbcType=DATE}, #{createdDate,jdbcType=TIMESTAMP}, #{createdUserId,jdbcType=BIGINT}, 
+      #{waybillCode,jdbcType=VARCHAR}, #{customerCode,jdbcType=VARCHAR}, #{customerName,jdbcType=VARCHAR}, 
+      #{customerId,jdbcType=BIGINT}, #{pickUpAddress,jdbcType=VARCHAR}, #{pickUpAddressId,jdbcType=BIGINT}, 
+      #{productTypeId,jdbcType=BIGINT}, #{transportationTypeId,jdbcType=BIGINT}, #{contactPerson,jdbcType=VARCHAR}, 
+      #{contactNumber,jdbcType=VARCHAR}, #{detailedAddress,jdbcType=VARCHAR}, #{latitude,jdbcType=DECIMAL}, 
+      #{longitude,jdbcType=DECIMAL}, #{paymentTypeId,jdbcType=BIGINT}, #{requiredPickupDatetime,jdbcType=TIMESTAMP}, 
+      #{notes,jdbcType=VARCHAR}, #{waybillStatusId,jdbcType=BIGINT}, #{waybillValidatingStatusId,jdbcType=BIGINT}, 
+      #{validatedDate,jdbcType=TIMESTAMP}, #{validatedUserId,jdbcType=BIGINT}, #{settlementDate,jdbcType=TIMESTAMP}, 
+      #{settlementUserId,jdbcType=BIGINT}, #{shippedQuantity,jdbcType=INTEGER}, #{isDeleted,jdbcType=BIT}, 
+      #{isActive,jdbcType=BIT}, #{isUrgent,jdbcType=BIT}, #{version,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Waybill" useGeneratedKeys="true" keyProperty="waybillId" keyColumn="waybill_id">
+    insert into waybill
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="waybillId != null">
+        waybill_id,
+      </if>
+      <if test="branchId != null">
+        branch_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="acceptedDate != null">
+        accepted_date,
+      </if>
+      <if test="createdDate != null">
+        created_date,
+      </if>
+      <if test="createdUserId != null">
+        created_user_id,
+      </if>
+      <if test="waybillCode != null">
+        waybill_code,
+      </if>
+      <if test="customerCode != null">
+        customer_code,
+      </if>
+      <if test="customerName != null">
+        customer_name,
+      </if>
+      <if test="customerId != null">
+        customer_id,
+      </if>
+      <if test="pickUpAddress != null">
+        pick_up_address,
+      </if>
+      <if test="pickUpAddressId != null">
+        pick_up_address_id,
+      </if>
+      <if test="productTypeId != null">
+        product_type_id,
+      </if>
+      <if test="transportationTypeId != null">
+        transportation_type_id,
+      </if>
+      <if test="contactPerson != null">
+        contact_person,
+      </if>
+      <if test="contactNumber != null">
+        contact_number,
+      </if>
+      <if test="detailedAddress != null">
+        detailed_address,
+      </if>
+      <if test="latitude != null">
+        latitude,
+      </if>
+      <if test="longitude != null">
+        longitude,
+      </if>
+      <if test="paymentTypeId != null">
+        payment_type_id,
+      </if>
+      <if test="requiredPickupDatetime != null">
+        required_pickup_datetime,
+      </if>
+      <if test="notes != null">
+        notes,
+      </if>
+      <if test="waybillStatusId != null">
+        waybill_status_id,
+      </if>
+      <if test="waybillValidatingStatusId != null">
+        waybill_validating_status_id,
+      </if>
+      <if test="validatedDate != null">
+        validated_date,
+      </if>
+      <if test="validatedUserId != null">
+        validated_user_id,
+      </if>
+      <if test="settlementDate != null">
+        settlement_date,
+      </if>
+      <if test="settlementUserId != null">
+        settlement_user_id,
+      </if>
+      <if test="shippedQuantity != null">
+        shipped_quantity,
+      </if>
+      <if test="isDeleted != null">
+        is_deleted,
+      </if>
+      <if test="isActive != null">
+        is_active,
+      </if>
+      <if test="isUrgent != null">
+        is_urgent,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="waybillId != null">
+        #{waybillId,jdbcType=BIGINT},
+      </if>
+      <if test="branchId != null">
+        #{branchId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="acceptedDate != null">
+        #{acceptedDate,jdbcType=DATE},
+      </if>
+      <if test="createdDate != null">
+        #{createdDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdUserId != null">
+        #{createdUserId,jdbcType=BIGINT},
+      </if>
+      <if test="waybillCode != null">
+        #{waybillCode,jdbcType=VARCHAR},
+      </if>
+      <if test="customerCode != null">
+        #{customerCode,jdbcType=VARCHAR},
+      </if>
+      <if test="customerName != null">
+        #{customerName,jdbcType=VARCHAR},
+      </if>
+      <if test="customerId != null">
+        #{customerId,jdbcType=BIGINT},
+      </if>
+      <if test="pickUpAddress != null">
+        #{pickUpAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="pickUpAddressId != null">
+        #{pickUpAddressId,jdbcType=BIGINT},
+      </if>
+      <if test="productTypeId != null">
+        #{productTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="transportationTypeId != null">
+        #{transportationTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="contactPerson != null">
+        #{contactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactNumber != null">
+        #{contactNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="detailedAddress != null">
+        #{detailedAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        #{latitude,jdbcType=DECIMAL},
+      </if>
+      <if test="longitude != null">
+        #{longitude,jdbcType=DECIMAL},
+      </if>
+      <if test="paymentTypeId != null">
+        #{paymentTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="requiredPickupDatetime != null">
+        #{requiredPickupDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="notes != null">
+        #{notes,jdbcType=VARCHAR},
+      </if>
+      <if test="waybillStatusId != null">
+        #{waybillStatusId,jdbcType=BIGINT},
+      </if>
+      <if test="waybillValidatingStatusId != null">
+        #{waybillValidatingStatusId,jdbcType=BIGINT},
+      </if>
+      <if test="validatedDate != null">
+        #{validatedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="validatedUserId != null">
+        #{validatedUserId,jdbcType=BIGINT},
+      </if>
+      <if test="settlementDate != null">
+        #{settlementDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="settlementUserId != null">
+        #{settlementUserId,jdbcType=BIGINT},
+      </if>
+      <if test="shippedQuantity != null">
+        #{shippedQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="isDeleted != null">
+        #{isDeleted,jdbcType=BIT},
+      </if>
+      <if test="isActive != null">
+        #{isActive,jdbcType=BIT},
+      </if>
+      <if test="isUrgent != null">
+        #{isUrgent,jdbcType=BIT},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.Waybill">
+    update waybill
+    <set>
+      <if test="branchId != null">
+        branch_id = #{branchId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="acceptedDate != null">
+        accepted_date = #{acceptedDate,jdbcType=DATE},
+      </if>
+      <if test="createdDate != null">
+        created_date = #{createdDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdUserId != null">
+        created_user_id = #{createdUserId,jdbcType=BIGINT},
+      </if>
+      <if test="waybillCode != null">
+        waybill_code = #{waybillCode,jdbcType=VARCHAR},
+      </if>
+      <if test="customerCode != null">
+        customer_code = #{customerCode,jdbcType=VARCHAR},
+      </if>
+      <if test="customerName != null">
+        customer_name = #{customerName,jdbcType=VARCHAR},
+      </if>
+      <if test="customerId != null">
+        customer_id = #{customerId,jdbcType=BIGINT},
+      </if>
+      <if test="pickUpAddress != null">
+        pick_up_address = #{pickUpAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="pickUpAddressId != null">
+        pick_up_address_id = #{pickUpAddressId,jdbcType=BIGINT},
+      </if>
+      <if test="productTypeId != null">
+        product_type_id = #{productTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="transportationTypeId != null">
+        transportation_type_id = #{transportationTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="contactPerson != null">
+        contact_person = #{contactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactNumber != null">
+        contact_number = #{contactNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="detailedAddress != null">
+        detailed_address = #{detailedAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        latitude = #{latitude,jdbcType=DECIMAL},
+      </if>
+      <if test="longitude != null">
+        longitude = #{longitude,jdbcType=DECIMAL},
+      </if>
+      <if test="paymentTypeId != null">
+        payment_type_id = #{paymentTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="requiredPickupDatetime != null">
+        required_pickup_datetime = #{requiredPickupDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="notes != null">
+        notes = #{notes,jdbcType=VARCHAR},
+      </if>
+      <if test="waybillStatusId != null">
+        waybill_status_id = #{waybillStatusId,jdbcType=BIGINT},
+      </if>
+      <if test="waybillValidatingStatusId != null">
+        waybill_validating_status_id = #{waybillValidatingStatusId,jdbcType=BIGINT},
+      </if>
+      <if test="validatedDate != null">
+        validated_date = #{validatedDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="validatedUserId != null">
+        validated_user_id = #{validatedUserId,jdbcType=BIGINT},
+      </if>
+      <if test="settlementDate != null">
+        settlement_date = #{settlementDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="settlementUserId != null">
+        settlement_user_id = #{settlementUserId,jdbcType=BIGINT},
+      </if>
+      <if test="shippedQuantity != null">
+        shipped_quantity = #{shippedQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="isDeleted != null">
+        is_deleted = #{isDeleted,jdbcType=BIT},
+      </if>
+      <if test="isActive != null">
+        is_active = #{isActive,jdbcType=BIT},
+      </if>
+      <if test="isUrgent != null">
+        is_urgent = #{isUrgent,jdbcType=BIT},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=BIGINT},
+      </if>
+    </set>
+    where waybill_id = #{waybillId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.Waybill">
+    update waybill
+    set branch_id = #{branchId,jdbcType=BIGINT},
+      user_id = #{userId,jdbcType=BIGINT},
+      accepted_date = #{acceptedDate,jdbcType=DATE},
+      created_date = #{createdDate,jdbcType=TIMESTAMP},
+      created_user_id = #{createdUserId,jdbcType=BIGINT},
+      waybill_code = #{waybillCode,jdbcType=VARCHAR},
+      customer_code = #{customerCode,jdbcType=VARCHAR},
+      customer_name = #{customerName,jdbcType=VARCHAR},
+      customer_id = #{customerId,jdbcType=BIGINT},
+      pick_up_address = #{pickUpAddress,jdbcType=VARCHAR},
+      pick_up_address_id = #{pickUpAddressId,jdbcType=BIGINT},
+      product_type_id = #{productTypeId,jdbcType=BIGINT},
+      transportation_type_id = #{transportationTypeId,jdbcType=BIGINT},
+      contact_person = #{contactPerson,jdbcType=VARCHAR},
+      contact_number = #{contactNumber,jdbcType=VARCHAR},
+      detailed_address = #{detailedAddress,jdbcType=VARCHAR},
+      latitude = #{latitude,jdbcType=DECIMAL},
+      longitude = #{longitude,jdbcType=DECIMAL},
+      payment_type_id = #{paymentTypeId,jdbcType=BIGINT},
+      required_pickup_datetime = #{requiredPickupDatetime,jdbcType=TIMESTAMP},
+      notes = #{notes,jdbcType=VARCHAR},
+      waybill_status_id = #{waybillStatusId,jdbcType=BIGINT},
+      waybill_validating_status_id = #{waybillValidatingStatusId,jdbcType=BIGINT},
+      validated_date = #{validatedDate,jdbcType=TIMESTAMP},
+      validated_user_id = #{validatedUserId,jdbcType=BIGINT},
+      settlement_date = #{settlementDate,jdbcType=TIMESTAMP},
+      settlement_user_id = #{settlementUserId,jdbcType=BIGINT},
+      shipped_quantity = #{shippedQuantity,jdbcType=INTEGER},
+      is_deleted = #{isDeleted,jdbcType=BIT},
+      is_active = #{isActive,jdbcType=BIT},
+      is_urgent = #{isUrgent,jdbcType=BIT},
+      version = #{version,jdbcType=BIGINT}
+    where waybill_id = #{waybillId,jdbcType=BIGINT}
+  </update>
+</mapper>

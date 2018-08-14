@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jaagro.tms.biz.mapper.BranchMapper">
+  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.Branch">
+    <id column="branch_id" jdbcType="BIGINT" property="branchId" />
+    <result column="tenant_id" jdbcType="BIGINT" property="tenantId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="contact_person" jdbcType="VARCHAR" property="contactPerson" />
+    <result column="contact_number" jdbcType="VARCHAR" property="contactNumber" />
+    <result column="admin_region_id" jdbcType="BIGINT" property="adminRegionId" />
+    <result column="contact_address" jdbcType="VARCHAR" property="contactAddress" />
+    <result column="latitude" jdbcType="DECIMAL" property="latitude" />
+    <result column="longitude" jdbcType="DECIMAL" property="longitude" />
+    <result column="notes" jdbcType="VARCHAR" property="notes" />
+    <result column="branch_type_id" jdbcType="BIGINT" property="branchTypeId" />
+    <result column="business_character_id" jdbcType="BIGINT" property="businessCharacterId" />
+    <result column="upper_level_branch_id" jdbcType="BIGINT" property="upperLevelBranchId" />
+    <result column="created_date" jdbcType="TIMESTAMP" property="createdDate" />
+    <result column="created_user_id" jdbcType="BIGINT" property="createdUserId" />
+    <result column="is_deleted" jdbcType="BIT" property="isDeleted" />
+    <result column="is_active" jdbcType="BIT" property="isActive" />
+    <result column="version" jdbcType="BIGINT" property="version" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    branch_id, tenant_id, name, contact_person, contact_number, admin_region_id, contact_address, 
+    latitude, longitude, notes, branch_type_id, business_character_id, upper_level_branch_id, 
+    created_date, created_user_id, is_deleted, is_active, version
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from branch
+    where branch_id = #{branchId,jdbcType=BIGINT}
+  </select>
+    <select id="getBranchByUser" resultType="com.jaagro.tms.biz.entity.Branch">
+      select b.* from branch b, user_branch ub where b.branch_id = ub.branch_id and ub.user_id = #{userId}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from branch
+    where branch_id = #{branchId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Branch">
+    insert into branch (branch_id, tenant_id, name, 
+      contact_person, contact_number, admin_region_id, 
+      contact_address, latitude, longitude, 
+      notes, branch_type_id, business_character_id, 
+      upper_level_branch_id, created_date, created_user_id, 
+      is_deleted, is_active, version
+      )
+    values (#{branchId,jdbcType=BIGINT}, #{tenantId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, 
+      #{contactPerson,jdbcType=VARCHAR}, #{contactNumber,jdbcType=VARCHAR}, #{adminRegionId,jdbcType=BIGINT}, 
+      #{contactAddress,jdbcType=VARCHAR}, #{latitude,jdbcType=DECIMAL}, #{longitude,jdbcType=DECIMAL}, 
+      #{notes,jdbcType=VARCHAR}, #{branchTypeId,jdbcType=BIGINT}, #{businessCharacterId,jdbcType=BIGINT}, 
+      #{upperLevelBranchId,jdbcType=BIGINT}, #{createdDate,jdbcType=TIMESTAMP}, #{createdUserId,jdbcType=BIGINT}, 
+      #{isDeleted,jdbcType=BIT}, #{isActive,jdbcType=BIT}, #{version,jdbcType=BIGINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Branch">
+    insert into branch
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="branchId != null">
+        branch_id,
+      </if>
+      <if test="tenantId != null">
+        tenant_id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="contactPerson != null">
+        contact_person,
+      </if>
+      <if test="contactNumber != null">
+        contact_number,
+      </if>
+      <if test="adminRegionId != null">
+        admin_region_id,
+      </if>
+      <if test="contactAddress != null">
+        contact_address,
+      </if>
+      <if test="latitude != null">
+        latitude,
+      </if>
+      <if test="longitude != null">
+        longitude,
+      </if>
+      <if test="notes != null">
+        notes,
+      </if>
+      <if test="branchTypeId != null">
+        branch_type_id,
+      </if>
+      <if test="businessCharacterId != null">
+        business_character_id,
+      </if>
+      <if test="upperLevelBranchId != null">
+        upper_level_branch_id,
+      </if>
+      <if test="createdDate != null">
+        created_date,
+      </if>
+      <if test="createdUserId != null">
+        created_user_id,
+      </if>
+      <if test="isDeleted != null">
+        is_deleted,
+      </if>
+      <if test="isActive != null">
+        is_active,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="branchId != null">
+        #{branchId,jdbcType=BIGINT},
+      </if>
+      <if test="tenantId != null">
+        #{tenantId,jdbcType=BIGINT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPerson != null">
+        #{contactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactNumber != null">
+        #{contactNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="adminRegionId != null">
+        #{adminRegionId,jdbcType=BIGINT},
+      </if>
+      <if test="contactAddress != null">
+        #{contactAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        #{latitude,jdbcType=DECIMAL},
+      </if>
+      <if test="longitude != null">
+        #{longitude,jdbcType=DECIMAL},
+      </if>
+      <if test="notes != null">
+        #{notes,jdbcType=VARCHAR},
+      </if>
+      <if test="branchTypeId != null">
+        #{branchTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="businessCharacterId != null">
+        #{businessCharacterId,jdbcType=BIGINT},
+      </if>
+      <if test="upperLevelBranchId != null">
+        #{upperLevelBranchId,jdbcType=BIGINT},
+      </if>
+      <if test="createdDate != null">
+        #{createdDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdUserId != null">
+        #{createdUserId,jdbcType=BIGINT},
+      </if>
+      <if test="isDeleted != null">
+        #{isDeleted,jdbcType=BIT},
+      </if>
+      <if test="isActive != null">
+        #{isActive,jdbcType=BIT},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.Branch">
+    update branch
+    <set>
+      <if test="tenantId != null">
+        tenant_id = #{tenantId,jdbcType=BIGINT},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPerson != null">
+        contact_person = #{contactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactNumber != null">
+        contact_number = #{contactNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="adminRegionId != null">
+        admin_region_id = #{adminRegionId,jdbcType=BIGINT},
+      </if>
+      <if test="contactAddress != null">
+        contact_address = #{contactAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        latitude = #{latitude,jdbcType=DECIMAL},
+      </if>
+      <if test="longitude != null">
+        longitude = #{longitude,jdbcType=DECIMAL},
+      </if>
+      <if test="notes != null">
+        notes = #{notes,jdbcType=VARCHAR},
+      </if>
+      <if test="branchTypeId != null">
+        branch_type_id = #{branchTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="businessCharacterId != null">
+        business_character_id = #{businessCharacterId,jdbcType=BIGINT},
+      </if>
+      <if test="upperLevelBranchId != null">
+        upper_level_branch_id = #{upperLevelBranchId,jdbcType=BIGINT},
+      </if>
+      <if test="createdDate != null">
+        created_date = #{createdDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdUserId != null">
+        created_user_id = #{createdUserId,jdbcType=BIGINT},
+      </if>
+      <if test="isDeleted != null">
+        is_deleted = #{isDeleted,jdbcType=BIT},
+      </if>
+      <if test="isActive != null">
+        is_active = #{isActive,jdbcType=BIT},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=BIGINT},
+      </if>
+    </set>
+    where branch_id = #{branchId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.Branch">
+    update branch
+    set tenant_id = #{tenantId,jdbcType=BIGINT},
+      name = #{name,jdbcType=VARCHAR},
+      contact_person = #{contactPerson,jdbcType=VARCHAR},
+      contact_number = #{contactNumber,jdbcType=VARCHAR},
+      admin_region_id = #{adminRegionId,jdbcType=BIGINT},
+      contact_address = #{contactAddress,jdbcType=VARCHAR},
+      latitude = #{latitude,jdbcType=DECIMAL},
+      longitude = #{longitude,jdbcType=DECIMAL},
+      notes = #{notes,jdbcType=VARCHAR},
+      branch_type_id = #{branchTypeId,jdbcType=BIGINT},
+      business_character_id = #{businessCharacterId,jdbcType=BIGINT},
+      upper_level_branch_id = #{upperLevelBranchId,jdbcType=BIGINT},
+      created_date = #{createdDate,jdbcType=TIMESTAMP},
+      created_user_id = #{createdUserId,jdbcType=BIGINT},
+      is_deleted = #{isDeleted,jdbcType=BIT},
+      is_active = #{isActive,jdbcType=BIT},
+      version = #{version,jdbcType=BIGINT}
+    where branch_id = #{branchId,jdbcType=BIGINT}
+  </update>
+</mapper>
