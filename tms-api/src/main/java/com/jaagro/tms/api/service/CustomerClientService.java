@@ -2,6 +2,7 @@ package com.jaagro.tms.api.service;
 
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,4 +28,12 @@ public interface CustomerClientService {
      */
     @GetMapping("/getShowCustomerContract/{id}")
     ShowCustomerContractDto getShowCustomerContractById(@PathVariable("id") Integer id);
+
+    /**
+     * 获取装卸货地显示对象
+     * @param id
+     * @return
+     */
+    @GetMapping("/getShowSite/{id}")
+    ShowSiteDto getShowSiteById(@PathVariable("id") Integer id);
 }
