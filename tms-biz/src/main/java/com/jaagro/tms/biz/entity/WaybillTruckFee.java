@@ -12,7 +12,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class Waybill implements Serializable {
+public class WaybillTruckFee implements Serializable {
     /**
      * 
      */
@@ -21,42 +21,27 @@ public class Waybill implements Serializable {
     /**
      * 
      */
-    private Integer orderId;
+    private Integer waybillId;
 
     /**
-     * 车队合同id
+     * 
      */
-    private Integer truckTeamContractId;
+    private Integer waybillItemId;
 
     /**
-     * 运单状态：待派车、待司机接单、已接单、司机已出发、司机到达装货地、运输中、卸货完成、已完成，取消
+     * 费用类型：1-运费 2-附加费
      */
-    private String waybillStatus;
+    private Integer costType;
 
     /**
-     * 需求车型
+     * 金额
      */
-    private Integer needTruckType;
+    private BigDecimal money;
 
     /**
-     * 车辆id
+     * 是否有效
      */
-    private Integer truckId;
-
-    /**
-     * 司机id
-     */
-    private Integer driverId;
-
-    /**
-     * 任务推送司机时间
-     */
-    private Date sendTime;
-
-    /**
-     * 实际公里数
-     */
-    private BigDecimal distance;
+    private Boolean enabled;
 
     /**
      * 创建时间

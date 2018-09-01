@@ -14,9 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
-@MapperScan("com.jaagro.microservice.platform.tms.mapper")
 public class JaagroPlatformTmsApplicationTests {
 
     @Test
@@ -31,7 +29,7 @@ public class JaagroPlatformTmsApplicationTests {
 //    public void mybatisGenerator() throws Exception {
 //        List<String> warnings = new ArrayList<String>();
 //        boolean overwrite = true;
-//        File configFile = new File("/Users/tony/Documents/git_repository/Git/jaagro-platform/jaagro-platform-tms/src/main/resources/mybatis/generatorConfig.xml");
+//        File configFile = new File("/Users/tony/Documents/jaagro_repository/jaagro-platform-tms/tms-biz/src/main/resources/mybatis/generatorConfig.xml");
 //        ConfigurationParser cp = new ConfigurationParser(warnings);
 //        Configuration config = cp.parseConfiguration(configFile);
 //        DefaultShellCallback callback = new DefaultShellCallback(overwrite);

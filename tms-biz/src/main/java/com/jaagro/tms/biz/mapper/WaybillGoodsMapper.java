@@ -1,13 +1,10 @@
 package com.jaagro.tms.biz.mapper;
 
-import com.jaagro.tms.biz.entity.Waybill;
+import com.jaagro.tms.biz.entity.WaybillGoods;
 
-/**
- * @author tony
- */
-public interface WaybillMapper {
+public interface WaybillGoodsMapper {
     /**
-     * 删除
+     *
      * @mbggenerated 2018-08-31
      */
     int deleteByPrimaryKey(Integer id);
@@ -16,29 +13,29 @@ public interface WaybillMapper {
      *
      * @mbggenerated 2018-08-31
      */
-    int insert(Waybill record);
+    int insert(WaybillGoods record);
 
     /**
      *
      * @mbggenerated 2018-08-31
      */
-    int insertSelective(Waybill record);
+    int insertSelective(WaybillGoods record);
 
     /**
      *
      * @mbggenerated 2018-08-31
      */
-    Waybill selectByPrimaryKey(Integer id);
+    WaybillGoods selectByPrimaryKey(Integer id);
 
     /**
      *
      * @mbggenerated 2018-08-31
      */
-    int updateByPrimaryKeySelective(Waybill record);
+    int updateByPrimaryKeySelective(WaybillGoods record);
 
     /**
      *
      * @mbggenerated 2018-08-31
      */
-    int updateByPrimaryKey(Waybill record);
+    int updateByPrimaryKey(WaybillGoods record);
 }

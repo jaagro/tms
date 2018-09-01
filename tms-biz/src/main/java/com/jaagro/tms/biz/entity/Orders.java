@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -12,51 +11,51 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class Waybill implements Serializable {
+public class Orders implements Serializable {
     /**
      * 
      */
     private Integer id;
 
     /**
-     * 
+     * 客户合同id
      */
-    private Integer orderId;
+    private Integer customerContractId;
 
     /**
-     * 车队合同id
+     * 货物类型
      */
-    private Integer truckTeamContractId;
+    private Integer goodsType;
 
     /**
-     * 运单状态：待派车、待司机接单、已接单、司机已出发、司机到达装货地、运输中、卸货完成、已完成，取消
+     * 订单状态:
      */
-    private String waybillStatus;
+    private String orderStatus;
 
     /**
-     * 需求车型
+     * 客户id
      */
-    private Integer needTruckType;
+    private Integer customerId;
 
     /**
-     * 车辆id
+     * 装货地id
      */
-    private Integer truckId;
+    private Integer loadSiteId;
 
     /**
-     * 司机id
+     * 要求装货时间
      */
-    private Integer driverId;
+    private Date loadTime;
 
     /**
-     * 任务推送司机时间
+     * 是否需要纸质回单
      */
-    private Date sendTime;
+    private Boolean paperReceipt;
 
     /**
-     * 实际公里数
+     * 备注
      */
-    private BigDecimal distance;
+    private String notes;
 
     /**
      * 创建时间
