@@ -11,4 +11,16 @@ import java.io.Serializable;
 @Data
 @Accessors(chain = true)
 public class ShowUserDto implements Serializable {
+
+    private Integer id;
+
+    /**
+     * 用户名
+     */
+    private String userName;
+
+    /**
+     * 用户类型
+     */
+    private String userType;
 }

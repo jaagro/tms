@@ -20,7 +20,6 @@ public class CurrentUserService {
 
     public UserInfo getCurrentUser(){
         String token = request.getHeader("token");
-        System.out.println(tokenClient.getUserByToken(token));
         return tokenClient.getUserByToken(token);
     }
 }
