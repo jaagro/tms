@@ -16,5 +16,4 @@ public interface OrderGoodsService {
      * @return
      */
     Map<String, Object> createOrderGood(CreateOrderGoodsDto orderGoodsDto);
-
 }

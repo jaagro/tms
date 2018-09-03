@@ -1,9 +1,9 @@
 package com.jaagro.tms.biz.entity;
 
-import com.sun.xml.internal.ws.encoding.soap.SerializerConstants;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -11,7 +11,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class WaybillFeeAdjustment implements SerializerConstants {
+public class WaybillFeeAdjustment implements Serializable {
     /**
      * 
      */

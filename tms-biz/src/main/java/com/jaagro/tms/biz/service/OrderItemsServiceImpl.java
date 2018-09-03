@@ -51,7 +51,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
                 this.goodsService.createOrderGood(goodsDto);
             }
         } else {
-            throw new RuntimeException("明细数据不能为空");
+            throw new NullPointerException("订单明细不能为空");
         }
         return ServiceResult.toResult("创建成功");
     }
