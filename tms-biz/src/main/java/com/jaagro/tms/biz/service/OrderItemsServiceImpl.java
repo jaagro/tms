@@ -5,7 +5,6 @@ import com.jaagro.tms.api.dto.order.CreateOrderItemsDto;
 import com.jaagro.tms.api.service.CustomerClientService;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
-import com.jaagro.tms.api.service.UserClientService;
 import com.jaagro.tms.biz.entity.OrderItems;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
 import com.jaagro.tms.biz.mapper.OrderItemsMapper;
@@ -38,6 +37,9 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createOrderItem(CreateOrderItemsDto orderItemDto) {
+        if (this.ordersMapper.selectByPrimaryKey(orderItemDto.getOrderId()) == null) {
+            throw new RuntimeException("订单不存在");
+        }
         if (this.customerService.getShowSiteById(orderItemDto.getUnloadId()) == null) {
             throw new NullPointerException("卸货地不存在");
         }
@@ -54,5 +56,16 @@ public class OrderItemsServiceImpl implements OrderItemsService {
             throw new NullPointerException("订单明细不能为空");
         }
         return ServiceResult.toResult("创建成功");
+    }
+
+    @Override
+    public Map<String, Object> disableById(Integer id) {
+        OrderItems orderItems = this.orderItemsMapper.selectByPrimaryKey(id);
+        if (orderItems == null) {
+            return ServiceResult.error("删除失败");
+        }
+        orderItems.setEnabled(false);
+        this.orderItemsMapper.updateByPrimaryKeySelective(orderItems);
+        return ServiceResult.toResult("删除成功");
     }
 }

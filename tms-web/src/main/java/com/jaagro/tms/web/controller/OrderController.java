@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -20,7 +21,7 @@ import java.util.Map;
  * @author baiyiran
  */
 @RestController
-@Api(description = "客户计价管理", produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(description = "订单管理", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrderController {
 
     @Autowired
@@ -36,7 +37,7 @@ public class OrderController {
      */
     @ApiOperation("新增订单")
     @PostMapping("/order")
-    public BaseResponse createOrder(CreateOrderDto orderDto) {
+    public BaseResponse createOrder(@RequestBody CreateOrderDto orderDto) {
         if (StringUtils.isEmpty(orderDto.getCustomerId())) {
             return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空"));
         }

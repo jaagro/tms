@@ -2,6 +2,7 @@ package com.jaagro.tms.api.dto.order;
 
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
+import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -39,7 +40,7 @@ public class ListOrderDto implements Serializable {
     /**
      * 客户id
      */
-    private Integer customerId;
+    private ShowCustomerDto customerId;
 
     /**
      * 装货地id

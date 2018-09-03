@@ -31,9 +31,18 @@ public class OrderGoodsServiceImpl implements OrderGoodsService {
         if (this.orderItemsMapper.selectByPrimaryKey(orderGoodsDto.getOrderItemId()) == null) {
             throw new RuntimeException("订单明细不能为空");
         }
-        OrderGoods good = new OrderGoods();
-        BeanUtils.copyProperties(orderGoodsDto, good);
-        this.orderGoodsMapper.insertSelective(good);
+        OrderGoods goods = new OrderGoods();
+        BeanUtils.copyProperties(orderGoodsDto, goods);
+        this.orderGoodsMapper.insertSelective(goods);
         return ServiceResult.toResult("创建成功");
+    }
+
+    @Override
+    public Map<String, Object> disableById(Integer id) {
+        OrderGoods goods = this.orderGoodsMapper.selectByPrimaryKey(id);
+        if (goods != null) {
+            return ServiceResult.toResult("删除失败");
+        }
+        return null;
     }
 }
