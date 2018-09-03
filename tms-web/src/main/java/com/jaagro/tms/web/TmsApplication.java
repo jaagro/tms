@@ -13,10 +13,9 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @EnableEurekaClient
 @EnableCircuitBreaker
-@ComponentScan("com.jaagro.tms")
 @MapperScan("com.jaagro.tms.biz.mapper")
-@EnableFeignClients(basePackages = {"com.jaagro.tms.api"})
-@SpringBootApplication
+@EnableFeignClients(basePackages = {"com.jaagro.tms.biz"})
+@SpringBootApplication(scanBasePackages = {"com.jaagro.tms"})
 public class TmsApplication {
 
     public static void main(String[] args) {

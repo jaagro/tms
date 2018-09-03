@@ -1,6 +1,4 @@
 package com.jaagro.tms.api.dto.order;
-
-import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;

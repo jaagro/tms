@@ -16,8 +16,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class GetWaybillDto implements Serializable {
-
+public class ListWaybillDto implements Serializable {
     /**
      *
      */
@@ -29,9 +28,9 @@ public class GetWaybillDto implements Serializable {
     private Integer orderId;
 
     /**
-     * 车队合同id
+     * 货物类型
      */
-    private Integer truckTeamContractId;
+    private Integer productType;
 
     /**
      * 运单状态：待派车、待司机接单、已接单、司机已出发、司机到达装货地、运输中、卸货完成、已完成，取消
@@ -46,12 +45,12 @@ public class GetWaybillDto implements Serializable {
     /**
      * 车辆id
      */
-    private ShowTruckDto truckId;
+    private ShowTruckDto truck;
 
     /**
      * 司机id
      */
-    private ShowDriverDto driverId;
+    private ShowDriverDto driver;
 
     /**
      * 任务推送司机时间
@@ -72,14 +71,4 @@ public class GetWaybillDto implements Serializable {
      * 创建人
      */
     private ShowUserDto createdUserId;
-
-    /**
-     * 修改时间
-     */
-    private Date modifyTime;
-
-    /**
-     * 修改人id
-     */
-    private ShowUserDto modifyUserId;
 }

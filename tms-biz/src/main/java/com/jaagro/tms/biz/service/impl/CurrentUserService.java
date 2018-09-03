@@ -1,8 +1,8 @@
-package com.jaagro.tms.biz.service;
+package com.jaagro.tms.biz.service.impl;
 
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
-import com.jaagro.tms.api.service.UserClientService;
+import com.jaagro.tms.biz.service.UserClientService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

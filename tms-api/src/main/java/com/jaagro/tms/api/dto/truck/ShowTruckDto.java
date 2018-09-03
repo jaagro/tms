@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author tony
@@ -22,11 +23,6 @@ public class ShowTruckDto implements Serializable {
      * 车牌号码
      */
     private String truckNumber;
-
-    /**
-     * 车辆品牌
-     */
-    private String vehicleBrand;
 
     /**
      * 关联车辆类型ID
@@ -47,4 +43,9 @@ public class ShowTruckDto implements Serializable {
      * 区县
      */
     private String county;
+
+    /**
+     * 司机列表
+     */
+    private List<ShowDriverDto> drivers;
 }

@@ -1,4 +1,4 @@
-package com.jaagro.tms.api.service;
+package com.jaagro.tms.biz.service;
 
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
