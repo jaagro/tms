@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * @author tony
@@ -23,4 +24,44 @@ public class ShowSiteDto implements Serializable {
      * 装货地名称
      */
     private String siteName;
+
+    /**
+     * 联系人姓名
+     */
+    private String contact;
+
+    /**
+     * 联系电话
+     */
+    private String phone;
+
+    /**
+     * 省份
+     */
+    private String province;
+
+    /**
+     * 城市
+     */
+    private String city;
+
+    /**
+     * 区
+     */
+    private String county;
+
+    /**
+     * 详细地址
+     */
+    private String address;
+
+    /**
+     * 纬度
+     */
+    private BigDecimal latitude;
+
+    /**
+     * 经度
+     */
+    private BigDecimal longitude;
 }

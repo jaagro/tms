@@ -3,8 +3,10 @@ package com.jaagro.tms.web.controller;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
-import com.jaagro.tms.api.service.CustomerClientService;
-import com.jaagro.tms.biz.service.CurrentUserService;
+import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.biz.service.impl.CurrentUserService;
+import com.jaagro.utils.BeanDifferentUtils;
+import com.jaagro.utils.DifferentResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,5 +36,15 @@ public class TestController {
     @GetMapping("/test3")
     public UserInfo test3(){
         return currentUserService.getCurrentUser();
+    }
+
+    @GetMapping("/test4")
+    public DifferentResult test4(){
+        UserInfo userInfo = new UserInfo();
+        userInfo.setLoginName("hello");
+        UserInfo userInfo1 = new UserInfo();
+        userInfo1.setName("world");
+        DifferentResult result = BeanDifferentUtils.compare(userInfo, userInfo1);
+        return result;
     }
 }

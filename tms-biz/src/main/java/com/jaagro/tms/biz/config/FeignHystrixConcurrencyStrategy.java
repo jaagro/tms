@@ -1,4 +1,4 @@
-package com.jaagro.tms.api.config;
+package com.jaagro.tms.biz.config;
 
 import com.netflix.hystrix.HystrixThreadPoolKey;
 import com.netflix.hystrix.HystrixThreadPoolProperties;

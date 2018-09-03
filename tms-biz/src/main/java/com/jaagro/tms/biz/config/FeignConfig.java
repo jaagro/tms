@@ -1,4 +1,4 @@
-package com.jaagro.tms.api.config;
+package com.jaagro.tms.biz.config;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;

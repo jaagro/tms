@@ -1,4 +1,4 @@
-package com.jaagro.tms.api.service;
+package com.jaagro.tms.biz.service;
 
 import com.jaagro.constant.UserInfo;
 import org.springframework.cloud.netflix.feign.FeignClient;

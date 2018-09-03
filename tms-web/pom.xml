@@ -24,6 +24,13 @@
             <artifactId>tms-biz</artifactId>
             <version>${biz.version}</version>
         </dependency>
+
+        <!-- ====================================springMVC====================================== -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
         <!-- =======================================swagger2===================================== -->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -51,6 +58,4 @@
             </plugin>
         </plugins>
     </build>
-
-
 </project>

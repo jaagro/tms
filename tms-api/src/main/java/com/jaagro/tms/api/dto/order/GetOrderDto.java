@@ -1,6 +1,4 @@
 package com.jaagro.tms.api.dto.order;
-
-import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
@@ -82,7 +80,7 @@ public class GetOrderDto implements Serializable {
     /**
      * 修改人id
      */
-    private ShowSiteDto modifyUser;
+    private ShowUserDto modifyUser;
 
     /**
      * 订单列表
