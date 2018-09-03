@@ -1,8 +1,17 @@
 package com.jaagro.tms.biz.service;
 
 import com.jaagro.tms.api.dto.order.*;
+import com.jaagro.tms.api.service.CustomerClientService;
+import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
+import com.jaagro.tms.api.service.UserClientService;
+import com.jaagro.tms.biz.entity.Orders;
+import com.jaagro.tms.biz.mapper.OrdersMapper;
+import com.jaagro.utils.ServiceResult;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -12,15 +21,40 @@ import java.util.Map;
  */
 @Service
 public class OrderServiceImpl implements OrderService {
+
+    @Autowired
+    private UserClientService userService;
+    @Autowired
+    private OrdersMapper ordersMapper;
+    @Autowired
+    private CustomerClientService customerService;
+    @Autowired
+    private OrderItemsService orderItemsService;
+
     /**
      * 创建订单
      *
      * @param orderDto 入参json
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createOrder(CreateOrderDto orderDto) {
-        return null;
+        Orders order = new Orders();
+        BeanUtils.copyProperties(orderDto, order);
+        //未完成
+        /*order.setCreatedUserId(userService.getUserByToken("").getId());*/
+        this.ordersMapper.insertSelective(order);
+        if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
+            for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()
+            ) {
+                itemsDto.setOrderId(order.getId());
+                this.orderItemsService.createOrderItem(itemsDto);
+            }
+        } else {
+            throw new RuntimeException("订单明细不能为空");
+        }
+        return ServiceResult.toResult("创建成功");
     }
 
     /**

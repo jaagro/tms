@@ -16,6 +16,11 @@ public class CreateOrderGoodsDto implements Serializable {
     private Integer id;
 
     /**
+     *
+     */
+    private Integer orderItemId;
+
+    /**
      * 货物名称
      */
     private String goodsName;

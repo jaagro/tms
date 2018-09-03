@@ -25,6 +25,11 @@ public class CreateOrderItemsDto implements Serializable {
     private Integer unloadId;
 
     /**
+     * 订单id
+     */
+    private Integer orderId;
+
+    /**
      * 要求卸货时间
      */
     private Date unloadTime;
