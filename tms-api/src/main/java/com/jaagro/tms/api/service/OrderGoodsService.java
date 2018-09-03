@@ -17,4 +17,11 @@ public interface OrderGoodsService {
      */
     Map<String, Object> createOrderGood(CreateOrderGoodsDto orderGoodsDto);
 
+    /**
+     * 逻辑删除
+     *
+     * @param id
+     * @return
+     */
+    Map<String, Object> disableById(Integer id);
 }

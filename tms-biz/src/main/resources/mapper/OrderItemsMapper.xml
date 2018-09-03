@@ -14,7 +14,7 @@
     id, order_id, unload_id, unload_time, enabled, modify_time, modify_user_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from order_items
     where id = #{id,jdbcType=INTEGER}
@@ -114,4 +114,10 @@
       modify_user_id = #{modifyUserId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="listByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from order_items
+    where order_id = #{id,jdbcType=INTEGER}
+  </select>
 </mapper>
