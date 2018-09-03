@@ -38,11 +38,8 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createOrderItem(CreateOrderItemsDto orderItemDto) {
-        if (this.ordersMapper.selectByPrimaryKey(orderItemDto.getOrderId()) == null) {
-            throw new RuntimeException("订单不存在");
-        }
         if (this.customerService.getShowSiteById(orderItemDto.getUnloadId()) == null) {
-            throw new RuntimeException("卸货地不存在");
+            throw new NullPointerException("卸货地不存在");
         }
         OrderItems orderItem = new OrderItems();
         BeanUtils.copyProperties(orderItemDto, orderItem);

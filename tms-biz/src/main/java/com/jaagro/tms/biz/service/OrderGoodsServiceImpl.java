@@ -29,7 +29,7 @@ public class OrderGoodsServiceImpl implements OrderGoodsService {
     @Override
     public Map<String, Object> createOrderGood(CreateOrderGoodsDto orderGoodsDto) {
         if (this.orderItemsMapper.selectByPrimaryKey(orderGoodsDto.getOrderItemId()) == null) {
-            throw new RuntimeException("订单需求不存在");
+            throw new RuntimeException("订单明细不能为空");
         }
         OrderGoods good = new OrderGoods();
         BeanUtils.copyProperties(orderGoodsDto, good);

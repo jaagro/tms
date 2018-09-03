@@ -23,7 +23,7 @@ import java.util.Map;
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
-    private UserClientService userService;
+    private CurrentUserService currentUserService;
     @Autowired
     private OrdersMapper ordersMapper;
     @Autowired
@@ -42,8 +42,7 @@ public class OrderServiceImpl implements OrderService {
     public Map<String, Object> createOrder(CreateOrderDto orderDto) {
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
-        //未完成
-        /*order.setCreatedUserId(userService.getUserByToken("").getId());*/
+        order.setCreatedUserId(currentUserService.getShowUser().getId());
         this.ordersMapper.insertSelective(order);
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
             for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()
