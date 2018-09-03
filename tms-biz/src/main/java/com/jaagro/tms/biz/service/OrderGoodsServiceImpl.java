@@ -2,7 +2,6 @@ package com.jaagro.tms.biz.service;
 
 import com.jaagro.tms.api.dto.order.CreateOrderGoodsDto;
 import com.jaagro.tms.api.service.OrderGoodsService;
-import com.jaagro.tms.api.service.UserClientService;
 import com.jaagro.tms.biz.entity.OrderGoods;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
 import com.jaagro.tms.biz.mapper.OrderItemsMapper;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -20,6 +20,8 @@ import java.util.Map;
 @Service
 public class OrderGoodsServiceImpl implements OrderGoodsService {
 
+    @Autowired
+    private CurrentUserService currentUserService;
     @Autowired
     private OrderGoodsMapper orderGoodsMapper;
     @Autowired
@@ -40,9 +42,24 @@ public class OrderGoodsServiceImpl implements OrderGoodsService {
     @Override
     public Map<String, Object> disableById(Integer id) {
         OrderGoods goods = this.orderGoodsMapper.selectByPrimaryKey(id);
-        if (goods != null) {
+        if (goods == null) {
             return ServiceResult.toResult("删除失败");
         }
-        return null;
+        goods.setEnabled(false);
+        this.orderGoodsMapper.updateByPrimaryKeySelective(goods);
+        return ServiceResult.toResult("删除成功");
+    }
+
+    @Override
+    public Map<String, Object> updateGoods(CreateOrderGoodsDto goodsDto) {
+        OrderGoods goods = this.orderGoodsMapper.selectByPrimaryKey(goodsDto.getId());
+        if (goods != null) {
+            return ServiceResult.toResult("修改失败");
+        }
+        goods
+                .setModifyTime(new Date())
+                .setModifyUserId(this.currentUserService.getShowUser().getId());
+        this.orderGoodsMapper.updateByPrimaryKeySelective(goods);
+        return ServiceResult.toResult("修改成功");
     }
 }

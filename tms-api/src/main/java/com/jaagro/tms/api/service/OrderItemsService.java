@@ -18,9 +18,18 @@ public interface OrderItemsService {
     Map<String, Object> createOrderItem(CreateOrderItemsDto orderItem);
 
     /**
+     * 修改
+     *
+     * @param itemsDto
+     * @return
+     */
+    Map<String, Object> updateItems(CreateOrderItemsDto itemsDto);
+
+    /**
      * 逻辑删除
      *
      * @param id
      */
     Map<String, Object> disableById(Integer id);
+
 }

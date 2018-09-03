@@ -10,11 +10,13 @@ import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
 import com.jaagro.tms.biz.mapper.OrderItemsMapper;
 import com.jaagro.tms.biz.mapper.OrdersMapper;
 import com.jaagro.utils.ServiceResult;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -23,6 +25,8 @@ import java.util.Map;
 @Service
 public class OrderItemsServiceImpl implements OrderItemsService {
 
+    @Autowired
+    private CurrentUserService currentUserService;
     @Autowired
     private OrderItemsMapper orderItemsMapper;
     @Autowired
@@ -38,7 +42,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     @Override
     public Map<String, Object> createOrderItem(CreateOrderItemsDto orderItemDto) {
         if (this.ordersMapper.selectByPrimaryKey(orderItemDto.getOrderId()) == null) {
-            throw new RuntimeException("订单不存在");
+            throw new RuntimeException("订单明细不存在");
         }
         if (this.customerService.getShowSiteById(orderItemDto.getUnloadId()) == null) {
             throw new NullPointerException("卸货地不存在");
@@ -56,6 +60,26 @@ public class OrderItemsServiceImpl implements OrderItemsService {
             throw new NullPointerException("订单明细不能为空");
         }
         return ServiceResult.toResult("创建成功");
+    }
+
+    @Override
+    public Map<String, Object> updateItems(CreateOrderItemsDto itemsDto) {
+        if (this.ordersMapper.selectByPrimaryKey(itemsDto.getOrderId()) == null) {
+            throw new RuntimeException("订单明细不存在");
+        }
+        OrderItems orderItems = new OrderItems();
+        BeanUtils.copyProperties(itemsDto, orderItems);
+        orderItems
+                .setModifyTime(new Date())
+                .setModifyUserId(this.currentUserService.getShowUser().getId());
+        this.orderItemsMapper.updateByPrimaryKeySelective(orderItems);
+        if (itemsDto.getGoods() != null && itemsDto.getGoods().size() > 0) {
+            for (CreateOrderGoodsDto goodsDto : itemsDto.getGoods()
+            ) {
+                this.goodsService.updateGoods(goodsDto);
+            }
+        }
+        return ServiceResult.toResult("修改成功");
     }
 
     @Override
