@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -19,6 +20,8 @@ import java.util.Map;
 @Service
 public class OrderGoodsServiceImpl implements OrderGoodsService {
 
+    @Autowired
+    private CurrentUserService currentUserService;
     @Autowired
     private OrderGoodsMapper orderGoodsMapper;
     @Autowired
@@ -30,9 +33,33 @@ public class OrderGoodsServiceImpl implements OrderGoodsService {
         if (this.orderItemsMapper.selectByPrimaryKey(orderGoodsDto.getOrderItemId()) == null) {
             throw new RuntimeException("订单明细不能为空");
         }
-        OrderGoods good = new OrderGoods();
-        BeanUtils.copyProperties(orderGoodsDto, good);
-        this.orderGoodsMapper.insertSelective(good);
+        OrderGoods goods = new OrderGoods();
+        BeanUtils.copyProperties(orderGoodsDto, goods);
+        this.orderGoodsMapper.insertSelective(goods);
         return ServiceResult.toResult("创建成功");
+    }
+
+    @Override
+    public Map<String, Object> disableById(Integer id) {
+        OrderGoods goods = this.orderGoodsMapper.selectByPrimaryKey(id);
+        if (goods == null) {
+            return ServiceResult.toResult("删除失败");
+        }
+        goods.setEnabled(false);
+        this.orderGoodsMapper.updateByPrimaryKeySelective(goods);
+        return ServiceResult.toResult("删除成功");
+    }
+
+    @Override
+    public Map<String, Object> updateGoods(CreateOrderGoodsDto goodsDto) {
+        OrderGoods goods = this.orderGoodsMapper.selectByPrimaryKey(goodsDto.getId());
+        if (goods != null) {
+            return ServiceResult.toResult("修改失败");
+        }
+        goods
+                .setModifyTime(new Date())
+                .setModifyUserId(this.currentUserService.getShowUser().getId());
+        this.orderGoodsMapper.updateByPrimaryKeySelective(goods);
+        return ServiceResult.toResult("修改成功");
     }
 }

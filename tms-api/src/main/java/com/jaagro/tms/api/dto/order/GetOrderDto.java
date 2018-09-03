@@ -80,7 +80,7 @@ public class GetOrderDto implements Serializable {
     /**
      * 修改人id
      */
-    private ShowSiteDto modifyUser;
+    private ShowUserDto modifyUser;
 
     /**
      * 订单列表
