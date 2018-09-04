@@ -9,9 +9,10 @@
     <result column="enabled" property="enabled" jdbcType="BIT" />
     <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
     <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER" />
+    <result column="sign_status" property="signStatus" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, waybill_id, unload_site_id, required_time, enabled, modify_time, modify_user_id
+    id, waybill_id, unload_site_id, required_time, enabled, modify_time, modify_user_id, sign_status
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -26,10 +27,10 @@
   <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillItems" >
     insert into waybill_items (id, waybill_id, unload_site_id, 
       required_time, enabled, modify_time, 
-      modify_user_id)
+      modify_user_id, sign_status)
     values (#{id,jdbcType=INTEGER}, #{waybillId,jdbcType=INTEGER}, #{unloadSiteId,jdbcType=INTEGER}, 
       #{requiredTime,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT}, #{modifyTime,jdbcType=TIMESTAMP}, 
-      #{modifyUserId,jdbcType=INTEGER})
+      #{modifyUserId,jdbcType=INTEGER}, #{signStatus,jdbcType=BIT})
   </insert>
   <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillItems" >
     insert into waybill_items
@@ -55,6 +56,9 @@
       <if test="modifyUserId != null" >
         modify_user_id,
       </if>
+      <if test="signStatus != null" >
+        sign_status,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -77,6 +81,9 @@
       </if>
       <if test="modifyUserId != null" >
         #{modifyUserId,jdbcType=INTEGER},
+      </if>
+      <if test="signStatus != null" >
+        #{signStatus,jdbcType=BIT},
       </if>
     </trim>
   </insert>
@@ -101,6 +108,9 @@
       <if test="modifyUserId != null" >
         modify_user_id = #{modifyUserId,jdbcType=INTEGER},
       </if>
+      <if test="signStatus != null" >
+        sign_status = #{signStatus,jdbcType=BIT},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -111,7 +121,8 @@
       required_time = #{requiredTime,jdbcType=TIMESTAMP},
       enabled = #{enabled,jdbcType=BIT},
       modify_time = #{modifyTime,jdbcType=TIMESTAMP},
-      modify_user_id = #{modifyUserId,jdbcType=INTEGER}
+      modify_user_id = #{modifyUserId,jdbcType=INTEGER},
+      sign_status = #{signStatus,jdbcType=BIT}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

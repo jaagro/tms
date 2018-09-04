@@ -7,7 +7,7 @@ public final class WaybillStatus {
     private static final String SEND_TRUCK = "待派单";
     private static final String RECEIVE = "待接单";
     private static final String DEPART = "待出发";
-    private static final String ARRIVE_LOAD_SITE = "待到厂";
+    private static final String ARRIVE_LOAD_SITE = "前往装货地";
     private static final String LOAD_PRODUCT = "待装货";
     private static final String DELIVERY = "待送达";
     private static final String SIGN = "待签收";

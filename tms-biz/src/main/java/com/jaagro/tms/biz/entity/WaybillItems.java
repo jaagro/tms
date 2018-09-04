@@ -46,4 +46,9 @@ public class WaybillItems implements Serializable {
      * 修改人id
      */
     private Integer modifyUserId;
+
+    /**
+     * 签收状态
+     */
+    private Boolean signStatus;
 }
