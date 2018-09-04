@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillItemsTempMapper" >
+  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillItemsTemp" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="waybill_temp_id" property="waybillTempId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, waybill_temp_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from waybill_items_temp
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from waybill_items_temp
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillItemsTemp" >
+    insert into waybill_items_temp (id, waybill_temp_id)
+    values (#{id,jdbcType=INTEGER}, #{waybillTempId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillItemsTemp" >
+    insert into waybill_items_temp
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="waybillTempId != null" >
+        waybill_temp_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="waybillTempId != null" >
+        #{waybillTempId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.WaybillItemsTemp" >
+    update waybill_items_temp
+    <set >
+      <if test="waybillTempId != null" >
+        waybill_temp_id = #{waybillTempId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.WaybillItemsTemp" >
+    update waybill_items_temp
+    set waybill_temp_id = #{waybillTempId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
