@@ -1,9 +1,8 @@
-package com.jaagro.tms.biz.service;
+package com.jaagro.tms.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.order.*;
-import com.jaagro.tms.api.service.CustomerClientService;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
@@ -13,18 +12,17 @@ import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
 import com.jaagro.tms.biz.mapper.OrderItemsMapper;
 import com.jaagro.tms.biz.mapper.OrdersMapper;
+import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.ServiceResult;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author tony
@@ -90,8 +88,7 @@ public class OrderServiceImpl implements OrderService {
         this.ordersMapper.updateByPrimaryKeySelective(orders);
 
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
-            for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()
-            ) {
+            for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
                 this.orderItemsService.updateItems(itemsDto);
             }
         }

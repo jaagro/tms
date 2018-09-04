@@ -52,7 +52,6 @@ public class GetWaybillDto implements Serializable {
      * 司机id
      */
     private ShowDriverDto driverId;
-
     /**
      * 任务推送司机时间
      */
