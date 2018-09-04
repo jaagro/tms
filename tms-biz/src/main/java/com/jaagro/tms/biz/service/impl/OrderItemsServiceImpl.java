@@ -42,7 +42,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     @Override
     public Map<String, Object> createOrderItem(CreateOrderItemsDto orderItemDto) {
         if (this.ordersMapper.selectByPrimaryKey(orderItemDto.getOrderId()) == null) {
-            throw new RuntimeException("订单明细不存在");
+            throw new NullPointerException("订单明细不存在");
         }
         if (this.customerService.getShowSiteById(orderItemDto.getUnloadId()) == null) {
             throw new NullPointerException("卸货地不存在");

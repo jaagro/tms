@@ -3,9 +3,9 @@ package com.jaagro.tms.web.controller;
 import com.jaagro.tms.api.dto.order.CreateOrderDto;
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
 import com.jaagro.tms.api.dto.order.UpdateOrderDto;
-import com.jaagro.tms.api.service.CustomerClientService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.biz.mapper.OrdersMapper;
+import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 /**
  * @author baiyiran
@@ -102,8 +100,8 @@ public class OrderController {
      * @return
      */
     @ApiOperation("查询单条订单")
-    @GetMapping("/getOrderById")
-    public BaseResponse getOrderById(@PathVariable Integer id) {
+    @GetMapping("/getOrderById/{id}")
+    public BaseResponse getOrderById(@PathVariable("id") Integer id) {
         if (this.ordersMapper.selectByPrimaryKey(id) == null) {
             return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在"));
         }
