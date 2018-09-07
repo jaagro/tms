@@ -14,6 +14,8 @@ import com.jaagro.tms.biz.mapper.OrderItemsMapper;
 import com.jaagro.tms.biz.mapper.OrdersMapper;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.ServiceResult;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import java.util.Map;
  * @author tony
  */
 @Service
+@Aspect
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -45,6 +48,27 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderGoodsService orderGoodsService;
 
+    @Pointcut("execution(public * com.jaagro.tms.biz.service.impl.OrderServiceImpl.*(..))")
+    public void different() {
+        System.err.println("---------different()");
+    }
+
+    @Before("different()")
+    public void doBefore(JoinPoint joinPoint) {
+        System.err.println("---------doBefore()");
+    }
+
+    @Around("different()")
+    public void doAround() {
+        System.err.println("---------doAround(1)");
+        System.err.println("---------doAround(2)");
+    }
+
+    @AfterReturning(pointcut = "different()", returning = "retValue")//打印输出结果
+    public void doAfterReturing(JoinPoint joinPoint, Object retValue) {
+        System.err.println("---------doAfterReturing()");
+    }
+
     /**
      * 创建订单
      *
@@ -53,7 +77,6 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-
     public Map<String, Object> createOrder(CreateOrderDto orderDto) {
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
@@ -113,6 +136,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public GetOrderDto getOrderById(Integer id) {
+        different();
         Orders order = this.ordersMapper.selectByPrimaryKey(id);
         GetOrderDto orderDto = new GetOrderDto();
         BeanUtils.copyProperties(order, orderDto);
@@ -131,12 +155,13 @@ public class OrderServiceImpl implements OrderService {
      * @return 订单列表
      */
     @Override
-    public List<ListOrderDto> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
+    public Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
         List<Orders> orderDtos = this.ordersMapper.listByCriteria(criteriaDto);
+
         List<ListOrderDto> listOrderDtos = new ArrayList<>();
-        BeanUtils.copyProperties(orderDtos, listOrderDtos);
-        if (listOrderDtos != null && listOrderDtos.size() > 0) {
+
+        if (orderDtos != null && orderDtos.size() > 0) {
             for (Orders order : orderDtos
             ) {
                 ListOrderDto orderDto = new ListOrderDto();
@@ -146,9 +171,11 @@ public class OrderServiceImpl implements OrderService {
                         .setCreatedUserId(this.currentUserService.getShowUser())
                         .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                         .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                listOrderDtos.add(orderDto);
             }
         }
-        return null;
+//        different();
+        return ServiceResult.toResult(listOrderDtos);
     }
 
     /**

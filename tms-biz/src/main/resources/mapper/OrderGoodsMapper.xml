@@ -27,7 +27,8 @@
     delete from order_goods
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.OrderGoods" >
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.OrderGoods"  useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
     insert into order_goods (id, order_item_id, goods_name, 
       goods_unit, goods_quantity, goods_weight, 
       join_drug, enabled, modify_time, 
@@ -37,7 +38,8 @@
       #{joinDrug,jdbcType=BIT}, #{enabled,jdbcType=BIT}, #{modifyTime,jdbcType=TIMESTAMP}, 
       #{modifyUserId,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.OrderGoods" >
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.OrderGoods" useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id" >
     insert into order_goods
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

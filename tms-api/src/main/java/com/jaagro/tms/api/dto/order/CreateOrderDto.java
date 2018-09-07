@@ -25,11 +25,6 @@ public class CreateOrderDto implements Serializable {
     private Integer goodsType;
 
     /**
-     * 订单状态
-     */
-    private String orderStatus;
-
-    /**
      * 客户id
      */
     private Integer customerId;
