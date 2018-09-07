@@ -18,4 +18,9 @@ public class ShowCustomerContractDto implements Serializable {
      * 合同编号
      */
     private String contractNumber;
+
+    /**
+     * 合同类型
+     */
+    private Integer type;
 }

@@ -1,9 +1,8 @@
-package com.jaagro.tms.biz.service;
+package com.jaagro.tms.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.order.*;
-import com.jaagro.tms.api.service.CustomerClientService;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
@@ -13,18 +12,18 @@ import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
 import com.jaagro.tms.biz.mapper.OrderItemsMapper;
 import com.jaagro.tms.biz.mapper.OrdersMapper;
+import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.ServiceResult;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author tony
@@ -55,7 +54,6 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-
     public Map<String, Object> createOrder(CreateOrderDto orderDto) {
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
@@ -90,8 +88,7 @@ public class OrderServiceImpl implements OrderService {
         this.ordersMapper.updateByPrimaryKeySelective(orders);
 
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
-            for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()
-            ) {
+            for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
                 this.orderItemsService.updateItems(itemsDto);
             }
         }
@@ -123,7 +120,8 @@ public class OrderServiceImpl implements OrderService {
                 .setCustomer(this.customerService.getShowCustomerById(order.getCustomerId()))
                 .setCreatedUser(this.currentUserService.getShowUser())
                 .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
-                .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()))
+                .setOrderItems(this.orderItemsService.listByOrderId(order.getId()));
         return orderDto;
     }
 
@@ -134,12 +132,13 @@ public class OrderServiceImpl implements OrderService {
      * @return 订单列表
      */
     @Override
-    public List<ListOrderDto> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
+    public Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
         List<Orders> orderDtos = this.ordersMapper.listByCriteria(criteriaDto);
+
         List<ListOrderDto> listOrderDtos = new ArrayList<>();
-        BeanUtils.copyProperties(orderDtos, listOrderDtos);
-        if (listOrderDtos != null && listOrderDtos.size() > 0) {
+
+        if (orderDtos != null && orderDtos.size() > 0) {
             for (Orders order : orderDtos
             ) {
                 ListOrderDto orderDto = new ListOrderDto();
@@ -149,9 +148,11 @@ public class OrderServiceImpl implements OrderService {
                         .setCreatedUserId(this.currentUserService.getShowUser())
                         .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                         .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                listOrderDtos.add(orderDto);
             }
         }
-        return null;
+//        different();
+        return ServiceResult.toResult(listOrderDtos);
     }
 
     /**
