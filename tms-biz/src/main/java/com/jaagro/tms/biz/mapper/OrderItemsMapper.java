@@ -1,5 +1,7 @@
 package com.jaagro.tms.biz.mapper;
 
+import com.jaagro.tms.api.dto.order.GetOrderGoodsDto;
+import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
 import com.jaagro.tms.biz.entity.OrderItems;
 
 import java.util.List;
@@ -42,4 +44,13 @@ public interface OrderItemsMapper {
      * @return
      */
     List<OrderItems> listByOrderId(Integer id);
+
+    /**
+     * 提供给订单详情
+     *
+     * @param id
+     * @return
+     */
+    List<GetOrderItemsDto> listItemsByOrderId(Integer id);
+
 }

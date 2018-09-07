@@ -58,11 +58,6 @@ public class TestController {
         return result;
     }
 
-    @GetMapping("/test4-1")
-    public BaseResponse test41() {
-        return BaseResponse.service(this.modifyLogService.createModifyLog(null));
-    }
-
     @GetMapping("/test5")
     public List<ListTruckTypeDto> test5() {
         return truckTypeClientService.listTruckTypeReturnDto();

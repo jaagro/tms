@@ -2,6 +2,7 @@ package com.jaagro.tms.biz.service.impl;
 
 import com.jaagro.tms.api.dto.order.CreateOrderGoodsDto;
 import com.jaagro.tms.api.dto.order.CreateOrderItemsDto;
+import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
@@ -16,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -88,5 +91,21 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         orderItems.setEnabled(false);
         this.orderItemsMapper.updateByPrimaryKeySelective(orderItems);
         return ServiceResult.toResult("删除成功");
+    }
+
+    @Override
+    public List<GetOrderItemsDto> listByOrderId(Integer orderId) {
+        List<GetOrderItemsDto> getOrderItemsDtoList = this.orderItemsMapper.listItemsByOrderId(orderId);
+        if (getOrderItemsDtoList != null && getOrderItemsDtoList.size() > 0) {
+            for (GetOrderItemsDto items : getOrderItemsDtoList) {
+                OrderItems orderItems = this.orderItemsMapper.selectByPrimaryKey(items.getId());
+                items
+                        .setModifyUserId(this.currentUserService.getShowUser())
+//                        .setModifyUserId(this.customerService.getShowCustomerById(orderItems.getModifyUserId()))
+                        .setUnload(this.customerService.getShowSiteById(orderItems.getUnloadId()));
+
+            }
+        }
+        return getOrderItemsDtoList;
     }
 }

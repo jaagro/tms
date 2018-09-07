@@ -14,7 +14,6 @@ import com.jaagro.tms.biz.mapper.OrderItemsMapper;
 import com.jaagro.tms.biz.mapper.OrdersMapper;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.ServiceResult;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,6 @@ import java.util.Map;
  * @author tony
  */
 @Service
-@Aspect
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -47,27 +45,6 @@ public class OrderServiceImpl implements OrderService {
     private OrderGoodsMapper orderGoodsMapper;
     @Autowired
     private OrderGoodsService orderGoodsService;
-
-    @Pointcut("execution(public * com.jaagro.tms.biz.service.impl.OrderServiceImpl.*(..))")
-    public void different() {
-        System.err.println("---------different()");
-    }
-
-    @Before("different()")
-    public void doBefore(JoinPoint joinPoint) {
-        System.err.println("---------doBefore()");
-    }
-
-    @Around("different()")
-    public void doAround() {
-        System.err.println("---------doAround(1)");
-        System.err.println("---------doAround(2)");
-    }
-
-    @AfterReturning(pointcut = "different()", returning = "retValue")//打印输出结果
-    public void doAfterReturing(JoinPoint joinPoint, Object retValue) {
-        System.err.println("---------doAfterReturing()");
-    }
 
     /**
      * 创建订单
@@ -136,7 +113,6 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public GetOrderDto getOrderById(Integer id) {
-        different();
         Orders order = this.ordersMapper.selectByPrimaryKey(id);
         GetOrderDto orderDto = new GetOrderDto();
         BeanUtils.copyProperties(order, orderDto);
@@ -144,7 +120,8 @@ public class OrderServiceImpl implements OrderService {
                 .setCustomer(this.customerService.getShowCustomerById(order.getCustomerId()))
                 .setCreatedUser(this.currentUserService.getShowUser())
                 .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
-                .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()))
+                .setOrderItems(this.orderItemsService.listByOrderId(order.getId()));
         return orderDto;
     }
 
