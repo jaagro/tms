@@ -8,9 +8,7 @@ import com.jaagro.tms.api.dto.base.ShowTruckTypeDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.*;
-import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
-import com.jaagro.tms.biz.mapper.OrdersMapper;
-import com.jaagro.tms.biz.mapper.WaybillItemsTempMapper;
+import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +35,8 @@ public class WaybillServiceImpl implements WaybillService {
     private TruckTypeClientService truckTypeClientService;
     @Autowired
     private OrderGoodsMapper orderGoodsMapper;
+    @Autowired
+    private OrderItemsMapper orderItemsMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -64,10 +64,8 @@ public class WaybillServiceImpl implements WaybillService {
             truckLoadTempBo
                     .setId(truckTypeId)
                     .setProductName(truckType.getProductName())
-                    .setMaxAmount(Integer.valueOf(truckType.getTruckAmount()))
-                    .setMaxWeight(new BigDecimal(truckType.getTruckWeight()))
-                    .setLoadWeight(new BigDecimal(0))
-                    .setLoadAmount(0);
+                    .setMaxQuantity(new BigDecimal(truckType.getTruckWeight()))
+                    .setLoadQuantity(new BigDecimal(0));
             truckTypeList.add(truckLoadTempBo);
         }
         log.info("待分配车型，共：" + truckTypeList.size() + "台车: " + truckTypeList);
@@ -79,30 +77,34 @@ public class WaybillServiceImpl implements WaybillService {
             TruckLoadTempBo truckLoadTempBo = truckTypeList.get(i);
 
             //waybill
+            Orders ordersData = ordersMapper.selectByPrimaryKey(waybillPlanDto.getOrderId());
+            if(ordersData == null){
+                throw new NullPointerException("订单号为：" + waybillPlanDto.getOrderId() + " 不存在");
+            }
             CreateWaybillDto createwaybillDto = new CreateWaybillDto();
+            createwaybillDto
+                    .setNeedTruckType(truckLoadTempBo.getId())
+                    .setLoadSiteId(ordersData.getLoadSiteId())
+                    .setTruckTeamContractId(ordersData.getCustomerContractId());
             List<CreateWaybillItemsDto> itemsList = new LinkedList<>();
 
             log.info("waybill：" + createwaybillDto);
             //先把一个车型搞定
-            while (truckLoadTempBo.getMaxWeight().compareTo(truckLoadTempBo.getLoadWeight()) == 1){
-                //货物为饲料
-                if(truckLoadTempBo.getProductName().equals(ProductType.FODDER)){
-
-                }
+            while (truckLoadTempBo.getMaxQuantity().compareTo(truckLoadTempBo.getLoadQuantity()) == 1){
                 //所有货物都循环完了还满足不了车，则跳出循环
                 boolean stopWhile = false;
 
                  for(int j =0; j < waybillPlanDto.getItems().size(); j ++){
                     boolean stopItem = false;
                     CreateWaybillItemsPlanDto waybillItemsPlanDto = waybillPlanDto.getItems().get(j);
+                    OrderItems orderItems = orderItemsMapper.selectByPrimaryKey(waybillItemsPlanDto.getOrderItemId());
                     //当前车装满后跳出循环
-                    if(truckLoadTempBo.getLoadWeight().compareTo(truckLoadTempBo.getMaxWeight()) >= 0){
+                    if(truckLoadTempBo.getLoadQuantity().compareTo(truckLoadTempBo.getMaxQuantity()) >= 0){
                         break;
                     }
-
                     for (CreateWaybillGoodsPlanDto goodsPlanDto : waybillItemsPlanDto.getGoods()){
                         //当前车装满后跳出循环
-                        if(truckLoadTempBo.getLoadWeight().compareTo(truckLoadTempBo.getMaxWeight()) >= 0){
+                        if(truckLoadTempBo.getLoadQuantity().compareTo(truckLoadTempBo.getMaxQuantity()) >= 0){
                             break;
                         }
                         OrderGoods orderGoods = orderGoodsMapper.selectByPrimaryKey(goodsPlanDto.getGoodsId());
@@ -117,28 +119,30 @@ public class WaybillServiceImpl implements WaybillService {
                                 .setGoodsUnit(orderGoods.getGoodsUnit())
                                 .setJoinDrug(orderGoods.getJoinDrug());
                         //待操作余量 >= 车辆空缺量
-                        BigDecimal truckVacancy = truckLoadTempBo.getMaxWeight().subtract(truckLoadTempBo.getLoadWeight());
+                        BigDecimal truckVacancy = truckLoadTempBo.getMaxQuantity().subtract(truckLoadTempBo.getLoadQuantity());
                         if(goodsPlanDto.getSurplus().compareTo(truckVacancy) >= 0){
                             createWaybillGoodsDto
                                     .setGoodsWeight(truckVacancy);
                             //更新待操作余量
                             goodsPlanDto.setSurplus(goodsPlanDto.getSurplus().subtract(truckVacancy));
                             //更新待分配车型的已装量
-                            truckLoadTempBo.setLoadWeight(truckLoadTempBo.getLoadWeight().add(truckVacancy));
+                            truckLoadTempBo.setLoadQuantity(truckLoadTempBo.getLoadQuantity().add(truckVacancy));
                         } else {
                             //待操作余量 < 车辆装载余量
                             createWaybillGoodsDto
                                     .setGoodsWeight(goodsPlanDto.getSurplus());
                             //更新待分配车型的已装量
-                            truckLoadTempBo.setLoadWeight(truckLoadTempBo.getLoadWeight().add(goodsPlanDto.getSurplus()));
+                            truckLoadTempBo.setLoadQuantity(truckLoadTempBo.getLoadQuantity().add(goodsPlanDto.getSurplus()));
                             //清空待配在余量
                             goodsPlanDto.setSurplus(BigDecimal.valueOf(0));
                         }
-
                         //goods列表
                         List<CreateWaybillGoodsDto> goodsList = new LinkedList<>();
                         //waybillItem
                         CreateWaybillItemsDto createWaybillItemsDto = new CreateWaybillItemsDto();
+                        createWaybillItemsDto
+                                .setUnloadSiteId(orderItems.getUnloadId())
+                                .setRequiredTime(orderItems.getUnloadTime());
                         if(createWaybillGoodsDto.getGoodsWeight().compareTo(BigDecimal.valueOf(0)) == 1){
                             goodsList.add(createWaybillGoodsDto);
                         }
@@ -150,13 +154,13 @@ public class WaybillServiceImpl implements WaybillService {
                         log.debug("goods：" + createWaybillGoodsDto);
                     }
                     //waybillItem循环完了车还没装满
-                    if(j + 1 == waybillPlanDto.getItems().size() && truckLoadTempBo.getMaxWeight().compareTo(truckLoadTempBo.getLoadWeight()) == 1){
+                    if(j + 1 == waybillPlanDto.getItems().size() && truckLoadTempBo.getMaxQuantity().compareTo(truckLoadTempBo.getLoadQuantity()) == 1){
                         stopWhile = true;
                     }
                 }
                 //所有货物都循环完了还满足不了车，则跳出循环
                 if(stopWhile){
-                    log.debug("亏吨了");
+                    log.debug(truckLoadTempBo.getId() + " 亏吨了");
                     break;
                 }
             }

@@ -24,22 +24,12 @@ public class TruckLoadTempBo implements Serializable {
     private String productName;
 
     /**
-     * 最大装载重量
+     * 最大装载量
      */
-    private BigDecimal maxWeight;
+    private BigDecimal maxQuantity;
 
     /**
-     * 最大装载数量
+     * 已装量
      */
-    private Integer maxAmount;
-
-    /**
-     * 已装重量
-     */
-    private BigDecimal loadWeight;
-
-    /**
-     * 已装数量
-     */
-    private Integer loadAmount;
+    private BigDecimal loadQuantity;
 }
