@@ -1,7 +1,9 @@
 package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.biz.entity.WaybillTemp;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface WaybillTempMapper {
     /**
      *
@@ -38,4 +40,6 @@ public interface WaybillTempMapper {
      * @mbggenerated 2018-09-04
      */
     int updateByPrimaryKey(WaybillTemp record);
+
+    WaybillTemp getByOrderIdAndTruckId(Integer orderId, Integer truckId);
 }

@@ -31,4 +31,8 @@ public class WaybillGoodsTemp implements Serializable {
      * 计划重量
      */
     private BigDecimal goodsWeight;
+    /**
+     * 订单货物ID
+     */
+    private Integer orderGoodsId;
 }

@@ -17,6 +17,12 @@ public class WaybillItemsTemp implements Serializable {
     private Integer id;
 
     /**
-     * 
+     * 运单id
      */
-    private Integer waybillTempId;}
+    private Integer waybillTempId;
+
+    /**
+     * 卸货地址Id
+     */
+    private Integer unloadSiteId;
+}
