@@ -24,6 +24,11 @@ public class Waybill implements Serializable {
     private Integer orderId;
 
     /**
+     * 装货地id
+     */
+    private Integer loadSiteId;
+
+    /**
      * 车队合同id
      */
     private Integer truckTeamContractId;

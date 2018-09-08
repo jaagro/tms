@@ -1,21 +1,18 @@
-package com.jaagro.tms.biz.entity;
+package com.jaagro.tms.api.dto.waybill;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tony
  */
 @Data
 @Accessors(chain = true)
-public class WaybillItems implements Serializable {
-    /**
-     * 
-     */
-    private Integer id;
+public class CreateWaybillItemsDto implements Serializable {
 
     /**
      * 运单id
@@ -33,22 +30,7 @@ public class WaybillItems implements Serializable {
     private Date requiredTime;
 
     /**
-     * 是否有效
+     * 商品信息列表
      */
-    private Boolean enabled;
-
-    /**
-     * 修改时间
-     */
-    private Date modifyTime;
-
-    /**
-     * 修改人id
-     */
-    private Integer modifyUserId;
-
-    /**
-     * 签收状态
-     */
-    private Boolean signStatus;
+    private List<CreateWaybillGoodsDto> goods;
 }
