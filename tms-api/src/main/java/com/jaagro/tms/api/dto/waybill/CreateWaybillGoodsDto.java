@@ -41,11 +41,4 @@ public class CreateWaybillGoodsDto implements Serializable {
      * 是否加药
      */
     private Boolean joinDrug;
-    /**
-     * 可配量
-     */
-    private Integer Proportioning;
-
-
-
 }

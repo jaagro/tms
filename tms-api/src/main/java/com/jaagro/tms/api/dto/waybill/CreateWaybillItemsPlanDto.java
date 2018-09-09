@@ -13,10 +13,10 @@ import java.util.List;
 @Accessors(chain = true)
 public class CreateWaybillItemsPlanDto implements Serializable {
 
-    /**
-     * 卸货地id
+   /**
+     * 订单明细id 用于获取卸货地id
      */
-    private Integer unloadSiteId;
+    private Integer orderItemId;
 
     /**
      * 货物列表
