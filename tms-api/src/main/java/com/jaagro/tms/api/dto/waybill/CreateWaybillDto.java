@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -22,9 +23,27 @@ public class CreateWaybillDto implements Serializable {
      * 需求车型列表
      */
     private List<TruckDto> trucks;
+    /**
+     * 装货地id
+     */
+    private Integer loadSiteId;
 
     /**
-     * 发货地和对应的货物明细列表
+     * 车队合同id
+     */
+    private Integer truckTeamContractId;
+
+    /**
+     * 需求车型
+     */
+    private Integer needTruckType;
+
+    /**
+     * 实际公里数
+     */
+    private BigDecimal distance;
+    /**
+     * 发货地和对应的货物明细列表 运单明细列表
      */
     private List<CreateWaybillItemsDto> waybillItems;
 
