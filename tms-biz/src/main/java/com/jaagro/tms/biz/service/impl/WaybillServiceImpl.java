@@ -1,9 +1,6 @@
 package com.jaagro.tms.biz.service.impl;
 
-import com.jaagro.tms.api.dto.waybill.CreateWaybillDto;
-import com.jaagro.tms.api.dto.waybill.CreateWaybillGoodsDto;
-import com.jaagro.tms.api.dto.waybill.CreateWaybillItemsDto;
-import com.jaagro.tms.api.dto.waybill.TruckDto;
+import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
 import com.jaagro.tms.biz.mapper.OrderItemsMapper;
@@ -37,10 +34,11 @@ public class WaybillServiceImpl implements WaybillService {
 
     @Override
     public Map<String,Object> createWaybill(List<CreateWaybillDto> waybillDtos) {
-      return null;
+
+        return null;
     }
     @Override
-    public List<CreateWaybillDto> calculateWaybill(CreateWaybillDto waybillDto){
+    public List<CreateWaybillDto> createWaybillPlan(CreateWaybillPlanDto waybillDto){
         Integer orderId = waybillDto.getOrderId();
         if (StringUtils.isEmpty(orderId)) {
             throw new NullPointerException("订单为空");
@@ -55,23 +53,23 @@ public class WaybillServiceImpl implements WaybillService {
                 throw new NullPointerException("车辆数量为空");
             }
         }
-        List<CreateWaybillItemsDto>  waybillItemsDtos = waybillDto.getWaybillItems();
+        List<CreateWaybillItemsPlanDto>  waybillItemsDtos = waybillDto.getWaybillItems();
         if(CollectionUtils.isEmpty(waybillItemsDtos))
         {
             throw new NullPointerException("送货地址为空");
         }
-        for(CreateWaybillItemsDto waybillItemsDto:waybillItemsDtos) {
-            List<CreateWaybillGoodsDto> goods =  waybillItemsDto.getGoods();
+        for(CreateWaybillItemsPlanDto waybillItemsDto:waybillItemsDtos) {
+            List<CreateWaybillGoodsPlanDto> goods =  waybillItemsDto.getGoods();
             if(CollectionUtils.isEmpty(goods))
             {
                 throw new NullPointerException("计划配送物品为空");
             }
         }
         List<MiddleObject> middleObjects = new ArrayList<>();
-        for(CreateWaybillItemsDto waybillItemsDto:waybillItemsDtos) {
+        for(CreateWaybillItemsPlanDto waybillItemsDto:waybillItemsDtos) {
             Integer unloadSiteId = waybillItemsDto.getUnloadSiteId();
-            List<CreateWaybillGoodsDto> goods =  waybillItemsDto.getGoods();
-            for(CreateWaybillGoodsDto waybillGoodsDto:goods){
+            List<CreateWaybillGoodsPlanDto> goods =  waybillItemsDto.getGoods();
+            for(CreateWaybillGoodsPlanDto waybillGoodsDto:goods){
                 MiddleObject  middleObject = new MiddleObject();
                 middleObject.setOrderId(orderId);
                 middleObject.setUnloadSiteId(unloadSiteId);
