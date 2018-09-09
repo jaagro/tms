@@ -1,9 +1,13 @@
 package com.jaagro.tms.biz.service.impl;
 
+import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillService;
+import com.jaagro.tms.biz.entity.OrderGoods;
+import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
 import com.jaagro.tms.biz.mapper.OrderItemsMapper;
+import com.jaagro.tms.biz.mapper.OrdersMapper;
 import com.jaagro.tms.biz.mapper.WaybillMapper;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
 import lombok.Data;
@@ -30,6 +34,8 @@ public class WaybillServiceImpl implements WaybillService {
     private OrderItemsMapper orderItemsMapper;
     @Autowired
     private TruckTypeClientService truckTypeClientService;
+    @Autowired
+    private OrdersMapper ordersMapper;
 
 
     @Override
@@ -152,15 +158,44 @@ public class WaybillServiceImpl implements WaybillService {
 }
 
 private  CreateWaybillDto gerneratorWaybill(List<MiddleObject> assignList){
+    CreateWaybillDto createwaybillDto = new CreateWaybillDto();
+    Orders ordersData = null;
+    ListTruckTypeDto truckType = null;
     Integer orderId = 0;
     for (MiddleObject obj:assignList) {
         orderId = obj.getOrderId();
+        ordersData = ordersMapper.selectByPrimaryKey(orderId);
+        if(ordersData == null){
+            throw new NullPointerException("订单号为：" + orderId + " 不存在");
+        }
+        Integer truckTypeId = obj.getTruckId();
+        truckType = truckTypeClientService.getTruckTypeById(truckTypeId);
+        if(truckType == null) {
+            throw new NullPointerException("车型id为： " + truckTypeId + "的车不存在");
+        }
         break;
     }
+    createwaybillDto.setOrderId(orderId)
+            .setNeedTruckType(truckType.getId())
+            .setLoadSiteId(ordersData.getLoadSiteId())
+            .setTruckTeamContractId(ordersData.getCustomerContractId());
 
+    List<CreateWaybillItemsDto> waybillItems = new ArrayList<>();
+    for (MiddleObject obj:assignList) {
+         OrderGoods orderGoods = orderGoodsMapper.selectByPrimaryKey(obj.getOrderGoodsId());
+        if(orderGoods == null){
+            throw new NullPointerException("goodsId为：" + obj.getOrderGoodsId()+ " 的货物不存在");
+        }
+        CreateWaybillItemsDto createWaybillItemsDto = new CreateWaybillItemsDto();
+        createWaybillItemsDto
+                .setUnloadSiteId(orderItems.getUnloadId())
+                .setRequiredTime(orderItems.getUnloadTime());
 
-    //endregion
-        return null;
+    }
+
+    createwaybillDto.setWaybillItems(waybillItems);
+
+    return createwaybillDto;
     }
 
 @Data
