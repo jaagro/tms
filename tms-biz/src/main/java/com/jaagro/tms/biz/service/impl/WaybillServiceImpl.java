@@ -25,6 +25,9 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * @author gavin
+ */
 @Service
 public class WaybillServiceImpl implements WaybillService {
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
@@ -188,30 +191,29 @@ public class WaybillServiceImpl implements WaybillService {
     return waybillPlanDto;
  }
 
-@Override
-public Map<String,Object> createWaybill(List<CreateWaybillDto> waybillDtos) {
+    @Override
+    public Map<String,Object> createWaybill(List<CreateWaybillDto> waybillDtos) {
 
-    return null;
-}
-@Data
-@Accessors(chain = true)
-public class MiddleObject{
-    private Integer orderId;
-    private Integer truckId;
-    private Integer orderItemId;
-    private Integer orderGoodsId;
-    /**
-     * 可配量
-     */
-    private Integer proportioning;
-    /**
-     * 已配量
-     */
-    private Integer planAmount;
-    /**
-     * 剩余量
-     */
-    private Integer unPlanAmount;
-}
-
+        return null;
+    }
+    @Data
+    @Accessors(chain = true)
+    public class MiddleObject{
+        private Integer orderId;
+        private Integer truckId;
+        private Integer orderItemId;
+        private Integer orderGoodsId;
+        /**
+         * 可配量
+         */
+        private Integer proportioning;
+        /**
+         * 已配量
+         */
+        private Integer planAmount;
+        /**
+         * 剩余量
+         */
+        private Integer unPlanAmount;
+    }
 }
