@@ -7,6 +7,7 @@ import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.service.WayBillService;
 import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.entity.WaybillTracking;
@@ -29,7 +30,7 @@ import java.util.Map;
  * @author @gao
  */
 @Service
-public class WaybillServiceImpl implements  {
+public class WaybillServiceImpl implements WayBillService {
 
 
     @Autowired
