@@ -161,10 +161,10 @@ public class WaybillServiceImpl implements WaybillService {
         List<ListWaybillItemsPlanDto> itemsList = new ArrayList<>();
         for (MiddleObject obj:assignList) {
              OrderGoods orderGoods = orderGoodsMapper.selectByPrimaryKey(obj.getOrderGoodsId());
-            Integer goodsUnit = orderGoods.getGoodsUnit();
             if(orderGoods == null){
                 throw new NullPointerException("goodsId为：" + obj.getOrderGoodsId()+ " 的货物不存在");
             }
+            Integer goodsUnit = orderGoods.getGoodsUnit();
             OrderItems orderItems = orderItemsMapper.selectByPrimaryKey(obj.getOrderItemId());
             ListWaybillItemsPlanDto createWaybillItemsDto = new ListWaybillItemsPlanDto();
             createWaybillItemsDto
