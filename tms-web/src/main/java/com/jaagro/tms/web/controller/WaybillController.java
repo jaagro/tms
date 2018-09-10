@@ -2,9 +2,7 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.service.WaybillService;
-import com.jaagro.tms.api.dto.waybill.GetWaybillParamDto;
-import com.jaagro.tms.biz.service.impl.WaybillServiceImpl;
+import com.jaagro.tms.api.service.WayBillService;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,11 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gavin
@@ -26,7 +23,7 @@ import java.util.List;
 public class WaybillController {
 
     @Autowired
-    private WaybillService waybillService;
+    private WayBillService waybillService;
 
     /**
      * 配送计划保存到临时表
@@ -84,7 +81,7 @@ public class WaybillController {
             if (waybillId == null) {
                 return BaseResponse.errorInstance("订单参数不能为空");
             }
-            final Map<String, Object> waybillDetails = waybillService.ListWayBillDetails(waybillId);
+            final Map<String, Object> waybillDetails = waybillService.listWayBillDetails(waybillId);
             return BaseResponse.service(waybillDetails);
         }
 

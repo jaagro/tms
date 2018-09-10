@@ -6,7 +6,7 @@ import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.waybill.CreateWaybillPlanDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillPlanDto;
-import com.jaagro.tms.api.service.WaybillService;
+import com.jaagro.tms.api.service.WayBillService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
@@ -30,7 +30,7 @@ public class TestController {
     @Autowired
     private TruckTypeClientService truckTypeClientService;
     @Autowired
-    private WaybillService waybillService;
+    private WayBillService waybillService;
 
     @GetMapping("/test1/{id}")
     public ShowCustomerDto test1(@PathVariable("id") Integer id){

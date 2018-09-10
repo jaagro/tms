@@ -1,16 +1,19 @@
 package com.jaagro.tms.biz.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
+import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.biz.entity.OrderGoods;
-import com.jaagro.tms.biz.entity.OrderItems;
-import com.jaagro.tms.biz.entity.Orders;
-import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
-import com.jaagro.tms.biz.mapper.OrderItemsMapper;
-import com.jaagro.tms.biz.mapper.OrdersMapper;
-import com.jaagro.tms.biz.mapper.WaybillMapper;
+import com.jaagro.tms.api.service.WayBillService;
+import com.jaagro.tms.biz.entity.*;
+import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
+import com.jaagro.utils.ServiceResult;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import com.jaagro.tms.biz.service.CustomerClientService;
@@ -50,6 +53,10 @@ public class WaybillServiceImpl implements WayBillService {
     private TruckTypeClientService truckTypeClientService;
     @Autowired
     private OrdersMapper ordersMapper;
+    @Autowired
+    private WaybillTrackingImagesMapper waybillTrackingImagesMapper;
+    @Autowired
+    private WaybillTrackingMapper waybillTrackingMapper;
 
     @Override
     public List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto){
@@ -200,14 +207,47 @@ public class WaybillServiceImpl implements WayBillService {
     return waybillPlanDto;
  }
 
+    /**
+     * 根据状态查询我的运单信息
+     *
+     * @param dto
+     * @return
+     */
     @Override
-    public Map<String,Object> createWaybill(List<CreateWaybillDto> waybillDtos) {
+    public Map<String, Object> listWaybillByStatus(GetWaybillParamDto dto) {
 
-        return null;
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        Waybill waybill = new Waybill();
+        waybill.setDriverId(currentUser.getId());
+        List<ListWaybillAppDto> listWaybillAppDtos;
+        //承运中订单
+        if (WaybillStatus.CARRIER.equals(dto.getWaybillStatus())) {
+            PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+            List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByCarrierStatus(waybill);
+            listWaybillAppDtos = listWaybill(waybillDtos);
+            return ServiceResult.toResult(new PageInfo<>(listWaybillAppDtos));
+        }
+        //已完成运单
+        if (WaybillStatus.ACCOMPLISH.equals(dto.getWaybillStatus())) {
+            PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+            waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
+            List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByStatus(waybill);
+            listWaybillAppDtos = listWaybill(waybillDtos);
+            return ServiceResult.toResult(new PageInfo<>(listWaybillAppDtos));
+        }
+        //取消运单
+        if (WaybillStatus.CANCEL.equals(dto.getWaybillStatus())) {
+            PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+            waybill.setWaybillStatus(WaybillStatus.CANCEL);
+            List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByStatus(waybill);
+            listWaybillAppDtos = listWaybill(waybillDtos);
+            return ServiceResult.toResult(new PageInfo<>(listWaybillAppDtos));
+        }
+        return ServiceResult.error("没有相关运单");
     }
 
     @Override
-    public Map<String, Object> ListWayBillDetails(Integer waybillId) {
+    public Map<String, Object> listWayBillDetails(Integer waybillId) {
         GetWaybillDetailsAppDto waybillDetailsAppDto = new GetWaybillDetailsAppDto();
         WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
         Waybill waybillParam = new Waybill();
