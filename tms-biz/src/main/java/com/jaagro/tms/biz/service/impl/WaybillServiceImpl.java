@@ -31,10 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author gavin
- * @author @gao
- */
+
 @Service
 public class WaybillServiceImpl implements WayBillService {
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
