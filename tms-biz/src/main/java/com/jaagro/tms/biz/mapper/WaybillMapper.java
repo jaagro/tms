@@ -1,5 +1,6 @@
 package com.jaagro.tms.biz.mapper;
 
+import com.jaagro.tms.api.dto.waybill.GetWaybillAppDto;
 import com.jaagro.tms.biz.entity.Waybill;
 
 import java.util.List;
@@ -49,4 +50,18 @@ public interface WaybillMapper {
      * @mbggenerated 2018-08-31
      */
     List<Waybill> selectByOrderId(Integer orderld);
+
+    /**
+     * 查询未完成的运单
+     * @param record
+     * @return
+     */
+    List<GetWaybillAppDto> selectWaybillByCarrierStatus(Waybill record);
+
+    /**
+     * 查询完成与取消的运单
+     * @param record
+     * @return
+     */
+    List<GetWaybillAppDto> selectWaybillByStatus(Waybill record);
 }

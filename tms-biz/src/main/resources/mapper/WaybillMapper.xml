@@ -1,37 +1,56 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.jaagro.tms.biz.mapper.WaybillMapper" >
-  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.Waybill" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="order_id" property="orderId" jdbcType="INTEGER" />
-    <result column="truck_team_contract_id" property="truckTeamContractId" jdbcType="INTEGER" />
-    <result column="waybill_status" property="waybillStatus" jdbcType="VARCHAR" />
-    <result column="need_truck_type" property="needTruckType" jdbcType="INTEGER" />
-    <result column="truck_id" property="truckId" jdbcType="INTEGER" />
-    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
-    <result column="send_time" property="sendTime" jdbcType="TIMESTAMP" />
-    <result column="distance" property="distance" jdbcType="DECIMAL" />
-    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-    <result column="created_user_id" property="createdUserId" jdbcType="INTEGER" />
-    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
-    <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER" />
-    <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER" />
-  </resultMap>
-  <sql id="Base_Column_List" >
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillMapper">
+    <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.Waybill">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="truck_team_contract_id" property="truckTeamContractId" jdbcType="INTEGER"/>
+        <result column="waybill_status" property="waybillStatus" jdbcType="VARCHAR"/>
+        <result column="need_truck_type" property="needTruckType" jdbcType="INTEGER"/>
+        <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
+        <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
+        <result column="send_time" property="sendTime" jdbcType="TIMESTAMP"/>
+        <result column="distance" property="distance" jdbcType="DECIMAL"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="created_user_id" property="createdUserId" jdbcType="INTEGER"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
+        <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.waybill.GetWaybillAppDto">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="truck_team_contract_id" property="truckTeamContractId" jdbcType="INTEGER"/>
+        <result column="waybill_status" property="waybillStatus" jdbcType="VARCHAR"/>
+        <result column="need_truck_type" property="needTruckType" jdbcType="INTEGER"/>
+        <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
+        <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
+        <result column="send_time" property="sendTime" jdbcType="TIMESTAMP"/>
+        <result column="distance" property="distance" jdbcType="DECIMAL"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="created_user_id" property="createdUserId" jdbcType="INTEGER"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
+        <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
+        <collection property="waybillItems" column="id"
+                    select="com.jaagro.tms.biz.mapper.WaybillItemsMapper.listByWaybillId"></collection>
+    </resultMap>
+    <sql id="Base_Column_List">
     id, order_id, truck_team_contract_id, waybill_status, need_truck_type, truck_id, 
     driver_id, send_time, distance, create_time, created_user_id, modify_time, modify_user_id, load_site_id
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
-    <include refid="Base_Column_List" />
-    from waybill
-    where id = #{id,jdbcType=INTEGER}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from waybill
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Waybill" >
+    <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Waybill">
     insert into waybill (id, order_id, truck_team_contract_id, 
       waybill_status, need_truck_type, truck_id, 
       driver_id, send_time, distance, 
@@ -203,4 +222,30 @@
     where order_id = #{orderld,jdbcType=INTEGER}
 
   </select>
+    <select id="selectWaybillByCarrierStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill
+        where waybill_status in ('待出发','前往装货地','待装货','待送达','待签收')
+        <if test="driverId != null">
+            and driver_id = #{driverId,jdbcType=INTEGER}
+        </if>
+
+    </select>
+    <select id="selectWaybillByStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill
+        where
+        <if test="waybillStatus != null">
+            waybill_status=#{waybillStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="driverId != null">
+            and driver_id = #{driverId,jdbcType=INTEGER}
+        </if>
+        <if test="id != null">
+            id = #{id,jdbcType=INTEGER}
+        </if>
+    </select>
+
 </mapper>

@@ -1,4 +1,4 @@
-package com.jaagro.tms.biz.entity;
+ package com.jaagro.tms.biz.entity;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
