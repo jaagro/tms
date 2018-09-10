@@ -1,6 +1,7 @@
 package com.jaagro.tms.api.dto.waybill;
 
-import com.jaagro.tms.api.dto.base.ShowUserDto;
+import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import lombok.Data;
@@ -9,13 +10,14 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tony
  */
 @Data
 @Accessors(chain = true)
-public class ListWaybillDto implements Serializable {
+public class ListWaybillAppDto implements Serializable {
     /**
      *
      */
@@ -25,6 +27,16 @@ public class ListWaybillDto implements Serializable {
      *
      */
     private Integer orderId;
+
+    /**
+     * 装货地
+     */
+    private ShowSiteDto loadSite;
+
+    /**
+     * 客户
+     */
+    private ShowCustomerDto customer;
 
     /**
      * 货物类型
@@ -37,12 +49,12 @@ public class ListWaybillDto implements Serializable {
     private String waybillStatus;
 
     /**
-     * 车辆id
+     * 车辆
      */
     private ShowTruckDto truck;
 
     /**
-     * 司机id
+     * 司机
      */
     private ShowDriverDto driver;
 
@@ -57,12 +69,12 @@ public class ListWaybillDto implements Serializable {
     private BigDecimal distance;
 
     /**
-     * 创建时间
+     * 卸货地列表
      */
-    private Date createTime;
+    private List<ShowSiteDto> unloadSite;
 
     /**
-     * 创建人
+     * 货物列表
      */
-    private ShowUserDto createdUserId;
+    private List<ShowGoodsDto> goods;
 }

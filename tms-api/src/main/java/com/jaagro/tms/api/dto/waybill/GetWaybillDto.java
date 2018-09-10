@@ -2,6 +2,7 @@ package com.jaagro.tms.api.dto.waybill;
 
 import com.jaagro.tms.api.dto.base.ShowTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tony
@@ -32,6 +34,11 @@ public class GetWaybillDto implements Serializable {
      * 车队合同id
      */
     private Integer truckTeamContractId;
+
+    /**
+     * 装货地
+     */
+    private ShowSiteDto loadSite;
 
     /**
      * 运单状态：待派车、待司机接单、已接单、司机已出发、司机到达装货地、运输中、卸货完成、已完成，取消
@@ -81,4 +88,14 @@ public class GetWaybillDto implements Serializable {
      * 修改人id
      */
     private ShowUserDto modifyUserId;
+
+    /**
+     * 运单明细list
+     */
+    private List<GetWaybillItemsDto> waybillItems;
+
+    /**
+     * 运单轨迹
+     */
+    private List<ShowTrackingDto> tracking;
 }

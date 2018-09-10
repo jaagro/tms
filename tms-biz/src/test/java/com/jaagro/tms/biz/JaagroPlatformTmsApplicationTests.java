@@ -25,15 +25,15 @@ public class JaagroPlatformTmsApplicationTests {
      * Mybatis逆向生成测试方法
      * @throws Exception
      */
-//    @Test
-//    public void mybatisGenerator() throws Exception {
-//        List<String> warnings = new ArrayList<String>();
-//        boolean overwrite = true;
-//        File configFile = new File("/Users/tony/Documents/jaagro_repository/jaagro-platform-tms/tms-biz/src/main/resources/mybatis/generatorConfig.xml");
-//        ConfigurationParser cp = new ConfigurationParser(warnings);
-//        Configuration config = cp.parseConfiguration(configFile);
-//        DefaultShellCallback callback = new DefaultShellCallback(overwrite);
-//        MyBatisGenerator myBatisGenerator = new MyBatisGenerator(config, callback, warnings);
-//        myBatisGenerator.generate(null);
-//    }
+    @Test
+    public void mybatisGenerator() throws Exception {
+        List<String> warnings = new ArrayList<String>();
+        boolean overwrite = true;
+        File configFile = new File("/Users/tony/Documents/jaagro_repository/jaagro-platform-tms/tms-biz/src/main/resources/mybatis/generatorConfig.xml");
+        ConfigurationParser cp = new ConfigurationParser(warnings);
+        Configuration config = cp.parseConfiguration(configFile);
+        DefaultShellCallback callback = new DefaultShellCallback(overwrite);
+        MyBatisGenerator myBatisGenerator = new MyBatisGenerator(config, callback, warnings);
+        myBatisGenerator.generate(null);
+    }
 }
