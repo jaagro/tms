@@ -46,6 +46,6 @@ public interface WayBillService {
      * @return
      */
 
-    
+
     List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto);
 }
