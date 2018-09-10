@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.dto.waybill;
 
+import com.jaagro.tms.api.dto.truck.TruckDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

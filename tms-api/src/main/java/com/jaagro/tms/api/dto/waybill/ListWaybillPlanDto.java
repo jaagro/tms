@@ -1,6 +1,6 @@
 package com.jaagro.tms.api.dto.waybill;
 
-import com.jaagro.tms.api.dto.base.ShowTruckTypeDto;
+import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -21,7 +21,7 @@ public class ListWaybillPlanDto implements Serializable {
     /**
      * 需求车型
      */
-    private ShowTruckTypeDto needTruckType;
+    private ListTruckTypeDto needTruckType;
     /**
      * 装货地id
      */

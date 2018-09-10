@@ -1,5 +1,6 @@
 package com.jaagro.tms.web.controller;
 
+import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
@@ -62,7 +63,7 @@ public class WaybillController {
             }
         }
         try {
-            List<CreateWaybillDto> result= waybillService.createWaybillPlan(waybillDto);
+            List<ListWaybillPlanDto> result= waybillService.createWaybillPlan(waybillDto);
             return BaseResponse.successInstance(result);
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,6 +1,7 @@
 package com.jaagro.tms.biz.service.impl;
 
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
+import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.OrderGoods;
