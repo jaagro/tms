@@ -16,7 +16,7 @@ import com.jaagro.tms.biz.mapper.WaybillMapper;
 import com.jaagro.tms.biz.mapper.WaybillTrackingImagesMapper;
 import com.jaagro.tms.biz.mapper.WaybillTrackingMapper;
 import com.jaagro.tms.biz.service.CustomerClientService;
-import com.jaagro.tms.biz.service.WayBillService;
+import com.jaagro.tms.api.service.WayBillService;
 import com.jaagro.utils.ServiceResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
