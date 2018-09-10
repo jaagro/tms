@@ -1,4 +1,4 @@
-package com.jaagro.tms.biz.entity;
+package com.jaagro.tms.api.dto.waybill;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -11,16 +11,21 @@ import java.math.BigDecimal;
  */
 @Data
 @Accessors(chain = true)
-public class WaybillGoodsTemp implements Serializable {
+public class ShowGoodsDto implements Serializable {
     /**
      *
      */
     private Integer id;
 
     /**
-     *
+     * 货物名称
      */
-    private Integer waybillItemsTempId;
+    private String goodsName;
+
+    /**
+     * 货物单位：1-羽 2-头 3-吨
+     */
+    private Integer goodsUnit;
 
     /**
      * 计划数量
@@ -31,8 +36,4 @@ public class WaybillGoodsTemp implements Serializable {
      * 计划重量
      */
     private BigDecimal goodsWeight;
-    /**
-     * 订单货物ID
-     */
-    private Integer orderGoodsId;
 }

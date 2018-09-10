@@ -8,14 +8,14 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * @author gavin
+ * @author tony
  */
 @Data
 @Accessors(chain = true)
 public class CreateWaybillDto implements Serializable {
 
     /**
-     *订单id
+     *
      */
     private Integer orderId;
 
@@ -38,9 +38,9 @@ public class CreateWaybillDto implements Serializable {
      * 实际公里数
      */
     private BigDecimal distance;
+
     /**
-     * 发货地和对应的货物明细列表 运单明细列表
+     * 运单明细列表
      */
     private List<CreateWaybillItemsDto> waybillItems;
-
 }

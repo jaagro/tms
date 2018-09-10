@@ -11,14 +11,17 @@ import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+
 /**
  * @author baiyiran
  */
+@Aspect
 @RestController
 @Api(description = "订单管理", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrderController {
@@ -115,10 +118,8 @@ public class OrderController {
      * @return
      */
     @ApiOperation("分页查询订单")
-    @GetMapping("/listOrders")
+    @PostMapping("/listOrders")
     public BaseResponse listOrders(@RequestBody ListOrderCriteriaDto criteriaDto) {
-        return BaseResponse.successInstance(orderService.listOrderByCriteria(criteriaDto));
+        return BaseResponse.service(orderService.listOrderByCriteria(criteriaDto));
     }
-
-
 }

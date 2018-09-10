@@ -36,7 +36,7 @@ public interface OrderService {
      * @param criteriaDto 查询条件 json
      * @return 订单列表
      */
-    List<ListOrderDto> listOrderByCriteria(ListOrderCriteriaDto criteriaDto);
+    Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto);
 
     /**
      * 【逻辑】删除订单

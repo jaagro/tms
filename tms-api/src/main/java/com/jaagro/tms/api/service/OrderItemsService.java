@@ -1,7 +1,9 @@
 package com.jaagro.tms.api.service;
 
 import com.jaagro.tms.api.dto.order.CreateOrderItemsDto;
+import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,4 +34,11 @@ public interface OrderItemsService {
      */
     Map<String, Object> disableById(Integer id);
 
+    /**
+     * 为订单详情页面提供
+     *
+     * @param orderId
+     * @return
+     */
+    List<GetOrderItemsDto> listByOrderId(Integer orderId);
 }

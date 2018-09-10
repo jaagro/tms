@@ -4,15 +4,16 @@ import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
+import com.jaagro.tms.api.dto.waybill.CreateWaybillDto;
+import com.jaagro.tms.api.dto.waybill.CreateWaybillPlanDto;
+import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import com.jaagro.utils.BeanDifferentUtils;
 import com.jaagro.utils.DifferentResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,6 +29,8 @@ public class TestController {
     private CurrentUserService currentUserService;
     @Autowired
     private TruckTypeClientService truckTypeClientService;
+    @Autowired
+    private WaybillService waybillService;
 
     @GetMapping("/test1/{id}")
     public ShowCustomerDto test1(@PathVariable("id") Integer id){
@@ -57,5 +60,13 @@ public class TestController {
     @GetMapping("/test5")
     public List<ListTruckTypeDto> test5(){
         return truckTypeClientService.listTruckTypeReturnDto();
+    }
+    @GetMapping("/test6/{id}")
+    public ListTruckTypeDto test56(@PathVariable("id") Integer id){
+        return truckTypeClientService.getTruckTypeById(id);
+    }
+    @PostMapping("/createWaybillPlan")
+    public List<CreateWaybillDto> createWaybill(@RequestBody CreateWaybillPlanDto waybillPlanDto){
+        return waybillService.createWaybillPlan(waybillPlanDto);
     }
 }

@@ -14,6 +14,7 @@ import com.jaagro.tms.biz.mapper.OrderItemsMapper;
 import com.jaagro.tms.biz.mapper.OrdersMapper;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.ServiceResult;
+import org.aspectj.lang.annotation.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,6 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-
     public Map<String, Object> createOrder(CreateOrderDto orderDto) {
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
@@ -120,7 +120,8 @@ public class OrderServiceImpl implements OrderService {
                 .setCustomer(this.customerService.getShowCustomerById(order.getCustomerId()))
                 .setCreatedUser(this.currentUserService.getShowUser())
                 .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
-                .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()))
+                .setOrderItems(this.orderItemsService.listByOrderId(order.getId()));
         return orderDto;
     }
 
@@ -131,12 +132,13 @@ public class OrderServiceImpl implements OrderService {
      * @return 订单列表
      */
     @Override
-    public List<ListOrderDto> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
+    public Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
         List<Orders> orderDtos = this.ordersMapper.listByCriteria(criteriaDto);
+
         List<ListOrderDto> listOrderDtos = new ArrayList<>();
-        BeanUtils.copyProperties(orderDtos, listOrderDtos);
-        if (listOrderDtos != null && listOrderDtos.size() > 0) {
+
+        if (orderDtos != null && orderDtos.size() > 0) {
             for (Orders order : orderDtos
             ) {
                 ListOrderDto orderDto = new ListOrderDto();
@@ -146,9 +148,10 @@ public class OrderServiceImpl implements OrderService {
                         .setCreatedUserId(this.currentUserService.getShowUser())
                         .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                         .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                listOrderDtos.add(orderDto);
             }
         }
-        return null;
+        return ServiceResult.toResult(listOrderDtos);
     }
 
     /**
