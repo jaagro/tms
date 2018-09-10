@@ -4,22 +4,19 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
- * @author tony
+ * @author gavin
  */
 @Data
 @Accessors(chain = true)
 public class CreateWaybillGoodsPlanDto implements Serializable {
-
     /**
-     * 商品id
+     *货物id
      */
     private Integer goodsId;
-
     /**
-     * 待配载余量
+     * 可配量
      */
-    private BigDecimal surplus;
+    private Integer Proportioning;
 }
