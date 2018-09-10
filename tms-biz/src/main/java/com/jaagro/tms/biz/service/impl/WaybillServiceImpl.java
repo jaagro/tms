@@ -81,7 +81,7 @@ public class WaybillServiceImpl implements WayBillService {
     }
 
     @Override
-    public Map<String, Object> ListWayBillDetails(Integer waybillId) {
+    public Map<String, Object> listWayBillDetails(Integer waybillId) {
         GetWaybillDetailsAppDto waybillDetailsAppDto = new GetWaybillDetailsAppDto();
         WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
         Waybill waybillParam = new Waybill();
