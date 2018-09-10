@@ -25,9 +25,6 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * @author gavin
- */
 @Service
 public class WaybillServiceImpl implements WaybillService {
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
@@ -216,4 +213,5 @@ public class MiddleObject{
      */
     private Integer unPlanAmount;
 }
+
 }
