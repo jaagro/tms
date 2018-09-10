@@ -205,6 +205,116 @@ public class WaybillServiceImpl implements WayBillService {
 
         return null;
     }
+
+    @Override
+    public Map<String, Object> ListWayBillDetails(Integer waybillId) {
+        GetWaybillDetailsAppDto waybillDetailsAppDto = new GetWaybillDetailsAppDto();
+        WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
+        Waybill waybillParam = new Waybill();
+        waybillParam.setId(waybillId);
+        List<GetWaybillAppDto> waybillAppDtos = waybillMapper.selectWaybillByStatus(waybillParam);
+        //运单状态
+        waybillDetailsAppDto.setWaybillStatus(waybillAppDtos.get(0).getWaybillStatus());
+        //运单号
+        waybillDetailsAppDto.setWaybillId(waybillId);
+        //客户信息
+        Orders orders = ordersMapper.selectByPrimaryKey(waybillAppDtos.get(0).getId());
+        if (null != orders) {
+            ShowCustomerDto showCustomerDto = customerClientService.getShowCustomerById(orders.getCustomerId());
+            waybillDetailsAppDto.setCustomer(showCustomerDto);
+        }
+        //装货信息
+        if (null != orders) {
+            ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
+            waybillDetailsAppDto.setLoadSite(loadSite);
+            //提货单
+            waybillTrackingImages.setWaybillId(waybillId);
+            waybillTrackingImages.setSiteId(orders.getLoadSiteId());
+            List<GetWaybillTrackingImagesDto> loadSiteWaybillTrackingImages = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
+            loadSite.setWaybillTrackingImagesDtos(loadSiteWaybillTrackingImages);
+        }
+        //卸货信息
+        List<GetWaybillItemsDto> waybillItems = waybillAppDtos.get(0).getWaybillItems();
+        List<ShowSiteDto> unloadSiteList = new ArrayList<>();
+        for (GetWaybillItemsDto waybillItem : waybillItems) {
+            List<ShowGoodsDto> goods = waybillItem.getGoods();
+            ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
+            unloadSite.setGoods(goods);
+            unloadSite.setRequiredTime(waybillItem.getRequiredTime());
+            //卸货单
+            waybillTrackingImages.setWaybillId(waybillId);
+            waybillTrackingImages.setSiteId(waybillItem.getUnloadSiteId());
+            List<GetWaybillTrackingImagesDto> waybillTrackingImagesDtosList = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
+            unloadSite.setWaybillTrackingImagesDtos(waybillTrackingImagesDtosList);
+            unloadSiteList.add(unloadSite);
+
+        }
+        waybillDetailsAppDto.setUnloadSite(unloadSiteList);
+
+        return ServiceResult.toResult(waybillDetailsAppDto);
+    }
+
+    @Override
+    public Map<String, Object> showWaybill(Integer waybillId) {
+        WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
+        waybillTrackingImages.setWaybillId(waybillId);
+        return ServiceResult.toResult(waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages));
+    }
+
+    private List<ListWaybillAppDto> listWaybill(List<GetWaybillAppDto> waybillDtos) {
+        List<ListWaybillAppDto> listWaybillAppDtos = new ArrayList<>();
+        if (null != waybillDtos && waybillDtos.size() > 0) {
+            for (GetWaybillAppDto waybillDto : waybillDtos) {
+                ListWaybillAppDto listWaybillAppDto = new ListWaybillAppDto();
+                List<ShowGoodsDto> showGoodsDtos = new ArrayList<>();
+                List<ShowSiteDto> unloadSiteList = new ArrayList<>();
+                //运单号
+                listWaybillAppDto.setWaybillId(waybillDto.getId());
+                //运单状态
+                listWaybillAppDto.setWaybillStatus(waybillDto.getWaybillStatus());
+                //接单时间
+                WaybillTracking waybillTrackingCondition = new WaybillTracking();
+                waybillTrackingCondition
+                        .setWaybillId(waybillDto.getId())
+                        .setNewStatus(WaybillStatus.DEPART);
+                WaybillTracking waybillTracking = waybillTrackingMapper.selectSingleTime(waybillTrackingCondition);
+                if (null != waybillTracking) {
+                    listWaybillAppDto.setSingleTime(waybillTracking.getCreateTime());
+                }
+                //客户信息
+                Orders orders = ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
+                if (null != orders) {
+                    ShowCustomerDto showCustomerDto = customerClientService.getShowCustomerById(orders.getCustomerId());
+                    listWaybillAppDto.setCustomer(showCustomerDto);
+                }
+                //货物信息
+                List<GetWaybillItemsDto> waybillItems = waybillDto.getWaybillItems();
+                if (null != waybillItems && waybillItems.size() > 0) {
+                    for (GetWaybillItemsDto waybillItem : waybillItems) {
+                        if (null != waybillItem) {
+                            ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
+                            unloadSiteList.add(unloadSite);
+                        }
+                        List<ShowGoodsDto> goods = waybillItem.getGoods();
+                        for (ShowGoodsDto good : goods) {
+                            showGoodsDtos.add(good);
+                        }
+                    }
+                }
+                listWaybillAppDto.setGoods(showGoodsDtos);
+                //装货地
+                if (null != orders) {
+                    ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
+                    listWaybillAppDto.setLoadSite(loadSite);
+                }
+                //卸货地
+                listWaybillAppDto.setUnloadSite(unloadSiteList);
+                listWaybillAppDtos.add(listWaybillAppDto);
+            }
+        }
+        return listWaybillAppDtos;
+    }
+
     @Data
     @Accessors(chain = true)
     public class MiddleObject{
