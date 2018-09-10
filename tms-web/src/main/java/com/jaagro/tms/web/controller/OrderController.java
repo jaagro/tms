@@ -122,6 +122,4 @@ public class OrderController {
     public BaseResponse listOrders(@RequestBody ListOrderCriteriaDto criteriaDto) {
         return BaseResponse.service(orderService.listOrderByCriteria(criteriaDto));
     }
-
-
 }
