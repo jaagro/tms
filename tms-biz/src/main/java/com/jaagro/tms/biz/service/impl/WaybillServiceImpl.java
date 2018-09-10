@@ -26,10 +26,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * @author gavin
- * @author @gao
- */
+
 @Service
 public class WaybillServiceImpl implements WayBillService {
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
