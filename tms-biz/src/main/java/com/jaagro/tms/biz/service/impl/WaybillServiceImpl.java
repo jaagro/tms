@@ -3,7 +3,7 @@ package com.jaagro.tms.biz.service.impl;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.service.WaybillService;
+import com.jaagro.tms.api.service.WayBillService;
 import com.jaagro.tms.biz.entity.OrderGoods;
 import com.jaagro.tms.biz.entity.OrderItems;
 import com.jaagro.tms.biz.entity.Orders;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * @author gavin
  */
 @Service
-public class WaybillServiceImpl implements WaybillService {
+public class WaybillServiceImpl implements WayBillService {
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
     @Autowired
     private WaybillMapper waybillMapper;
