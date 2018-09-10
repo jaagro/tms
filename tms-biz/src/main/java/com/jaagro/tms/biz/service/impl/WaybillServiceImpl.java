@@ -19,7 +19,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -40,7 +39,7 @@ public class WaybillServiceImpl implements WaybillService {
     private OrdersMapper ordersMapper;
 
     @Override
-    public List<CreateWaybillDto> createWaybillPlan(CreateWaybillPlanDto waybillDto){
+    public List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto){
         Integer orderId = waybillDto.getOrderId();
         List<CreateWaybillItemsPlanDto>  waybillItemsDtos = waybillDto.getWaybillItems();
         List<TruckDto> truckDtos = waybillDto.getTrucks();
@@ -57,7 +56,7 @@ public class WaybillServiceImpl implements WaybillService {
                 middleObjects.add(middleObject);
             }
         }
-        List<CreateWaybillDto> waybillDtos = null;
+        List<ListWaybillPlanDto> waybillDtos = null;
         if(!CollectionUtils.isEmpty(middleObjects)){
             try {
                    waybillDtos=wayBillAlgorithm(middleObjects,truckDtos);
@@ -74,9 +73,9 @@ public class WaybillServiceImpl implements WaybillService {
      * @param middleObjects
      * @param truckDtos
      */
-    private List<CreateWaybillDto> wayBillAlgorithm(List<MiddleObject> middleObjects,List<TruckDto> truckDtos){
+    private List<ListWaybillPlanDto> wayBillAlgorithm(List<MiddleObject> middleObjects,List<TruckDto> truckDtos){
         List<MiddleObject> middleObjects_assigned = new ArrayList<>();
-        List<CreateWaybillDto> waybillDtos = new ArrayList<>();
+        List<ListWaybillPlanDto> waybillDtos = new ArrayList<>();
         //按配送地排序
         List<MiddleObject> newMiddleObjectsList = middleObjects.stream().sorted((e1,e2)->Integer.compare(e1.getOrderItemId(),e2.getOrderItemId())).collect(Collectors.toList());
             Iterator<TruckDto> truckIterator = truckDtos.iterator();
@@ -114,7 +113,7 @@ public class WaybillServiceImpl implements WaybillService {
                         boolean flag = (assignTotal.equals(capacity) || (assignTotal<capacity && newMiddleObjectsList.size()==0));
                         if (flag) {
                             middleObjects_assigned.addAll(assignList);
-                            CreateWaybillDto waybillDto = this.makeOneWaybillPlan(assignList);
+                            ListWaybillPlanDto waybillDto = this.makeOneWaybillPlan(assignList);
                             waybillDtos.add(waybillDto);
                             assignList.clear();
                             break;
@@ -135,27 +134,27 @@ public class WaybillServiceImpl implements WaybillService {
      * @param assignList
      * @return
      */
-    private  CreateWaybillDto makeOneWaybillPlan(List<MiddleObject> assignList){
-        CreateWaybillDto createwaybillDto = new CreateWaybillDto();
+    private  ListWaybillPlanDto makeOneWaybillPlan(List<MiddleObject> assignList){
+        ListWaybillPlanDto waybillPlanDto = new ListWaybillPlanDto();
         Orders ordersData = null;
         ListTruckTypeDto truckType = null;
         Integer orderId = 0;
-        Integer truckTypeId=0;
         for (MiddleObject obj:assignList) {
             orderId = obj.getOrderId();
             ordersData = ordersMapper.selectByPrimaryKey(orderId);
             if(ordersData == null){
                 throw new NullPointerException("订单号为：" + orderId + " 不存在");
             }
-            truckTypeId= obj.getTruckId();
+            Integer truckTypeId= obj.getTruckId();
+            truckType = truckTypeClientService.getTruckTypeById(truckTypeId);
             break;
         }
-        createwaybillDto.setOrderId(orderId);
-        createwaybillDto.setNeedTruckType(truckTypeId);
-        createwaybillDto.setLoadSiteId(ordersData.getLoadSiteId());
-        createwaybillDto.setTruckTeamContractId(ordersData.getCustomerContractId());
+        waybillPlanDto.setOrderId(orderId);
+        waybillPlanDto.setNeedTruckType(truckType);
+        waybillPlanDto.setLoadSiteId(ordersData.getLoadSiteId());
+        waybillPlanDto.setTruckTeamContractId(ordersData.getCustomerContractId());
 
-        List<CreateWaybillItemsDto> itemsList = new ArrayList<>();
+        List<ListWaybillItemsPlanDto> itemsList = new ArrayList<>();
         for (MiddleObject obj:assignList) {
              OrderGoods orderGoods = orderGoodsMapper.selectByPrimaryKey(obj.getOrderGoodsId());
             Integer goodsUnit = orderGoods.getGoodsUnit();
@@ -163,12 +162,12 @@ public class WaybillServiceImpl implements WaybillService {
                 throw new NullPointerException("goodsId为：" + obj.getOrderGoodsId()+ " 的货物不存在");
             }
             OrderItems orderItems = orderItemsMapper.selectByPrimaryKey(obj.getOrderItemId());
-            CreateWaybillItemsDto createWaybillItemsDto = new CreateWaybillItemsDto();
+            ListWaybillItemsPlanDto createWaybillItemsDto = new ListWaybillItemsPlanDto();
             createWaybillItemsDto
                     .setUnloadSiteId(orderItems.getUnloadId())
                     .setRequiredTime(orderItems.getUnloadTime());
-            List<CreateWaybillGoodsDto> goodsList = new LinkedList<>();
-            CreateWaybillGoodsDto createWaybillGoodsDto = new CreateWaybillGoodsDto();
+            List<ListWaybillGoodsPlanDto> goodsList = new LinkedList<>();
+            ListWaybillGoodsPlanDto createWaybillGoodsDto = new ListWaybillGoodsPlanDto();
             createWaybillGoodsDto
                     .setGoodsId(orderGoods.getId())
                     .setGoodsName(orderGoods.getGoodsName())
@@ -184,12 +183,13 @@ public class WaybillServiceImpl implements WaybillService {
             createWaybillItemsDto.setGoods(goodsList);
             itemsList.add(createWaybillItemsDto);
         }
-        createwaybillDto.setWaybillItems(itemsList);
-    return createwaybillDto;
+        waybillPlanDto.setWaybillItems(itemsList);
+    return waybillPlanDto;
  }
 
 @Override
 public Map<String,Object> createWaybill(List<CreateWaybillDto> waybillDtos) {
+
     return null;
 }
 @Data

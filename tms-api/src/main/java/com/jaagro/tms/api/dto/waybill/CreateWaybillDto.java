@@ -20,10 +20,6 @@ public class CreateWaybillDto implements Serializable {
     private Integer orderId;
 
     /**
-     * 需求车型列表
-     */
-    private List<TruckDto> trucks;
-    /**
      * 装货地id
      */
     private Integer loadSiteId;
