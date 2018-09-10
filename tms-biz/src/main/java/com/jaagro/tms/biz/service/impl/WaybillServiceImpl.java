@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,13 +34,13 @@ public class WaybillServiceImpl implements WayBillService {
     private CurrentUserService currentUserService;
     @Autowired
     private CustomerClientService customerClientService;
-    @Resource
+    @Autowired
     private WaybillMapper waybillMapper;
-    @Resource
+    @Autowired
     private OrdersMapper ordersMapper;
-    @Resource
+    @Autowired
     private WaybillTrackingMapper waybillTrackingMapper;
-    @Resource
+    @Autowired
     private WaybillTrackingImagesMapper waybillTrackingImagesMapper;
 
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
@@ -101,16 +100,10 @@ public class WaybillServiceImpl implements WayBillService {
             ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
             waybillDetailsAppDto.setLoadSite(loadSite);
             //提货单
-            boolean flag=(WaybillStatus.ARRIVE_LOAD_SITE.equals(waybillAppDtos.get(0).getWaybillStatus())
-                    || WaybillStatus.LOAD_PRODUCT.equals(waybillAppDtos.get(0).getWaybillStatus())
-                    || WaybillStatus.SIGN.equals(waybillAppDtos.get(0).getWaybillStatus())
-                    || WaybillStatus.ACCOMPLISH.equals(waybillAppDtos.get(0).getWaybillStatus()));
-            if (flag) {
-                waybillTrackingImages.setWaybillId(waybillId);
-                waybillTrackingImages.setSiteId(orders.getLoadSiteId());
-                List<GetWaybillTrackingImagesDto> loadSiteWaybillTrackingImages = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
-                loadSite.setWaybillTrackingImagesDtos(loadSiteWaybillTrackingImages);
-            }
+            waybillTrackingImages.setWaybillId(waybillId);
+            waybillTrackingImages.setSiteId(orders.getLoadSiteId());
+            List<GetWaybillTrackingImagesDto> loadSiteWaybillTrackingImages = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
+            loadSite.setWaybillTrackingImagesDtos(loadSiteWaybillTrackingImages);
         }
         //卸货信息
         List<GetWaybillItemsDto> waybillItems = waybillAppDtos.get(0).getWaybillItems();
@@ -120,13 +113,11 @@ public class WaybillServiceImpl implements WayBillService {
             ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
             unloadSite.setGoods(goods);
             unloadSite.setRequiredTime(waybillItem.getRequiredTime());
-            //判断运单是否签收 签收显示卸货单
-            if (waybillItem.getSignStatus()) {
-                waybillTrackingImages.setWaybillId(waybillId);
-                waybillTrackingImages.setSiteId(waybillItem.getUnloadSiteId());
-                List<GetWaybillTrackingImagesDto> waybillTrackingImagesDtosList = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
-                unloadSite.setWaybillTrackingImagesDtos(waybillTrackingImagesDtosList);
-            }
+            //卸货单
+            waybillTrackingImages.setWaybillId(waybillId);
+            waybillTrackingImages.setSiteId(waybillItem.getUnloadSiteId());
+            List<GetWaybillTrackingImagesDto> waybillTrackingImagesDtosList = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
+            unloadSite.setWaybillTrackingImagesDtos(waybillTrackingImagesDtosList);
             unloadSiteList.add(unloadSite);
 
         }
@@ -160,7 +151,7 @@ public class WaybillServiceImpl implements WayBillService {
                         .setNewStatus(WaybillStatus.DEPART);
                 WaybillTracking waybillTracking = waybillTrackingMapper.selectSingleTime(waybillTrackingCondition);
                 if (null != waybillTracking) {
-                    listWaybillAppDto.setSendTime(waybillTracking.getCreateTime());
+                    listWaybillAppDto.setSingleTime(waybillTracking.getCreateTime());
                 }
                 //客户信息
                 Orders orders = ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());

@@ -30,6 +30,7 @@ public class ListWaybillAppDto implements Serializable {
     /**
      * 接单时间
      */
+    private Date singleTime;
 
     /**
      * 运单号
