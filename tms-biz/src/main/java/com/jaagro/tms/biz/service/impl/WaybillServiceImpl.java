@@ -41,7 +41,6 @@ import java.util.Map;
 public class WaybillServiceImpl implements WayBillService {
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
 
-
     @Autowired
     private CurrentUserService currentUserService;
     @Autowired
