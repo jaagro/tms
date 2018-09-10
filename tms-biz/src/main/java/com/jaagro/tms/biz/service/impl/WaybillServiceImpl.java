@@ -143,6 +143,7 @@ public class WaybillServiceImpl implements WaybillService {
                         createWaybillItemsDto
                                 .setUnloadSiteId(orderItems.getUnloadId())
                                 .setRequiredTime(orderItems.getUnloadTime());
+                        //这里有个坑，不能直接用weight做判断
                         if(createWaybillGoodsDto.getGoodsWeight().compareTo(BigDecimal.valueOf(0)) == 1){
                             goodsList.add(createWaybillGoodsDto);
                         }
