@@ -32,7 +32,6 @@ import java.util.Map;
 @Service
 public class WaybillServiceImpl implements WayBillService {
 
-
     @Autowired
     private CurrentUserService currentUserService;
     @Autowired
