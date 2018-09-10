@@ -36,4 +36,19 @@ public class ShowGoodsDto implements Serializable {
      * 计划重量
      */
     private BigDecimal goodsWeight;
+
+    /**
+     * 是否加药
+     */
+    private Boolean joinDrug;
+
+    /**
+     * 装货重量
+     */
+    private BigDecimal loadWeight;
+
+    /**
+     * 卸货重量
+     */
+    private Integer unloadWeight;
 }

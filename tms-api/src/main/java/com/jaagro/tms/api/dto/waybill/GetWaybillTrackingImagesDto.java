@@ -1,14 +1,19 @@
-package com.jaagro.tms.biz.entity;
+package com.jaagro.tms.api.dto.waybill;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.Date;
+
+/**
+ * @author @gao
+ */
 @Data
 @Accessors(chain = true)
-public class WaybillTrackingImages {
+public class GetWaybillTrackingImagesDto implements Serializable {
     /**
-     * 
+     *
      */
     private Integer id;
 
@@ -18,7 +23,7 @@ public class WaybillTrackingImages {
     private Integer waybillId;
 
     /**
-     * 
+     *
      */
     private Integer waybillTrackingId;
 
@@ -48,16 +53,16 @@ public class WaybillTrackingImages {
     private Integer createUserId;
 
     /**
-     * 
-     * @return id 
+     *
+     * @return id
      */
     public Integer getId() {
         return id;
     }
 
     /**
-     * 
-     * @param id 
+     *
+     * @param id
      */
     public void setId(Integer id) {
         this.id = id;
@@ -80,16 +85,16 @@ public class WaybillTrackingImages {
     }
 
     /**
-     * 
-     * @return waybill_tracking_id 
+     *
+     * @return waybill_tracking_id
      */
     public Integer getWaybillTrackingId() {
         return waybillTrackingId;
     }
 
     /**
-     * 
-     * @param waybillTrackingId 
+     *
+     * @param waybillTrackingId
      */
     public void setWaybillTrackingId(Integer waybillTrackingId) {
         this.waybillTrackingId = waybillTrackingId;
