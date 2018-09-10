@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.service;
 
+import com.jaagro.tms.api.dto.waybill.CreateWaybillDto;
 import com.jaagro.tms.api.dto.waybill.CreateWaybillPlanDto;
 import com.jaagro.tms.api.dto.waybill.GetWaybillParamDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillPlanDto;
@@ -40,4 +41,11 @@ public interface WayBillService {
      * @return
      */
     List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto);
+
+    /**
+     * 创建运单
+     * @param waybillDto
+     * @return
+     */
+    Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDto);
 }

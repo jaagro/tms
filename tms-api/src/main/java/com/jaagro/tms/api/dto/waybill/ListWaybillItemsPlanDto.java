@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.dto.waybill;
 
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -17,6 +18,10 @@ public class ListWaybillItemsPlanDto implements Serializable {
      * 卸货地id
      */
     private Integer unloadSiteId;
+    /**
+     * 卸货地对象
+     */
+    private ShowSiteDto showSiteDto;
     /**
      * 要求送达时间
      */

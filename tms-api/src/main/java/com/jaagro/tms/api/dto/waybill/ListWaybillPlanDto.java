@@ -19,6 +19,10 @@ public class ListWaybillPlanDto implements Serializable {
      */
     private Integer orderId;
     /**
+     * 车型id
+     */
+    private Integer truckTypeId;
+    /**
      * 需求车型
      */
     private ListTruckTypeDto needTruckType;
@@ -26,6 +30,10 @@ public class ListWaybillPlanDto implements Serializable {
      * 装货地id
      */
     private Integer loadSiteId;
+    /**
+     * 货物类型
+     */
+    private Integer goodType;
     /**
      * 装货时间(就是提货时间)
      */
