@@ -64,4 +64,12 @@ public interface WaybillMapper {
      * @return
      */
     List<GetWaybillAppDto> selectWaybillByStatus(Waybill record);
+
+    /**
+     * 根据orderId获取waybillId的list
+     * @param orderId
+     * @return
+     */
+    List<Integer> listWaybillIdByOrderId(Integer orderId);
+
 }

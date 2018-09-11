@@ -11,6 +11,7 @@
         <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
         <result column="send_time" property="sendTime" jdbcType="TIMESTAMP"/>
         <result column="distance" property="distance" jdbcType="DECIMAL"/>
+        <result column="enabled" property="enabled" jdbcType="BIT" />
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="created_user_id" property="createdUserId" jdbcType="INTEGER"/>
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
@@ -36,8 +37,9 @@
         <collection property="waybillItems" column="id"
                     select="com.jaagro.tms.biz.mapper.WaybillItemsMapper.listByWaybillId"></collection>
     </resultMap>
+
     <sql id="Base_Column_List">
-    id, order_id, truck_team_contract_id, waybill_status, need_truck_type, truck_id, 
+    id, order_id, truck_team_contract_id, waybill_status, need_truck_type, truck_id, enabled,
     driver_id, send_time, distance, create_time, created_user_id, modify_time, modify_user_id, load_site_id
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
@@ -50,19 +52,19 @@
     delete from waybill
     where id = #{id,jdbcType=INTEGER}
   </delete>
-    <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Waybill">
+    <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Waybill"  useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
     insert into waybill (id, order_id, truck_team_contract_id, 
       waybill_status, need_truck_type, truck_id, 
-      driver_id, send_time, distance, 
+      driver_id, send_time, distance,
       create_time, created_user_id, modify_time, 
-      modify_user_id, load_site_id)
+      modify_user_id, load_site_id), enabled
     values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{truckTeamContractId,jdbcType=INTEGER}, 
       #{waybillStatus,jdbcType=VARCHAR}, #{needTruckType,jdbcType=INTEGER}, #{truckId,jdbcType=INTEGER}, 
       #{driverId,jdbcType=INTEGER}, #{sendTime,jdbcType=TIMESTAMP}, #{distance,jdbcType=DECIMAL}, 
       #{createTime,jdbcType=TIMESTAMP}, #{createdUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, 
-      #{modifyUserId,jdbcType=INTEGER}, #{loadSiteId,jdbcType=INTEGER})
+      #{modifyUserId,jdbcType=INTEGER}, #{loadSiteId,jdbcType=INTEGER}), #{enabled,jdbcType=BIT}
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Waybill" >
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Waybill" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
     insert into waybill
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -159,6 +161,9 @@
       <if test="orderId != null" >
         order_id = #{orderId,jdbcType=INTEGER},
       </if>
+      <if test="enabled != null" >
+        enabled = #{enabled,jdbcType=BIT},
+      </if>
       <if test="truckTeamContractId != null" >
         truck_team_contract_id = #{truckTeamContractId,jdbcType=INTEGER},
       </if>
@@ -201,6 +206,7 @@
   <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.Waybill" >
     update waybill
     set order_id = #{orderId,jdbcType=INTEGER},
+      enabled = #{enabled,jdbcType=BIT},
       truck_team_contract_id = #{truckTeamContractId,jdbcType=INTEGER},
       waybill_status = #{waybillStatus,jdbcType=VARCHAR},
       need_truck_type = #{needTruckType,jdbcType=INTEGER},
@@ -220,7 +226,6 @@
     <include refid="Base_Column_List" />
     from waybill
     where order_id = #{orderld,jdbcType=INTEGER}
-
   </select>
     <select id="selectWaybillByCarrierStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
         select
@@ -246,6 +251,12 @@
         <if test="id != null">
             id = #{id,jdbcType=INTEGER}
         </if>
+    </select>
+    <select id="listWaybillIdByOrderId" resultType="java.lang.Integer">
+        select id
+        from waybill
+        where order_id = #{orderId, jdbcType=INTEGER}
+        and enabled = 1
     </select>
 
 </mapper>

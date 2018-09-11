@@ -1,7 +1,8 @@
 package com.jaagro.tms.web.controller;
 
+import com.jaagro.tms.api.dto.waybill.GetReceiptParamDto;
 import com.jaagro.tms.api.dto.waybill.GetWaybillParamDto;
-import com.jaagro.tms.api.service.WayBillService;
+import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,7 +21,7 @@ import java.util.Map;
 public class WaybillAppController {
 
     @Autowired
-    private WayBillService waybillService;
+    private WaybillService waybillService;
 
     @ApiOperation("我的运单")
     @PostMapping("/listWaybillApp")
@@ -49,5 +50,32 @@ public class WaybillAppController {
             return BaseResponse.errorInstance("订单参数不能为空");
         }
         return BaseResponse.service(waybillService.showWaybill(waybillId));
+    }
+
+    @ApiOperation("接单列表")
+    @PostMapping("/receiptListApp")
+    public BaseResponse receiptListApp(@RequestBody GetReceiptParamDto dto) {
+        if (dto == null) {
+            return BaseResponse.errorInstance("接单参数不能为空");
+        }
+        return BaseResponse.service(waybillService.receiptList(dto));
+    }
+
+    @ApiOperation("接单控制")
+    @PostMapping("/upDateReceiptStatusApp")
+    public BaseResponse upDateReceiptStatusApp(@RequestBody GetReceiptParamDto dto) {
+        if (dto.getWaybillId() == null) {
+            return BaseResponse.errorInstance("接单参数不能为空");
+        }
+        return BaseResponse.service(waybillService.upDateReceiptStatus(dto));
+    }
+
+    @ApiOperation("接单消息")
+    @PostMapping("/receiptMessageApp")
+    public BaseResponse receiptMessageApp(GetReceiptParamDto dto) {
+        if (dto == null) {
+            return BaseResponse.errorInstance("订单参数不能为空");
+        }
+        return BaseResponse.service(waybillService.receiptMessage(dto));
     }
 }

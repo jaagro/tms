@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.dto.waybill;
 
+import com.jaagro.tms.api.dto.order.GetOrderDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -11,15 +12,15 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class UpdateWaybillPlanDto implements Serializable {
+public class GetWaybillPlanDto implements Serializable {
 
     /**
-     * 订单id
+     * 订单信息
      */
-    private Integer orderId;
+    private GetOrderDto orderDto;
 
     /**
-     * 订单明细列表
+     * 订单相关运单列表
      */
-    private List<UpdateWaybillItemPlanDto> waybillItemPlans;
+    private List<GetWaybillDto> waybillDtoList;
 }

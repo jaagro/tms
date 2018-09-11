@@ -13,11 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gavin
@@ -27,7 +26,7 @@ import java.util.List;
 public class WaybillController {
 
     @Autowired
-    private WayBillService waybillService;
+    private WaybillService waybillService;
 
     /**
      * 创建运单计划
@@ -66,6 +65,52 @@ public class WaybillController {
         } catch (Exception e) {
             e.printStackTrace();
             return BaseResponse.errorInstance(e.getMessage());
+        }
+    }
+
+    @ApiOperation("通过id获取运单对象")
+    @GetMapping("/waybill/{id}")
+    public BaseResponse getWaybillById(@PathVariable("id") Integer id){
+        GetWaybillDto result;
+        try {
+            result = waybillService.getWaybillById(id);
+        } catch (Exception e){
+            e.printStackTrace();
+            return BaseResponse.errorInstance(e.getMessage());
+        }
+        return BaseResponse.successInstance(result);
+    }
+
+    @ApiOperation("通过id获取运单对象")
+    @GetMapping("/orderAndWaybill/{orderId}")
+    public BaseResponse getOrderAndWaybillByOrderId(@PathVariable("orderId") Integer orderId){
+        GetWaybillPlanDto result;
+        try {
+            result = waybillService.getOrderAndWaybill(orderId);
+        } catch (Exception e){
+            e.printStackTrace();
+            return BaseResponse.errorInstance(e.getMessage());
+        }
+        return BaseResponse.successInstance(result);
+    }
+
+
+    /**
+     * 创建运单
+     * @param waybillDtoList
+     * @return
+     */
+    @ApiOperation("创建运单")
+    @PostMapping("/createWaybill")
+    public BaseResponse createWaybill(@RequestBody List<CreateWaybillDto> waybillDtoList) {
+        Map<String, Object> result;
+        try {
+            result = waybillService.createWaybill(waybillDtoList);
+            return BaseResponse.successInstance(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new NullPointerException("创建运单失败:"+e.getMessage());
+            //return BaseResponse.errorInstance(e.getMessage());
         }
     }
 }

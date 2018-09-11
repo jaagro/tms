@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.dto.waybill;
 
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -8,33 +9,30 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author tony
+ * @author @gao
  */
 @Data
 @Accessors(chain = true)
-public class CreateWaybillItemsDto implements Serializable {
-
+public class GetReceiptListAppDto implements Serializable {
     /**
      * 运单id
      */
     private Integer waybillId;
+    /**
+     * 提货时间
+     */
+    private Date loadTime;
+    /**
+     * 装货地
+     */
+    private ShowSiteDto loadSite;
+    /**
+     * 卸货地
+     */
+    private List<ShowSiteDto> unloadSite;
 
     /**
-     * 卸货地id
+     * 货物
      */
-    private Integer unloadSiteId;
-    /**
-     * 订单明细id 用于获取卸货地id
-     */
-    private Integer orderItemId;
-
-    /**
-     * 要求送达时间
-     */
-    private Date requiredTime;
-
-    /**
-     * 商品信息列表
-     */
-    private List<CreateWaybillGoodsDto> goods;
+    private List<ShowGoodsDto> goods;
 }
