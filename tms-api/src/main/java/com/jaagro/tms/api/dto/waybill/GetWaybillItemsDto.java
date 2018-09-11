@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class  GetWaybillItemsDto implements Serializable {
+public class GetWaybillItemsDto implements Serializable {
     /**
      *
      */
@@ -29,6 +29,11 @@ public class  GetWaybillItemsDto implements Serializable {
      * 卸货地id
      */
     private Integer unloadSiteId;
+
+    /**
+     * 卸货地对象
+     */
+    private ShowSiteDto unloadSite;
 
     /**
      * 要求送达时间

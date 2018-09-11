@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * @author tony
  */
-public interface WayBillService {
+public interface WaybillService {
 
     /**
      * 根据状态查询我的运单信息
@@ -39,11 +39,18 @@ public interface WayBillService {
     List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto);
 
     /**
+     * 根据orderId获取订单计划
+     * @param orderId
+     * @return
+     */
+    Map<String, Object> getWaybillPlanByOrderId(Integer orderId);
+
+    /**
      * 修改订单计划
      * @param waybillPlanDto
      * @return
      */
-    Map<String, Object> updateWaybillPlan(UpdateWaybillPlanDto waybillPlanDto);
+    Map<String, Object> updateWaybillPlan(CreateWaybillPlanDto waybillPlanDto);
 
     /**
      * 创建运单
@@ -51,4 +58,18 @@ public interface WayBillService {
      * @return
      */
     Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDto);
+
+    /**
+     * 根据订单号获取运单列表
+     * @param orderId
+     * @return
+     */
+    List<GetWaybillDto> listWaybillByOrderId(Integer orderId);
+
+    /**
+     * 根据id获取waybill对象
+     * @param id
+     * @return
+     */
+    GetWaybillDto getWaybillById(Integer id);
 }

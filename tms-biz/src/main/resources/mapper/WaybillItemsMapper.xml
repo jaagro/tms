@@ -31,6 +31,12 @@
     from waybill_items
     where id = #{id,jdbcType=INTEGER}
   </select>
+  <select id="listWaybillItemsByWaybillId" resultType="com.jaagro.tms.biz.entity.WaybillItems">
+    select
+    <include refid="Base_Column_List" />
+    from waybill_items
+    where waybill_id = #{waybillId,jdbcType=INTEGER}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from waybill_items
     where id = #{id,jdbcType=INTEGER}
@@ -136,10 +142,4 @@
       sign_status = #{signStatus,jdbcType=BIT}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="listByWaybillId" resultMap="DetailInfo" parameterType="java.lang.Integer" >
-    select
-    <include refid="Base_Column_List" />
-    from waybill_items
-    where waybill_id = #{id,jdbcType=INTEGER}
-  </select>
 </mapper>

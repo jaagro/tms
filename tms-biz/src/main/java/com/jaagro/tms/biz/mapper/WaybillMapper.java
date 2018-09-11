@@ -64,4 +64,5 @@ public interface WaybillMapper {
      * @return
      */
     List<GetWaybillAppDto> selectWaybillByStatus(Waybill record);
+
 }

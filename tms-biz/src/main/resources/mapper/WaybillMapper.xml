@@ -36,6 +36,7 @@
         <collection property="waybillItems" column="id"
                     select="com.jaagro.tms.biz.mapper.WaybillItemsMapper.listByWaybillId"></collection>
     </resultMap>
+
     <sql id="Base_Column_List">
     id, order_id, truck_team_contract_id, waybill_status, need_truck_type, truck_id, 
     driver_id, send_time, distance, create_time, created_user_id, modify_time, modify_user_id, load_site_id
@@ -220,7 +221,6 @@
     <include refid="Base_Column_List" />
     from waybill
     where order_id = #{orderld,jdbcType=INTEGER}
-
   </select>
     <select id="selectWaybillByCarrierStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
         select

@@ -5,7 +5,7 @@ import com.jaagro.tms.api.dto.waybill.CreateWaybillGoodsPlanDto;
 import com.jaagro.tms.api.dto.waybill.CreateWaybillItemsPlanDto;
 import com.jaagro.tms.api.dto.waybill.CreateWaybillPlanDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillPlanDto;
-import com.jaagro.tms.api.service.WayBillService;
+import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +27,7 @@ import java.util.List;
 public class WaybillController {
 
     @Autowired
-    private WayBillService waybillService;
+    private WaybillService waybillService;
 
     /**
      * 创建运单计划

@@ -5,14 +5,17 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
+import com.jaagro.tms.api.dto.base.ShowTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.service.WayBillService;
+import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.biz.service.TruckClientService;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.tms.biz.vo.MiddleObjectVo;
 import com.jaagro.utils.ServiceResult;
@@ -23,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -33,7 +37,7 @@ import java.util.stream.Collectors;
  * @author tony
  */
 @Service
-public class WaybillServiceImpl implements WayBillService {
+public class WaybillServiceImpl implements WaybillService {
 
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
 
@@ -61,6 +65,8 @@ public class WaybillServiceImpl implements WayBillService {
     private WaybillTrackingMapper waybillTrackingMapper;
     @Autowired
     private OrderGoodsMarginMapper orderGoodsMarginMapper;
+    @Autowired
+    private TruckClientService truckClientService;
 
     @Override
     public List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto){
@@ -94,6 +100,17 @@ public class WaybillServiceImpl implements WayBillService {
     }
 
     /**
+     * 根据orderId获取订单计划
+     *
+     * @param orderId
+     * @return
+     */
+    @Override
+    public Map<String, Object> getWaybillPlanByOrderId(Integer orderId) {
+        return null;
+    }
+
+    /**
      * 修改订单计划
      *
      * @param waybillPlanDto 入参修改对象
@@ -101,7 +118,7 @@ public class WaybillServiceImpl implements WayBillService {
      * @author tony
      */
     @Override
-    public Map<String, Object> updateWaybillPlan(UpdateWaybillPlanDto waybillPlanDto) {
+    public Map<String, Object> updateWaybillPlan(CreateWaybillPlanDto waybillPlanDto) {
         return null;
     }
 
@@ -285,6 +302,86 @@ public class WaybillServiceImpl implements WayBillService {
 
         return null;
     }
+
+    /**
+     * 根据订单号获取运单列表
+     *
+     * @param orderId
+     * @return
+     */
+    @Override
+    public List<GetWaybillDto> listWaybillByOrderId(Integer orderId) {
+        List<Waybill> waybillList = waybillMapper.selectByOrderId(orderId);
+        if(waybillList == null){
+            throw new NullPointerException("当前订单无有效运单");
+        }
+        List<GetWaybillDto> getWaybills = new ArrayList<>();
+        for (Waybill waybill : waybillList){
+            GetWaybillDto getWaybillDto = new GetWaybillDto();
+            BeanUtils.copyProperties(waybill, getWaybillDto);
+            getWaybills.add(getWaybillDto);
+        }
+
+        return null;
+    }
+
+    /**
+     * 根据id获取waybill对象
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public GetWaybillDto getWaybillById(Integer id) {
+        //拿到waybill对象
+        Waybill waybill = waybillMapper.selectByPrimaryKey(id);
+        if(waybill == null){
+            throw new NullPointerException(id + ": 无效");
+        }
+        //拿到装货地对象
+        ShowSiteDto loadSiteDto = customerClientService.getShowSiteById(waybill.getLoadSiteId());
+
+        //拿到车型对象
+        ListTruckTypeDto truckTypeDto = null;
+        if(!StringUtils.isEmpty(waybill.getNeedTruckType())) {
+            truckTypeDto = truckTypeClientService.getTruckTypeById(waybill.getNeedTruckType());
+        }
+        //车辆对象
+        ShowTruckDto truckDto = null;
+        if(!StringUtils.isEmpty(waybill.getTruckId())){
+            truckDto = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
+        }
+        //获取waybillItem列表
+        List<GetWaybillItemsDto> getWaybillItemsDtoList = new ArrayList<>();
+        List<WaybillItems> waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybill.getId());
+        for(WaybillItems items : waybillItemsList){
+            GetWaybillItemsDto getWaybillItemsDto = new GetWaybillItemsDto();
+            BeanUtils.copyProperties(items, getWaybillItemsDto);
+            List<ShowGoodsDto> showGoodsDtoList = new LinkedList<>();
+            List<WaybillGoods> waybillGoodsList = waybillGoodsMapper.listWaybillGoodsByItemId(items.getId());
+            for(WaybillGoods wg : waybillGoodsList){
+                ShowGoodsDto showGoodsDto = new ShowGoodsDto();
+                BeanUtils.copyProperties(wg, showGoodsDto);
+                showGoodsDtoList.add(showGoodsDto);
+            }
+            //拿到卸货信息
+            ShowSiteDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());
+            getWaybillItemsDto
+                    .setUnloadSite(unloadSite)
+                    .setGoods(showGoodsDtoList);
+             getWaybillItemsDtoList.add(getWaybillItemsDto);
+        }
+        GetWaybillDto getWaybillDto = new GetWaybillDto();
+        BeanUtils.copyProperties(waybill, getWaybillDto);
+        getWaybillDto
+                .setLoadSite(loadSiteDto)
+                .setNeedTruckType(truckTypeDto)
+                .setTruckId(truckDto)
+                .setWaybillItems(getWaybillItemsDtoList);
+
+        return getWaybillDto;
+    }
+
     /**
      * 根据状态查询我的运单信息
      *

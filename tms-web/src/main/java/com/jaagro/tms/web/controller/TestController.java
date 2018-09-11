@@ -4,14 +4,19 @@ import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
+import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.waybill.CreateWaybillPlanDto;
+import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillPlanDto;
-import com.jaagro.tms.api.service.WayBillService;
+import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.biz.service.TruckClientService;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import com.jaagro.utils.BeanDifferentUtils;
 import com.jaagro.utils.DifferentResult;
+import io.swagger.annotations.Authorization;
+import lombok.experimental.Accessors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +35,7 @@ public class TestController {
     @Autowired
     private TruckTypeClientService truckTypeClientService;
     @Autowired
-    private WayBillService waybillService;
+    private WaybillService waybillService;
 
     @GetMapping("/test1/{id}")
     public ShowCustomerDto test1(@PathVariable("id") Integer id){
@@ -68,5 +73,22 @@ public class TestController {
     @PostMapping("/createWaybillPlan")
     public List<ListWaybillPlanDto> createWaybill(@RequestBody CreateWaybillPlanDto waybillPlanDto){
         return waybillService.createWaybillPlan(waybillPlanDto);
+    }
+
+//    @GetMapping("/test7/{orderId}")
+//    public List<GetWaybillDto> test7(@PathVariable("orderId") Integer orderId){
+//        return waybillService.listWaybillByOrderId(orderId);
+//    }
+    @Autowired
+    private TruckClientService truckClientService;
+
+    @GetMapping("/test8/{truckId}")
+    public ShowTruckDto test8(@PathVariable("truckId") Integer truckId){
+        return truckClientService.getTruckByIdReturnObject(truckId);
+    }
+
+    @GetMapping("/test9/{id}")
+    public GetWaybillDto test9(@PathVariable("id") Integer id){
+        return waybillService.getWaybillById(id);
     }
 }

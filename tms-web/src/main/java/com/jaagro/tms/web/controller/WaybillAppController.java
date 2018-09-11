@@ -1,7 +1,7 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.waybill.GetWaybillParamDto;
-import com.jaagro.tms.api.service.WayBillService;
+import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class WaybillAppController {
 
     @Autowired
-    private WayBillService waybillService;
+    private WaybillService waybillService;
 
     @ApiOperation("我的运单")
     @PostMapping("/listWaybillApp")
