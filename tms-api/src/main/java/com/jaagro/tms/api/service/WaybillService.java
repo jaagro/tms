@@ -46,11 +46,11 @@ public interface WaybillService {
     Map<String, Object> getWaybillPlanByOrderId(Integer orderId);
 
     /**
-     * 修改订单计划
-     * @param waybillPlanDto
+     * 从配载计划中移除运单【逻辑删除】
+     * @param waybillId
      * @return
      */
-    Map<String, Object> updateWaybillPlan(CreateWaybillPlanDto waybillPlanDto);
+    Map<String, Object> removeWaybillFromPlan(Integer waybillId);
 
     /**
      * 创建运单

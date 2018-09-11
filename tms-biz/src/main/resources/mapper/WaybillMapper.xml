@@ -251,6 +251,7 @@
         select id
         from waybill
         where order_id = #{orderId, jdbcType=INTEGER}
+        and enabled = 1
     </select>
 
 </mapper>

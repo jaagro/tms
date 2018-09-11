@@ -5,7 +5,6 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
-import com.jaagro.tms.api.dto.base.ShowTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
@@ -119,14 +118,15 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     /**
-     * 修改订单计划
+     * 从配载计划中移除运单【逻辑删除】
      *
-     * @param waybillPlanDto 入参修改对象
+     * @param waybillId
      * @return 结果集
      * @author tony
      */
     @Override
-    public Map<String, Object> updateWaybillPlan(CreateWaybillPlanDto waybillPlanDto) {
+    public Map<String, Object> removeWaybillFromPlan(Integer waybillId) {
+        //判断运单状态是否满足条件
         return null;
     }
 
