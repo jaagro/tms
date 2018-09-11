@@ -27,7 +27,7 @@ public class ListWaybillItemsPlanDto implements Serializable {
      */
     private ShowSiteDto showSiteDto;
     /**
-     * 要求送达时间
+     * 要求送达时间 (就是卸货时间)
      */
     private Date requiredTime;
 

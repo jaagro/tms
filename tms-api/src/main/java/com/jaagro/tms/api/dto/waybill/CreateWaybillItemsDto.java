@@ -23,6 +23,10 @@ public class CreateWaybillItemsDto implements Serializable {
      * 卸货地id
      */
     private Integer unloadSiteId;
+    /**
+     * 订单明细id 用于获取卸货地id
+     */
+    private Integer orderItemId;
 
     /**
      * 要求送达时间

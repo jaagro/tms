@@ -52,6 +52,10 @@ public class Waybill implements Serializable {
      * 司机id
      */
     private Integer driverId;
+    /**
+     * 是否有效
+     */
+    private Boolean enabled;
 
     /**
      * 任务推送司机时间

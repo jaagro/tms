@@ -21,7 +21,7 @@ public class ListWaybillPlanDto implements Serializable {
     /**
      * 车型id
      */
-    private Integer truckTypeId;
+    private Integer needTruckTypeId;
     /**
      * 需求车型
      */

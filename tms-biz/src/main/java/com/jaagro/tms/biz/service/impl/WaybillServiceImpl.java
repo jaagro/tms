@@ -3,6 +3,7 @@ package com.jaagro.tms.biz.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
@@ -171,7 +172,7 @@ public class WaybillServiceImpl implements WayBillService {
             break;
         }
         waybillPlanDto.setOrderId(orderId);
-        waybillPlanDto.setTruckTypeId(truckTypeId);
+        waybillPlanDto.setNeedTruckTypeId(truckTypeId);
         waybillPlanDto.setNeedTruckType(truckType);
         waybillPlanDto.setLoadSiteId(ordersData.getLoadSiteId());
         waybillPlanDto.setTruckTeamContractId(ordersData.getCustomerContractId());
@@ -193,19 +194,19 @@ public class WaybillServiceImpl implements WayBillService {
             waybillItemsPlanDto.setShowSiteDto(showSiteDto);
             waybillItemsPlanDto.setRequiredTime(orderItems.getUnloadTime());
             List<ListWaybillGoodsPlanDto> goodsList = new LinkedList<>();
-            ListWaybillGoodsPlanDto createWaybillGoodsDto = new ListWaybillGoodsPlanDto();
-            createWaybillGoodsDto
-                    .setGoodsId(orderGoods.getId())
+            ListWaybillGoodsPlanDto waybillGoodsDto = new ListWaybillGoodsPlanDto();
+            waybillGoodsDto
+                    .setOrderGoodsId(orderGoods.getId())
                     .setGoodsName(orderGoods.getGoodsName())
                     .setGoodsQuantity(orderGoods.getGoodsQuantity())
                     .setGoodsUnit(orderGoods.getGoodsUnit())
                     .setJoinDrug(orderGoods.getJoinDrug());
             if(goodsUnit==3){
-                createWaybillGoodsDto.setGoodsWeight(new BigDecimal(obj.getPlanAmount()));
+                waybillGoodsDto.setGoodsWeight(new BigDecimal(obj.getPlanAmount()));
             }else{
-                createWaybillGoodsDto.setGoodsQuantity(obj.getPlanAmount());
+                waybillGoodsDto.setGoodsQuantity(obj.getPlanAmount());
             }
-            goodsList.add(createWaybillGoodsDto);
+            goodsList.add(waybillGoodsDto);
             waybillItemsPlanDto.setGoods(goodsList);
             itemsList.add(waybillItemsPlanDto);
         }
@@ -216,57 +217,67 @@ public class WaybillServiceImpl implements WayBillService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
-
+        //更新orders表的状态OrderStatus.STOWAGE
         for (CreateWaybillDto createWaybillDto : waybillDtoList) {
             Integer orderId = createWaybillDto.getOrderId();
-            List<Waybill> waybills =  waybillMapper.selectByOrderId(orderId);
-            if(CollectionUtils.isEmpty(waybills)) {
-                Waybill waybill = new Waybill();
-                waybill.setOrderId(orderId);
-                waybill.setLoadSiteId(createWaybillDto.getLoadSiteId());
-                waybill.setNeedTruckType(createWaybillDto.getNeedTruckType());
-                waybill.setTruckTeamContractId(createWaybillDto.getTruckTeamContractId());
-                waybill.setWaybillStatus(WaybillStatus.RECEIVE);
-                waybill.setCreateTime(new Date());
-                waybill.setCreatedUserId(currentUserService.getShowUser().getId());
-                int waybillId = waybillMapper.insert(waybill);
-                List<CreateWaybillItemsDto> waybillItemsList = createWaybillDto.getWaybillItems();
-                //更新order的状态OrderStatus.STOWAGE
-                for (CreateWaybillItemsDto waybillItemsDto : waybillItemsList) {
-                   // OrderItems orderItems = orderItemsMapper.selectByOrderIdandUnloadSiteId(orderId,waybillItemsDto.getUnloadSiteId());
-                    WaybillItems  waybillItem = new WaybillItems();
-                    waybillItem.setWaybillId(waybillId);
-                    waybillItem.setUnloadSiteId(waybillItemsDto.getUnloadSiteId());
-                    waybillItem.setRequiredTime(waybillItemsDto.getRequiredTime());
-                    //waybillItem.setModifyTime(new Date());
-                    //waybillItem.setModifyUserId(currentUserService.getShowUser().getId());
-                    int waybillItemsId = waybillItemsMapper.insert(waybillItem);
-
-                    List<CreateWaybillGoodsDto> createWaybillGoodsDtoList =  waybillItemsDto.getGoods();
-                    for (CreateWaybillGoodsDto createWaybillGoodsDto : createWaybillGoodsDtoList) {
-                        WaybillGoods waybillGoods = new WaybillGoods();
-                        waybillGoods.setWaybillItemId(waybillItemsId);
-                        waybillGoods.setGoodsName(createWaybillGoodsDto.getGoodsName());
-                        waybillGoods.setGoodsUnit(createWaybillGoodsDto.getGoodsUnit());
-                        if(createWaybillGoodsDto.getGoodsUnit()==3){
-                            waybillGoods.setGoodsWeight(createWaybillGoodsDto.getGoodsWeight());
-                        }else{
-                            waybillGoods.setGoodsQuantity(createWaybillGoodsDto.getGoodsQuantity());
-                        }
-                        waybillGoods.setJoinDrug(createWaybillGoodsDto.getJoinDrug());
-                        waybillGoodsMapper.insert(waybillGoods);
-                        //插入order_goods_margin
-                        OrderGoodsMargin orderGoodsMargin = new OrderGoodsMargin();
-                        orderGoodsMargin.setOrderId(orderId);
-                        //orderGoodsMargin.setOrderItemId(waybillItemsDto.);
-
-                    }
-                }
-
-            }
+            Orders orders = new Orders();
+            orders.setId(orderId);
+            orders.setOrderStatus(OrderStatus.STOWAGE);
+            orders.setModifyTime(new Date());
+            orders.setModifyUserId(99999999);
+            ordersMapper.updateByPrimaryKeySelective(orders);
+            break;
         }
+        for (CreateWaybillDto createWaybillDto : waybillDtoList) {
+            Integer orderId = createWaybillDto.getOrderId();
+            Waybill waybill = new Waybill();
+            waybill.setOrderId(orderId);
+            waybill.setLoadSiteId(createWaybillDto.getLoadSiteId());
+            waybill.setNeedTruckType(createWaybillDto.getNeedTruckTypeId());
+            waybill.setTruckTeamContractId(createWaybillDto.getTruckTeamContractId());
+            waybill.setWaybillStatus(WaybillStatus.RECEIVE);
+            waybill.setCreateTime(new Date());
+            waybill.setCreatedUserId(99999999);
+            //waybill.setCreatedUserId(currentUserService.getCurrentUser().getId());
+            waybillMapper.insertSelective(waybill);
+            int waybillId = waybill.getId();
+            List<CreateWaybillItemsDto> waybillItemsList = createWaybillDto.getWaybillItems();
+            for (CreateWaybillItemsDto waybillItemsDto : waybillItemsList) {
+                WaybillItems  waybillItem = new WaybillItems();
+                waybillItem.setWaybillId(waybillId);
+                waybillItem.setUnloadSiteId(waybillItemsDto.getUnloadSiteId());
+                waybillItem.setRequiredTime(waybillItemsDto.getRequiredTime());
+                waybillItem.setModifyUserId(99999999);
+                waybillItemsMapper.insertSelective(waybillItem);
+                int waybillItemsId =waybillItem.getId();
 
-        return null;
+                List<CreateWaybillGoodsDto> createWaybillGoodsDtoList =  waybillItemsDto.getGoods();
+                for (CreateWaybillGoodsDto createWaybillGoodsDto : createWaybillGoodsDtoList) {
+                    WaybillGoods waybillGoods = new WaybillGoods();
+                    waybillGoods.setWaybillItemId(waybillItemsId);
+                    waybillGoods.setOrderGoodsId(createWaybillGoodsDto.getOrderGoodsId());
+                    waybillGoods.setGoodsName(createWaybillGoodsDto.getGoodsName());
+                    waybillGoods.setGoodsUnit(createWaybillGoodsDto.getGoodsUnit());
+                    if(createWaybillGoodsDto.getGoodsUnit()==3){
+                        waybillGoods.setGoodsWeight(createWaybillGoodsDto.getGoodsWeight());
+                    }else{
+                        waybillGoods.setGoodsQuantity(createWaybillGoodsDto.getGoodsQuantity());
+                    }
+                    waybillGoods.setJoinDrug(createWaybillGoodsDto.getJoinDrug());
+                    waybillGoods.setModifyUserId(99999999);
+                    waybillGoodsMapper.insertSelective(waybillGoods);
+                    //插入order_goods_margin
+                    OrderGoodsMargin orderGoodsMargin = new OrderGoodsMargin();
+                    orderGoodsMargin.setOrderId(orderId);
+                    orderGoodsMargin.setOrderItemId(waybillItemsDto.getOrderItemId());
+                    orderGoodsMargin.setOrderGoodsId(createWaybillGoodsDto.getOrderGoodsId());
+                    orderGoodsMargin.setMargin(BigDecimal.ZERO);
+                    orderGoodsMarginMapper.insertSelective(orderGoodsMargin);
+                }
+            }
+
+        }
+        return ServiceResult.toResult("运单创建成功");
     }
     /**
      * 根据状态查询我的运单信息
@@ -414,5 +425,30 @@ public class WaybillServiceImpl implements WayBillService {
             }
         }
         return listWaybillAppDtos;
+    }
+    public static void main(String[] args) {
+        List<TruckDto> truckDtosA = new ArrayList<>();
+        TruckDto truck1 = new TruckDto();
+        truck1.setTruckId(1);
+        truck1.setCapacity(10);
+        truck1.setNumber(2);
+        TruckDto truck2 = new TruckDto();
+        truck2.setTruckId(2);
+        truck2.setCapacity(20);
+        truck2.setNumber(200);
+        TruckDto truck3 = new TruckDto();
+        truck3.setTruckId(3);
+        truck3.setCapacity(30);
+        truck3.setNumber(300);
+        truckDtosA.add(truck1);
+        truckDtosA.add(truck2);
+        truckDtosA.add(truck3);
+        TruckDto truck4 = new TruckDto();
+        truck4.setTruckId(1);
+        truck4.setCapacity(40);
+        truck4.setNumber(400);
+        truckDtosA.add(truck4);
+
+
     }
 }
