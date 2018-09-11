@@ -34,32 +34,8 @@ public class ListOrderCriteriaDto implements Serializable {
     private String orderStatus;
 
     /**
-     * 货物类型
+     * 开单时间
      */
-    private Integer productType;
+    private Date createTime;
 
-    /**
-     * 开单人
-     */
-    private Integer createUserId;
-
-    /**
-     * 起始开单时间
-     */
-    private Date startCreateTime;
-
-    /**
-     * 截止开单时间
-     */
-    private Date endCreateTime;
-
-    /**
-     * 起始提货时间
-     */
-    private Date startLoadTime;
-
-    /**
-     * 截止提货时间
-     */
-    private Date endLoadTime;
 }

@@ -13,6 +13,7 @@ import com.jaagro.tms.biz.entity.OrderModifyLog;
 import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
 import com.jaagro.tms.biz.mapper.OrderItemsMapper;
+import com.jaagro.tms.biz.mapper.OrderModifyLogMapper;
 import com.jaagro.tms.biz.mapper.OrdersMapper;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.ResponseStatusCode;
@@ -48,6 +49,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderGoodsMapper orderGoodsMapper;
     @Autowired
     private OrderGoodsService orderGoodsService;
+    @Autowired
+    private OrderModifyLogMapper modifyLogMapper;
 
     /**
      * 创建订单
@@ -141,24 +144,21 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
-        List<Orders> orderDtos = this.ordersMapper.listByCriteria(criteriaDto);
-
-        List<ListOrderDto> listOrderDtos = new ArrayList<>();
+        List<ListOrderDto> orderDtos = this.ordersMapper.listOrdersByCriteria(criteriaDto);
 
         if (orderDtos != null && orderDtos.size() > 0) {
-            for (Orders order : orderDtos
+            for (ListOrderDto orderDto : orderDtos
             ) {
-                ListOrderDto orderDto = new ListOrderDto();
+                Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
                 BeanUtils.copyProperties(order, orderDto);
                 orderDto
                         .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
                         .setCreatedUserId(this.currentUserService.getShowUser())
                         .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                         .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
-                listOrderDtos.add(orderDto);
             }
         }
-        return ServiceResult.toResult(new PageInfo<>(listOrderDtos));
+        return ServiceResult.toResult(new PageInfo<>(orderDtos));
     }
 
     /**
@@ -177,13 +177,11 @@ public class OrderServiceImpl implements OrderService {
         ordersMapper.updateByPrimaryKeySelective(orders);
         List<OrderItems> orderItems = this.orderItemsMapper.listByOrderId(orders.getId());
         if (orderItems != null) {
-            for (OrderItems items : orderItems
-            ) {
+            for (OrderItems items : orderItems) {
                 this.orderItemsService.disableById(items.getId());
                 List<OrderGoods> orderGoods = this.orderGoodsMapper.listByItemsId(items.getId());
                 if (orderGoods != null) {
-                    for (OrderGoods goods : orderGoods
-                    ) {
+                    for (OrderGoods goods : orderGoods) {
                         this.orderGoodsService.disableById(goods.getId());
                     }
                 }
@@ -194,14 +192,24 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Map<String, Object> cancelOrders(Integer orderId, String detailInfo) {
-        if (this.ordersMapper.selectByPrimaryKey(orderId) == null) {
+        Orders orders = this.ordersMapper.selectByPrimaryKey(orderId);
+        if (orders == null) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在");
         }
+        // 修改日志
         OrderModifyLog modifyLog = new OrderModifyLog();
         modifyLog
                 .setOrderId(orderId)
                 .setCreatedUserId(this.currentUserService.getCurrentUser().getId())
                 .setNewInfo(detailInfo);
-        return null;
+        this.modifyLogMapper.insertSelective(modifyLog);
+        // 订单
+        orders
+                .setOrderStatus(OrderStatus.CANCEL)
+                .setModifyUserId(this.currentUserService.getCurrentUser().getId())
+                .setModifyTime(new Date());
+        this.ordersMapper.updateByPrimaryKeySelective(orders);
+        return ServiceResult.toResult("取消订单成功");
     }
+
 }

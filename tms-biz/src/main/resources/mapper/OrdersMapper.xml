@@ -16,6 +16,16 @@
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
         <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
     </resultMap>
+    <resultMap id="ReturnMap" type="com.jaagro.tms.api.dto.order.ListOrderDto">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="goods_type" property="goodsType" jdbcType="INTEGER"/>
+        <result column="order_status" property="orderStatus" jdbcType="VARCHAR"/>
+        <result column="load_time" property="loadTime" jdbcType="TIMESTAMP"/>
+        <result column="paper_receipt" property="paperReceipt" jdbcType="BIT"/>
+        <result column="notes" property="notes" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="created_user_id" property="createdUserId" jdbcType="INTEGER"/>
+    </resultMap>
     <sql id="Base_Column_List">
     id, customer_contract_id, goods_type, order_status, customer_id, load_site_id, load_time, 
     paper_receipt, notes, create_time, created_user_id, modify_time, modify_user_id
@@ -194,22 +204,29 @@
         from orders
         where 1=1
         <if test="orderStatus != null">
-            and order_status = #{orderStatus,jdbcType=INTEGER}
+            and order_status = #{orderStatus}
         </if>
-        <if test="createUserId != null">
-            and create_userId = #{createUserId,jdbcType=INTEGER}
+        <if test="createTime != null">
+            <![CDATA[and create_time >= #{createTime}]]>
         </if>
-        <if test="startCreateTime != null">
-            <![CDATA[and start_create_time >= #{startCreateTime}]]>
+        <if test="customerId != null">
+            and customer_id = #{customerId}
         </if>
-        <if test="endCreateTime != null">
-            <![CDATA[and end_create_time <= #{endCreateTime}]]>
+    </select>
+    <select id="listOrdersByCriteria" resultMap="ReturnMap"
+            parameterType="com.jaagro.tms.api.dto.order.ListOrderCriteriaDto">
+        select
+        <include refid="Base_Column_List"/>
+        from orders
+        where 1=1
+        <if test="orderStatus != null">
+            and order_status = #{orderStatus}
         </if>
-        <if test="startLoadTime != null">
-            <![CDATA[and start_load_time >= #{startLoadTime}]]>
+        <if test="createTime != null">
+            <![CDATA[and create_time >= #{createTime}]]>
         </if>
-        <if test="endLoadTime != null">
-            <![CDATA[and end_load_time <= #{endLoadTime}]]>
+        <if test="customerId != null">
+            and customer_id = #{customerId}
         </if>
     </select>
 </mapper>
