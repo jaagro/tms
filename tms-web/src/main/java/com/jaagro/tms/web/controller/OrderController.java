@@ -57,9 +57,6 @@ public class OrderController {
         if (this.customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
             return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同不存在"));
         }
-        if (this.customerService.getShowSiteById(orderDto.getLoadSiteId()) == null) {
-            return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "收货地址不存在"));
-        }
         return BaseResponse.service(orderService.createOrder(orderDto));
     }
 

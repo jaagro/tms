@@ -28,8 +28,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
+/**
+ * @author tony
+ */
 @Service
 public class WaybillServiceImpl implements WayBillService {
+
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
 
     @Autowired
@@ -81,6 +85,19 @@ public class WaybillServiceImpl implements WayBillService {
         }
         return waybillDtos;
     }
+
+    /**
+     * 修改订单计划
+     *
+     * @param waybillPlanDto 入参修改对象
+     * @return 结果集
+     * @author tony
+     */
+    @Override
+    public Map<String, Object> updateWaybillPlan(UpdateWaybillPlanDto waybillPlanDto) {
+        return null;
+    }
+
     /**
      * 货物配运单核心算法
      * @param middleObjects
@@ -90,7 +107,7 @@ public class WaybillServiceImpl implements WayBillService {
         List<MiddleObjectVo> middleObjects_assigned = new ArrayList<>();
         List<ListWaybillPlanDto> waybillDtos = new ArrayList<>();
         //按配送地排序
-        List<MiddleObjectVo> newMiddleObjectsList = middleObjects.stream().sorted((e1,e2)->Integer.compare(e1.getOrderItemId(),e2.getOrderItemId())).collect(Collectors.toList());
+        List<MiddleObjectVo> newMiddleObjectsList = middleObjects.stream().sorted(Comparator.comparingInt(MiddleObjectVo::getOrderItemId)).collect(Collectors.toList());
         Iterator<TruckDto> truckIterator = truckDtos.iterator();
         while(truckIterator.hasNext()) {
             TruckDto truckDto = truckIterator.next();
