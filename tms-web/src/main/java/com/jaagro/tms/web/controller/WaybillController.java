@@ -1,8 +1,11 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.truck.TruckDto;
-import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.service.WaybillService;
+import com.jaagro.tms.api.dto.waybill.CreateWaybillGoodsPlanDto;
+import com.jaagro.tms.api.dto.waybill.CreateWaybillItemsPlanDto;
+import com.jaagro.tms.api.dto.waybill.CreateWaybillPlanDto;
+import com.jaagro.tms.api.dto.waybill.ListWaybillPlanDto;
+import com.jaagro.tms.api.service.WayBillService;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,6 +16,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gavin
@@ -88,5 +92,25 @@ public class WaybillController {
             return BaseResponse.errorInstance(e.getMessage());
         }
         return BaseResponse.successInstance(result);
+    }
+
+
+    /**
+     * 创建运单
+     * @param waybillDtoList
+     * @return
+     */
+    @ApiOperation("创建运单")
+    @PostMapping("/createWaybill")
+    public BaseResponse createWaybill(@RequestBody List<CreateWaybillDto> waybillDtoList) {
+        Map<String, Object> result;
+        try {
+            result = waybillService.createWaybill(waybillDtoList);
+            return BaseResponse.successInstance(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new NullPointerException("创建运单失败:"+e.getMessage());
+            //return BaseResponse.errorInstance(e.getMessage());
+        }
     }
 }

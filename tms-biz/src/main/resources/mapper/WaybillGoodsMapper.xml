@@ -5,6 +5,7 @@
   <id column="id" property="id" jdbcType="INTEGER" />
   <result column="waybill_item_id" property="waybillItemId" jdbcType="INTEGER" />
   <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
+  <result column="order_goods_id" property="orderGoodsId" jdbcType="INTEGER" />
   <result column="goods_unit" property="goodsUnit" jdbcType="INTEGER" />
   <result column="goods_quantity" property="goodsQuantity" jdbcType="INTEGER" />
   <result column="goods_weight" property="goodsWeight" jdbcType="DECIMAL" />
@@ -27,7 +28,7 @@
   </resultMap>
 
   <sql id="Base_Column_List" >
-    id, waybill_item_id, goods_name, goods_unit, goods_quantity, goods_weight, load_quantity,
+    id, waybill_item_id,order_goods_id, goods_name, goods_unit, goods_quantity, goods_weight, load_quantity,
     load_weight, unload_quantity, unload_weight, join_drug, enabled, modify_time, modify_user_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -46,19 +47,19 @@
     delete from waybill_goods
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillGoods" >
-    insert into waybill_goods (id, waybill_item_id, goods_name,
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillGoods"  useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
+    insert into waybill_goods (id, waybill_item_id, goods_name,order_goods_id,
       goods_unit, goods_quantity, goods_weight, 
       load_quantity, load_weight, unload_quantity, 
       unload_weight, join_drug, enabled, 
       modify_time, modify_user_id)
-    values (#{id,jdbcType=INTEGER}, #{waybillItemId,jdbcType=INTEGER}, #{goodsName,jdbcType=VARCHAR},
+    values (#{id,jdbcType=INTEGER}, #{waybillItemId,jdbcType=INTEGER}, #{goodsName,jdbcType=VARCHAR},#{orderGoodsId,jdbcType=INTEGER},
       #{goodsUnit,jdbcType=INTEGER}, #{goodsQuantity,jdbcType=INTEGER}, #{goodsWeight,jdbcType=DECIMAL}, 
       #{loadQuantity,jdbcType=INTEGER}, #{loadWeight,jdbcType=DECIMAL}, #{unloadQuantity,jdbcType=INTEGER}, 
       #{unloadWeight,jdbcType=DECIMAL}, #{joinDrug,jdbcType=BIT}, #{enabled,jdbcType=BIT}, 
       #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillGoods" >
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillGoods"  useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
     insert into waybill_goods
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -66,6 +67,9 @@
       </if>
       <if test="waybillItemId != null" >
         waybill_item_id,
+      </if>
+      <if test="orderGoodsId != null" >
+        order_goods_id,
       </if>
       <if test="goodsName != null" >
         goods_name,
@@ -111,6 +115,9 @@
       <if test="waybillItemId != null" >
         #{waybillItemId,jdbcType=INTEGER},
       </if>
+      <if test="orderGoodsId != null" >
+        #{orderGoodsId,jdbcType=INTEGER},
+      </if>
       <if test="goodsName != null" >
         #{goodsName,jdbcType=VARCHAR},
       </if>
@@ -154,6 +161,9 @@
     <set >
       <if test="waybillItemId != null" >
         waybill_item_id = #{waybillItemId,jdbcType=INTEGER},
+      </if>
+      <if test="orderGoodsId != null" >
+        order_goods_id = #{orderGoodsId,jdbcType=INTEGER},
       </if>
       <if test="goodsName != null" >
         goods_name = #{goodsName,jdbcType=VARCHAR},

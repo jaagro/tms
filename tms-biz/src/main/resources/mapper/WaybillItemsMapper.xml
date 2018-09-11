@@ -41,7 +41,7 @@
     delete from waybill_items
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillItems" >
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillItems"  useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
     insert into waybill_items (id, waybill_id, unload_site_id, 
       required_time, enabled, modify_time, 
       modify_user_id, sign_status)
@@ -49,7 +49,7 @@
       #{requiredTime,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT}, #{modifyTime,jdbcType=TIMESTAMP}, 
       #{modifyUserId,jdbcType=INTEGER}, #{signStatus,jdbcType=BIT})
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillItems" >
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillItems"  useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
     insert into waybill_items
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
