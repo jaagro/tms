@@ -211,4 +211,9 @@
       modify_user_id = #{modifyUserId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="listWaybillGoodsByWaybillItemId" resultMap="DetailInfo" parameterType="java.lang.Integer" >
+    select id,goods_name,goods_unit,goods_quantity,goods_weight
+    from waybill_goods
+    where id = #{id,jdbcType=INTEGER}
+  </select>
 </mapper>

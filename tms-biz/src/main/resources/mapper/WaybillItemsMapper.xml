@@ -142,4 +142,10 @@
       sign_status = #{signStatus,jdbcType=BIT}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="listByWaybillId" resultMap="DetailInfo" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from waybill_items
+    where waybill_id = #{id,jdbcType=INTEGER}
+  </select>
 </mapper>
