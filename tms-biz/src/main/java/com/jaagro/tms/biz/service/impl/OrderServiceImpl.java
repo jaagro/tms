@@ -1,6 +1,7 @@
 package com.jaagro.tms.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderGoodsService;
@@ -8,6 +9,7 @@ import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.biz.entity.OrderGoods;
 import com.jaagro.tms.biz.entity.OrderItems;
+import com.jaagro.tms.biz.entity.OrderModifyLog;
 import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
 import com.jaagro.tms.biz.mapper.OrderItemsMapper;
@@ -58,11 +60,13 @@ public class OrderServiceImpl implements OrderService {
     public Map<String, Object> createOrder(CreateOrderDto orderDto) {
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
-        order.setCreatedUserId(currentUserService.getShowUser().getId());
+        order
+                .setCreatedUserId(currentUserService.getShowUser().getId())
+                .setOrderStatus(OrderStatus.PLACE_ORDER);
         this.ordersMapper.insertSelective(order);
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
             for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
-                if(StringUtils.isEmpty(itemsDto.getUnloadId())){
+                if (StringUtils.isEmpty(itemsDto.getUnloadId())) {
                     return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "卸货地不能为空");
                 }
                 itemsDto.setOrderId(order.getId());
@@ -154,7 +158,7 @@ public class OrderServiceImpl implements OrderService {
                 listOrderDtos.add(orderDto);
             }
         }
-        return ServiceResult.toResult(listOrderDtos);
+        return ServiceResult.toResult(new PageInfo<>(listOrderDtos));
     }
 
     /**
@@ -186,5 +190,18 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return ServiceResult.toResult("删除成功");
+    }
+
+    @Override
+    public Map<String, Object> cancelOrders(Integer orderId, String detailInfo) {
+        if (this.ordersMapper.selectByPrimaryKey(orderId) == null) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在");
+        }
+        OrderModifyLog modifyLog = new OrderModifyLog();
+        modifyLog
+                .setOrderId(orderId)
+                .setCreatedUserId(this.currentUserService.getCurrentUser().getId())
+                .setNewInfo(detailInfo);
+        return null;
     }
 }
