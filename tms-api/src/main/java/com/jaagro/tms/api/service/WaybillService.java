@@ -60,13 +60,6 @@ public interface WaybillService {
     Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDto);
 
     /**
-     * 根据订单号获取运单列表
-     * @param orderId
-     * @return
-     */
-    List<GetWaybillDto> listWaybillByOrderId(Integer orderId);
-
-    /**
      * 根据id获取waybill对象
      * @param id
      * @return
@@ -94,4 +87,11 @@ public interface WaybillService {
      * @return
      */
     Map<String, Object> receiptMessage(GetReceiptParamDto dto);
+
+    /**
+     * 根据orderId获取order和waybill信息
+     * @param orderId
+     * @return
+     */
+    GetWaybillPlanDto getOrderAndWaybill(Integer orderId);
 }
