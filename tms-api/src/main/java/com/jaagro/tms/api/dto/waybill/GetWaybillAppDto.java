@@ -7,6 +7,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+/**
+ * @author @gao
+ */
 @Data
 @Accessors(chain = true)
 public class GetWaybillAppDto implements Serializable {

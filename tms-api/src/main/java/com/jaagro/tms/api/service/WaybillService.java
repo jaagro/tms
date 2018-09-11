@@ -72,4 +72,26 @@ public interface WaybillService {
      * @return
      */
     GetWaybillDto getWaybillById(Integer id);
+
+
+    /**
+     * 接单状态控制
+     *
+     * @param dto
+     * @return
+     */
+    Map<String, Object> upDateReceiptStatus(GetReceiptParamDto dto);
+
+    /**
+     * 接单详情列表
+     *
+     * @return
+     */
+    Map<String, Object> receiptList(GetReceiptParamDto dto);
+
+    /**
+     * 接单消息列表显示
+     * @return
+     */
+    Map<String, Object> receiptMessage(GetReceiptParamDto dto);
 }
