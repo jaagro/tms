@@ -19,6 +19,10 @@ public class ListWaybillItemsPlanDto implements Serializable {
      */
     private Integer unloadSiteId;
     /**
+     * 订单明细id 用于获取卸货地id
+     */
+    private Integer orderItemId;
+    /**
      * 卸货地对象
      */
     private ShowSiteDto showSiteDto;
