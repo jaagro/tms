@@ -8,13 +8,17 @@ import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.order.GetOrderDto;
+import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.biz.service.DriverClientService;
 import com.jaagro.tms.biz.service.TruckClientService;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.tms.biz.vo.MiddleObjectVo;
@@ -67,6 +71,10 @@ public class WaybillServiceImpl implements WaybillService {
     private OrderGoodsMarginMapper orderGoodsMarginMapper;
     @Autowired
     private TruckClientService truckClientService;
+    @Autowired
+    private DriverClientService driverClientService;
+    @Autowired
+    private OrderService orderService;
 
     @Override
     public List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto){
@@ -304,28 +312,6 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     /**
-     * 根据订单号获取运单列表
-     *
-     * @param orderId
-     * @return
-     */
-    @Override
-    public List<GetWaybillDto> listWaybillByOrderId(Integer orderId) {
-        List<Waybill> waybillList = waybillMapper.selectByOrderId(orderId);
-        if(waybillList == null){
-            throw new NullPointerException("当前订单无有效运单");
-        }
-        List<GetWaybillDto> getWaybills = new ArrayList<>();
-        for (Waybill waybill : waybillList){
-            GetWaybillDto getWaybillDto = new GetWaybillDto();
-            BeanUtils.copyProperties(waybill, getWaybillDto);
-            getWaybills.add(getWaybillDto);
-        }
-
-        return null;
-    }
-
-    /**
      * 根据id获取waybill对象
      *
      * @param id
@@ -335,7 +321,7 @@ public class WaybillServiceImpl implements WaybillService {
     public GetWaybillDto getWaybillById(Integer id) {
         //拿到waybill对象
         Waybill waybill = waybillMapper.selectByPrimaryKey(id);
-        if(waybill == null){
+        if(null == waybill){
             throw new NullPointerException(id + ": 无效");
         }
         //拿到装货地对象
@@ -345,6 +331,11 @@ public class WaybillServiceImpl implements WaybillService {
         ListTruckTypeDto truckTypeDto = null;
         if(!StringUtils.isEmpty(waybill.getNeedTruckType())) {
             truckTypeDto = truckTypeClientService.getTruckTypeById(waybill.getNeedTruckType());
+        }
+
+        ShowDriverDto showDriverDto = null;
+        if(!StringUtils.isEmpty(waybill.getDriverId())){
+            showDriverDto = driverClientService.getDriverReturnObject(waybill.getDriverId());
         }
         //车辆对象
         ShowTruckDto truckDto = null;
@@ -377,9 +368,40 @@ public class WaybillServiceImpl implements WaybillService {
                 .setLoadSite(loadSiteDto)
                 .setNeedTruckType(truckTypeDto)
                 .setTruckId(truckDto)
+                .setDriverId(showDriverDto)
                 .setWaybillItems(getWaybillItemsDtoList);
 
         return getWaybillDto;
+    }
+
+    /**
+     * 根据orderId获取order和waybill信息
+     * 主要用于既需要order也需要waybill的场景
+     *
+     * 由于采用循环的方式获取值，项目紧任务中，后期时间宽裕需要重构
+     * @param orderId
+     * @return
+     */
+    @Override
+    public GetWaybillPlanDto getOrderAndWaybill(Integer orderId) {
+        GetOrderDto getOrderDto = orderService.getOrderById(orderId);
+        if(null == getOrderDto){
+            throw new NullPointerException(orderId + " :无效");
+        }
+        List<Integer> waybillIds = waybillMapper.listWaybillIdByOrderId(orderId);
+        if(null == waybillIds){
+            throw new NullPointerException(orderId + " :当前订单无有效运单");
+        }
+        List<GetWaybillDto> getWaybillDtoList = new ArrayList<>(12);
+        for(Integer waybillId : waybillIds){
+            GetWaybillDto getWaybillDto = this.getWaybillById(waybillId);
+            getWaybillDtoList.add(getWaybillDto);
+        }
+        GetWaybillPlanDto getWaybillPlanDto = new GetWaybillPlanDto();
+        getWaybillPlanDto
+                .setOrderDto(getOrderDto)
+                .setWaybillDtoList(getWaybillDtoList);
+        return getWaybillPlanDto;
     }
 
     /**
