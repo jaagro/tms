@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -35,21 +36,27 @@ public class WaybillServiceImpl implements WayBillService {
     @Autowired
     private CurrentUserService currentUserService;
     @Autowired
+    private TruckTypeClientService truckTypeClientService;
+    @Autowired
     private CustomerClientService customerClientService;
     @Autowired
     private WaybillMapper waybillMapper;
     @Autowired
-    private OrderGoodsMapper orderGoodsMapper;
+    private WaybillItemsMapper waybillItemsMapper;
+    @Autowired
+    private WaybillGoodsMapper waybillGoodsMapper;
+    @Autowired
+    private OrdersMapper ordersMapper;
     @Autowired
     private OrderItemsMapper orderItemsMapper;
     @Autowired
-    private TruckTypeClientService truckTypeClientService;
-    @Autowired
-    private OrdersMapper ordersMapper;
+    private OrderGoodsMapper orderGoodsMapper;
     @Autowired
     private WaybillTrackingImagesMapper waybillTrackingImagesMapper;
     @Autowired
     private WaybillTrackingMapper waybillTrackingMapper;
+    @Autowired
+    private OrderGoodsMarginMapper orderGoodsMarginMapper;
 
     @Override
     public List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto){
@@ -179,11 +186,12 @@ public class WaybillServiceImpl implements WayBillService {
                 throw new NullPointerException("goodsId为：" + obj.getOrderGoodsId()+ " 的货物不存在");
             }
             OrderItems orderItems = orderItemsMapper.selectByPrimaryKey(obj.getOrderItemId());
-            ListWaybillItemsPlanDto createWaybillItemsDto = new ListWaybillItemsPlanDto();
+            ListWaybillItemsPlanDto waybillItemsPlanDto = new ListWaybillItemsPlanDto();
             ShowSiteDto showSiteDto = customerClientService.getShowSiteById(orderItems.getUnloadId());
-            createWaybillItemsDto.setUnloadSiteId(orderItems.getUnloadId());
-            createWaybillItemsDto.setShowSiteDto(showSiteDto);
-            createWaybillItemsDto.setRequiredTime(orderItems.getUnloadTime());
+            waybillItemsPlanDto.setUnloadSiteId(orderItems.getUnloadId());
+            waybillItemsPlanDto.setOrderItemId(orderItems.getId());
+            waybillItemsPlanDto.setShowSiteDto(showSiteDto);
+            waybillItemsPlanDto.setRequiredTime(orderItems.getUnloadTime());
             List<ListWaybillGoodsPlanDto> goodsList = new LinkedList<>();
             ListWaybillGoodsPlanDto createWaybillGoodsDto = new ListWaybillGoodsPlanDto();
             createWaybillGoodsDto
@@ -198,18 +206,64 @@ public class WaybillServiceImpl implements WayBillService {
                 createWaybillGoodsDto.setGoodsQuantity(obj.getPlanAmount());
             }
             goodsList.add(createWaybillGoodsDto);
-            createWaybillItemsDto.setGoods(goodsList);
-            itemsList.add(createWaybillItemsDto);
+            waybillItemsPlanDto.setGoods(goodsList);
+            itemsList.add(waybillItemsPlanDto);
         }
         waybillPlanDto.setWaybillItems(itemsList);
         return waybillPlanDto;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
 
         for (CreateWaybillDto createWaybillDto : waybillDtoList) {
+            Integer orderId = createWaybillDto.getOrderId();
+            List<Waybill> waybills =  waybillMapper.selectByOrderId(orderId);
+            if(CollectionUtils.isEmpty(waybills)) {
+                Waybill waybill = new Waybill();
+                waybill.setOrderId(orderId);
+                waybill.setLoadSiteId(createWaybillDto.getLoadSiteId());
+                waybill.setNeedTruckType(createWaybillDto.getNeedTruckType());
+                waybill.setTruckTeamContractId(createWaybillDto.getTruckTeamContractId());
+                waybill.setWaybillStatus(WaybillStatus.RECEIVE);
+                waybill.setCreateTime(new Date());
+                waybill.setCreatedUserId(currentUserService.getShowUser().getId());
+                int waybillId = waybillMapper.insert(waybill);
+                List<CreateWaybillItemsDto> waybillItemsList = createWaybillDto.getWaybillItems();
+                //更新order的状态OrderStatus.STOWAGE
+                for (CreateWaybillItemsDto waybillItemsDto : waybillItemsList) {
+                   // OrderItems orderItems = orderItemsMapper.selectByOrderIdandUnloadSiteId(orderId,waybillItemsDto.getUnloadSiteId());
+                    WaybillItems  waybillItem = new WaybillItems();
+                    waybillItem.setWaybillId(waybillId);
+                    waybillItem.setUnloadSiteId(waybillItemsDto.getUnloadSiteId());
+                    waybillItem.setRequiredTime(waybillItemsDto.getRequiredTime());
+                    //waybillItem.setModifyTime(new Date());
+                    //waybillItem.setModifyUserId(currentUserService.getShowUser().getId());
+                    int waybillItemsId = waybillItemsMapper.insert(waybillItem);
 
+                    List<CreateWaybillGoodsDto> createWaybillGoodsDtoList =  waybillItemsDto.getGoods();
+                    for (CreateWaybillGoodsDto createWaybillGoodsDto : createWaybillGoodsDtoList) {
+                        WaybillGoods waybillGoods = new WaybillGoods();
+                        waybillGoods.setWaybillItemId(waybillItemsId);
+                        waybillGoods.setGoodsName(createWaybillGoodsDto.getGoodsName());
+                        waybillGoods.setGoodsUnit(createWaybillGoodsDto.getGoodsUnit());
+                        if(createWaybillGoodsDto.getGoodsUnit()==3){
+                            waybillGoods.setGoodsWeight(createWaybillGoodsDto.getGoodsWeight());
+                        }else{
+                            waybillGoods.setGoodsQuantity(createWaybillGoodsDto.getGoodsQuantity());
+                        }
+                        waybillGoods.setJoinDrug(createWaybillGoodsDto.getJoinDrug());
+                        waybillGoodsMapper.insert(waybillGoods);
+                        //插入order_goods_margin
+                        OrderGoodsMargin orderGoodsMargin = new OrderGoodsMargin();
+                        orderGoodsMargin.setOrderId(orderId);
+                        //orderGoodsMargin.setOrderItemId(waybillItemsDto.);
+
+                    }
+                }
+
+            }
         }
 
         return null;

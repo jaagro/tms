@@ -3,6 +3,10 @@ package com.jaagro.tms.biz.vo;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+/**
+ *
+ * @author gavin
+ */
 @Data
 @Accessors(chain = true)
 public class MiddleObjectVo {
