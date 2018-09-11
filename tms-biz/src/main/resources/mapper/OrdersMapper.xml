@@ -24,7 +24,6 @@
         <result column="paper_receipt" property="paperReceipt" jdbcType="BIT"/>
         <result column="notes" property="notes" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="created_user_id" property="createdUserId" jdbcType="INTEGER"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, customer_contract_id, goods_type, order_status, customer_id, load_site_id, load_time, 
