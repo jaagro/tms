@@ -8,6 +8,7 @@ import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.waybill.CreateWaybillPlanDto;
 import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillPlanDto;
+import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.TruckClientService;
@@ -15,8 +16,6 @@ import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import com.jaagro.utils.BeanDifferentUtils;
 import com.jaagro.utils.DifferentResult;
-import io.swagger.annotations.Authorization;
-import lombok.experimental.Accessors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +35,8 @@ public class TestController {
     private TruckTypeClientService truckTypeClientService;
     @Autowired
     private WaybillService waybillService;
+    @Autowired
+    private WaybillPlanService waybillPlanService;
 
     @GetMapping("/test1/{id}")
     public ShowCustomerDto test1(@PathVariable("id") Integer id){
@@ -72,7 +73,7 @@ public class TestController {
     }
     @PostMapping("/createWaybillPlan")
     public List<ListWaybillPlanDto> createWaybill(@RequestBody CreateWaybillPlanDto waybillPlanDto){
-        return waybillService.createWaybillPlan(waybillPlanDto);
+        return waybillPlanService.createWaybillPlan(waybillPlanDto);
     }
 
 //    @GetMapping("/test7/{orderId}")

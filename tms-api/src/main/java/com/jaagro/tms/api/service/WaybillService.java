@@ -31,26 +31,6 @@ public interface WaybillService {
      */
     Map<String, Object> showWaybill(Integer waybillId);
 
-    /**
-     * 创建订单计划
-     * @param waybillDto
-     * @return
-     */
-    List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto);
-
-    /**
-     * 根据orderId获取订单计划
-     * @param orderId
-     * @return
-     */
-    Map<String, Object> getWaybillPlanByOrderId(Integer orderId);
-
-    /**
-     * 从配载计划中移除运单【逻辑删除】
-     * @param waybillId
-     * @return
-     */
-    Map<String, Object> removeWaybillFromPlan(Integer waybillId);
 
     /**
      * 创建运单
@@ -65,7 +45,6 @@ public interface WaybillService {
      * @return
      */
     GetWaybillDto getWaybillById(Integer id);
-
 
     /**
      * 接单状态控制
@@ -94,4 +73,12 @@ public interface WaybillService {
      * @return
      */
     GetWaybillPlanDto getOrderAndWaybill(Integer orderId);
+
+    /**
+     * 根据订单号获取运单列表
+     *
+     * @param orderId
+     * @return
+     */
+    List<GetWaybillDto> listWaybillByOrderId(Integer orderId);
 }

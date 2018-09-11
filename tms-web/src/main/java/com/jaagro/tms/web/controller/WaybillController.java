@@ -1,11 +1,9 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.truck.TruckDto;
-import com.jaagro.tms.api.dto.waybill.CreateWaybillGoodsPlanDto;
-import com.jaagro.tms.api.dto.waybill.CreateWaybillItemsPlanDto;
-import com.jaagro.tms.api.dto.waybill.CreateWaybillPlanDto;
-import com.jaagro.tms.api.dto.waybill.ListWaybillPlanDto;
-import com.jaagro.tms.api.service.WayBillService;
+import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.service.WaybillPlanService;
+import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,6 +25,8 @@ public class WaybillController {
 
     @Autowired
     private WaybillService waybillService;
+    @Autowired
+    private WaybillPlanService waybillPlanService;
 
     /**
      * 创建运单计划
@@ -60,7 +60,7 @@ public class WaybillController {
             }
         }
         try {
-            List<ListWaybillPlanDto> result = waybillService.createWaybillPlan(waybillDto);
+            List<ListWaybillPlanDto> result = waybillPlanService.createWaybillPlan(waybillDto);
             return BaseResponse.successInstance(result);
         } catch (Exception e) {
             e.printStackTrace();
