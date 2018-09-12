@@ -28,11 +28,4 @@
         where id = #{waybillId}
         and waybill_status = '待接单'
     </update>
-    <select id="getWaybillById" resultType="com.jaagro.tms.api.dto.waybill.GetWaybillDto">
-        select
-        <include refid="Base_Column_List"/>
-        from waybill
-        where enabled = 1
-        and id = #{waybillId}
-    </select>
 </mapper>

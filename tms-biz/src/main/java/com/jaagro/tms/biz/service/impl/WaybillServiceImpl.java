@@ -49,11 +49,11 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     private CustomerClientService customerClientService;
     @Autowired
-    private WaybillMapper waybillMapper;
+    private WaybillMapperExt waybillMapper;
     @Autowired
-    private WaybillItemsMapper waybillItemsMapper;
+    private WaybillItemsMapperExt waybillItemsMapper;
     @Autowired
-    private WaybillGoodsMapper waybillGoodsMapper;
+    private WaybillGoodsMapperExt waybillGoodsMapper;
     @Autowired
     private OrdersMapper ordersMapper;
     @Autowired
@@ -191,36 +191,35 @@ public class WaybillServiceImpl implements WaybillService {
         if (!StringUtils.isEmpty(waybill.getTruckId())) {
             truckDto = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
         }
-//        //获取waybillItem列表
-//        List<GetWaybillItemsAppDto> getWaybillItemsDtoList = new ArrayList<>();
-//        List<WaybillItems> waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybill.getId());
-//        for (WaybillItems items : waybillItemsList) {
-//            GetWaybillItemsAppDto getWaybillItemsDto = new GetWaybillItemsAppDto();
-//            BeanUtils.copyProperties(items, getWaybillItemsDto);
-//            List<ShowGoodsDto> showGoodsDtoList = new LinkedList<>();
-//            List<WaybillGoods> waybillGoodsList = waybillGoodsMapper.listWaybillGoodsByItemId(items.getId());
-//            for (WaybillGoods wg : waybillGoodsList) {
-//                ShowGoodsDto showGoodsDto = new ShowGoodsDto();
-//                BeanUtils.copyProperties(wg, showGoodsDto);
-//                showGoodsDtoList.add(showGoodsDto);
-//            }
-//            //拿到卸货信息
-//            ShowSiteAppDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());
-//            getWaybillItemsDto
-//                    .setUnloadSite(unloadSite)
-//                    .setGoods(showGoodsDtoList);
-//            getWaybillItemsDtoList.add(getWaybillItemsDto);
-//        }
-//        GetWaybillDto getWaybillDto = new GetWaybillDto();
-//        BeanUtils.copyProperties(waybill, getWaybillDto);
-//        getWaybillDto
-//                .setLoadSite(loadSiteDto)
-//                .setNeedTruckType(truckTypeDto)
-//                .setTruckId(truckDto)
-//                .setDriverId(showDriverDto)
-//                .setWaybillItems(getWaybillItemsDtoList);
-
-        return null;
+        //获取waybillItem列表
+        List<GetWaybillItemDto> getWaybillItemsDtoList = new ArrayList<>();
+        List<WaybillItems> waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybill.getId());
+        for (WaybillItems items : waybillItemsList) {
+            GetWaybillItemDto getWaybillItemsDto = new GetWaybillItemDto();
+            BeanUtils.copyProperties(items, getWaybillItemsDto);
+            List<GetWaybillGoodsDto> getWaybillGoodsDtoList = new LinkedList<>();
+            List<WaybillGoods> waybillGoodsList = waybillGoodsMapper.listWaybillGoodsByItemId(items.getId());
+            for (WaybillGoods wg : waybillGoodsList) {
+                GetWaybillGoodsDto getWaybillGoodsDto = new GetWaybillGoodsDto();
+                BeanUtils.copyProperties(wg, getWaybillGoodsDto);
+                getWaybillGoodsDtoList.add(getWaybillGoodsDto);
+            }
+            //拿到卸货信息
+            ShowSiteDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());
+            getWaybillItemsDto
+                    .setUnloadSite(unloadSite)
+                    .setGoods(getWaybillGoodsDtoList);
+            getWaybillItemsDtoList.add(getWaybillItemsDto);
+        }
+        GetWaybillDto getWaybillDto = new GetWaybillDto();
+        BeanUtils.copyProperties(waybill, getWaybillDto);
+        getWaybillDto
+                .setLoadSite(loadSiteDto)
+                .setNeedTruckType(truckTypeDto)
+                .setTruckId(truckDto)
+                .setDriverId(showDriverDto)
+                .setWaybillItems(getWaybillItemsDtoList);
+        return getWaybillDto;
     }
 
     /**

@@ -14,8 +14,9 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 public class ListWaybillPlanDto implements Serializable {
+
     /**
-     *订单id
+     * 订单id
      */
     private Integer orderId;
     /**
@@ -48,6 +49,7 @@ public class ListWaybillPlanDto implements Serializable {
     private Integer truckTeamContractId;
     /**
      * 发货地和对应的货物明细列表 运单明细列表
-   s  */
+     * s
+     */
     private List<ListWaybillItemsPlanDto> waybillItems;
 }

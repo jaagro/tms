@@ -46,7 +46,7 @@
         select
         <include refid="Base_Column_List"/>
         from waybill
-        where id = #{id,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER} and enabled = 1
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from waybill
@@ -107,7 +107,7 @@
         modify_user_id,
       </if>
       <if test="loadSiteId != null" >
-      load_site_id,
+        load_site_id,
     </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -221,17 +221,17 @@
       load_site_id = #{loadSiteId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-    <select id="selectByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
-        select
-        <include refid="Base_Column_List"/>
-        from waybill
-        where order_id = #{orderld,jdbcType=INTEGER}
-    </select>
+  <select id="selectByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from waybill
+    where order_id = #{orderld,jdbcType=INTEGER} and enabled = 1
+  </select>
     <select id="selectWaybillByCarrierStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
         select
         <include refid="Base_Column_List"/>
         from waybill
-        where waybill_status in ('待出发','前往装货地','待装货','待送达','待签收')
+        where waybill_status in ('待出发','前往装货地','待装货','待送达','待签收') and enabled = 1
         <if test="driverId != null">
             and driver_id = #{driverId,jdbcType=INTEGER}
         </if>
@@ -241,20 +241,16 @@
         select
         <include refid="Base_Column_List"/>
         from waybill
-        where enabled=1
+        where enabled = 1
         <if test="waybillStatus != null">
             and waybill_status=#{waybillStatus,jdbcType=VARCHAR}
         </if>
         <if test="driverId != null">
             and driver_id = #{driverId,jdbcType=INTEGER}
         </if>
-        <if test="truckId != null">
-            and truck_id = #{truckId,jdbcType=INTEGER}
-        </if>
         <if test="id != null">
-            and id = #{id,jdbcType=INTEGER}
+            id = #{id,jdbcType=INTEGER}
         </if>
-
     </select>
     <select id="listWaybillIdByOrderId" resultType="java.lang.Integer">
         select id

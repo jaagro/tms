@@ -1,6 +1,7 @@
 package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
+import com.jaagro.tms.biz.entity.Waybill;
 
 /**
  * @author tony
@@ -14,10 +15,5 @@ public interface WaybillMapperExt extends WaybillMapper {
      */
     Integer removeWaybillById(Integer waybillId);
 
-    /**
-     * 通过id获取waybill对象
-     * @param waybillId
-     * @return
-     */
-    GetWaybillDto getWaybillById(Integer waybillId);
+
 }
