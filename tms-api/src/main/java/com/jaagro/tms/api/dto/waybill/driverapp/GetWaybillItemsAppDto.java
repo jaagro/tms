@@ -1,4 +1,4 @@
-package com.jaagro.tms.api.dto.waybill;
+package com.jaagro.tms.api.dto.waybill.driverapp;
 
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class GetWaybillItemsDto implements Serializable {
+public class GetWaybillItemsAppDto implements Serializable {
     /**
      *
      */

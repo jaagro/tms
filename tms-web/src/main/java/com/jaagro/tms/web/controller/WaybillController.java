@@ -2,12 +2,12 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;

@@ -1,4 +1,4 @@
-package com.jaagro.tms.api.dto.waybill;
+package com.jaagro.tms.api.dto.waybill.driverapp;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -85,6 +85,6 @@ public class GetWaybillAppDto implements Serializable {
     /**
      * 运单明细list
      */
-    private List<GetWaybillItemsDto> waybillItems;
+    private List<GetWaybillItemsAppDto> waybillItems;
 
 }

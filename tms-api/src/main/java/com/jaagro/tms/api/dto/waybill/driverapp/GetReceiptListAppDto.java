@@ -1,4 +1,4 @@
-package com.jaagro.tms.api.dto.waybill;
+package com.jaagro.tms.api.dto.waybill.driverapp;
 
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import lombok.Data;

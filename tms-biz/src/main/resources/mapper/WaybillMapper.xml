@@ -19,7 +19,7 @@
         <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
     </resultMap>
 
-    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.waybill.GetWaybillAppDto">
+    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.waybill.driverapp.GetWaybillAppDto">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="order_id" property="orderId" jdbcType="INTEGER"/>
         <result column="truck_team_contract_id" property="truckTeamContractId" jdbcType="INTEGER"/>

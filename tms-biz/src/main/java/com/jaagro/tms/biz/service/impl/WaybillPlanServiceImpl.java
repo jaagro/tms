@@ -5,19 +5,15 @@ import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.service.OrderService;
+import com.jaagro.tms.api.dto.waybill.driverapp.GetWaybillGoodsAppDto;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
-import com.jaagro.tms.biz.service.DriverClientService;
-import com.jaagro.tms.biz.service.TruckClientService;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.tms.biz.vo.MiddleObjectVo;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
-import com.netflix.discovery.converters.Auto;
-import lombok.experimental.Accessors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -120,8 +116,8 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id已是注销状态");
         }
         OrderGoodsMargin orderGoodsMargin = new OrderGoodsMargin();
-        List<GetWaybillGoodsDto> waybillGoodsDtoList = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
-        for (GetWaybillGoodsDto wg : waybillGoodsDtoList) {
+        List<GetWaybillGoodsAppDto> waybillGoodsDtoList = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
+        for (GetWaybillGoodsAppDto wg : waybillGoodsDtoList) {
             OrderGoodsMargin orderGoodsMarginData = orderGoodsMarginMapper.getMarginByGoodsId(wg.getOrderGoodsId());
             if (orderGoodsMarginData == null) {
                 return ServiceResult.error("货物余量表记录为空");
