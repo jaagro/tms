@@ -116,8 +116,8 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id已是注销状态");
         }
         OrderGoodsMargin orderGoodsMargin = new OrderGoodsMargin();
-        List<GetWaybillGoodsAppDto> waybillGoodsDtoList = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
-        for (GetWaybillGoodsAppDto wg : waybillGoodsDtoList) {
+        List<GetWaybillGoodsDto> waybillGoodsDtoList = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
+        for (GetWaybillGoodsDto wg : waybillGoodsDtoList) {
             OrderGoodsMargin orderGoodsMarginData = orderGoodsMarginMapper.getMarginByGoodsId(wg.getOrderGoodsId());
             if (orderGoodsMarginData == null) {
                 return ServiceResult.error("货物余量表记录为空");

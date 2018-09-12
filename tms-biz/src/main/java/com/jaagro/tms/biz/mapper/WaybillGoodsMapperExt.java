@@ -1,6 +1,7 @@
 package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.api.dto.driverapp.GetWaybillGoodsAppDto;
+import com.jaagro.tms.api.dto.waybill.GetWaybillGoodsDto;
 
 import java.util.List;
 
@@ -14,5 +15,5 @@ public interface WaybillGoodsMapperExt extends WaybillGoodsMapper {
      * @param waybillId
      * @return
      */
-    List<GetWaybillGoodsAppDto> listGoodsByWaybillId(Integer waybillId);
+    List<GetWaybillGoodsDto> listGoodsByWaybillId(Integer waybillId);
 }
