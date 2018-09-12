@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author tony
@@ -21,5 +22,5 @@ public class GetWaybillPlanDto implements Serializable {
     /**
      * 订单相关运单列表
      */
-//    private List<GetWaybillDto> waybillDtoList;
+    private List<GetWaybillDto> waybillDtoList;
 }

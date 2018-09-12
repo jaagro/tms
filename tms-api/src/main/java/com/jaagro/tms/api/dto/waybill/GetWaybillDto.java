@@ -5,8 +5,6 @@ import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
-import com.jaagro.tms.api.dto.driverapp.GetWaybillItemsAppDto;
-import com.jaagro.tms.api.dto.driverapp.ShowTrackingDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -82,22 +80,12 @@ public class GetWaybillDto implements Serializable {
     private ShowUserDto createdUserId;
 
     /**
-     * 修改时间
-     */
-    private Date modifyTime;
-
-    /**
-     * 修改人id
-     */
-    private ShowUserDto modifyUserId;
-
-    /**
      * 运单明细list
      */
-    private List<GetWaybillItemsAppDto> waybillItems;
+    private List<GetWaybillItemDto> waybillItems;
 
     /**
      * 运单轨迹
      */
-    private List<ShowTrackingDto> tracking;
+    private List<GetTrackingDto> tracking;
 }

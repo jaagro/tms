@@ -1,7 +1,6 @@
 package com.jaagro.tms.api.dto.driverapp;
 
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
-import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import lombok.Data;
@@ -40,7 +39,7 @@ public class ListWaybillAppDto implements Serializable {
     /**
      * 装货地
      */
-    private ShowSiteDto loadSite;
+    private ShowSiteAppDto loadSite;
 
     /**
      * 客户
@@ -80,7 +79,7 @@ public class ListWaybillAppDto implements Serializable {
     /**
      * 卸货地列表
      */
-    private List<ShowSiteDto> unloadSite;
+    private List<ShowSiteAppDto> unloadSite;
 
     /**
      * 货物列表

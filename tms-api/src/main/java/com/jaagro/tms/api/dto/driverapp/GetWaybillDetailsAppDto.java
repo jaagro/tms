@@ -1,7 +1,6 @@
 package com.jaagro.tms.api.dto.driverapp;
 
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
-import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -35,10 +34,10 @@ public class GetWaybillDetailsAppDto implements Serializable {
     /**
      * 装货地
      */
-    private ShowSiteDto loadSite;
+    private ShowSiteAppDto loadSite;
     /**
      * 卸货地列表
      */
-    private List<ShowSiteDto> unloadSite;
+    private List<ShowSiteAppDto> unloadSite;
 
 }
