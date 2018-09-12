@@ -1,14 +1,15 @@
 package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.api.dto.driverapp.GetWaybillAppDto;
-import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
 import com.jaagro.tms.biz.entity.Waybill;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
  * @author tony
  */
+@Resource
 public interface WaybillMapperExt extends WaybillMapper {
 
     /**
