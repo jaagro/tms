@@ -13,5 +13,9 @@ public final class WaybillStatus {
     public static final String SIGN = "待签收";
     public static final String ACCOMPLISH = "已完成";
     public static final String REJECT = "已拒单";
-    public static final String CANCEL = "取消";
+    public static final String CANCEL = "已取消";
+    public static final String CARRIER = "承运中";
+    public static final String RECEIPT = "接单";
+
+
 }

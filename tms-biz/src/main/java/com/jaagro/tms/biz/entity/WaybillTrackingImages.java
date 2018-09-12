@@ -1,7 +1,11 @@
 package com.jaagro.tms.biz.entity;
 
-import java.util.Date;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
+import java.util.Date;
+@Data
+@Accessors(chain = true)
 public class WaybillTrackingImages {
     /**
      * 
@@ -17,6 +21,11 @@ public class WaybillTrackingImages {
      * 
      */
     private Integer waybillTrackingId;
+
+    /**
+     * 装货 卸货id
+     */
+    private Integer siteId;
 
     /**
      * 图片类型：1-装货单 2- 卸货单

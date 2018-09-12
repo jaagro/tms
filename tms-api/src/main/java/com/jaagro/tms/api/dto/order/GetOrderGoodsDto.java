@@ -46,6 +46,11 @@ public class GetOrderGoodsDto implements Serializable {
     private BigDecimal goodsWeight;
 
     /**
+     * 余量
+     */
+    private BigDecimal margin;
+
+    /**
      * 是否加药
      */
     private Boolean joinDrug;

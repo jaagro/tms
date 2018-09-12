@@ -28,7 +28,12 @@ public class GetWaybillItemsDto implements Serializable {
     /**
      * 卸货地id
      */
-    private ShowSiteDto unloadSiteId;
+    private Integer unloadSiteId;
+
+    /**
+     * 卸货地对象
+     */
+    private ShowSiteDto unloadSite;
 
     /**
      * 要求送达时间
@@ -49,9 +54,12 @@ public class GetWaybillItemsDto implements Serializable {
      * 修改人id
      */
     private ShowUserDto modifyUserId;
-
+    /**
+     * 签收状态
+     */
+    private Boolean signStatus;
     /**
      * 货物列表
      */
-    private List<GetWaybillGoodsDto> goods;
+    private List<ShowGoodsDto> goods;
 }

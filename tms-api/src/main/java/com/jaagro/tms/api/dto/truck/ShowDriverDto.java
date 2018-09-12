@@ -17,7 +17,7 @@ public class ShowDriverDto implements Serializable {
     /**
      * 司机名
      */
-    private String driverName;
+    private String name;
 
     /**
      * 是不是主驾

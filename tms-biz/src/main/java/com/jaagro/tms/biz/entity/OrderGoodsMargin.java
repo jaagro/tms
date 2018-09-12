@@ -3,15 +3,13 @@ package com.jaagro.tms.biz.entity;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
-import java.util.Date;
-
+import java.math.BigDecimal;
 /**
  * @author tony
  */
 @Data
 @Accessors(chain = true)
-public class WaybillTemp implements Serializable {
+public class OrderGoodsMargin {
     /**
      * 
      */
@@ -23,12 +21,17 @@ public class WaybillTemp implements Serializable {
     private Integer orderId;
 
     /**
-     * 需求车型id
+     * 订单列表id
      */
-    private Integer needTruckType;
+    private Integer orderItemId;
 
     /**
-     * 创建时间
+     * 货物id
      */
-    private Date createTime;
+    private Integer orderGoodsId;
+
+    /**
+     * 余量
+     */
+    private BigDecimal margin;
 }

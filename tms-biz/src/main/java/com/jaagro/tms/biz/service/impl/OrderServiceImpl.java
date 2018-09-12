@@ -13,12 +13,13 @@ import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
 import com.jaagro.tms.biz.mapper.OrderItemsMapper;
 import com.jaagro.tms.biz.mapper.OrdersMapper;
 import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
-import org.aspectj.lang.annotation.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,8 +61,10 @@ public class OrderServiceImpl implements OrderService {
         order.setCreatedUserId(currentUserService.getShowUser().getId());
         this.ordersMapper.insertSelective(order);
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
-            for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()
-            ) {
+            for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
+                if(StringUtils.isEmpty(itemsDto.getUnloadId())){
+                    return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "卸货地不能为空");
+                }
                 itemsDto.setOrderId(order.getId());
                 this.orderItemsService.createOrderItem(itemsDto);
             }
@@ -151,7 +154,6 @@ public class OrderServiceImpl implements OrderService {
                 listOrderDtos.add(orderDto);
             }
         }
-//        different();
         return ServiceResult.toResult(listOrderDtos);
     }
 

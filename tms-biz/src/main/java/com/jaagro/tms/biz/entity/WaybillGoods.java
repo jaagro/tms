@@ -24,6 +24,11 @@ public class WaybillGoods implements Serializable {
     private Integer waybillItemId;
 
     /**
+     * 货物id
+     */
+    private Integer orderGoodsId;
+
+    /**
      * 货物名称
      */
     private String goodsName;
