@@ -7,7 +7,7 @@ import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
-import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.driverapp.ShowSiteAppDto;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
@@ -174,7 +174,7 @@ public class WaybillServiceImpl implements WaybillService {
             throw new NullPointerException(id + ": 无效");
         }
         //拿到装货地对象
-        ShowSiteDto loadSiteDto = customerClientService.getShowSiteById(waybill.getLoadSiteId());
+        ShowSiteAppDto loadSiteDto = customerClientService.getShowSiteById(waybill.getLoadSiteId());
 
         //拿到车型对象
         ListTruckTypeDto truckTypeDto = null;
@@ -205,7 +205,7 @@ public class WaybillServiceImpl implements WaybillService {
 //                showGoodsDtoList.add(showGoodsDto);
 //            }
 //            //拿到卸货信息
-//            ShowSiteDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());
+//            ShowSiteAppDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());
 //            getWaybillItemsDto
 //                    .setUnloadSite(unloadSite)
 //                    .setGoods(showGoodsDtoList);
@@ -318,7 +318,7 @@ public class WaybillServiceImpl implements WaybillService {
         }
         //装货信息
         if (null != orders) {
-            ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
+            ShowSiteAppDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
             waybillDetailsAppDto.setLoadSite(loadSite);
             //提货单
             waybillTrackingImages.setWaybillId(waybillId);
@@ -328,10 +328,10 @@ public class WaybillServiceImpl implements WaybillService {
         }
         //卸货信息
         List<GetWaybillItemsAppDto> waybillItems = waybillAppDtos.get(0).getWaybillItems();
-        List<ShowSiteDto> unloadSiteList = new ArrayList<>();
+        List<ShowSiteAppDto> unloadSiteList = new ArrayList<>();
         for (GetWaybillItemsAppDto waybillItem : waybillItems) {
             List<ShowGoodsDto> goods = waybillItem.getGoods();
-            ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
+            ShowSiteAppDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
             unloadSite.setGoods(goods);
             unloadSite.setRequiredTime(waybillItem.getRequiredTime());
             //卸货单
@@ -379,20 +379,20 @@ public class WaybillServiceImpl implements WaybillService {
             GetReceiptListAppDto receiptListAppDto = new GetReceiptListAppDto();
             receiptListAppDto.setWaybillId(waybillAppDto.getId());
             List<ShowGoodsDto> goodsList = new ArrayList<>();
-            List<ShowSiteDto> unloadSite = new ArrayList<>();
+            List<ShowSiteAppDto> unloadSite = new ArrayList<>();
             Orders orders = ordersMapper.selectByPrimaryKey(waybillAppDto.getOrderId());
             if (null != orders) {
                 //要求提货时间
                 receiptListAppDto.setLoadTime(orders.getLoadTime());
                 //装货地
-                ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
+                ShowSiteAppDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
                 receiptListAppDto.setLoadSite(loadSite);
             }
 
             List<GetWaybillItemsAppDto> waybillItems = waybillAppDto.getWaybillItems();
             for (GetWaybillItemsAppDto waybillItem : waybillItems) {
                 //卸货地
-                ShowSiteDto unLoadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
+                ShowSiteAppDto unLoadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
                 unloadSite.add(unLoadSite);
                 //货物信息
                 List<ShowGoodsDto> goods = waybillItem.getGoods();
@@ -487,7 +487,7 @@ public class WaybillServiceImpl implements WaybillService {
             for (GetWaybillAppDto waybillDto : waybillDtos) {
                 ListWaybillAppDto listWaybillAppDto = new ListWaybillAppDto();
                 List<ShowGoodsDto> showGoodsDtos = new ArrayList<>();
-                List<ShowSiteDto> unloadSiteList = new ArrayList<>();
+                List<ShowSiteAppDto> unloadSiteList = new ArrayList<>();
                 //运单号
                 listWaybillAppDto.setWaybillId(waybillDto.getId());
                 //运单状态
@@ -513,7 +513,7 @@ public class WaybillServiceImpl implements WaybillService {
                 if (null != waybillItems && waybillItems.size() > 0) {
                     for (GetWaybillItemsAppDto waybillItem : waybillItems) {
                         if (null != waybillItem) {
-                            ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
+                            ShowSiteAppDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
                             unloadSiteList.add(unloadSite);
                         }
                         List<ShowGoodsDto> goods = waybillItem.getGoods();
@@ -525,7 +525,7 @@ public class WaybillServiceImpl implements WaybillService {
                 listWaybillAppDto.setGoods(showGoodsDtos);
                 //装货地
                 if (null != orders) {
-                    ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
+                    ShowSiteAppDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
                     listWaybillAppDto.setLoadSite(loadSite);
                 }
                 //卸货地
