@@ -1,19 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.jaagro.tms.biz.mapper.AppMessageMapperExt" >
-  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.AppMessage" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="truck_id" property="truckId" jdbcType="INTEGER" />
-    <result column="msg_type" property="msgType" jdbcType="INTEGER" />
-    <result column="waybill_id" property="waybillId" jdbcType="INTEGER" />
-    <result column="msg_status" property="msgStatus" jdbcType="INTEGER" />
-    <result column="header" property="header" jdbcType="VARCHAR" />
-    <result column="body" property="body" jdbcType="VARCHAR" />
-    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
-    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
-  </resultMap>
-  <sql id="Base_Column_List" >
+<mapper namespace="com.jaagro.tms.biz.mapper.AppMessageMapperExt">
+    <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.AppMessage">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
+        <result column="msg_type" property="msgType" jdbcType="INTEGER"/>
+        <result column="waybill_id" property="waybillId" jdbcType="INTEGER"/>
+        <result column="msg_status" property="msgStatus" jdbcType="INTEGER"/>
+        <result column="header" property="header" jdbcType="VARCHAR"/>
+        <result column="body" property="body" jdbcType="VARCHAR"/>
+        <result column="start_time" property="startTime" jdbcType="TIMESTAMP"/>
+        <result column="end_time" property="endTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
     id, truck_id, msg_type, waybill_id, msg_status, header, body, start_time, end_time
   </sql>
-
+    <select id="listAppMessageByCondtion" resultMap="BaseResultMap"
+            parameterType="com.jaagro.tms.biz.entity.AppMessage">
+        select
+        <include refid="Base_Column_List"/>
+        from app_message
+        where 1=1
+        <if test="id != null">
+            and id=#{id}
+        </if>
+        <if test="truckId != null">
+            and truck_id=#{truckId}
+        </if>
+        <if test="msgType != null">
+            and msg_type=#{msgType}
+        </if>
+        <if test="waybillId != null">
+            and waybill_id=#{waybillId}
+        </if>
+    </select>
 </mapper>

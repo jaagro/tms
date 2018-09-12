@@ -101,7 +101,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
                 OrderItems orderItems = this.orderItemsMapper.selectByPrimaryKey(items.getId());
                 items
                         .setModifyUserId(this.currentUserService.getShowUser())
-//                        .setModifyUserId(this.customerService.getShowCustomerById(orderItems.getModifyUserId()))
+                       .setModifyUserId(this.customerService.getShowCustomerById(orderItems.getModifyUserId()))
                         .setUnload(this.customerService.getShowSiteById(orderItems.getUnloadId()));
 
             }

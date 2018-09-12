@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.dto.driverapp;
 
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -24,11 +25,11 @@ public class GetReceiptListAppDto implements Serializable {
     /**
      * 装货地
      */
-    private ShowSiteAppDto loadSite;
+    private ShowSiteDto loadSite;
     /**
      * 卸货地
      */
-    private List<ShowSiteAppDto> unloadSite;
+    private List<ShowSiteDto> unloadSite;
 
     /**
      * 货物

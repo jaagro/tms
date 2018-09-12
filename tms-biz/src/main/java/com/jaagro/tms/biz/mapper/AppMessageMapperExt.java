@@ -8,5 +8,12 @@ import java.util.List;
  * @author tony
  */
 public interface AppMessageMapperExt extends AppMessageMapper {
+    /**
+     *
+     * @param record
+     * @return
+     *  @author @Gao.
+     */
+    List<AppMessage> listAppMessageByCondtion(AppMessage record);
 
 }

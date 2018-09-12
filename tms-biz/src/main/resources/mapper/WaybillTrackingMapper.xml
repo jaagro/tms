@@ -180,12 +180,16 @@
         select
         <include refid="Base_Column_List"/>
         from waybill_tracking
-        where
+        where 1=1
         <if test="waybillId != null">
-            waybill_id=#{waybillId}
+            and waybill_id=#{waybillId}
         </if>
+        <if test="driverId!= null">
+            and driver_id=#{driverId}
+        </if>
+
         <if test="newStatus != null">
-            AND new_status=#{newStatus}
+            and new_status=#{newStatus}
         </if>
 
     </select>
