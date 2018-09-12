@@ -1,7 +1,7 @@
 package com.jaagro.tms.api.dto.customer;
 
-import com.jaagro.tms.api.dto.waybill.GetWaybillTrackingImagesDto;
-import com.jaagro.tms.api.dto.waybill.ShowGoodsDto;
+import com.jaagro.tms.api.dto.driverapp.GetWaybillTrackingImagesDto;
+import com.jaagro.tms.api.dto.driverapp.ShowGoodsDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

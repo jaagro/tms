@@ -1,6 +1,9 @@
 package com.jaagro.tms.api.service;
 
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
+import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
+import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
 
 import java.util.List;
 import java.util.Map;

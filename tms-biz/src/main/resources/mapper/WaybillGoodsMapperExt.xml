@@ -23,7 +23,7 @@
     load_weight, unload_quantity, unload_weight, join_drug, enabled, modify_time, modify_user_id
   </sql>
 
-  <select id="listGoodsByWaybillId" resultType="com.jaagro.tms.api.dto.waybill.GetWaybillGoodsDto">
+  <select id="listGoodsByWaybillId" resultType="com.jaagro.tms.api.dto.driverapp.GetWaybillGoodsAppDto">
     select
     wg.*
     from waybill w inner join waybill_items wi on w.id = wi.waybill_id inner join waybill_goods wg on wi.id = wg.waybill_item_id

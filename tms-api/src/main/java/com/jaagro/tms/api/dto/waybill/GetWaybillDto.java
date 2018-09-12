@@ -1,11 +1,12 @@
 package com.jaagro.tms.api.dto.waybill;
 
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
-import com.jaagro.tms.api.dto.base.ShowTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
+import com.jaagro.tms.api.dto.driverapp.GetWaybillItemsAppDto;
+import com.jaagro.tms.api.dto.driverapp.ShowTrackingDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -93,7 +94,7 @@ public class GetWaybillDto implements Serializable {
     /**
      * 运单明细list
      */
-    private List<GetWaybillItemsDto> waybillItems;
+    private List<GetWaybillItemsAppDto> waybillItems;
 
     /**
      * 运单轨迹

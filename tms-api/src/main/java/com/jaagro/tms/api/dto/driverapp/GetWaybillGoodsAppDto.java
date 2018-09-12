@@ -1,4 +1,4 @@
-package com.jaagro.tms.api.dto.waybill;
+package com.jaagro.tms.api.dto.driverapp;
 
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class GetWaybillGoodsDto implements Serializable {
+public class GetWaybillGoodsAppDto implements Serializable {
     /**
      *
      */
