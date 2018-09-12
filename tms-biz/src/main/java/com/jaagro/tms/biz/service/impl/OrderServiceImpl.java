@@ -62,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
         this.ordersMapper.insertSelective(order);
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
             for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
-                if(StringUtils.isEmpty(itemsDto.getUnloadId())){
+                if (StringUtils.isEmpty(itemsDto.getUnloadId())) {
                     return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "卸货地不能为空");
                 }
                 itemsDto.setOrderId(order.getId());

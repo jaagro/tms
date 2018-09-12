@@ -7,6 +7,7 @@ import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
@@ -67,6 +68,14 @@ public class WaybillController {
             return BaseResponse.errorInstance(e.getMessage());
         }
     }
+
+    @ApiOperation("从配载计划中移除运单")
+    @DeleteMapping("/waybillPlan/{waybillId}")
+    public BaseResponse removeWaybillFromPlan(@PathVariable("waybillId") Integer waybillId){
+        return BaseResponse.service(waybillPlanService.removeWaybillFromPlan(waybillId));
+    }
+
+//            ---------------------------------------运单---------------------------------------
 
     @ApiOperation("通过id获取运单对象")
     @GetMapping("/waybill/{id}")

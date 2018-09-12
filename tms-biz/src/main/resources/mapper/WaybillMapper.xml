@@ -107,7 +107,7 @@
         modify_user_id,
       </if>
       <if test="loadSiteId != null" >
-      load_site_id,
+        load_site_id,
     </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
