@@ -19,7 +19,7 @@
         <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
     </resultMap>
 
-    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.waybill.GetWaybillAppDto">
+    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.GetWaybillAppDto">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="order_id" property="orderId" jdbcType="INTEGER"/>
         <result column="truck_team_contract_id" property="truckTeamContractId" jdbcType="INTEGER"/>
@@ -46,7 +46,7 @@
         select
         <include refid="Base_Column_List"/>
         from waybill
-        where id = #{id,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER} and enabled = 1
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from waybill
@@ -107,7 +107,7 @@
         modify_user_id,
       </if>
       <if test="loadSiteId != null" >
-      load_site_id,
+        load_site_id,
     </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -225,13 +225,13 @@
     select
     <include refid="Base_Column_List" />
     from waybill
-    where order_id = #{orderld,jdbcType=INTEGER}
+    where order_id = #{orderld,jdbcType=INTEGER} and enabled = 1
   </select>
     <select id="selectWaybillByCarrierStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
         select
         <include refid="Base_Column_List"/>
         from waybill
-        where waybill_status in ('待出发','前往装货地','待装货','待送达','待签收')
+        where waybill_status in ('待出发','前往装货地','待装货','待送达','待签收') and enabled = 1
         <if test="driverId != null">
             and driver_id = #{driverId,jdbcType=INTEGER}
         </if>
@@ -241,9 +241,9 @@
         select
         <include refid="Base_Column_List"/>
         from waybill
-        where
+        where enabled = 1
         <if test="waybillStatus != null">
-            waybill_status=#{waybillStatus,jdbcType=VARCHAR}
+            and waybill_status=#{waybillStatus,jdbcType=VARCHAR}
         </if>
         <if test="driverId != null">
             and driver_id = #{driverId,jdbcType=INTEGER}

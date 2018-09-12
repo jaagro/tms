@@ -41,10 +41,4 @@ public interface WaybillItemsMapper {
      */
     int updateByPrimaryKey(WaybillItems record);
 
-    /**
-     * 通过waybillId获取运单明细
-     * @param waybillId
-     * @return
-     */
-    List<WaybillItems> listWaybillItemsByWaybillId(Integer waybillId);
 }

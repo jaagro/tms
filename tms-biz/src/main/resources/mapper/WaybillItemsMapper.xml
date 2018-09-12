@@ -11,7 +11,7 @@
     <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER" />
     <result column="sign_status" property="signStatus" jdbcType="INTEGER" />
   </resultMap>
-  <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.waybill.GetWaybillItemsDto" >
+  <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.GetWaybillItemsAppDto" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="waybill_id" property="waybillId" jdbcType="INTEGER" />
     <result column="unload_site_id" property="unloadSiteId" jdbcType="INTEGER" />
@@ -30,12 +30,6 @@
     <include refid="Base_Column_List" />
     from waybill_items
     where id = #{id,jdbcType=INTEGER}
-  </select>
-  <select id="listWaybillItemsByWaybillId" resultType="com.jaagro.tms.biz.entity.WaybillItems">
-    select
-    <include refid="Base_Column_List" />
-    from waybill_items
-    where waybill_id = #{waybillId,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from waybill_items

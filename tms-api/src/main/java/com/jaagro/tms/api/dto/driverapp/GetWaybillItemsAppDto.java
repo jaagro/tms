@@ -1,7 +1,6 @@
-package com.jaagro.tms.api.dto.waybill;
+package com.jaagro.tms.api.dto.driverapp;
 
 import com.jaagro.tms.api.dto.base.ShowUserDto;
-import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -14,7 +13,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class GetWaybillItemsDto implements Serializable {
+public class GetWaybillItemsAppDto implements Serializable {
     /**
      *
      */
@@ -33,7 +32,7 @@ public class GetWaybillItemsDto implements Serializable {
     /**
      * 卸货地对象
      */
-    private ShowSiteDto unloadSite;
+    private ShowSiteAppDto unloadSite;
 
     /**
      * 要求送达时间

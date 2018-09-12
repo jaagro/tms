@@ -1,6 +1,6 @@
 package com.jaagro.tms.biz.mapper;
 
-import com.jaagro.tms.api.dto.waybill.ShowTrackingDto;
+import com.jaagro.tms.api.dto.driverapp.ShowTrackingDto;
 import com.jaagro.tms.biz.entity.WaybillTracking;
 
 import java.util.List;
