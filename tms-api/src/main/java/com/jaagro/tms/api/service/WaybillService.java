@@ -32,7 +32,7 @@ public interface WaybillService {
      * @param waybillId
      * @return
      */
-    Map<String, Object> showWaybill(Integer waybillId);
+    Map<String, Object> showWaybillTrucking(Integer waybillId);
 
 
     /**

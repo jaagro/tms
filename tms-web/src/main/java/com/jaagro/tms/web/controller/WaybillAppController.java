@@ -1,8 +1,8 @@
 package com.jaagro.tms.web.controller;
 
+import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
+import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
 import com.jaagro.tms.api.dto.waybill.GetReceiptMessageParamDto;
-import com.jaagro.tms.api.dto.waybill.GetReceiptParamDto;
-import com.jaagro.tms.api.dto.waybill.GetWaybillParamDto;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
@@ -46,11 +46,11 @@ public class WaybillAppController {
 
     @ApiOperation("运单轨迹")
     @GetMapping("/showWaybillApp/{waybillId}")
-    public BaseResponse showWaybillApp(@PathVariable Integer waybillId) {
+    public BaseResponse showWaybillTruckingApp(@PathVariable Integer waybillId) {
         if (waybillId == null) {
             return BaseResponse.errorInstance("运单单参数不能为空");
         }
-        return BaseResponse.service(waybillService.showWaybill(waybillId));
+        return BaseResponse.service(waybillService.showWaybillTrucking(waybillId));
     }
 
     @ApiOperation("接单列表")
