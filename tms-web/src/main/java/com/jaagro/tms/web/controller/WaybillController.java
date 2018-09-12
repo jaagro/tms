@@ -109,8 +109,18 @@ public class WaybillController {
             return BaseResponse.successInstance(result);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new NullPointerException("创建运单失败:"+e.getMessage());
-            //return BaseResponse.errorInstance(e.getMessage());
+            throw new RuntimeException("创建运单失败:"+e.getMessage());
+        }
+    }
+
+    @ApiOperation("运单派给车辆")
+    @PostMapping("/assignWaybillToTruck/{waybillId}/{truckId}")
+    public BaseResponse assignWaybillToTruck(@PathVariable Integer waybillId,Integer truckId) {
+        try {
+            return BaseResponse.service(waybillService.assignWaybillToTruck(waybillId,truckId));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return BaseResponse.errorInstance("派单失败:"+e.getMessage());
         }
     }
 }
