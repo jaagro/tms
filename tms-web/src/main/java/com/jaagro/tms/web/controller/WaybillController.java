@@ -2,6 +2,7 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
@@ -68,6 +69,14 @@ public class WaybillController {
             return BaseResponse.errorInstance(e.getMessage());
         }
     }
+
+    @ApiOperation("从配载计划中移除运单")
+    @DeleteMapping("/waybillPlan/{waybillId}")
+    public BaseResponse removeWaybillFromPlan(@PathVariable("waybillId") Integer waybillId){
+        return BaseResponse.service(waybillPlanService.removeWaybillFromPlan(waybillId));
+    }
+
+//            ---------------------------------------运单---------------------------------------
 
     @ApiOperation("通过id获取运单对象")
     @GetMapping("/waybill/{id}")

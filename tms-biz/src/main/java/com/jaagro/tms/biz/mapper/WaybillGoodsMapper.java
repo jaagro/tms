@@ -1,7 +1,5 @@
 package com.jaagro.tms.biz.mapper;
 
-import com.jaagro.tms.api.dto.waybill.GetWaybillGoodsDto;
-import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.entity.WaybillGoods;
 
 import java.util.List;

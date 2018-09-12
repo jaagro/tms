@@ -1,7 +1,7 @@
 package com.jaagro.tms.web.controller;
 
-import com.jaagro.tms.api.dto.waybill.GetReceiptParamDto;
-import com.jaagro.tms.api.dto.waybill.GetWaybillParamDto;
+import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
+import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;

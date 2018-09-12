@@ -21,7 +21,7 @@
     delete from order_goods_margin
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.OrderGoodsMargin" >
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.OrderGoodsMargin" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
     insert into order_goods_margin (id, order_id, order_item_id, 
       order_goods_id, margin)
     values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{orderItemId,jdbcType=INTEGER}, 

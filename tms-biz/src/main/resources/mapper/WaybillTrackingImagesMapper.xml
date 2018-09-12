@@ -11,7 +11,7 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="create_user_id" property="createUserId" jdbcType="INTEGER" />
   </resultMap>
-  <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.waybill.GetWaybillTrackingImagesDto" >
+  <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.GetWaybillTrackingImagesDto" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="waybill_id" property="waybillId" jdbcType="INTEGER" />
     <result column="site_id" property="siteId" jdbcType="INTEGER" />
