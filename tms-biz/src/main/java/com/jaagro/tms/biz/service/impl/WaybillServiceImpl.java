@@ -55,10 +55,6 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     private OrdersMapper ordersMapper;
     @Autowired
-    private OrderItemsMapper orderItemsMapper;
-    @Autowired
-    private OrderGoodsMapper orderGoodsMapper;
-    @Autowired
     private WaybillTrackingImagesMapper waybillTrackingImagesMapper;
     @Autowired
     private WaybillTrackingMapper waybillTrackingMapper;
@@ -72,6 +68,7 @@ public class WaybillServiceImpl implements WaybillService {
     private TruckClientService truckClientService;
     @Autowired
     private AppMessageMapperExt appMessageMapperExt;
+
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -158,8 +155,7 @@ public class WaybillServiceImpl implements WaybillService {
             BeanUtils.copyProperties(waybill, getWaybillDto);
             getWaybills.add(getWaybillDto);
         }
-
-        return null;
+        return getWaybills;
     }
 
     /**
@@ -167,6 +163,7 @@ public class WaybillServiceImpl implements WaybillService {
      *
      * @param id
      * @return
+     * @author tony
      */
     @Override
     public GetWaybillDto getWaybillById(Integer id) {
@@ -193,36 +190,36 @@ public class WaybillServiceImpl implements WaybillService {
         if (!StringUtils.isEmpty(waybill.getTruckId())) {
             truckDto = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
         }
-        //获取waybillItem列表
-        List<GetWaybillItemsDto> getWaybillItemsDtoList = new ArrayList<>();
-        List<WaybillItems> waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybill.getId());
-        for (WaybillItems items : waybillItemsList) {
-            GetWaybillItemsDto getWaybillItemsDto = new GetWaybillItemsDto();
-            BeanUtils.copyProperties(items, getWaybillItemsDto);
-            List<ShowGoodsDto> showGoodsDtoList = new LinkedList<>();
-            List<WaybillGoods> waybillGoodsList = waybillGoodsMapper.listWaybillGoodsByItemId(items.getId());
-            for (WaybillGoods wg : waybillGoodsList) {
-                ShowGoodsDto showGoodsDto = new ShowGoodsDto();
-                BeanUtils.copyProperties(wg, showGoodsDto);
-                showGoodsDtoList.add(showGoodsDto);
-            }
-            //拿到卸货信息
-            ShowSiteDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());
-            getWaybillItemsDto
-                    .setUnloadSite(unloadSite)
-                    .setGoods(showGoodsDtoList);
-            getWaybillItemsDtoList.add(getWaybillItemsDto);
-        }
-        GetWaybillDto getWaybillDto = new GetWaybillDto();
-        BeanUtils.copyProperties(waybill, getWaybillDto);
-        getWaybillDto
-                .setLoadSite(loadSiteDto)
-                .setNeedTruckType(truckTypeDto)
-                .setTruckId(truckDto)
-                .setDriverId(showDriverDto)
-                .setWaybillItems(getWaybillItemsDtoList);
+//        //获取waybillItem列表
+//        List<GetWaybillItemsDto> getWaybillItemsDtoList = new ArrayList<>();
+//        List<WaybillItems> waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybill.getId());
+//        for (WaybillItems items : waybillItemsList) {
+//            GetWaybillItemsDto getWaybillItemsDto = new GetWaybillItemsDto();
+//            BeanUtils.copyProperties(items, getWaybillItemsDto);
+//            List<ShowGoodsDto> showGoodsDtoList = new LinkedList<>();
+//            List<WaybillGoods> waybillGoodsList = waybillGoodsMapper.listWaybillGoodsByItemId(items.getId());
+//            for (WaybillGoods wg : waybillGoodsList) {
+//                ShowGoodsDto showGoodsDto = new ShowGoodsDto();
+//                BeanUtils.copyProperties(wg, showGoodsDto);
+//                showGoodsDtoList.add(showGoodsDto);
+//            }
+//            //拿到卸货信息
+//            ShowSiteDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());
+//            getWaybillItemsDto
+//                    .setUnloadSite(unloadSite)
+//                    .setGoods(showGoodsDtoList);
+//            getWaybillItemsDtoList.add(getWaybillItemsDto);
+//        }
+//        GetWaybillDto getWaybillDto = new GetWaybillDto();
+//        BeanUtils.copyProperties(waybill, getWaybillDto);
+//        getWaybillDto
+//                .setLoadSite(loadSiteDto)
+//                .setNeedTruckType(truckTypeDto)
+//                .setTruckId(truckDto)
+//                .setDriverId(showDriverDto)
+//                .setWaybillItems(getWaybillItemsDtoList);
 
-        return getWaybillDto;
+        return null;
     }
 
     /**
@@ -261,21 +258,19 @@ public class WaybillServiceImpl implements WaybillService {
      *
      * @param dto
      * @return
-     * @author @Gao.
      */
     @Override
     public Map<String, Object> listWaybillByStatus(GetWaybillParamDto dto) {
 
         UserInfo currentUser = currentUserService.getCurrentUser();
-        Integer currentUserId = currentUser.getId();
         Waybill waybill = new Waybill();
-        waybill.setDriverId(currentUserId);
+        waybill.setDriverId(currentUser.getId());
         List<ListWaybillAppDto> listWaybillAppDtos;
         //承运中订单
         if (WaybillStatus.CARRIER.equals(dto.getWaybillStatus())) {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
             List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByCarrierStatus(waybill);
-            listWaybillAppDtos = listWaybill(waybillDtos, currentUserId);
+            listWaybillAppDtos = listWaybill(waybillDtos);
             return ServiceResult.toResult(new PageInfo<>(listWaybillAppDtos));
         }
         //已完成运单
@@ -283,7 +278,7 @@ public class WaybillServiceImpl implements WaybillService {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
             waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
             List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByStatus(waybill);
-            listWaybillAppDtos = listWaybill(waybillDtos, currentUserId);
+            listWaybillAppDtos = listWaybill(waybillDtos);
             return ServiceResult.toResult(new PageInfo<>(listWaybillAppDtos));
         }
         //取消运单
@@ -291,7 +286,7 @@ public class WaybillServiceImpl implements WaybillService {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
             waybill.setWaybillStatus(WaybillStatus.CANCEL);
             List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByStatus(waybill);
-            listWaybillAppDtos = listWaybill(waybillDtos, currentUserId);
+            listWaybillAppDtos = listWaybill(waybillDtos);
             return ServiceResult.toResult(new PageInfo<>(listWaybillAppDtos));
         }
         return ServiceResult.error("没有相关运单");
@@ -302,7 +297,6 @@ public class WaybillServiceImpl implements WaybillService {
      *
      * @param waybillId
      * @return
-     * @author @Gao.
      */
     @Override
     public Map<String, Object> listWayBillDetails(Integer waybillId) {
@@ -348,6 +342,7 @@ public class WaybillServiceImpl implements WaybillService {
 
         }
         waybillDetailsAppDto.setUnloadSite(unloadSiteList);
+
         return ServiceResult.toResult(waybillDetailsAppDto);
     }
 
@@ -356,7 +351,6 @@ public class WaybillServiceImpl implements WaybillService {
      *
      * @param waybillId
      * @return
-     * @author @Gao.
      */
     @Override
     public Map<String, Object> showWaybill(Integer waybillId) {

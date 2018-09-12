@@ -83,4 +83,9 @@ public class GetWaybillGoodsDto implements Serializable {
      * 修改人id
      */
     private ShowUserDto modifyUserId;
+
+    /**
+     * 订单货物id
+     */
+    private Integer orderGoodsId;
 }

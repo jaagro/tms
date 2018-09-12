@@ -1,25 +1,29 @@
 package com.jaagro.tms.biz.service.impl;
 
+import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillPlanService;
-import com.jaagro.tms.biz.entity.OrderGoods;
-import com.jaagro.tms.biz.entity.OrderItems;
-import com.jaagro.tms.biz.entity.Orders;
+import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.DriverClientService;
 import com.jaagro.tms.biz.service.TruckClientService;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.tms.biz.vo.MiddleObjectVo;
+import com.jaagro.utils.ResponseStatusCode;
+import com.jaagro.utils.ServiceResult;
+import com.netflix.discovery.converters.Auto;
+import lombok.experimental.Accessors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -35,17 +39,9 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
     private static final Logger log = LoggerFactory.getLogger(WaybillPlanServiceImpl.class);
 
     @Autowired
-    private CurrentUserService currentUserService;
-    @Autowired
     private TruckTypeClientService truckTypeClientService;
     @Autowired
     private CustomerClientService customerClientService;
-    @Autowired
-    private WaybillMapper waybillMapper;
-    @Autowired
-    private WaybillItemsMapper waybillItemsMapper;
-    @Autowired
-    private WaybillGoodsMapper waybillGoodsMapper;
     @Autowired
     private OrdersMapper ordersMapper;
     @Autowired
@@ -53,29 +49,23 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
     @Autowired
     private OrderGoodsMapper orderGoodsMapper;
     @Autowired
-    private WaybillTrackingImagesMapper waybillTrackingImagesMapper;
+    private WaybillMapperExt waybillMapper;
     @Autowired
-    private WaybillTrackingMapper waybillTrackingMapper;
+    private OrderGoodsMarginMapperExt orderGoodsMarginMapper;
     @Autowired
-    private OrderGoodsMarginMapper orderGoodsMarginMapper;
-    @Autowired
-    private OrderService orderService;
-    @Autowired
-    private DriverClientService driverClientService;
-    @Autowired
-    private TruckClientService truckClientService;
+    private WaybillGoodsMapperExt waybillGoodsMapper;
 
     @Override
-    public List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto){
+    public List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto) {
         Integer orderId = waybillDto.getOrderId();
-        List<CreateWaybillItemsPlanDto>  waybillItemsDtos = waybillDto.getWaybillItems();
+        List<CreateWaybillItemsPlanDto> waybillItemsDtos = waybillDto.getWaybillItems();
         List<TruckDto> truckDtos = waybillDto.getTrucks();
         List<MiddleObjectVo> middleObjects = new ArrayList<>();
-        for(CreateWaybillItemsPlanDto waybillItemsDto:waybillItemsDtos) {
+        for (CreateWaybillItemsPlanDto waybillItemsDto : waybillItemsDtos) {
             Integer orderItemId = waybillItemsDto.getOrderItemId();
-            List<CreateWaybillGoodsPlanDto> goods =  waybillItemsDto.getGoods();
-            for(CreateWaybillGoodsPlanDto waybillGoodsDto:goods){
-                MiddleObjectVo  middleObject = new MiddleObjectVo();
+            List<CreateWaybillGoodsPlanDto> goods = waybillItemsDto.getGoods();
+            for (CreateWaybillGoodsPlanDto waybillGoodsDto : goods) {
+                MiddleObjectVo middleObject = new MiddleObjectVo();
                 middleObject.setOrderId(orderId);
                 middleObject.setOrderItemId(orderItemId);
                 middleObject.setOrderGoodsId(waybillGoodsDto.getGoodsId());
@@ -84,9 +74,9 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             }
         }
         List<ListWaybillPlanDto> waybillDtos = null;
-        if(!CollectionUtils.isEmpty(middleObjects)){
+        if (!CollectionUtils.isEmpty(middleObjects)) {
             try {
-                waybillDtos=wayBillAlgorithm(middleObjects,truckDtos);
+                waybillDtos = wayBillAlgorithm(middleObjects, truckDtos);
             } catch (Exception e) {
                 e.printStackTrace();
                 log.error("计算配运单失败，货物内容={}", middleObjects);
@@ -114,37 +104,70 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
      * @return 结果集
      * @author tony
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> removeWaybillFromPlan(Integer waybillId) {
         //判断运单状态是否满足条件
-        return null;
+        Waybill waybillData = waybillMapper.selectByPrimaryKey(waybillId);
+        List<OrderGoodsMargin> orderGoodsMarginList = new LinkedList<>();
+        if (null == waybillData) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id无效");
+        }
+        if (!waybillData.getWaybillStatus().equals(WaybillStatus.RECEIVE)) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "只有【待接单】的运单才可以撤销");
+        }
+        if (!waybillData.getEnabled()) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id已是注销状态");
+        }
+        OrderGoodsMargin orderGoodsMargin = new OrderGoodsMargin();
+        List<GetWaybillGoodsDto> waybillGoodsDtoList = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
+        for (GetWaybillGoodsDto wg : waybillGoodsDtoList) {
+            OrderGoodsMargin orderGoodsMarginData = orderGoodsMarginMapper.getMarginByGoodsId(wg.getOrderGoodsId());
+            if (orderGoodsMarginData == null) {
+                return ServiceResult.error("货物余量表记录为空");
+            }
+            orderGoodsMargin
+                    .setId(orderGoodsMarginData.getId())
+                    .setMargin(wg.getGoodsWeight())
+                    .setOrderGoodsId(wg.getOrderGoodsId());
+            int count = orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
+            if (count == 0) {
+                log.debug(orderGoodsMargin + " :未被更新");
+                continue;
+            }
+            orderGoodsMarginList.add(orderGoodsMargin);
+        }
+        waybillMapper.removeWaybillById(waybillId);
+        return ServiceResult.toResult(orderGoodsMarginList);
     }
 
     /**
      * 货物配运单核心算法
+     *
      * @param middleObjects
      * @param truckDtos
+     * @return
      */
-    private List<ListWaybillPlanDto> wayBillAlgorithm(List<MiddleObjectVo> middleObjects,List<TruckDto> truckDtos){
+    private List<ListWaybillPlanDto> wayBillAlgorithm(List<MiddleObjectVo> middleObjects, List<TruckDto> truckDtos) {
         List<MiddleObjectVo> middleObjects_assigned = new ArrayList<>();
         List<ListWaybillPlanDto> waybillDtos = new ArrayList<>();
         //按配送地排序
-        List<MiddleObjectVo> newMiddleObjectsList = middleObjects.stream().sorted((e1,e2)->Integer.compare(e1.getOrderItemId(),e2.getOrderItemId())).collect(Collectors.toList());
+        List<MiddleObjectVo> newMiddleObjectsList = middleObjects.stream().sorted((e1, e2) -> Integer.compare(e1.getOrderItemId(), e2.getOrderItemId())).collect(Collectors.toList());
         Iterator<TruckDto> truckIterator = truckDtos.iterator();
-        while(truckIterator.hasNext()) {
+        while (truckIterator.hasNext()) {
             TruckDto truckDto = truckIterator.next();
             Integer capacity = truckDto.getCapacity();
             //使用按照送货地排序后货物分配到车辆生成临时送货单
             List<MiddleObjectVo> assignList = new ArrayList<>();
-            for (int k = 0;k<truckDto.getNumber(); k++){
+            for (int k = 0; k < truckDto.getNumber(); k++) {
                 Iterator<MiddleObjectVo> goodsIterator = newMiddleObjectsList.iterator();
                 Integer proposioningCount = 0;
                 while (goodsIterator.hasNext()) {
                     MiddleObjectVo middleObject = goodsIterator.next();
                     proposioningCount += middleObject.getProportioning();
-                    Integer planAmount  = (middleObject.getProportioning() + capacity - proposioningCount);
+                    Integer planAmount = (middleObject.getProportioning() + capacity - proposioningCount);
                     MiddleObjectVo assignedObj = new MiddleObjectVo();
-                    BeanUtils.copyProperties(middleObject,assignedObj);
+                    BeanUtils.copyProperties(middleObject, assignedObj);
                     assignList.add(assignedObj);
                     if (proposioningCount > capacity) {
                         List<MiddleObjectVo> assignedDtos = assignList.stream().filter(c -> c.getOrderGoodsId().equals(middleObject.getOrderGoodsId())).collect(Collectors.toList());
@@ -162,7 +185,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     }
 
                     Integer assignTotal = assignList.stream().mapToInt(c -> c.getPlanAmount()).sum();
-                    boolean flag = (assignTotal.equals(capacity) || (assignTotal<capacity && newMiddleObjectsList.size()==0));
+                    boolean flag = (assignTotal.equals(capacity) || (assignTotal < capacity && newMiddleObjectsList.size() == 0));
                     if (flag) {
                         middleObjects_assigned.addAll(assignList);
                         ListWaybillPlanDto waybillDto = this.makeOneWaybillPlan(assignList);
@@ -173,8 +196,8 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                 }
             }
         }
-        System.out.println("margin==="+newMiddleObjectsList.toString());
-        System.out.println("assigned==="+middleObjects_assigned.toString());
+        System.out.println("margin===" + newMiddleObjectsList.toString());
+        System.out.println("assigned===" + middleObjects_assigned.toString());
         log.error("货物配运时剩余货物，margin={}", newMiddleObjectsList);
         log.error("货物配运时已经分配的货物，assigned={}", middleObjects_assigned);
 
@@ -183,22 +206,23 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
 
     /**
      * 生成一个运单计划
+     *
      * @param assignList
      * @return
      */
-    private  ListWaybillPlanDto makeOneWaybillPlan(List<MiddleObjectVo> assignList){
+    private ListWaybillPlanDto makeOneWaybillPlan(List<MiddleObjectVo> assignList) {
         ListWaybillPlanDto waybillPlanDto = new ListWaybillPlanDto();
         Orders ordersData = null;
         ListTruckTypeDto truckType = null;
         Integer orderId = 0;
         Integer truckTypeId = 0;
-        for (MiddleObjectVo obj:assignList) {
+        for (MiddleObjectVo obj : assignList) {
             orderId = obj.getOrderId();
             ordersData = ordersMapper.selectByPrimaryKey(orderId);
-            if(ordersData == null){
+            if (ordersData == null) {
                 throw new NullPointerException("订单号为：" + orderId + " 不存在");
             }
-            truckTypeId= obj.getTruckId();
+            truckTypeId = obj.getTruckId();
             truckType = truckTypeClientService.getTruckTypeById(truckTypeId);
             break;
         }
@@ -211,11 +235,11 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         waybillPlanDto.setWaybillPlanTime(new Date());
         waybillPlanDto.setGoodType(ordersData.getGoodsType());
         List<ListWaybillItemsPlanDto> itemsList = new ArrayList<>();
-        for (MiddleObjectVo obj:assignList) {
+        for (MiddleObjectVo obj : assignList) {
             OrderGoods orderGoods = orderGoodsMapper.selectByPrimaryKey(obj.getOrderGoodsId());
             Integer goodsUnit = orderGoods.getGoodsUnit();
-            if(orderGoods == null){
-                throw new NullPointerException("goodsId为：" + obj.getOrderGoodsId()+ " 的货物不存在");
+            if (orderGoods == null) {
+                throw new NullPointerException("goodsId为：" + obj.getOrderGoodsId() + " 的货物不存在");
             }
             OrderItems orderItems = orderItemsMapper.selectByPrimaryKey(obj.getOrderItemId());
             ListWaybillItemsPlanDto waybillItemsPlanDto = new ListWaybillItemsPlanDto();
@@ -232,9 +256,9 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     .setGoodsQuantity(orderGoods.getGoodsQuantity())
                     .setGoodsUnit(orderGoods.getGoodsUnit())
                     .setJoinDrug(orderGoods.getJoinDrug());
-            if(goodsUnit==3){
+            if (goodsUnit == 3) {
                 waybillGoodsDto.setGoodsWeight(new BigDecimal(obj.getPlanAmount()));
-            }else{
+            } else {
                 waybillGoodsDto.setGoodsQuantity(obj.getPlanAmount());
             }
             goodsList.add(waybillGoodsDto);

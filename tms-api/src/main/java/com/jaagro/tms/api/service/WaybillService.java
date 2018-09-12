@@ -56,13 +56,14 @@ public interface WaybillService {
 
     /**
      * 接单详情列表
-     *
+     * @param dto
      * @return
      */
     Map<String, Object> receiptList(GetReceiptParamDto dto);
 
     /**
      * 接单消息列表显示
+     * @param dto
      * @return
      */
     Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto);

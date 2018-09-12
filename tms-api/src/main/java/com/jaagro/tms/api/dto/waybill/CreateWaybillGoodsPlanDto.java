@@ -18,5 +18,5 @@ public class CreateWaybillGoodsPlanDto implements Serializable {
     /**
      * 可配量
      */
-    private Integer Proportioning;
+    private Integer proportioning;
 }
