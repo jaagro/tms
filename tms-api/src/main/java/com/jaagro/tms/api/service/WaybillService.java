@@ -65,7 +65,7 @@ public interface WaybillService {
      * 接单消息列表显示
      * @return
      */
-    Map<String, Object> receiptMessage(GetReceiptParamDto dto);
+    Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto);
 
     /**
      * 根据orderId获取order和waybill信息

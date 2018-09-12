@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * @author @gao
+ * @author @Gao.
  */
 @Data
 @Accessors(chain = true)
@@ -47,5 +47,8 @@ public class GetReceiptParamDto implements Serializable {
      * 是否接单
      */
     private String receiptStatus;
-
+    /**
+     * 货车id
+     */
+    private Integer truckId;
 }
