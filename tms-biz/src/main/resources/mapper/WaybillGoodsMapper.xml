@@ -19,7 +19,7 @@
   <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER" />
 </resultMap>
 
-  <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.waybill.driverapp.ShowGoodsDto" >
+  <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.ShowGoodsDto" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
     <result column="goods_unit" property="goodsUnit" jdbcType="INTEGER" />

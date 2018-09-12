@@ -15,7 +15,7 @@
         <result column="create_time" property="createTime"/>
     </resultMap>
 
-    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.waybill.driverapp.ShowTrackingDto">
+    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.ShowTrackingDto">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="waybill_id" property="waybillId" jdbcType="INTEGER"/>
         <result column="old_status" property="oldStatus" jdbcType="VARCHAR"/>

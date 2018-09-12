@@ -5,8 +5,8 @@ import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
-import com.jaagro.tms.api.dto.waybill.driverapp.GetWaybillItemsAppDto;
-import com.jaagro.tms.api.dto.waybill.driverapp.ShowTrackingDto;
+import com.jaagro.tms.api.dto.driverapp.GetWaybillItemsAppDto;
+import com.jaagro.tms.api.dto.driverapp.ShowTrackingDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

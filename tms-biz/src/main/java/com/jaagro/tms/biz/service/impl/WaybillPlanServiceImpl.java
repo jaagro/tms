@@ -5,7 +5,7 @@ import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.dto.waybill.driverapp.GetWaybillGoodsAppDto;
+import com.jaagro.tms.api.dto.driverapp.GetWaybillGoodsAppDto;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;

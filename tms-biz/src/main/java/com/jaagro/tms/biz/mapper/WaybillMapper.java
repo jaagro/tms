@@ -1,6 +1,6 @@
 package com.jaagro.tms.biz.mapper;
 
-import com.jaagro.tms.api.dto.waybill.driverapp.GetWaybillAppDto;
+import com.jaagro.tms.api.dto.driverapp.GetWaybillAppDto;
 import com.jaagro.tms.biz.entity.Waybill;
 
 import java.util.List;
