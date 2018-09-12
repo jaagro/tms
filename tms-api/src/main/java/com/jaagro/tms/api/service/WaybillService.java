@@ -37,6 +37,7 @@ public interface WaybillService {
 
     /**
      * 创建运单
+     * Author gavin
      * @param waybillDto
      * @return
      */
@@ -85,4 +86,12 @@ public interface WaybillService {
      * @return
      */
     List<GetWaybillDto> listWaybillByOrderId(Integer orderId);
+
+    /**
+     * Author gavin
+     * @param waybillId
+     * @param truckId
+     * @return
+     */
+    Map<String, Object> assignWaybillToTruck(Integer waybillId,Integer truckId);
 }

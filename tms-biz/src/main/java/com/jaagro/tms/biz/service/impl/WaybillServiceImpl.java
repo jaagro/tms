@@ -22,6 +22,7 @@ import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.DriverClientService;
 import com.jaagro.tms.biz.service.TruckClientService;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
+import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +76,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
+            Integer userId = getUserId();
         //更新orders表的状态OrderStatus.STOWAGE
         for (CreateWaybillDto createWaybillDto : waybillDtoList) {
             Integer orderId = createWaybillDto.getOrderId();
@@ -82,7 +84,7 @@ public class WaybillServiceImpl implements WaybillService {
             orders.setId(orderId);
             orders.setOrderStatus(OrderStatus.STOWAGE);
             orders.setModifyTime(new Date());
-            orders.setModifyUserId(99999999);
+            orders.setModifyUserId(userId);
             ordersMapper.updateByPrimaryKeySelective(orders);
             break;
         }
@@ -93,10 +95,9 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setLoadSiteId(createWaybillDto.getLoadSiteId());
             waybill.setNeedTruckType(createWaybillDto.getNeedTruckTypeId());
             waybill.setTruckTeamContractId(createWaybillDto.getTruckTeamContractId());
-            waybill.setWaybillStatus(WaybillStatus.RECEIVE);
+            waybill.setWaybillStatus(WaybillStatus.SEND_TRUCK);
             waybill.setCreateTime(new Date());
-            waybill.setCreatedUserId(99999999);
-            //waybill.setCreatedUserId(currentUserService.getCurrentUser().getId());
+            waybill.setCreatedUserId(userId);
             waybillMapper.insertSelective(waybill);
             int waybillId = waybill.getId();
             List<CreateWaybillItemsDto> waybillItemsList = createWaybillDto.getWaybillItems();
@@ -105,7 +106,7 @@ public class WaybillServiceImpl implements WaybillService {
                 waybillItem.setWaybillId(waybillId);
                 waybillItem.setUnloadSiteId(waybillItemsDto.getUnloadSiteId());
                 waybillItem.setRequiredTime(waybillItemsDto.getRequiredTime());
-                waybillItem.setModifyUserId(99999999);
+                waybillItem.setModifyUserId(userId);
                 waybillItemsMapper.insertSelective(waybillItem);
                 int waybillItemsId = waybillItem.getId();
 
@@ -122,7 +123,7 @@ public class WaybillServiceImpl implements WaybillService {
                         waybillGoods.setGoodsQuantity(createWaybillGoodsDto.getGoodsQuantity());
                     }
                     waybillGoods.setJoinDrug(createWaybillGoodsDto.getJoinDrug());
-                    waybillGoods.setModifyUserId(99999999);
+                    waybillGoods.setModifyUserId(userId);
                     waybillGoodsMapper.insertSelective(waybillGoods);
                     //插入order_goods_margin
                     OrderGoodsMargin orderGoodsMargin = new OrderGoodsMargin();
@@ -537,5 +538,70 @@ public class WaybillServiceImpl implements WaybillService {
             }
         }
         return listWaybillAppDtos;
+    }
+    @Override
+    public Map<String, Object> assignWaybillToTruck(Integer waybillId, Integer truckId) {
+        Integer userId = getUserId();
+        Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+        String  waybillOldStatus = waybill.getWaybillStatus();
+        String  waybillNewStatus = WaybillStatus.RECEIVE;
+        if(null == waybill){
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " ：id不正确");
+        }
+        if(null == truckClientService.getTruckByIdReturnObject(truckId)){
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " ：id不正确");
+        }
+        //1.更新订单状态：从已配载(STOWAGE)改为运输中(TRANSPORT)
+        Orders orders = new Orders();
+        orders.setId(waybill.getOrderId());
+        orders.setOrderStatus(OrderStatus.TRANSPORT);
+        orders.setModifyTime(new Date());
+        orders.setModifyUserId(userId);
+        ordersMapper.updateByPrimaryKeySelective(orders);
+        //2.更新waybill
+        waybill  = new Waybill();
+        waybill.setId(waybillId);
+        waybill.setTruckId(truckId);
+        waybill.setWaybillStatus(waybillNewStatus);
+        waybill.setModifyTime(new Date());
+        waybill.setModifyUserId(userId);
+        waybillMapper.updateByPrimaryKeySelective(waybill);
+        //3.在waybill_tracking表插入一条记录
+        WaybillTracking waybillTracking = new WaybillTracking();
+        waybillTracking
+                .setWaybillId(waybillId)
+                .setCreateTime(new Date())
+                .setOldStatus(waybillOldStatus)
+                .setNewStatus(waybillNewStatus)
+                .setReferUserId(userId);
+        waybillTrackingMapper.insertSelective(waybillTracking);
+
+        //4.在app消息表插入一条记录
+          AppMessage appMessage = new AppMessage();
+          appMessage.setWaybillId(waybillId);
+          appMessage.setTruckId(truckId);
+
+
+
+        //5.发送短信给truckId对应的司机
+
+        //6.掉用Jpush接口
+
+        return null;
+    }
+    private Integer getUserId(){
+        UserInfo userInfo = null;
+        try {
+            userInfo = currentUserService.getCurrentUser();
+        }catch(Exception ex){
+            ex.printStackTrace();
+            log.error("获取当前用户失败：currentUserService.getCurrentUser()");
+            return 999999999;
+        }
+        if(null == userInfo){
+            return 999999999;
+        }else{
+            return userInfo.getId();
+        }
     }
 }
