@@ -30,6 +30,7 @@ public class WaybillController {
 
     /**
      * 创建运单计划
+     *
      * @param waybillDto
      * @return
      */
@@ -70,11 +71,11 @@ public class WaybillController {
 
     @ApiOperation("通过id获取运单对象")
     @GetMapping("/waybill/{id}")
-    public BaseResponse getWaybillById(@PathVariable("id") Integer id){
+    public BaseResponse getWaybillById(@PathVariable("id") Integer id) {
         GetWaybillDto result;
         try {
             result = waybillService.getWaybillById(id);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return BaseResponse.errorInstance(e.getMessage());
         }
@@ -83,11 +84,11 @@ public class WaybillController {
 
     @ApiOperation("通过id获取运单对象")
     @GetMapping("/orderAndWaybill/{orderId}")
-    public BaseResponse getOrderAndWaybillByOrderId(@PathVariable("orderId") Integer orderId){
+    public BaseResponse getOrderAndWaybillByOrderId(@PathVariable("orderId") Integer orderId) {
         GetWaybillPlanDto result;
         try {
             result = waybillService.getOrderAndWaybill(orderId);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return BaseResponse.errorInstance(e.getMessage());
         }
@@ -97,6 +98,7 @@ public class WaybillController {
 
     /**
      * 创建运单
+     *
      * @param waybillDtoList
      * @return
      */
@@ -109,8 +111,20 @@ public class WaybillController {
             return BaseResponse.successInstance(result);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new NullPointerException("创建运单失败:"+e.getMessage());
+            throw new NullPointerException("创建运单失败:" + e.getMessage());
             //return BaseResponse.errorInstance(e.getMessage());
         }
+    }
+
+    /**
+     * 运单分页管理
+     *
+     * @param waybillDtoList
+     * @return
+     */
+    @ApiOperation("运单分页管理")
+    @PostMapping("/listWaybill")
+    public BaseResponse listWaybill(@RequestBody ListWaybillCriteriaDto criteriaDto) {
+        return BaseResponse.service(waybillService.listWaybillByCriteria(criteriaDto));
     }
 }

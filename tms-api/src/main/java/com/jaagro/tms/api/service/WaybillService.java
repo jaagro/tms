@@ -12,6 +12,7 @@ public interface WaybillService {
 
     /**
      * 根据状态查询我的运单信息
+     *
      * @param dto
      * @return
      */
@@ -19,6 +20,7 @@ public interface WaybillService {
 
     /**
      * 查询订单详情页
+     *
      * @param waybillId
      * @return
      */
@@ -26,6 +28,7 @@ public interface WaybillService {
 
     /**
      * 运单轨迹展示
+     *
      * @param waybillId
      * @return
      */
@@ -34,6 +37,7 @@ public interface WaybillService {
 
     /**
      * 创建运单
+     *
      * @param waybillDto
      * @return
      */
@@ -41,6 +45,7 @@ public interface WaybillService {
 
     /**
      * 根据id获取waybill对象
+     *
      * @param id
      * @return
      */
@@ -63,12 +68,14 @@ public interface WaybillService {
 
     /**
      * 接单消息列表显示
+     *
      * @return
      */
     Map<String, Object> receiptMessage(GetReceiptParamDto dto);
 
     /**
      * 根据orderId获取order和waybill信息
+     *
      * @param orderId
      * @return
      */
@@ -81,4 +88,12 @@ public interface WaybillService {
      * @return
      */
     List<GetWaybillDto> listWaybillByOrderId(Integer orderId);
+
+    /**
+     * 分页查询运单管理
+     *
+     * @param criteriaDto
+     * @return
+     */
+    Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto);
 }

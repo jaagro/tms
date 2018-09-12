@@ -162,6 +162,11 @@ public class WaybillServiceImpl implements WaybillService {
         return null;
     }
 
+    @Override
+    public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
+        return null;
+    }
+
     /**
      * 根据id获取waybill对象
      *
