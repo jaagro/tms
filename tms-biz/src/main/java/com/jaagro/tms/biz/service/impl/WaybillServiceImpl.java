@@ -56,13 +56,13 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     private WaybillGoodsMapperExt waybillGoodsMapper;
     @Autowired
-    private OrdersMapper ordersMapper;
+    private OrdersMapperExt ordersMapper;
     @Autowired
-    private WaybillTrackingImagesMapper waybillTrackingImagesMapper;
+    private WaybillTrackingImagesMapperExt waybillTrackingImagesMapper;
     @Autowired
-    private WaybillTrackingMapper waybillTrackingMapper;
+    private WaybillTrackingMapperExt waybillTrackingMapper;
     @Autowired
-    private OrderGoodsMarginMapper orderGoodsMarginMapper;
+    private OrderGoodsMarginMapperExt orderGoodsMarginMapper;
     @Autowired
     private OrderService orderService;
     @Autowired
@@ -147,7 +147,7 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public List<GetWaybillDto> listWaybillByOrderId(Integer orderId) {
-        List<Waybill> waybillList = waybillMapper.selectByOrderId(orderId);
+        List<Waybill> waybillList = waybillMapper.listWaybillByOrderId(orderId);
         if (waybillList == null) {
             throw new NullPointerException("当前订单无有效运单");
         }

@@ -187,32 +187,4 @@
       modify_user_id = #{modifyUserId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-    <select id="listByCriteria" resultMap="BaseResultMap"
-            parameterType="com.jaagro.tms.api.dto.order.ListOrderCriteriaDto">
-        select
-        <include refid="Base_Column_List"/>
-        from orders
-        where 1=1
-        <if test="customerName != null">
-            and (customer_name like concat('%',#{customerName},'%'))
-        </if>
-        <if test="orderStatus != null">
-            and order_status = #{orderStatus,jdbcType=INTEGER}
-        </if>
-        <if test="createUserId != null">
-            and create_userId = #{createUserId,jdbcType=INTEGER}
-        </if>
-        <if test="startCreateTime != null">
-            <![CDATA[and start_create_time >= #{startCreateTime}]]>
-        </if>
-        <if test="endCreateTime != null">
-            <![CDATA[and end_create_time <= #{endCreateTime}]]>
-        </if>
-        <if test="startLoadTime != null">
-            <![CDATA[and start_load_time >= #{startLoadTime}]]>
-        </if>
-        <if test="endLoadTime != null">
-            <![CDATA[and end_load_time <= #{endLoadTime}]]>
-        </if>
-    </select>
 </mapper>

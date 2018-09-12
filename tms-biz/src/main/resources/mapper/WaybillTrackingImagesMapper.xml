@@ -135,16 +135,4 @@
       create_user_id = #{createUserId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="listWaybillTrackingImage" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.WaybillTrackingImages" >
-    select
-    <include refid="Base_Column_List" />
-    from waybill_tracking_images
-    where
-    <if test="siteId != null" >
-      site_id = #{siteId,jdbcType=INTEGER}
-    </if>
-    <if test="waybillId != null" >
-      waybill_id = #{waybillId,jdbcType=INTEGER}
-    </if>
-  </select>
 </mapper>

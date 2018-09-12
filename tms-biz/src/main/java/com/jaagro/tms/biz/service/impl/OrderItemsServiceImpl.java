@@ -3,13 +3,11 @@ package com.jaagro.tms.biz.service.impl;
 import com.jaagro.tms.api.dto.order.CreateOrderGoodsDto;
 import com.jaagro.tms.api.dto.order.CreateOrderItemsDto;
 import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
+import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.biz.entity.OrderItems;
-import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
-import com.jaagro.tms.biz.mapper.OrderItemsMapper;
-import com.jaagro.tms.biz.mapper.OrdersMapper;
 import com.jaagro.utils.ServiceResult;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.BeanUtils;
@@ -31,11 +29,11 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     @Autowired
     private CurrentUserService currentUserService;
     @Autowired
-    private OrderItemsMapper orderItemsMapper;
+    private OrderItemsMapperExt orderItemsMapper;
     @Autowired
-    private OrdersMapper ordersMapper;
+    private OrdersMapperExt ordersMapper;
     @Autowired
-    private OrderGoodsMapper orderGoodsMapper;
+    private OrderGoodsMapperExt orderGoodsMapper;
     @Autowired
     private OrderGoodsService goodsService;
     @Autowired

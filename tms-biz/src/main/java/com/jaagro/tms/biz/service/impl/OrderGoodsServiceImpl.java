@@ -4,7 +4,9 @@ import com.jaagro.tms.api.dto.order.CreateOrderGoodsDto;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.biz.entity.OrderGoods;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
+import com.jaagro.tms.biz.mapper.OrderGoodsMapperExt;
 import com.jaagro.tms.biz.mapper.OrderItemsMapper;
+import com.jaagro.tms.biz.mapper.OrderItemsMapperExt;
 import com.jaagro.utils.ServiceResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +25,9 @@ public class OrderGoodsServiceImpl implements OrderGoodsService {
     @Autowired
     private CurrentUserService currentUserService;
     @Autowired
-    private OrderGoodsMapper orderGoodsMapper;
+    private OrderGoodsMapperExt orderGoodsMapper;
     @Autowired
-    private OrderItemsMapper orderItemsMapper;
+    private OrderItemsMapperExt orderItemsMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
