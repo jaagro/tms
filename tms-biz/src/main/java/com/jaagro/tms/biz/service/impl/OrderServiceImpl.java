@@ -9,9 +9,7 @@ import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.biz.entity.OrderGoods;
 import com.jaagro.tms.biz.entity.OrderItems;
 import com.jaagro.tms.biz.entity.Orders;
-import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
-import com.jaagro.tms.biz.mapper.OrderItemsMapper;
-import com.jaagro.tms.biz.mapper.OrdersMapper;
+import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
@@ -35,15 +33,15 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CurrentUserService currentUserService;
     @Autowired
-    private OrdersMapper ordersMapper;
+    private OrdersMapperExt ordersMapper;
     @Autowired
     private CustomerClientService customerService;
     @Autowired
     private OrderItemsService orderItemsService;
     @Autowired
-    private OrderItemsMapper orderItemsMapper;
+    private OrderItemsMapperExt orderItemsMapper;
     @Autowired
-    private OrderGoodsMapper orderGoodsMapper;
+    private OrderGoodsMapperExt orderGoodsMapper;
     @Autowired
     private OrderGoodsService orderGoodsService;
 

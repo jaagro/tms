@@ -32,7 +32,7 @@ public interface WaybillService {
      * @param waybillId
      * @return
      */
-    Map<String, Object> showWaybill(Integer waybillId);
+    Map<String, Object> showWaybillTrucking(Integer waybillId);
 
 
     /**
@@ -70,7 +70,7 @@ public interface WaybillService {
      * @param dto
      * @return
      */
-    Map<String, Object> receiptMessage(GetReceiptParamDto dto);
+    Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto);
 
     /**
      * 根据orderId获取order和waybill信息

@@ -1,6 +1,7 @@
 package com.jaagro.tms.api.dto.order;
 
 import com.jaagro.tms.api.dto.base.ShowUserDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.driverapp.ShowSiteAppDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -29,7 +30,7 @@ public class GetOrderItemsDto implements Serializable {
     /**
      * 卸货地id
      */
-    private ShowSiteAppDto unload;
+    private ShowSiteDto unload;
 
     /**
      * 要求卸货时间
