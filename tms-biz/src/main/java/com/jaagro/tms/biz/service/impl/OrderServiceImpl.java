@@ -1,7 +1,6 @@
 package com.jaagro.tms.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderGoodsService;
@@ -9,12 +8,8 @@ import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.biz.entity.OrderGoods;
 import com.jaagro.tms.biz.entity.OrderItems;
-import com.jaagro.tms.biz.entity.OrderModifyLog;
 import com.jaagro.tms.biz.entity.Orders;
-import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
-import com.jaagro.tms.biz.mapper.OrderItemsMapper;
-import com.jaagro.tms.biz.mapper.OrderModifyLogMapper;
-import com.jaagro.tms.biz.mapper.OrdersMapper;
+import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
@@ -38,19 +33,17 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private CurrentUserService currentUserService;
     @Autowired
-    private OrdersMapper ordersMapper;
+    private OrdersMapperExt ordersMapper;
     @Autowired
     private CustomerClientService customerService;
     @Autowired
     private OrderItemsService orderItemsService;
     @Autowired
-    private OrderItemsMapper orderItemsMapper;
+    private OrderItemsMapperExt orderItemsMapper;
     @Autowired
-    private OrderGoodsMapper orderGoodsMapper;
+    private OrderGoodsMapperExt orderGoodsMapper;
     @Autowired
     private OrderGoodsService orderGoodsService;
-    @Autowired
-    private OrderModifyLogMapper modifyLogMapper;
 
     /**
      * 创建订单
@@ -63,9 +56,7 @@ public class OrderServiceImpl implements OrderService {
     public Map<String, Object> createOrder(CreateOrderDto orderDto) {
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
-        order
-                .setCreatedUserId(currentUserService.getShowUser().getId())
-                .setOrderStatus(OrderStatus.PLACE_ORDER);
+        order.setCreatedUserId(currentUserService.getShowUser().getId());
         this.ordersMapper.insertSelective(order);
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
             for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
@@ -144,21 +135,24 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
-        List<ListOrderDto> orderDtos = this.ordersMapper.listOrdersByCriteria(criteriaDto);
+        List<Orders> orderDtos = this.ordersMapper.listByCriteria(criteriaDto);
+
+        List<ListOrderDto> listOrderDtos = new ArrayList<>();
 
         if (orderDtos != null && orderDtos.size() > 0) {
-            for (ListOrderDto orderDto : orderDtos
+            for (Orders order : orderDtos
             ) {
-                Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
+                ListOrderDto orderDto = new ListOrderDto();
                 BeanUtils.copyProperties(order, orderDto);
                 orderDto
                         .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
                         .setCreatedUserId(this.currentUserService.getShowUser())
                         .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                         .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                listOrderDtos.add(orderDto);
             }
         }
-        return ServiceResult.toResult(new PageInfo<>(orderDtos));
+        return ServiceResult.toResult(listOrderDtos);
     }
 
     /**
@@ -177,11 +171,13 @@ public class OrderServiceImpl implements OrderService {
         ordersMapper.updateByPrimaryKeySelective(orders);
         List<OrderItems> orderItems = this.orderItemsMapper.listByOrderId(orders.getId());
         if (orderItems != null) {
-            for (OrderItems items : orderItems) {
+            for (OrderItems items : orderItems
+            ) {
                 this.orderItemsService.disableById(items.getId());
                 List<OrderGoods> orderGoods = this.orderGoodsMapper.listByItemsId(items.getId());
                 if (orderGoods != null) {
-                    for (OrderGoods goods : orderGoods) {
+                    for (OrderGoods goods : orderGoods
+                    ) {
                         this.orderGoodsService.disableById(goods.getId());
                     }
                 }
@@ -189,27 +185,4 @@ public class OrderServiceImpl implements OrderService {
         }
         return ServiceResult.toResult("删除成功");
     }
-
-    @Override
-    public Map<String, Object> cancelOrders(Integer orderId, String detailInfo) {
-        Orders orders = this.ordersMapper.selectByPrimaryKey(orderId);
-        if (orders == null) {
-            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在");
-        }
-        // 修改日志
-        OrderModifyLog modifyLog = new OrderModifyLog();
-        modifyLog
-                .setOrderId(orderId)
-                .setCreatedUserId(this.currentUserService.getCurrentUser().getId())
-                .setNewInfo(detailInfo);
-        this.modifyLogMapper.insertSelective(modifyLog);
-        // 订单
-        orders
-                .setOrderStatus(OrderStatus.CANCEL)
-                .setModifyUserId(this.currentUserService.getCurrentUser().getId())
-                .setModifyTime(new Date());
-        this.ordersMapper.updateByPrimaryKeySelective(orders);
-        return ServiceResult.toResult("取消订单成功");
-    }
-
 }

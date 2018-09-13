@@ -16,15 +16,6 @@
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
         <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
     </resultMap>
-    <resultMap id="ReturnMap" type="com.jaagro.tms.api.dto.order.ListOrderDto">
-        <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="goods_type" property="goodsType" jdbcType="INTEGER"/>
-        <result column="order_status" property="orderStatus" jdbcType="VARCHAR"/>
-        <result column="load_time" property="loadTime" jdbcType="TIMESTAMP"/>
-        <result column="paper_receipt" property="paperReceipt" jdbcType="BIT"/>
-        <result column="notes" property="notes" jdbcType="VARCHAR"/>
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-    </resultMap>
     <sql id="Base_Column_List">
     id, customer_contract_id, goods_type, order_status, customer_id, load_site_id, load_time, 
     paper_receipt, notes, create_time, created_user_id, modify_time, modify_user_id
@@ -196,36 +187,4 @@
       modify_user_id = #{modifyUserId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-    <select id="listByCriteria" resultMap="BaseResultMap"
-            parameterType="com.jaagro.tms.api.dto.order.ListOrderCriteriaDto">
-        select
-        <include refid="Base_Column_List"/>
-        from orders
-        where 1=1
-        <if test="orderStatus != null">
-            and order_status = #{orderStatus}
-        </if>
-        <if test="createTime != null">
-            <![CDATA[and create_time >= #{createTime}]]>
-        </if>
-        <if test="customerId != null">
-            and customer_id = #{customerId}
-        </if>
-    </select>
-    <select id="listOrdersByCriteria" resultMap="ReturnMap"
-            parameterType="com.jaagro.tms.api.dto.order.ListOrderCriteriaDto">
-        select
-        <include refid="Base_Column_List"/>
-        from orders
-        where 1=1
-        <if test="orderStatus != null">
-            and order_status = #{orderStatus}
-        </if>
-        <if test="createTime != null">
-            <![CDATA[and create_time >= #{createTime}]]>
-        </if>
-        <if test="customerId != null">
-            and customer_id = #{customerId}
-        </if>
-    </select>
 </mapper>

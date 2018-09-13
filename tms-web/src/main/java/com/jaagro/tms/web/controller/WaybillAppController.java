@@ -2,6 +2,7 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
 import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
+import com.jaagro.tms.api.dto.waybill.GetReceiptMessageParamDto;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /**
- * @author @gao
+ * @author @Gao.
  */
 @Api(description = "App运单管理", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
@@ -37,7 +38,7 @@ public class WaybillAppController {
     @GetMapping("/ListWayBillDetailsApp/{waybillId}")
     public BaseResponse listWayBillDetailsApp(@PathVariable Integer waybillId) {
         if (waybillId == null) {
-            return BaseResponse.errorInstance("订单参数不能为空");
+            return BaseResponse.errorInstance("运单参数不能为空");
         }
         final Map<String, Object> waybillDetails = waybillService.listWayBillDetails(waybillId);
         return BaseResponse.service(waybillDetails);
@@ -45,11 +46,11 @@ public class WaybillAppController {
 
     @ApiOperation("运单轨迹")
     @GetMapping("/showWaybillApp/{waybillId}")
-    public BaseResponse showWaybillApp(@PathVariable Integer waybillId) {
+    public BaseResponse showWaybillTruckingApp(@PathVariable Integer waybillId) {
         if (waybillId == null) {
-            return BaseResponse.errorInstance("订单参数不能为空");
+            return BaseResponse.errorInstance("运单单参数不能为空");
         }
-        return BaseResponse.service(waybillService.showWaybill(waybillId));
+        return BaseResponse.service(waybillService.showWaybillTrucking(waybillId));
     }
 
     @ApiOperation("接单列表")
@@ -72,9 +73,9 @@ public class WaybillAppController {
 
     @ApiOperation("接单消息")
     @PostMapping("/receiptMessageApp")
-    public BaseResponse receiptMessageApp(GetReceiptParamDto dto) {
+    public BaseResponse receiptMessageApp(GetReceiptMessageParamDto dto) {
         if (dto == null) {
-            return BaseResponse.errorInstance("订单参数不能为空");
+            return BaseResponse.errorInstance("接单参数不能为空");
         }
         return BaseResponse.service(waybillService.receiptMessage(dto));
     }

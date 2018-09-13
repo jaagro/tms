@@ -1,9 +1,6 @@
 package com.jaagro.tms.biz.mapper;
 
-import com.jaagro.tms.api.dto.driverapp.GetWaybillTrackingImagesDto;
 import com.jaagro.tms.biz.entity.WaybillTrackingImages;
-
-import java.util.List;
 
 public interface WaybillTrackingImagesMapper {
     /**
@@ -35,11 +32,4 @@ public interface WaybillTrackingImagesMapper {
      * @mbggenerated 2018-09-05
      */
     int updateByPrimaryKey(WaybillTrackingImages record);
-
-    /**
-     * 根据卸货地 装货地id
-     * @param record
-     * @return
-     */
-    List<GetWaybillTrackingImagesDto> listWaybillTrackingImage(WaybillTrackingImages record);
 }

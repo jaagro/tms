@@ -32,11 +32,12 @@ public interface WaybillService {
      * @param waybillId
      * @return
      */
-    Map<String, Object> showWaybill(Integer waybillId);
+    Map<String, Object> showWaybillTrucking(Integer waybillId);
 
 
     /**
      * 创建运单
+     * Author gavin
      * @param waybillDto
      * @return
      */
@@ -69,7 +70,7 @@ public interface WaybillService {
      * @param dto
      * @return
      */
-    Map<String, Object> receiptMessage(GetReceiptParamDto dto);
+    Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto);
 
     /**
      * 根据orderId获取order和waybill信息
@@ -87,10 +88,10 @@ public interface WaybillService {
     List<GetWaybillDto> listWaybillByOrderId(Integer orderId);
 
     /**
-     * 分页查询运单管理
-     *
-     * @param criteriaDto
+     * Author gavin
+     * @param waybillId
+     * @param truckId
      * @return
      */
-    Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto);
+    Map<String, Object> assignWaybillToTruck(Integer waybillId,Integer truckId);
 }

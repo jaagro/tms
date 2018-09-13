@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jaagro.tms.biz.mapper.OrdersMapperExt">
+    <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.Orders">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="customer_contract_id" property="customerContractId" jdbcType="INTEGER"/>
+        <result column="goods_type" property="goodsType" jdbcType="INTEGER"/>
+        <result column="order_status" property="orderStatus" jdbcType="VARCHAR"/>
+        <result column="customer_id" property="customerId" jdbcType="INTEGER"/>
+        <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
+        <result column="load_time" property="loadTime" jdbcType="TIMESTAMP"/>
+        <result column="paper_receipt" property="paperReceipt" jdbcType="BIT"/>
+        <result column="notes" property="notes" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="created_user_id" property="createdUserId" jdbcType="INTEGER"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, customer_contract_id, goods_type, order_status, customer_id, load_site_id, load_time, 
+    paper_receipt, notes, create_time, created_user_id, modify_time, modify_user_id
+  </sql>
+    <select id="listByCriteria" resultMap="BaseResultMap"
+            parameterType="com.jaagro.tms.api.dto.order.ListOrderCriteriaDto">
+        select
+        <include refid="Base_Column_List"/>
+        from orders
+        where 1=1
+        <if test="customerName != null">
+            and (customer_name like concat('%',#{customerName},'%'))
+        </if>
+        <if test="orderStatus != null">
+            and order_status = #{orderStatus,jdbcType=INTEGER}
+        </if>
+        <if test="createUserId != null">
+            and create_userId = #{createUserId,jdbcType=INTEGER}
+        </if>
+        <if test="startCreateTime != null">
+            <![CDATA[and start_create_time >= #{startCreateTime}]]>
+        </if>
+        <if test="endCreateTime != null">
+            <![CDATA[and end_create_time <= #{endCreateTime}]]>
+        </if>
+        <if test="startLoadTime != null">
+            <![CDATA[and start_load_time >= #{startLoadTime}]]>
+        </if>
+        <if test="endLoadTime != null">
+            <![CDATA[and end_load_time <= #{endLoadTime}]]>
+        </if>
+    </select>
+</mapper>
