@@ -92,4 +92,9 @@ public class TestController {
     public GetWaybillDto test9(@PathVariable("id") Integer id){
         return waybillService.getWaybillById(id);
     }
+
+    @GetMapping("/test10/{id}/{userType}")
+    public UserInfo test10(@PathVariable("id") Integer id, @PathVariable("userType") String userType){
+        return currentUserService.getUserInfoById(id, userType);
+    }
 }
