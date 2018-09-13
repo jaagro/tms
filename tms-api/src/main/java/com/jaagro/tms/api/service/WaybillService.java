@@ -85,4 +85,12 @@ public interface WaybillService {
      * @return
      */
     List<GetWaybillDto> listWaybillByOrderId(Integer orderId);
+
+    /**
+     * 分页查询运单管理
+     *
+     * @param criteriaDto
+     * @return
+     */
+    Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto);
 }
