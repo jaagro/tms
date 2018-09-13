@@ -6,6 +6,7 @@ import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
+import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.driverapp.ShowSiteAppDto;
@@ -18,10 +19,7 @@ import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
-import com.jaagro.tms.biz.service.CustomerClientService;
-import com.jaagro.tms.biz.service.DriverClientService;
-import com.jaagro.tms.biz.service.TruckClientService;
-import com.jaagro.tms.biz.service.TruckTypeClientService;
+import com.jaagro.tms.biz.service.*;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.slf4j.Logger;
@@ -71,6 +69,8 @@ public class WaybillServiceImpl implements WaybillService {
     private TruckClientService truckClientService;
     @Autowired
     private AppMessageMapperExt appMessageMapperExt;
+    @Autowired
+    private UserClientService userClientService;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -611,11 +611,21 @@ public class WaybillServiceImpl implements WaybillService {
                         waybillDto.setCustomerName(customer.getCustomerName());
                     }
                 }
-                waybillDto
-                        .setCreatedUserId(this.currentUserService.getShowUser())
-                        .setTruck(this.truckClientService.getTruckByIdReturnObject(waybill.getTruckId()))
-                        .setDriver(this.driverClientService.getDriverReturnObject(waybill.getDriverId()));
+                if (waybill.getCreatedUserId() != null) {
+                    UserInfo userInfo = this.userClientService.getUserInfoById(waybill.getCreatedUserId(), "employee");
+                    if (userInfo != null) {
+                        ShowUserDto userDto = new ShowUserDto();
+                        userDto.setUserName(userInfo.getName());
+                        waybillDto.setCreatedUserId(userDto);
+                    }
+                }
+                if (waybill.getTruckId() != null) {
+                    waybillDto.setTruck(this.truckClientService.getTruckByIdReturnObject(waybill.getTruckId()));
+                }
+                if (waybill.getDriverId() != null) {
+                    waybillDto.setDriver(this.driverClientService.getDriverReturnObject(waybill.getDriverId()));
 
+                }
             }
         }
         return ServiceResult.toResult(new PageInfo<>(listWaybillDto));

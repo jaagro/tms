@@ -1,7 +1,10 @@
 package com.jaagro.tms.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
+import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
@@ -11,6 +14,7 @@ import com.jaagro.tms.biz.entity.OrderItems;
 import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.biz.service.UserClientService;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.springframework.beans.BeanUtils;
@@ -44,6 +48,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderGoodsMapperExt orderGoodsMapper;
     @Autowired
     private OrderGoodsService orderGoodsService;
+    @Autowired
+    private UserClientService userClientService;
 
     /**
      * 创建订单
@@ -100,9 +106,14 @@ public class OrderServiceImpl implements OrderService {
         BeanUtils.copyProperties(order, orderDto);
         getOrderDto
                 .setCustomer(this.customerService.getShowCustomerById(order.getCustomerId()))
-                .setCreatedUser(this.currentUserService.getShowUser())
                 .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                 .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()));
+        UserInfo userInfo = this.userClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+        if (userInfo != null) {
+            ShowUserDto userDto = new ShowUserDto();
+            userDto.setUserName(userInfo.getName());
+            getOrderDto.setCreatedUser(userDto);
+        }
         return getOrderDto;
     }
 
@@ -119,10 +130,16 @@ public class OrderServiceImpl implements OrderService {
         BeanUtils.copyProperties(order, orderDto);
         orderDto
                 .setCustomer(this.customerService.getShowCustomerById(order.getCustomerId()))
-                .setCreatedUser(this.currentUserService.getShowUser())
                 .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                 .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()))
                 .setOrderItems(this.orderItemsService.listByOrderId(order.getId()));
+
+        UserInfo userInfo = this.userClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+        if (userInfo != null) {
+            ShowUserDto userDto = new ShowUserDto();
+            userDto.setUserName(userInfo.getName());
+            orderDto.setCreatedUser(userDto);
+        }
         return orderDto;
     }
 
@@ -135,24 +152,21 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
-        List<Orders> orderDtos = this.ordersMapper.listByCriteria(criteriaDto);
-
-        List<ListOrderDto> listOrderDtos = new ArrayList<>();
+        List<ListOrderDto> orderDtos = this.ordersMapper.listOrdersByCriteria(criteriaDto);
 
         if (orderDtos != null && orderDtos.size() > 0) {
-            for (Orders order : orderDtos
+            for (ListOrderDto orderDto : orderDtos
             ) {
-                ListOrderDto orderDto = new ListOrderDto();
+                Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
                 BeanUtils.copyProperties(order, orderDto);
                 orderDto
                         .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
                         .setCreatedUserId(this.currentUserService.getShowUser())
                         .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                         .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
-                listOrderDtos.add(orderDto);
             }
         }
-        return ServiceResult.toResult(listOrderDtos);
+        return ServiceResult.toResult(new PageInfo<>(orderDtos));
     }
 
     /**
