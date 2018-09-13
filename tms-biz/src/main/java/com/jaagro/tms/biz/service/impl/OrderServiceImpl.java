@@ -11,6 +11,7 @@ import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.biz.entity.OrderGoods;
 import com.jaagro.tms.biz.entity.OrderItems;
+import com.jaagro.tms.biz.entity.OrderModifyLog;
 import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
@@ -50,6 +51,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderGoodsService orderGoodsService;
     @Autowired
     private UserClientService userClientService;
+    @Autowired
+    private OrderModifyLogMapper modifyLogMapper;
 
     /**
      * 创建订单
@@ -202,6 +205,23 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Map<String, Object> cancelOrders(Integer orderId, String detailInfo) {
-        return null;
+        Orders orders = this.ordersMapper.selectByPrimaryKey(orderId);
+        if (orders == null) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在");
+        }
+        // 修改日志
+        OrderModifyLog modifyLog = new OrderModifyLog();
+        modifyLog
+                .setOrderId(orderId)
+                .setCreatedUserId(this.currentUserService.getCurrentUser().getId())
+                .setNewInfo(detailInfo);
+        this.modifyLogMapper.insertSelective(modifyLog);
+        // 订单
+        orders
+                .setOrderStatus(OrderStatus.CANCEL)
+                .setModifyUserId(this.currentUserService.getCurrentUser().getId())
+                .setModifyTime(new Date());
+        this.ordersMapper.updateByPrimaryKeySelective(orders);
+        return ServiceResult.toResult("取消订单成功");
     }
 }
