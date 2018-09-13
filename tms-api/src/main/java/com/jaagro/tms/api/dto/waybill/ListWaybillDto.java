@@ -17,19 +17,19 @@ import java.util.Date;
 @Accessors(chain = true)
 public class ListWaybillDto implements Serializable {
     /**
-     *
+     * 运单号
      */
     private Integer id;
 
     /**
-     *
+     * 订单号
      */
     private Integer orderId;
 
     /**
-     * 货物类型
+     * 客户名称
      */
-    private Integer productType;
+    private String customerName;
 
     /**
      * 运单状态：待派车、待司机接单、已接单、司机已出发、司机到达装货地、运输中、卸货完成、已完成，取消
@@ -57,12 +57,12 @@ public class ListWaybillDto implements Serializable {
     private BigDecimal distance;
 
     /**
-     * 创建时间
+     * 创建时间（派单时间）
      */
     private Date createTime;
 
     /**
-     * 创建人
+     * 创建人（派单人）
      */
     private ShowUserDto createdUserId;
 }

@@ -14,12 +14,12 @@ import java.util.Date;
 @Accessors(chain = true)
 public class Waybill implements Serializable {
     /**
-     * 
+     * 运单号
      */
     private Integer id;
 
     /**
-     * 
+     * 订单号
      */
     private Integer orderId;
 

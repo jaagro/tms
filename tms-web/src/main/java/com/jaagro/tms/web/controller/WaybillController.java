@@ -31,6 +31,7 @@ public class WaybillController {
 
     /**
      * 创建运单计划
+     *
      * @param waybillDto
      * @return
      */
@@ -71,7 +72,7 @@ public class WaybillController {
 
     @ApiOperation("从配载计划中移除运单")
     @DeleteMapping("/waybillPlan/{waybillId}")
-    public BaseResponse removeWaybillFromPlan(@PathVariable("waybillId") Integer waybillId){
+    public BaseResponse removeWaybillFromPlan(@PathVariable("waybillId") Integer waybillId) {
         return BaseResponse.service(waybillPlanService.removeWaybillFromPlan(waybillId));
     }
 
@@ -79,11 +80,11 @@ public class WaybillController {
 
     @ApiOperation("通过id获取运单对象")
     @GetMapping("/waybill/{id}")
-    public BaseResponse getWaybillById(@PathVariable("id") Integer id){
+    public BaseResponse getWaybillById(@PathVariable("id") Integer id) {
         GetWaybillDto result;
         try {
             result = waybillService.getWaybillById(id);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return BaseResponse.errorInstance(e.getMessage());
         }
@@ -92,11 +93,11 @@ public class WaybillController {
 
     @ApiOperation("通过id获取运单对象")
     @GetMapping("/orderAndWaybill/{orderId}")
-    public BaseResponse getOrderAndWaybillByOrderId(@PathVariable("orderId") Integer orderId){
+    public BaseResponse getOrderAndWaybillByOrderId(@PathVariable("orderId") Integer orderId) {
         GetWaybillPlanDto result;
         try {
             result = waybillService.getOrderAndWaybill(orderId);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return BaseResponse.errorInstance(e.getMessage());
         }
@@ -106,6 +107,7 @@ public class WaybillController {
 
     /**
      * 创建运单
+     *
      * @param waybillDtoList
      * @return
      */
@@ -118,18 +120,30 @@ public class WaybillController {
             return BaseResponse.successInstance(result);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("创建运单失败:"+e.getMessage());
+            throw new RuntimeException("创建运单失败:" + e.getMessage());
         }
     }
 
     @ApiOperation("运单派给车辆")
     @PostMapping("/assignWaybillToTruck/{waybillId}/{truckId}")
-    public BaseResponse assignWaybillToTruck(@PathVariable Integer waybillId,Integer truckId) {
+    public BaseResponse assignWaybillToTruck(@PathVariable Integer waybillId, Integer truckId) {
         try {
-            return BaseResponse.service(waybillService.assignWaybillToTruck(waybillId,truckId));
+            return BaseResponse.service(waybillService.assignWaybillToTruck(waybillId, truckId));
         } catch (Exception e) {
             e.printStackTrace();
-            return BaseResponse.errorInstance("派单失败:"+e.getMessage());
+            return BaseResponse.errorInstance("派单失败:" + e.getMessage());
         }
+    }
+
+    /**
+     * 运单分页查询管理
+     *
+     * @param criteriaDto
+     * @return
+     */
+    @ApiOperation("运单分页查询管理")
+    @PostMapping("/listWaybill")
+    public BaseResponse listWaybill(@RequestBody ListWaybillCriteriaDto criteriaDto) {
+        return BaseResponse.service(waybillService.listWaybillByCriteria(criteriaDto));
     }
 }

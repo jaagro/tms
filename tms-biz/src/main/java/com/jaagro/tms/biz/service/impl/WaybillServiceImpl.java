@@ -598,7 +598,27 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
-        return null;
+        PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        List<ListWaybillDto> listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
+        if (listWaybillDto != null && listWaybillDto.size() > 0) {
+            for (ListWaybillDto waybillDto : listWaybillDto
+            ) {
+                Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
+                Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
+                if (orders != null) {
+                    ShowCustomerDto customer = this.customerClientService.getShowCustomerById(orders.getCustomerId());
+                    if (customer != null) {
+                        waybillDto.setCustomerName(customer.getCustomerName());
+                    }
+                }
+                waybillDto
+                        .setCreatedUserId(this.currentUserService.getShowUser())
+                        .setTruck(this.truckClientService.getTruckByIdReturnObject(waybill.getTruckId()))
+                        .setDriver(this.driverClientService.getDriverReturnObject(waybill.getDriverId()));
+
+            }
+        }
+        return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
     }
 
     private Integer getUserId() {
