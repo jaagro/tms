@@ -164,9 +164,14 @@ public class OrderServiceImpl implements OrderService {
                 BeanUtils.copyProperties(order, orderDto);
                 orderDto
                         .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
-                        .setCreatedUserId(this.currentUserService.getShowUser())
                         .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                         .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                UserInfo userInfo = this.userClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+                if (userInfo != null) {
+                    ShowUserDto userDto = new ShowUserDto();
+                    userDto.setUserName(userInfo.getName());
+                    orderDto.setCreatedUserId(userDto);
+                }
             }
         }
         return ServiceResult.toResult(new PageInfo<>(orderDtos));
