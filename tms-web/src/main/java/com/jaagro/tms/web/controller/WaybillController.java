@@ -91,7 +91,7 @@ public class WaybillController {
         return BaseResponse.successInstance(result);
     }
 
-    @ApiOperation("通过id获取运单对象")
+    @ApiOperation("通过orderId获取订单和运单")
     @GetMapping("/orderAndWaybill/{orderId}")
     public BaseResponse getOrderAndWaybillByOrderId(@PathVariable("orderId") Integer orderId) {
         GetWaybillPlanDto result;
