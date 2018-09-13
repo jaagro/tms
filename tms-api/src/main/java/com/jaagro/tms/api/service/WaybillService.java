@@ -94,4 +94,12 @@ public interface WaybillService {
      * @return
      */
     Map<String, Object> assignWaybillToTruck(Integer waybillId,Integer truckId);
+
+    /**
+     * 分页查询运单管理
+     *
+     * @param criteriaDto
+     * @return
+     */
+    Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto);
 }

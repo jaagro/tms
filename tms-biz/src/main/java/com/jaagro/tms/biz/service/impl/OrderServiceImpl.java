@@ -185,4 +185,9 @@ public class OrderServiceImpl implements OrderService {
         }
         return ServiceResult.toResult("删除成功");
     }
+
+    @Override
+    public Map<String, Object> cancelOrders(Integer orderId, String detailInfo) {
+        return null;
+    }
 }

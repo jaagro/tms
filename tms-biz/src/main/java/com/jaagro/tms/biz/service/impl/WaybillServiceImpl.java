@@ -76,7 +76,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
-            Integer userId = getUserId();
+        Integer userId = getUserId();
         //更新orders表的状态OrderStatus.STOWAGE
         for (CreateWaybillDto createWaybillDto : waybillDtoList) {
             Integer orderId = createWaybillDto.getOrderId();
@@ -158,11 +158,6 @@ public class WaybillServiceImpl implements WaybillService {
             getWaybills.add(getWaybillDto);
         }
         return getWaybills;
-    }
-
-    @Override
-    public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
-        return null;
     }
 
     /**
@@ -341,7 +336,7 @@ public class WaybillServiceImpl implements WaybillService {
             List<ShowGoodsDto> goods = waybillItem.getGoods();
             ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
             ShowSiteAppDto unloadSiteApp = new ShowSiteAppDto();
-            BeanUtils.copyProperties(unloadSite,unloadSiteApp );
+            BeanUtils.copyProperties(unloadSite, unloadSiteApp);
             unloadSiteApp.setGoods(goods);
             unloadSiteApp.setRequiredTime(waybillItem.getRequiredTime());
             //卸货单
@@ -544,16 +539,17 @@ public class WaybillServiceImpl implements WaybillService {
         }
         return listWaybillAppDtos;
     }
+
     @Override
     public Map<String, Object> assignWaybillToTruck(Integer waybillId, Integer truckId) {
         Integer userId = getUserId();
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
-        String  waybillOldStatus = waybill.getWaybillStatus();
-        String  waybillNewStatus = WaybillStatus.RECEIVE;
-        if(null == waybill){
+        String waybillOldStatus = waybill.getWaybillStatus();
+        String waybillNewStatus = WaybillStatus.RECEIVE;
+        if (null == waybill) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " ：id不正确");
         }
-        if(null == truckClientService.getTruckByIdReturnObject(truckId)){
+        if (null == truckClientService.getTruckByIdReturnObject(truckId)) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " ：id不正确");
         }
         //1.更新订单状态：从已配载(STOWAGE)改为运输中(TRANSPORT)
@@ -564,7 +560,7 @@ public class WaybillServiceImpl implements WaybillService {
         orders.setModifyUserId(userId);
         ordersMapper.updateByPrimaryKeySelective(orders);
         //2.更新waybill
-        waybill  = new Waybill();
+        waybill = new Waybill();
         waybill.setId(waybillId);
         waybill.setTruckId(truckId);
         waybill.setWaybillStatus(waybillNewStatus);
@@ -582,10 +578,9 @@ public class WaybillServiceImpl implements WaybillService {
         waybillTrackingMapper.insertSelective(waybillTracking);
 
         //4.在app消息表插入一条记录
-          AppMessage appMessage = new AppMessage();
-          appMessage.setWaybillId(waybillId);
-          appMessage.setTruckId(truckId);
-
+        AppMessage appMessage = new AppMessage();
+        appMessage.setWaybillId(waybillId);
+        appMessage.setTruckId(truckId);
 
 
         //5.发送短信给truckId对应的司机
@@ -594,18 +589,30 @@ public class WaybillServiceImpl implements WaybillService {
 
         return null;
     }
-    private Integer getUserId(){
+
+    /**
+     * 分页查询运单
+     *
+     * @param criteriaDto
+     * @return
+     */
+    @Override
+    public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
+        return null;
+    }
+
+    private Integer getUserId() {
         UserInfo userInfo = null;
         try {
             userInfo = currentUserService.getCurrentUser();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             log.error("获取当前用户失败：currentUserService.getCurrentUser()");
             return 999999999;
         }
-        if(null == userInfo){
+        if (null == userInfo) {
             return 999999999;
-        }else{
+        } else {
             return userInfo.getId();
         }
     }
