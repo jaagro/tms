@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * @author tony
  */
-@Resource
 public interface WaybillMapperExt extends WaybillMapper {
 
     /**
