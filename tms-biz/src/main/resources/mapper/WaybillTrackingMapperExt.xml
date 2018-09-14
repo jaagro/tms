@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillTrackingMapperExt">
+    <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillTracking">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="waybill_id" property="waybillId" jdbcType="INTEGER"/>
+        <result column="old_status" property="oldStatus" jdbcType="VARCHAR"/>
+        <result column="new_status" property="newStatus" jdbcType="VARCHAR"/>
+        <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
+        <result column="latitude" property="latitude" jdbcType="DECIMAL"/>
+        <result column="longitude" property="longitude" jdbcType="DECIMAL"/>
+        <result column="tracking_info" property="trackingInfo" jdbcType="VARCHAR"/>
+        <result column="device" property="device" jdbcType="VARCHAR"/>
+        <result column="refer_user_id" property="referUserId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.ShowTrackingDto">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="waybill_id" property="waybillId" jdbcType="INTEGER"/>
+        <result column="old_status" property="oldStatus" jdbcType="VARCHAR"/>
+        <result column="new_status" property="newStatus" jdbcType="VARCHAR"/>
+        <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
+        <result column="latitude" property="latitude" jdbcType="DECIMAL"/>
+        <result column="longitude" property="longitude" jdbcType="DECIMAL"/>
+        <result column="tracking_info" property="trackingInfo" jdbcType="VARCHAR"/>
+        <result column="device" property="device" jdbcType="VARCHAR"/>
+        <result column="refer_user_id" property="referUserId" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, waybill_id, old_status, new_status, driver_id, latitude, longitude, tracking_info, 
+    device, refer_user_id,create_time
+  </sql>
+
+    <select id="selectSingleTime" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill_tracking
+        where 1=1
+        <if test="waybillId != null">
+            and waybill_id=#{waybillId}
+        </if>
+        <if test="driverId!= null">
+            and driver_id=#{driverId}
+        </if>
+
+        <if test="newStatus != null">
+            and new_status=#{newStatus}
+        </if>
+
+    </select>
+
+    <select id="listWaybillTrackingByWaybillId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill_tracking
+        where waybill_id=#{waybillId}
+    </select>
+
+</mapper>

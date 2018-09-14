@@ -39,11 +39,11 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
     @Autowired
     private CustomerClientService customerClientService;
     @Autowired
-    private OrdersMapper ordersMapper;
+    private OrdersMapperExt ordersMapper;
     @Autowired
-    private OrderItemsMapper orderItemsMapper;
+    private OrderItemsMapperExt orderItemsMapper;
     @Autowired
-    private OrderGoodsMapper orderGoodsMapper;
+    private OrderGoodsMapperExt orderGoodsMapper;
     @Autowired
     private WaybillMapperExt waybillMapper;
     @Autowired

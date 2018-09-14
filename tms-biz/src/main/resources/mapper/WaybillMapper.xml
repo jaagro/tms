@@ -11,31 +11,12 @@
         <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
         <result column="send_time" property="sendTime" jdbcType="TIMESTAMP"/>
         <result column="distance" property="distance" jdbcType="DECIMAL"/>
-        <result column="enabled" property="enabled" jdbcType="BIT" />
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="created_user_id" property="createdUserId" jdbcType="INTEGER"/>
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
         <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
         <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
-    </resultMap>
-
-    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.GetWaybillAppDto">
-        <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
-        <result column="truck_team_contract_id" property="truckTeamContractId" jdbcType="INTEGER"/>
-        <result column="waybill_status" property="waybillStatus" jdbcType="VARCHAR"/>
-        <result column="need_truck_type" property="needTruckType" jdbcType="INTEGER"/>
-        <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
-        <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
-        <result column="send_time" property="sendTime" jdbcType="TIMESTAMP"/>
-        <result column="distance" property="distance" jdbcType="DECIMAL"/>
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="created_user_id" property="createdUserId" jdbcType="INTEGER"/>
-        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
-        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
-        <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
-        <collection property="waybillItems" column="id"
-                    select="com.jaagro.tms.biz.mapper.WaybillItemsMapper.listByWaybillId"></collection>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -52,7 +33,8 @@
     delete from waybill
     where id = #{id,jdbcType=INTEGER}
   </delete>
-    <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Waybill"  useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
+    <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Waybill" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id">
     insert into waybill (id, order_id, truck_team_contract_id, 
       waybill_status, need_truck_type, truck_id, 
       driver_id, send_time, distance,
@@ -64,146 +46,147 @@
       #{createTime,jdbcType=TIMESTAMP}, #{createdUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, 
       #{modifyUserId,jdbcType=INTEGER}, #{loadSiteId,jdbcType=INTEGER}), #{enabled,jdbcType=BIT}
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Waybill" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-    insert into waybill
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        id,
-      </if>
-      <if test="orderId != null" >
-        order_id,
-      </if>
-      <if test="truckTeamContractId != null" >
-        truck_team_contract_id,
-      </if>
-      <if test="waybillStatus != null" >
-        waybill_status,
-      </if>
-      <if test="needTruckType != null" >
-        need_truck_type,
-      </if>
-      <if test="truckId != null" >
-        truck_id,
-      </if>
-      <if test="driverId != null" >
-        driver_id,
-      </if>
-      <if test="sendTime != null" >
-        send_time,
-      </if>
-      <if test="distance != null" >
-        distance,
-      </if>
-      <if test="createTime != null" >
-        create_time,
-      </if>
-      <if test="createdUserId != null" >
-        created_user_id,
-      </if>
-      <if test="modifyTime != null" >
-        modify_time,
-      </if>
-      <if test="modifyUserId != null" >
-        modify_user_id,
-      </if>
-      <if test="loadSiteId != null" >
-        load_site_id,
-    </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=INTEGER},
-      </if>
-      <if test="orderId != null" >
-        #{orderId,jdbcType=INTEGER},
-      </if>
-      <if test="truckTeamContractId != null" >
-        #{truckTeamContractId,jdbcType=INTEGER},
-      </if>
-      <if test="waybillStatus != null" >
-        #{waybillStatus,jdbcType=VARCHAR},
-      </if>
-      <if test="needTruckType != null" >
-        #{needTruckType,jdbcType=INTEGER},
-      </if>
-      <if test="truckId != null" >
-        #{truckId,jdbcType=INTEGER},
-      </if>
-      <if test="driverId != null" >
-        #{driverId,jdbcType=INTEGER},
-      </if>
-      <if test="sendTime != null" >
-        #{sendTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="distance != null" >
-        #{distance,jdbcType=DECIMAL},
-      </if>
-      <if test="createTime != null" >
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createdUserId != null" >
-        #{createdUserId,jdbcType=INTEGER},
-      </if>
-      <if test="modifyTime != null" >
-        #{modifyTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="modifyUserId != null" >
-        #{modifyUserId,jdbcType=INTEGER},
-      </if>
-      <if test="loadSiteId != null" >
-        #{loadSiteId,jdbcType=INTEGER},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.Waybill" >
-    update waybill
-    <set >
-      <if test="orderId != null" >
-        order_id = #{orderId,jdbcType=INTEGER},
-      </if>
-      <if test="enabled != null" >
-        enabled = #{enabled,jdbcType=BIT},
-      </if>
-      <if test="truckTeamContractId != null" >
-        truck_team_contract_id = #{truckTeamContractId,jdbcType=INTEGER},
-      </if>
-      <if test="waybillStatus != null" >
-        waybill_status = #{waybillStatus,jdbcType=VARCHAR},
-      </if>
-      <if test="needTruckType != null" >
-        need_truck_type = #{needTruckType,jdbcType=INTEGER},
-      </if>
-      <if test="truckId != null" >
-        truck_id = #{truckId,jdbcType=INTEGER},
-      </if>
-      <if test="driverId != null" >
-        driver_id = #{driverId,jdbcType=INTEGER},
-      </if>
-      <if test="sendTime != null" >
-        send_time = #{sendTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="distance != null" >
-        distance = #{distance,jdbcType=DECIMAL},
-      </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createdUserId != null" >
-        created_user_id = #{createdUserId,jdbcType=INTEGER},
-      </if>
-      <if test="modifyTime != null" >
-        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="modifyUserId != null" >
-        modify_user_id = #{modifyUserId,jdbcType=INTEGER},
-      </if>
-      <if test="loadSiteId != null" >
-        load_site_id = #{loadSiteId,jdbcType=INTEGER},
-      </if>
-    </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.Waybill" >
+    <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Waybill" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
+        insert into waybill
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="orderId != null">
+                order_id,
+            </if>
+            <if test="truckTeamContractId != null">
+                truck_team_contract_id,
+            </if>
+            <if test="waybillStatus != null">
+                waybill_status,
+            </if>
+            <if test="needTruckType != null">
+                need_truck_type,
+            </if>
+            <if test="truckId != null">
+                truck_id,
+            </if>
+            <if test="driverId != null">
+                driver_id,
+            </if>
+            <if test="sendTime != null">
+                send_time,
+            </if>
+            <if test="distance != null">
+                distance,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="createdUserId != null">
+                created_user_id,
+            </if>
+            <if test="modifyTime != null">
+                modify_time,
+            </if>
+            <if test="modifyUserId != null">
+                modify_user_id,
+            </if>
+            <if test="loadSiteId != null">
+                load_site_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="orderId != null">
+                #{orderId,jdbcType=INTEGER},
+            </if>
+            <if test="truckTeamContractId != null">
+                #{truckTeamContractId,jdbcType=INTEGER},
+            </if>
+            <if test="waybillStatus != null">
+                #{waybillStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="needTruckType != null">
+                #{needTruckType,jdbcType=INTEGER},
+            </if>
+            <if test="truckId != null">
+                #{truckId,jdbcType=INTEGER},
+            </if>
+            <if test="driverId != null">
+                #{driverId,jdbcType=INTEGER},
+            </if>
+            <if test="sendTime != null">
+                #{sendTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="distance != null">
+                #{distance,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createdUserId != null">
+                #{createdUserId,jdbcType=INTEGER},
+            </if>
+            <if test="modifyTime != null">
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyUserId != null">
+                #{modifyUserId,jdbcType=INTEGER},
+            </if>
+            <if test="loadSiteId != null">
+                #{loadSiteId,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.Waybill">
+        update waybill
+        <set>
+            <if test="orderId != null">
+                order_id = #{orderId,jdbcType=INTEGER},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=BIT},
+            </if>
+            <if test="truckTeamContractId != null">
+                truck_team_contract_id = #{truckTeamContractId,jdbcType=INTEGER},
+            </if>
+            <if test="waybillStatus != null">
+                waybill_status = #{waybillStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="needTruckType != null">
+                need_truck_type = #{needTruckType,jdbcType=INTEGER},
+            </if>
+            <if test="truckId != null">
+                truck_id = #{truckId,jdbcType=INTEGER},
+            </if>
+            <if test="driverId != null">
+                driver_id = #{driverId,jdbcType=INTEGER},
+            </if>
+            <if test="sendTime != null">
+                send_time = #{sendTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="distance != null">
+                distance = #{distance,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createdUserId != null">
+                created_user_id = #{createdUserId,jdbcType=INTEGER},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyUserId != null">
+                modify_user_id = #{modifyUserId,jdbcType=INTEGER},
+            </if>
+            <if test="loadSiteId != null">
+                load_site_id = #{loadSiteId,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.Waybill">
     update waybill
     set order_id = #{orderId,jdbcType=INTEGER},
       enabled = #{enabled,jdbcType=BIT},
@@ -221,42 +204,5 @@
       load_site_id = #{loadSiteId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="selectByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select
-    <include refid="Base_Column_List" />
-    from waybill
-    where order_id = #{orderld,jdbcType=INTEGER} and enabled = 1
-  </select>
-    <select id="selectWaybillByCarrierStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
-        select
-        <include refid="Base_Column_List"/>
-        from waybill
-        where waybill_status in ('待出发','前往装货地','待装货','待送达','待签收') and enabled = 1
-        <if test="driverId != null">
-            and driver_id = #{driverId,jdbcType=INTEGER}
-        </if>
-
-    </select>
-    <select id="selectWaybillByStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
-        select
-        <include refid="Base_Column_List"/>
-        from waybill
-        where enabled = 1
-        <if test="waybillStatus != null">
-            and waybill_status=#{waybillStatus,jdbcType=VARCHAR}
-        </if>
-        <if test="driverId != null">
-            and driver_id = #{driverId,jdbcType=INTEGER}
-        </if>
-        <if test="id != null">
-            id = #{id,jdbcType=INTEGER}
-        </if>
-    </select>
-    <select id="listWaybillIdByOrderId" resultType="java.lang.Integer">
-        select id
-        from waybill
-        where order_id = #{orderId, jdbcType=INTEGER}
-        and enabled = 1
-    </select>
 
 </mapper>
