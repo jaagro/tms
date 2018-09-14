@@ -5,30 +5,20 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author @Gao.
  */
 @Data
 @Accessors(chain = true)
-public class GetReceiptParamDto implements Serializable {
-
+public class GetWaybillTruckingParamDto implements Serializable {
     /**
-     * app消息id
+     * 运单状态
      */
-    private Integer messageId;
+    private String waybillStatus;
     /**
-     * 起始页
-     */
-    private Integer pageNum;
-
-    /**
-     * 每页条数
-     */
-    private Integer pageSize;
-
-    /**
-     * 运单
+     * 运单id
      */
     private Integer waybillId;
     /**
@@ -55,4 +45,17 @@ public class GetReceiptParamDto implements Serializable {
      * 货车id
      */
     private Integer truckId;
+    /**
+     * 确认提货信息
+     */
+    private List<ConfirmProductDto> confirmProductDtos;
+    /**
+     *是否显示提货信息列表
+     */
+    private String showStatus;
+    /**
+     * 提货单URL
+     */
+    private List<String> imagesUrl;
+
 }

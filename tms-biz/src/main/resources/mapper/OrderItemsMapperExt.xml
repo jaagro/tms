@@ -35,4 +35,10 @@
         from order_items
         where order_id = #{id,jdbcType=INTEGER}
     </select>
+    <update id="disableByOrderId">
+        update order_items
+        set enabled = 0
+        where order_id = #{orderId}
+    </update>
+
 </mapper>

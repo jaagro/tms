@@ -17,4 +17,11 @@ public interface OrderGoodsMapperExt extends OrderGoodsMapper {
      * @return
      */
     List<OrderGoods> listByItemsId(Integer id);
+
+    /**
+     * 根据orderItemsId删除
+     *
+     * @param id
+     */
+    void disableByItemsId(Integer id);
 }

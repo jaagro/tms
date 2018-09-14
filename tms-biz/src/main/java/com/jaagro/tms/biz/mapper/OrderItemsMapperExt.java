@@ -26,4 +26,13 @@ public interface OrderItemsMapperExt extends OrderItemsMapper {
      */
     List<GetOrderItemsDto> listItemsByOrderId(Integer id);
 
+    /**
+     * 根据订单逻辑删除
+     *
+     * @param orderId
+     * @return
+     */
+    int disableByOrderId(Integer orderId);
+
+
 }

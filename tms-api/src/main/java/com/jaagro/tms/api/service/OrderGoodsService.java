@@ -18,18 +18,17 @@ public interface OrderGoodsService {
     Map<String, Object> createOrderGood(CreateOrderGoodsDto orderGoodsDto);
 
     /**
-     * 逻辑删除
-     *
-     * @param id
-     * @return
-     */
-    Map<String, Object> disableById(Integer id);
-
-    /**
      * 修改
      *
      * @param goodsDto
      * @return
      */
     Map<String, Object> updateGoods(CreateOrderGoodsDto goodsDto);
+
+    /**
+     * 根据itemId删除
+     *
+     * @param id
+     */
+    Map<String, Object> disableByItemsId(Integer itemId);
 }

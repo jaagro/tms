@@ -10,8 +10,14 @@ import java.util.List;
 public interface WaybillItemsMapperExt extends WaybillItemsMapper {
     /**
      * 通过waybillId获取运单明细
+     *
      * @param waybillId
      * @return
      */
     List<WaybillItems> listWaybillItemsByWaybillId(Integer waybillId);
+
+    /**
+     * 通过waybillid获取unloadSiteId
+     */
+    List<Integer> getUnLoadSiteIdByWaybillId(Integer waybillId);
 }
