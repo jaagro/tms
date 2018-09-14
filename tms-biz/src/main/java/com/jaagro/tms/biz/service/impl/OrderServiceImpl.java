@@ -48,8 +48,6 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderGoodsMapperExt orderGoodsMapper;
     @Autowired
-    private OrderGoodsService orderGoodsService;
-    @Autowired
     private UserClientService userClientService;
     @Autowired
     private OrderModifyLogMapper modifyLogMapper;
@@ -87,8 +85,15 @@ public class OrderServiceImpl implements OrderService {
      * @param orderDto 入参json
      * @return 修改后的order对象
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public GetOrderDto updateOrder(UpdateOrderDto orderDto) {
+        if (orderDto.getId() == null) {
+            throw new NullPointerException("订单id不能为空");
+        }
+        if (ordersMapper.selectByPrimaryKey(orderDto.getId()) == null) {
+            throw new NullPointerException("订单查询无数据");
+        }
         //修改order
         Orders orders = new Orders();
         BeanUtils.copyProperties(orderDto, orders);
@@ -183,6 +188,7 @@ public class OrderServiceImpl implements OrderService {
      * @param id 订单id
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> deleteOrderById(Integer id) {
         Orders orders = this.ordersMapper.selectByPrimaryKey(id);
@@ -193,21 +199,12 @@ public class OrderServiceImpl implements OrderService {
         ordersMapper.updateByPrimaryKeySelective(orders);
         List<OrderItems> orderItems = this.orderItemsMapper.listByOrderId(orders.getId());
         if (orderItems != null) {
-            for (OrderItems items : orderItems
-            ) {
-                this.orderItemsService.disableById(items.getId());
-                List<OrderGoods> orderGoods = this.orderGoodsMapper.listByItemsId(items.getId());
-                if (orderGoods != null) {
-                    for (OrderGoods goods : orderGoods
-                    ) {
-                        this.orderGoodsService.disableById(goods.getId());
-                    }
-                }
-            }
+            this.orderItemsService.disableByOrderId(id);
         }
         return ServiceResult.toResult("删除成功");
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> cancelOrders(Integer orderId, String detailInfo) {
         Orders orders = this.ordersMapper.selectByPrimaryKey(orderId);
@@ -227,6 +224,11 @@ public class OrderServiceImpl implements OrderService {
                 .setModifyUserId(this.currentUserService.getCurrentUser().getId())
                 .setModifyTime(new Date());
         this.ordersMapper.updateByPrimaryKeySelective(orders);
+        // 订单明细
+        List<OrderItems> orderItems = this.orderItemsMapper.listByOrderId(orders.getId());
+        if (orderItems != null) {
+            this.orderItemsService.disableByOrderId(orderId);
+        }
         return ServiceResult.toResult("取消订单成功");
     }
 }

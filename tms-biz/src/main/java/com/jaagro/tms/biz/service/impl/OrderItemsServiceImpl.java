@@ -8,6 +8,7 @@ import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.biz.entity.OrderItems;
+import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.BeanUtils;
@@ -60,10 +61,11 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         return ServiceResult.toResult("创建成功");
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> updateItems(CreateOrderItemsDto itemsDto) {
         if (this.ordersMapper.selectByPrimaryKey(itemsDto.getOrderId()) == null) {
-            throw new RuntimeException("订单明细不存在");
+            throw new NullPointerException("订单明细不存在");
         }
         OrderItems orderItems = new OrderItems();
         BeanUtils.copyProperties(itemsDto, orderItems);
@@ -80,14 +82,22 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         return ServiceResult.toResult("修改成功");
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public Map<String, Object> disableById(Integer id) {
-        OrderItems orderItems = this.orderItemsMapper.selectByPrimaryKey(id);
-        if (orderItems == null) {
-            return ServiceResult.error("删除失败");
+    public Map<String, Object> disableByOrderId(Integer orderId) {
+        if (ordersMapper.selectByPrimaryKey(orderId) == null) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在");
         }
-        orderItems.setEnabled(false);
-        this.orderItemsMapper.updateByPrimaryKeySelective(orderItems);
+        List<OrderItems> orderItems = this.orderItemsMapper.listByOrderId(orderId);
+        if (orderItems.size() < 1) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单明细不存在");
+        }
+        this.orderItemsMapper.disableByOrderId(orderId);
+        // goods
+        for (OrderItems items : orderItems
+        ) {
+            this.goodsService.disableByItemsId(items.getId());
+        }
         return ServiceResult.toResult("删除成功");
     }
 
