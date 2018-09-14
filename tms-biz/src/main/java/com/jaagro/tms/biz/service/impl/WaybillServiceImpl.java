@@ -259,6 +259,17 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     /**
+     * 根据状态查询我的运单信息
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public Map<String, Object> listWaybillByStatus(GetWaybillParamDto dto) {
+        return null;
+    }
+
+    /**
      * 运单详情页
      *
      * @param waybillId
