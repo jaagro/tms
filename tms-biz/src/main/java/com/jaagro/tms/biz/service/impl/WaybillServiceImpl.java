@@ -72,7 +72,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     private TruckClientService truckClientService;
     @Autowired
-    private AppMessageMapperExt appMessageMapperExt;
+    private MessageMapperExt messageMapperExt;
 
     /**
      * @Author gavin
@@ -478,11 +478,12 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto) {
-        AppMessage appMessage = new AppMessage();
+        Message appMessage = new Message();
         appMessage.setMsgType(dto.getMsgType());
-        appMessage.setTruckId(dto.getTruckId());
-        appMessage.setWaybillId(dto.getWaybillId());
-        return ServiceResult.toResult(appMessageMapperExt.listAppMessageByCondtion(appMessage));
+//        appMessage.setTruckId(dto.getTruckId());
+//        appMessage.setWaybillId(dto.getWaybillId());
+//        return ServiceResult.toResult(appMessageMapperExt.listAppMessageByCondtion(appMessage));
+        return null;
     }
 
     /**
@@ -591,16 +592,16 @@ public class WaybillServiceImpl implements WaybillService {
         waybillTrackingMapper.insertSelective(waybillTracking);
 
         //4.在app消息表插入一条记录
-          AppMessage appMessage = new AppMessage();
-          appMessage.setWaybillId(waybillId);
-          appMessage.setTruckId(truckId);
+          Message appMessage = new Message();
+          appMessage.setReferId(waybillId);
           appMessage.setMsgType(1);
           appMessage.setMsgStatus(0);
           appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
           appMessage.setBody("有从{waybill.load_site_id}到{waybillItem.unload_site_id}的运单");
-          appMessage.setStartTime(new Date());
-          appMessage.setEndTime(DateUtils.addDays(new Date(), 7));
-          appMessageMapperExt.insertSelective(appMessage);
+          appMessage.setCreateTime(new Date());
+          appMessage.setCreateUserId(userId);
+          appMessage.setFromUserId(userId);
+          messageMapperExt.insertSelective(appMessage);
         //5.发送短信给truckId对应的司机
         List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
         for (DriverReturnDto driver : drivers) {
