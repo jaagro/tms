@@ -19,12 +19,12 @@
         <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
     </resultMap>
 
-    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.ShowGoodsDto" >
-        <id column="id" property="id" jdbcType="INTEGER" />
-        <result column="goods_name" property="goodsName" jdbcType="VARCHAR" />
-        <result column="goods_unit" property="goodsUnit" jdbcType="INTEGER" />
-        <result column="goods_quantity" property="goodsQuantity" jdbcType="INTEGER" />
-        <result column="goods_weight" property="goodsWeight" jdbcType="DECIMAL" />
+    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.ShowGoodsDto">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="goods_name" property="goodsName" jdbcType="VARCHAR"/>
+        <result column="goods_unit" property="goodsUnit" jdbcType="INTEGER"/>
+        <result column="goods_quantity" property="goodsQuantity" jdbcType="INTEGER"/>
+        <result column="goods_weight" property="goodsWeight" jdbcType="DECIMAL"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, waybill_item_id,order_goods_id, goods_name, goods_unit, goods_quantity, goods_weight, load_quantity,
@@ -49,4 +49,9 @@
     from waybill_goods
     where id = #{id,jdbcType=INTEGER}
   </select>
+    <update id="updateGoodLoadWeightById" parameterType="com.jaagro.tms.biz.entity.WaybillCustomerFee">
+        update waybill_goods
+        set unload_quantity = #{loadWeight},
+        where id = #{waybillGoodId,jdbcType=INTEGER}
+    </update>
 </mapper>

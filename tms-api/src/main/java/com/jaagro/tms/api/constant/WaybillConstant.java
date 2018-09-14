@@ -6,6 +6,14 @@ public class WaybillConstant {
      */
     public static final String CARRIER = "CARRIER";
     /**
+     * 已取消
+     */
+    public static final String CANCEL = "CANCEL";
+    /**
+     * 已完成
+     */
+    public static final String ACCOMPLISH = "ACCOMPLISH";
+    /**
      * 接单
      */
     public static final String RECEIPT = "RECEIPT";
@@ -14,11 +22,8 @@ public class WaybillConstant {
      */
     public static final String REJECT = "REJECT";
     /**
-     *已取消
+     *判断是否显示提货信息返货货品
      */
-    public static final String CANCEL = "CANCEL";
-    /**
-     * 已完成
-     */
-    public static final String ACCOMPLISH = "ACCOMPLISH";
+    public static final String SHOWPAGE = "SHOWPAGE";
+
 }

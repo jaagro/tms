@@ -14,6 +14,10 @@ import java.math.BigDecimal;
 public class GetReceiptParamDto implements Serializable {
 
     /**
+     * app消息id
+     */
+    private Integer messageId;
+    /**
      * 起始页
      */
     private Integer pageNum;

@@ -5,22 +5,25 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
+
 /**
  * @author @Gao.
  */
+
+/**
+ * 确认提货信息后,更新货物字段
+ */
 @Data
 @Accessors(chain = true)
-public class ConfirmProductDto implements Serializable {
-
+public class UpdateGoodDto implements Serializable {
     /**
-     * 运单货物id
+     * 货物id
      */
     private Integer waybillGoodId;
 
     /**
      * 装货重量
      */
-    private BigDecimal loadWeightList;
+    private BigDecimal loadWeight;
 
 }
