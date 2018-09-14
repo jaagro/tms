@@ -2,6 +2,7 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
 import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
+import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
 import com.jaagro.tms.api.dto.waybill.GetReceiptMessageParamDto;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
@@ -53,6 +54,15 @@ public class WaybillAppController {
         return BaseResponse.service(waybillService.showWaybillTrucking(waybillId));
     }
 
+    @ApiOperation("运单轨迹更新")
+    @PostMapping("/updateWaybillTruckingApp")
+    public BaseResponse updateWaybillTruckingApp(@RequestBody GetWaybillTruckingParamDto dto) {
+        if (dto == null) {
+            return BaseResponse.errorInstance("运单单参数不能为空");
+        }
+        return BaseResponse.service(waybillService.upDateWaybillTrucking(dto));
+    }
+
     @ApiOperation("接单列表")
     @PostMapping("/receiptListApp")
     public BaseResponse receiptListApp(@RequestBody GetReceiptParamDto dto) {
@@ -73,10 +83,18 @@ public class WaybillAppController {
 
     @ApiOperation("接单消息")
     @PostMapping("/receiptMessageApp")
-    public BaseResponse receiptMessageApp(GetReceiptMessageParamDto dto) {
+    public BaseResponse receiptMessageApp(@RequestBody GetReceiptMessageParamDto dto) {
         if (dto == null) {
             return BaseResponse.errorInstance("接单参数不能为空");
         }
         return BaseResponse.service(waybillService.receiptMessage(dto));
+    }
+    @ApiOperation("显示卸货地")
+    @PostMapping("/showUnloadSiteApp/{waybillId}")
+    public BaseResponse showUnloadSiteApp(@PathVariable Integer waybillId) {
+        if (waybillId == null) {
+            return BaseResponse.errorInstance("运单参数不能为空");
+        }
+        return BaseResponse.service(null);
     }
 }

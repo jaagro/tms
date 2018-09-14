@@ -28,12 +28,12 @@
     select
     <include refid="Base_Column_List" />
     from waybill_tracking_images
-    where
+    where 1=1
     <if test="siteId != null" >
-      site_id = #{siteId,jdbcType=INTEGER}
+      and site_id = #{siteId,jdbcType=INTEGER}
     </if>
     <if test="waybillId != null" >
-      waybill_id = #{waybillId,jdbcType=INTEGER}
+      and  waybill_id = #{waybillId,jdbcType=INTEGER}
     </if>
   </select>
 </mapper>
