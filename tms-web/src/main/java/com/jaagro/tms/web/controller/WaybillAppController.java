@@ -89,4 +89,12 @@ public class WaybillAppController {
         }
         return BaseResponse.service(waybillService.receiptMessage(dto));
     }
+    @ApiOperation("显示卸货地")
+    @PostMapping("/showUnloadSiteApp/{waybillId}")
+    public BaseResponse showUnloadSiteApp(@PathVariable Integer waybillId) {
+        if (waybillId == null) {
+            return BaseResponse.errorInstance("运单参数不能为空");
+        }
+        return BaseResponse.service(null);
+    }
 }
