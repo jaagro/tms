@@ -7,6 +7,7 @@ import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapperExt;
 import com.jaagro.tms.biz.mapper.OrderItemsMapper;
 import com.jaagro.tms.biz.mapper.OrderItemsMapperExt;
+import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,27 +42,24 @@ public class OrderGoodsServiceImpl implements OrderGoodsService {
         return ServiceResult.toResult("创建成功");
     }
 
-    @Override
-    public Map<String, Object> disableById(Integer id) {
-        OrderGoods goods = this.orderGoodsMapper.selectByPrimaryKey(id);
-        if (goods == null) {
-            return ServiceResult.toResult("删除失败");
-        }
-        goods.setEnabled(false);
-        this.orderGoodsMapper.updateByPrimaryKeySelective(goods);
-        return ServiceResult.toResult("删除成功");
-    }
-
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> updateGoods(CreateOrderGoodsDto goodsDto) {
         OrderGoods goods = this.orderGoodsMapper.selectByPrimaryKey(goodsDto.getId());
-        if (goods != null) {
-            return ServiceResult.toResult("修改失败");
+        if (goods == null) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "goods查询无数据");
         }
         goods
                 .setModifyTime(new Date())
                 .setModifyUserId(this.currentUserService.getShowUser().getId());
         this.orderGoodsMapper.updateByPrimaryKeySelective(goods);
         return ServiceResult.toResult("修改成功");
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Map<String, Object> disableByItemsId(Integer itemId) {
+        this.orderGoodsMapper.disableByItemsId(itemId);
+        return ServiceResult.toResult("取消成功");
     }
 }
