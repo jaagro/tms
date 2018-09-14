@@ -24,11 +24,6 @@ public class ListOrderCriteriaDto implements Serializable {
     private int pageSize;
 
     /**
-     * 客户名称 -- 模糊
-     */
-    private String customerName;
-
-    /**
      * 客户id
      */
     private Integer customerId;
