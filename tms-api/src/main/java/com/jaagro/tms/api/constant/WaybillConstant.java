@@ -1,6 +1,7 @@
 package com.jaagro.tms.api.constant;
 
 public class WaybillConstant {
+    public static final String NEW__WAYBILL_FOR_RECEIVE = "你有新的运单待接收";
     /**
      * 承运中
      */
@@ -25,5 +26,4 @@ public class WaybillConstant {
      *判断是否显示提货信息返货货品
      */
     public static final String SHOWPAGE = "SHOWPAGE";
-
 }

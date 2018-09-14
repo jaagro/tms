@@ -31,7 +31,7 @@ public class OrderController {
     @Autowired
     private CustomerClientService customerService;
     @Autowired
-    private OrdersMapper ordersMapper;
+    private OrdersMapper ordersMapper; 
 
     /**
      * 新增订单
@@ -117,6 +117,37 @@ public class OrderController {
     @ApiOperation("分页查询订单")
     @PostMapping("/listOrders")
     public BaseResponse listOrders(@RequestBody ListOrderCriteriaDto criteriaDto) {
+        return BaseResponse.service(orderService.listOrderByCriteria(criteriaDto));
+    }
+
+    /**
+     * 取消订单
+     *
+     * @param orderId
+     * @param detailInfo
+     * @return
+     */
+    @ApiOperation("取消订单")
+    @PostMapping("/cancelOrders/{orderId}/{detailInfo}")
+    public BaseResponse cancelOrders(@PathVariable("orderId") Integer orderId, @PathVariable("detailInfo") String detailInfo) {
+        if (StringUtils.isEmpty(orderId)) {
+            return BaseResponse.idNull("订单id不能为空");
+        }
+        if (StringUtils.isEmpty(detailInfo)) {
+            return BaseResponse.idNull("取消理由必填");
+        }
+        return BaseResponse.service(orderService.cancelOrders(orderId, detailInfo));
+    }
+
+    /**
+     * 待派单列表分页
+     *
+     * @param criteriaDto
+     * @return
+     */
+    @ApiOperation("待派单列表分页")
+    @PostMapping("/listToSendOrders")
+    public BaseResponse listToSendOrders(@RequestBody ListOrderCriteriaDto criteriaDto) {
         return BaseResponse.service(orderService.listOrderByCriteria(criteriaDto));
     }
 }

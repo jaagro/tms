@@ -102,4 +102,20 @@ public interface WaybillService {
      * @return
      */
     Map<String, Object> assignWaybillToTruck(Integer waybillId,Integer truckId);
+
+    /**
+     *显示运单卸货
+     * @param waybillId
+     * @return
+     * Author @Gao.
+     */
+    Map<String, Object> showUnloadSite(Integer waybillId);
+
+    /**
+     * 分页查询运单管理
+     *
+     * @param criteriaDto
+     * @return
+     */
+    Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto);
 }

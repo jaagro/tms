@@ -5,24 +5,23 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
+import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
-import com.jaagro.tms.api.dto.driverapp.ShowSiteAppDto;
+import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
+import com.jaagro.tms.api.dto.truck.DriverReturnDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
-import com.jaagro.tms.biz.service.CustomerClientService;
-import com.jaagro.tms.biz.service.DriverClientService;
-import com.jaagro.tms.biz.service.TruckClientService;
-import com.jaagro.tms.biz.service.TruckTypeClientService;
+import com.jaagro.tms.biz.service.*;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -69,13 +68,19 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     private TruckClientService truckClientService;
     @Autowired
-    private AppMessageMapperExt appMessageMapperExt;
+    private MessageMapperExt messageMapperExt;
+    @Autowired
+    private UserClientService userClientService;
 
-
-    @Transactional(rollbackFor = Exception.class)
+    /**
+     * @Author gavin
+     * @param waybillDtoList
+     * @return
+     */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
-        Integer userId = getUserId();
+            Integer userId = getUserId();
         //更新orders表的状态OrderStatus.STOWAGE
         for (CreateWaybillDto createWaybillDto : waybillDtoList) {
             Integer orderId = createWaybillDto.getOrderId();
@@ -299,7 +304,6 @@ public class WaybillServiceImpl implements WaybillService {
      *
      * @param waybillId
      * @return
-     * @author @Gao.
      */
     @Override
     public Map<String, Object> listWayBillDetails(Integer waybillId) {
@@ -337,7 +341,7 @@ public class WaybillServiceImpl implements WaybillService {
             List<ShowGoodsDto> goods = waybillItem.getGoods();
             ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
             ShowSiteAppDto unloadSiteApp = new ShowSiteAppDto();
-            BeanUtils.copyProperties(unloadSite, unloadSiteApp);
+            BeanUtils.copyProperties(unloadSite,unloadSiteApp );
             unloadSiteApp.setGoods(goods);
             unloadSiteApp.setRequiredTime(waybillItem.getRequiredTime());
             //卸货单
@@ -444,7 +448,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setWaybillStatus(WaybillStatus.DELIVERY);
             waybillMapper.updateByPrimaryKey(waybill);
             //司机送达
-        }else if(WaybillStatus.DELIVERY.equals(dto.getWaybillStatus())){
+        } else if (WaybillStatus.DELIVERY.equals(dto.getWaybillStatus())) {
             waybillTracking
                     .setNewStatus(WaybillStatus.SIGN)
                     .setOldStatus(waybill.getWaybillStatus());
@@ -452,16 +456,29 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setWaybillStatus(WaybillStatus.SIGN);
             waybillMapper.updateByPrimaryKey(waybill);
             //客户签收
-        }else if(WaybillStatus.SIGN.equals(dto.getWaybillStatus())){
+        } else if (WaybillStatus.SIGN.equals(dto.getWaybillStatus())) {
             //卸货地Id
             List<Integer> unLoadSiteIdList = waybillItemsMapper.getUnLoadSiteIdByWaybillId(waybillId);
-            Integer count=unLoadSiteIdList.size();
-            for (int unLoadSiteId = 0; unLoadSiteId <unLoadSiteIdList.size() ; unLoadSiteId++) {
+            Integer count = unLoadSiteIdList.size();
+            for (int unLoadSiteId = 0; unLoadSiteId < unLoadSiteIdList.size(); unLoadSiteId++) {
                 Integer id = unLoadSiteIdList.get(unLoadSiteId);
 
             }
 
         }
+        return null;
+    }
+
+    /**
+     * 显示运单卸货
+     *
+     * @param waybillId
+     * @return Author @Gao.
+     */
+    @Override
+    public Map<String, Object> showUnloadSite(Integer waybillId) {
+
+        //显示未签收
         return null;
     }
 
@@ -475,9 +492,9 @@ public class WaybillServiceImpl implements WaybillService {
     public Map<String, Object> receiptList(GetReceiptParamDto dto) {
         if (null != dto.getMessageId()) {
             //更新消息是否已读
-            AppMessage appMessage = appMessageMapperExt.selectByPrimaryKey(dto.getMessageId());
-            appMessage.setMsgStatus(MsgStatusConstant.READ);
-            appMessageMapperExt.updateByPrimaryKey(appMessage);
+            Message message = messageMapperExt.selectByPrimaryKey(dto.getMessageId());
+            message.setMsgStatus(MsgStatusConstant.READ);
+            messageMapperExt.updateByPrimaryKey(message);
         }
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         Waybill waybill = new Waybill();
@@ -578,9 +595,9 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-        AppMessage appMessage = new AppMessage();
-        appMessage.setTruckId(53);
-        return ServiceResult.toResult(new PageInfo<>(appMessageMapperExt.listAppMessageByCondtion(appMessage)));
+        Message message = new Message();
+        message.setReferId(53);
+        return null;
     }
 
     /**
@@ -682,31 +699,85 @@ public class WaybillServiceImpl implements WaybillService {
         waybillTrackingMapper.insertSelective(waybillTracking);
 
         //4.在app消息表插入一条记录
-        AppMessage appMessage = new AppMessage();
-        appMessage.setWaybillId(waybillId);
-        appMessage.setTruckId(truckId);
-
-
+          Message appMessage = new Message();
+          appMessage.setReferId(waybillId);
+          appMessage.setMsgType(1);
+          appMessage.setMsgStatus(0);
+          appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
+          appMessage.setBody("有从{waybill.load_site_id}到{waybillItem.unload_site_id}的运单");
+          appMessage.setCreateTime(new Date());
+          appMessage.setCreateUserId(userId);
+          appMessage.setFromUserId(userId);
+          messageMapperExt.insertSelective(appMessage);
         //5.发送短信给truckId对应的司机
+        List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
+        for (DriverReturnDto driver : drivers) {
+            System.out.println(driver);
+        }
 
         //6.掉用Jpush接口
+        return ServiceResult.toResult("派单成功");
+    }
 
-        return null;
+    /**
+     * 分页查询运单
+     *
+     * @param criteriaDto
+     * @return
+     */
+    @Override
+    public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
+        PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        List<ListWaybillDto> listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
+        if (listWaybillDto != null && listWaybillDto.size() > 0) {
+            for (ListWaybillDto waybillDto : listWaybillDto
+            ) {
+                Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
+                Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
+                if (orders != null) {
+                    ShowCustomerDto customer = this.customerClientService.getShowCustomerById(orders.getCustomerId());
+                    if (customer != null) {
+                        waybillDto.setCustomerName(customer.getCustomerName());
+                    }
+                }
+                if (waybill.getCreatedUserId() != null) {
+                    UserInfo userInfo = this.userClientService.getUserInfoById(waybill.getCreatedUserId(), "employee");
+                    if (userInfo != null) {
+                        ShowUserDto userDto = new ShowUserDto();
+                        userDto.setUserName(userInfo.getName());
+                        waybillDto.setCreatedUserId(userDto);
+                    }
+                }
+                if (waybill.getTruckId() != null) {
+                    waybillDto.setTruck(this.truckClientService.getTruckByIdReturnObject(waybill.getTruckId()));
+                }
+                if (waybill.getDriverId() != null) {
+                    waybillDto.setDriver(this.driverClientService.getDriverReturnObject(waybill.getDriverId()));
+
+                }
+            }
+        }
+        return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
     }
 
     private Integer getUserId() {
         UserInfo userInfo = null;
         try {
             userInfo = currentUserService.getCurrentUser();
-        } catch (Exception ex) {
+        }catch(Exception ex){
             ex.printStackTrace();
             log.error("获取当前用户失败：currentUserService.getCurrentUser()");
             return 999999999;
         }
-        if (null == userInfo) {
+        if(null == userInfo){
             return 999999999;
-        } else {
+        }else{
             return userInfo.getId();
         }
+    }
+
+    public static void main(String[]   args){
+        System.out.println(new Date());
+        System.out.println(DateUtils.addDays(new Date(), 7));
     }
 }
