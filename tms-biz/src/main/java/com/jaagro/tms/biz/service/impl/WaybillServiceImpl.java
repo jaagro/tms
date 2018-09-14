@@ -418,7 +418,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setWaybillStatus(WaybillStatus.DELIVERY);
             waybillMapper.updateByPrimaryKey(waybill);
             //司机送达
-        }else if(WaybillStatus.DELIVERY.equals(dto.getWaybillStatus())){
+        } else if (WaybillStatus.DELIVERY.equals(dto.getWaybillStatus())) {
             waybillTracking
                     .setNewStatus(WaybillStatus.SIGN)
                     .setOldStatus(waybill.getWaybillStatus());
@@ -426,16 +426,29 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setWaybillStatus(WaybillStatus.SIGN);
             waybillMapper.updateByPrimaryKey(waybill);
             //客户签收
-        }else if(WaybillStatus.SIGN.equals(dto.getWaybillStatus())){
+        } else if (WaybillStatus.SIGN.equals(dto.getWaybillStatus())) {
             //卸货地Id
             List<Integer> unLoadSiteIdList = waybillItemsMapper.getUnLoadSiteIdByWaybillId(waybillId);
-            Integer count=unLoadSiteIdList.size();
-            for (int unLoadSiteId = 0; unLoadSiteId <unLoadSiteIdList.size() ; unLoadSiteId++) {
+            Integer count = unLoadSiteIdList.size();
+            for (int unLoadSiteId = 0; unLoadSiteId < unLoadSiteIdList.size(); unLoadSiteId++) {
                 Integer id = unLoadSiteIdList.get(unLoadSiteId);
 
             }
 
         }
+        return null;
+    }
+
+    /**
+     * 显示运单卸货
+     *
+     * @param waybillId
+     * @return Author @Gao.
+     */
+    @Override
+    public Map<String, Object> showUnloadSite(Integer waybillId) {
+
+        //显示未签收
         return null;
     }
 

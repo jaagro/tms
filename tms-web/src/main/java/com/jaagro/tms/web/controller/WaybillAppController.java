@@ -95,6 +95,6 @@ public class WaybillAppController {
         if (waybillId == null) {
             return BaseResponse.errorInstance("运单参数不能为空");
         }
-        return BaseResponse.service(null);
+        return BaseResponse.service(waybillService.showUnloadSite(waybillId));
     }
 }

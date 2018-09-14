@@ -31,7 +31,7 @@ public class OrderController {
     @Autowired
     private CustomerClientService customerService;
     @Autowired
-    private OrdersMapper ordersMapper;
+    private OrdersMapper ordersMapper; 
 
     /**
      * 新增订单
