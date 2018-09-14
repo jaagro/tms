@@ -3,9 +3,7 @@ package com.jaagro.tms.biz.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
-import com.jaagro.tms.api.constant.OrderStatus;
-import com.jaagro.tms.api.constant.WaybillConstant;
-import com.jaagro.tms.api.constant.WaybillStatus;
+import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
@@ -71,6 +69,8 @@ public class WaybillServiceImpl implements WaybillService {
     private TruckClientService truckClientService;
     @Autowired
     private MessageMapperExt messageMapperExt;
+    @Autowired
+    private UserClientService userClientService;
 
     /**
      * @Author gavin
@@ -259,46 +259,6 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     /**
-     * 根据状态查询我的运单信息
-     *
-     * @param dto
-     * @return
-     */
-    @Override
-    public Map<String, Object> listWaybillByStatus(GetWaybillParamDto dto) {
-
-        UserInfo currentUser = currentUserService.getCurrentUser();
-        Integer waybillId = currentUser.getId();
-        Waybill waybill = new Waybill();
-        waybill.setDriverId(currentUser.getId());
-        List<ListWaybillAppDto> listWaybillAppDtos;
-        //承运中订单
-        if (WaybillStatus.CARRIER.equals(dto.getWaybillStatus())) {
-            PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-            List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByCarrierStatus(waybill);
-            listWaybillAppDtos = listWaybill(waybillDtos, waybillId);
-            return ServiceResult.toResult(new PageInfo<>(listWaybillAppDtos));
-        }
-        //已完成运单
-        if (WaybillStatus.ACCOMPLISH.equals(dto.getWaybillStatus())) {
-            PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-            waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
-            List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByStatus(waybill);
-            listWaybillAppDtos = listWaybill(waybillDtos, waybillId);
-            return ServiceResult.toResult(new PageInfo<>(listWaybillAppDtos));
-        }
-        //取消运单
-        if (WaybillStatus.CANCEL.equals(dto.getWaybillStatus())) {
-            PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-            waybill.setWaybillStatus(WaybillStatus.CANCEL);
-            List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByStatus(waybill);
-            listWaybillAppDtos = listWaybill(waybillDtos, waybillId);
-            return ServiceResult.toResult(new PageInfo<>(listWaybillAppDtos));
-        }
-        return ServiceResult.error("没有相关运单");
-    }
-
-    /**
      * 运单详情页
      *
      * @param waybillId
@@ -478,9 +438,9 @@ public class WaybillServiceImpl implements WaybillService {
     public Map<String, Object> receiptList(GetReceiptParamDto dto) {
         if (null != dto.getMessageId()) {
             //更新消息是否已读
-            AppMessage appMessage = appMessageMapperExt.selectByPrimaryKey(dto.getMessageId());
-            appMessage.setMsgStatus(MsgStatusConstant.READ);
-            appMessageMapperExt.updateByPrimaryKey(appMessage);
+            Message message = messageMapperExt.selectByPrimaryKey(dto.getMessageId());
+            message.setMsgStatus(MsgStatusConstant.READ);
+            messageMapperExt.updateByPrimaryKey(message);
         }
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         Waybill waybill = new Waybill();
@@ -581,14 +541,8 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-        AppMessage appMessage = new AppMessage();
-        appMessage.setTruckId(53);
-        return ServiceResult.toResult(new PageInfo<>(appMessageMapperExt.listAppMessageByCondtion(appMessage)));
-        Message appMessage = new Message();
-        appMessage.setMsgType(dto.getMsgType());
-//        appMessage.setTruckId(dto.getTruckId());
-//        appMessage.setWaybillId(dto.getWaybillId());
-//        return ServiceResult.toResult(appMessageMapperExt.listAppMessageByCondtion(appMessage));
+        Message message = new Message();
+        message.setReferId(53);
         return null;
     }
 
