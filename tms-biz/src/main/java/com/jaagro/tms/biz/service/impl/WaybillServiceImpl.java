@@ -4,16 +4,17 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
+import com.jaagro.tms.api.constant.WaybillConstant;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
-import com.jaagro.tms.api.dto.driverapp.ShowSiteAppDto;
+import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
+import com.jaagro.tms.api.dto.truck.DriverReturnDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.*;
@@ -24,6 +25,7 @@ import com.jaagro.tms.biz.service.TruckClientService;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -72,9 +74,13 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     private AppMessageMapperExt appMessageMapperExt;
 
-
-    @Transactional(rollbackFor = Exception.class)
+    /**
+     * @Author gavin
+     * @param waybillDtoList
+     * @return
+     */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
             Integer userId = getUserId();
         //更新orders表的状态OrderStatus.STOWAGE
@@ -539,7 +545,15 @@ public class WaybillServiceImpl implements WaybillService {
         }
         return listWaybillAppDtos;
     }
+
+    /**
+     * @author gavin
+     * @param waybillId
+     * @param truckId
+     * @return
+     */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> assignWaybillToTruck(Integer waybillId, Integer truckId) {
         Integer userId = getUserId();
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
@@ -580,14 +594,21 @@ public class WaybillServiceImpl implements WaybillService {
           AppMessage appMessage = new AppMessage();
           appMessage.setWaybillId(waybillId);
           appMessage.setTruckId(truckId);
-
-
-
+          appMessage.setMsgType(1);
+          appMessage.setMsgStatus(0);
+          appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
+          appMessage.setBody("有从{waybill.load_site_id}到{waybillItem.unload_site_id}的运单");
+          appMessage.setStartTime(new Date());
+          appMessage.setEndTime(DateUtils.addDays(new Date(), 7));
+          appMessageMapperExt.insertSelective(appMessage);
         //5.发送短信给truckId对应的司机
+        List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
+        for (DriverReturnDto driver : drivers) {
+            System.out.println(driver);
+        }
 
         //6.掉用Jpush接口
-
-        return null;
+        return ServiceResult.toResult("派单成功");
     }
     private Integer getUserId(){
         UserInfo userInfo = null;
@@ -603,5 +624,10 @@ public class WaybillServiceImpl implements WaybillService {
         }else{
             return userInfo.getId();
         }
+    }
+
+    public static void main(String[]   args){
+        System.out.println(new Date());
+        System.out.println(DateUtils.addDays(new Date(), 7));
     }
 }
