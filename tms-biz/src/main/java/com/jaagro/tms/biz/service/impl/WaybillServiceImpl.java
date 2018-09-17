@@ -690,8 +690,9 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+        UserInfo currentUser = currentUserService.getCurrentUser();
         Message message = new Message();
-        message.setReferId(53);
+        message.setToUserId(currentUser.getId());
         return ServiceResult.toResult(messageMapper.listMessageByCondtion(message));
     }
 
