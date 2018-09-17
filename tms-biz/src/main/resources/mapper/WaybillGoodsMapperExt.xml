@@ -30,14 +30,14 @@
     id, waybill_item_id,order_goods_id, goods_name, goods_unit, goods_quantity, goods_weight, load_quantity,
     load_weight, unload_quantity, unload_weight, join_drug, enabled, modify_time, modify_user_id
   </sql>
-    <select id="listWaybillGoodsByItemId" resultType="com.jaagro.tms.biz.entity.WaybillGoods">
+    <select id="listWaybillGoodsByItemId" resultType="com.jaagro.tms.biz.entity.WaybillGoods" parameterType="java.lang.Integer">
         select
         <include refid="Base_Column_List"/>
         from waybill_goods
         where waybill_item_id = #{itemId,jdbcType=INTEGER}
     </select>
 
-    <select id="listGoodsByWaybillId" resultType="com.jaagro.tms.api.dto.waybill.GetWaybillGoodsDto">
+    <select id="listGoodsByWaybillId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
     select
     wg.*
     from waybill w inner join waybill_items wi on w.id = wi.waybill_id inner join waybill_goods wg on wi.id = wg.waybill_item_id
@@ -47,11 +47,7 @@
     <select id="listWaybillGoodsByWaybillItemId" resultMap="DetailInfo" parameterType="java.lang.Integer">
     select id,goods_name,goods_unit,goods_quantity,goods_weight
     from waybill_goods
-    where id = #{id,jdbcType=INTEGER}
+    where waybill_item_id = #{id,jdbcType=INTEGER}
   </select>
-    <update id="updateGoodLoadWeightById" parameterType="com.jaagro.tms.biz.entity.WaybillCustomerFee">
-        update waybill_goods
-        set unload_quantity = #{loadWeight},
-        where id = #{waybillGoodId,jdbcType=INTEGER}
-    </update>
+
 </mapper>

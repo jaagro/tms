@@ -118,4 +118,14 @@ public interface WaybillService {
      * @return
      */
     Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto);
+
+    /**
+     * 根据waybillId 卸货地Id 查询货物信息
+     * @param
+     * @return
+     */
+    Map<String, Object> showGoodsByWaybillItemId(Integer waybillId);
+
+
+    Map<String, Object> showGoodsByWaybillId(Integer waybillItemId);
 }

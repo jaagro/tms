@@ -46,7 +46,7 @@ public class WaybillAppController {
     }
 
     @ApiOperation("运单轨迹")
-    @GetMapping("/showWaybillApp/{waybillId}")
+    @GetMapping("/showWaybillTruckingApp/{waybillId}")
     public BaseResponse showWaybillTruckingApp(@PathVariable Integer waybillId) {
         if (waybillId == null) {
             return BaseResponse.errorInstance("运单单参数不能为空");
@@ -61,6 +61,33 @@ public class WaybillAppController {
             return BaseResponse.errorInstance("运单单参数不能为空");
         }
         return BaseResponse.service(waybillService.upDateWaybillTrucking(dto));
+    }
+
+    @ApiOperation("装货地商品信息")
+    @GetMapping("/showGoodsByLoadSiteApp/{waybillId}")
+    public BaseResponse showGoodsByLoadSiteApp(@PathVariable Integer waybillId) {
+        if (waybillId == null) {
+            return BaseResponse.errorInstance("参数不能为空");
+        }
+        return BaseResponse.service(waybillService.showGoodsByWaybillId(waybillId));
+    }
+
+    @ApiOperation("卸货地商品信息")
+    @GetMapping("/showGoodsByUnLoadSiteApp/{waybillItemId}")
+    public BaseResponse showGoodsByUnLoadSiteApp(@PathVariable Integer waybillItemId) {
+        if (waybillItemId == null) {
+            return BaseResponse.errorInstance("参数不能为空");
+        }
+        return BaseResponse.service(waybillService.showGoodsByWaybillItemId(waybillItemId));
+    }
+
+    @ApiOperation("显示卸货地")
+    @PostMapping("/showUnloadSiteApp/{waybillId}")
+    public BaseResponse showUnloadSiteApp(@PathVariable Integer waybillId) {
+        if (waybillId == null) {
+            return BaseResponse.errorInstance("运单参数不能为空");
+        }
+        return BaseResponse.service(waybillService.showUnloadSite(waybillId));
     }
 
     @ApiOperation("接单列表")
@@ -88,13 +115,5 @@ public class WaybillAppController {
             return BaseResponse.errorInstance("接单参数不能为空");
         }
         return BaseResponse.service(waybillService.receiptMessage(dto));
-    }
-    @ApiOperation("显示卸货地")
-    @PostMapping("/showUnloadSiteApp/{waybillId}")
-    public BaseResponse showUnloadSiteApp(@PathVariable Integer waybillId) {
-        if (waybillId == null) {
-            return BaseResponse.errorInstance("运单参数不能为空");
-        }
-        return BaseResponse.service(waybillService.showUnloadSite(waybillId));
     }
 }
