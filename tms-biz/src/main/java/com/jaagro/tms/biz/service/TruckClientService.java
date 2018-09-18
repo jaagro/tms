@@ -18,4 +18,11 @@ public interface TruckClientService {
      */
     @GetMapping("/truckToFeign/{truckId}")
     ShowTruckDto getTruckByIdReturnObject(@PathVariable("truckId") Integer truckId);
+
+    /**
+     * 获取当前司机对应的车辆
+     * @return
+     */
+    @GetMapping("/getTruckByToken")
+    ShowTruckDto getTruckByToken();
 }
