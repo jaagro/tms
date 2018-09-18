@@ -1,5 +1,7 @@
 package com.jaagro.tms.api.constant;
-
+/**
+ * @author @Gao.
+ */
 public class WaybillConstant {
     public static final String NEW__WAYBILL_FOR_RECEIVE = "你有新的运单待接收";
     /**

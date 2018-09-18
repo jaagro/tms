@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
+
 /**
  * @author @Gao.
  */
@@ -14,6 +15,14 @@ import java.util.List;
 public class ConfirmProductDto implements Serializable {
 
     /**
+     * waybillItemId
+     */
+    private Integer waybillItemId;
+    /**
+     * 卸货地 id
+     */
+    private Integer unLoadSiteId;
+    /**
      * 运单货物id
      */
     private Integer waybillGoodId;
@@ -21,6 +30,11 @@ public class ConfirmProductDto implements Serializable {
     /**
      * 装货重量
      */
-    private BigDecimal loadWeightList;
+    private BigDecimal loadWeight;
+
+    /**
+     * 卸货重量
+     */
+    private BigDecimal unloadWeight;
 
 }

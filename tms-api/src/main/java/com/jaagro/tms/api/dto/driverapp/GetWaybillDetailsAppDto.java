@@ -33,9 +33,13 @@ public class GetWaybillDetailsAppDto implements Serializable {
      */
     private ShowCustomerDto customer;
     /**
+     * 是否需要纸质回单
+     */
+    private boolean paperReceipt;
+    /**
      * 装货地
      */
-    private ShowSiteDto loadSite;
+    private ShowSiteAppDto loadSite;
     /**
      * 卸货地列表
      */

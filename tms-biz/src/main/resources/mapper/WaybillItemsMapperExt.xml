@@ -39,10 +39,17 @@
         from waybill_items
         where waybill_id = #{id,jdbcType=INTEGER}
     </select>
-    <select id="getUnLoadSiteIdByWaybillId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
-        select unload_site_id
-        from waybill wb join waybill_items wi ON (wb.id=wi.waybill_id)
-        where wb.id=#{waybillId}
+
+    <select id="listWaybillIdIdAndSignStatus" resultType="java.util.Map" parameterType="com.jaagro.tms.biz.entity.WaybillItems">
+        select id waybillItemId,unload_site_id unloadSiteId
+        from  waybill_items
+        where 1=1
+        <if test="waybillId != null" >
+           and waybill_id=#{waybillId}
+        </if>
+        <if test="waybillId != null" >
+           and sign_status=#{signStatus}
+        </if>
     </select>
 
 </mapper>
