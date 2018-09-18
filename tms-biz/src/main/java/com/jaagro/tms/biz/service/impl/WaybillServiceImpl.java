@@ -22,13 +22,10 @@ import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
-import org.apache.commons.lang.time.DateUtils;
-import org.apache.ibatis.jdbc.Null;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -815,23 +812,31 @@ public class WaybillServiceImpl implements WaybillService {
         //5.发送短信给truckId对应的司机
         List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
         for (DriverReturnDto driver : drivers) {
-            System.out.println(driver);
+            System.out.println("给司机发短信:"+driver);
         }
 
         //6.掉用Jpush接口给司机推送消息
-        String alias = "";
-        String msgTitle = "派单消息";
-        String msgContent;
-        String regId ;
         orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         //装货地
         ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
         String loadSiteName = loadSite.getSiteName();
-       // WaybillItems waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
+        List<WaybillItems>  waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
+        StringBuffer unLoadSiteNames = new StringBuffer();
+        for (WaybillItems waybillItem : waybillItems) {
+            //卸货地
+            ShowSiteDto unLoadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
+            unLoadSiteNames.append(unLoadSite.getSiteName());
+        }
+        String alias = "";
+        String msgTitle = "派单消息";
+        String msgContent;
+        String regId;
         for (DriverReturnDto driver : drivers) {
             Map<String,String> extraParam = new HashMap<>();
             extraParam.put("driverId", driver.getId().toString());
-            msgContent = "您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。";
+            extraParam.put("waybillId", waybillId.toString());
+            //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
+            msgContent = "您有新的运单信息待接单，从"+loadSiteName+"到"+unLoadSiteNames.substring(0,unLoadSiteNames.length()-1)+"的运单。";
             regId = driver.getRegistrationId();
             JpushClientUtil.sendPush(alias,msgTitle,msgContent,regId,extraParam);
         }
@@ -896,7 +901,7 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     public static void main(String[] args) {
-        System.out.println(new Date());
-        System.out.println(DateUtils.addDays(new Date(), 7));
+
+
     }
 }
