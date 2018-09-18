@@ -1,5 +1,6 @@
 package com.jaagro.tms.jpush;
 
+import cn.jiguang.common.ClientConfig;
 import cn.jpush.api.JPushClient;
 import cn.jpush.api.push.PushResult;
 import cn.jpush.api.push.model.Platform;
@@ -17,9 +18,9 @@ import java.util.Map;
 public class JPushTestMine {
     private static final Log log = LogFactory.getLog(JPushTestMine.class);
 
-    private static final String APP_KEY = "97e71dd3af7b165822a52658";
-    private static final String MASTER_SECRET = "4e6cc81b13f8f12754282c7b";
-    public static final String REGISTRATION_ID3 = "18071adc030dcba91c0";
+    private static final String APP_KEY = "3ff0ace6ce40fcae6f18eb27";
+    private static final String MASTER_SECRET = "05f523c0d6c3d81220ad6741";
+    public static final String REGISTRATION_ID3 = "18071adc035858ee43b";
 
     /**
      * 消息推送类型：专家消息
@@ -44,20 +45,24 @@ public class JPushTestMine {
     public static void sendPush(String appId, String alertid, String alert) {
         Map<String, String> extra = new HashMap<String, String>();
         extra.put("alertid", alertid);
-
+        ClientConfig clientConfig = ClientConfig.getInstance();
         String title = "专家消息";
-        JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY);
+        JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY,null,clientConfig);
         // maxRetryTime:最大的尝试次数，设为3表示：跟服务器进行建立连接若失败会尝试再进行两次尝试
 //		JPushClient jpushClient = new JPushClient(masterSecret, appKey, 3);
         PushPayload payload = PushPayload.newBuilder().setPlatform(Platform.android())
                 .setAudience(Audience.alias(appId))
                 .setAudience(Audience.registrationId(REGISTRATION_ID3))
+                .setPlatform(Platform.all())
                 .setNotification(Notification.android(alert, title, extra))
                 .build();
 
         try {
             PushResult result = jpushClient.sendPush(payload);
+            System.out.println("result========"+result);
         } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("JPUSH Failed root cause:"+e.getMessage());
             log.error("Connection error. Should retry later. ", e);
 
             // } catch (Exception e) {
@@ -86,7 +91,8 @@ public class JPushTestMine {
      * @param content
      * @return
      */
-    public static PushPayload buildPushObject_all_all_alert(String content) {
+    public static PushPayload buildPushObject_all_all_alert(String content)
+    {
         return PushPayload.alertAll(content);
     }
 
@@ -134,7 +140,8 @@ public class JPushTestMine {
     }
 
     public static void main(String[] arg) {
-        JPushTestMine.sendPush("18071adc030dcba91c0", "12345", "信息555");
+
+        JPushTestMine.sendPush("", "123456", "王海泉测试333");
     }
 
 }

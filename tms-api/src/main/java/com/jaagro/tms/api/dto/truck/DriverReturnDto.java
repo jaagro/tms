@@ -116,4 +116,9 @@ public class DriverReturnDto implements Serializable {
      * 所属区县
      */
     private String county;
+
+    /**
+     * 设备标识，用于jpush
+     */
+    private String registrationId;
 }

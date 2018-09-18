@@ -17,6 +17,7 @@ import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.*;
+import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
 import com.jaagro.utils.ResponseStatusCode;
@@ -631,6 +632,13 @@ public class WaybillServiceImpl implements WaybillService {
         return listWaybillAppDtos;
     }
 
+    /**
+     * 派单
+     * Author: gavin
+     * @param waybillId
+     * @param truckId
+     * @return
+     */
     @Override
     public Map<String, Object> assignWaybillToTruck(Integer waybillId, Integer truckId) {
         Integer userId = getUserId();
@@ -685,7 +693,23 @@ public class WaybillServiceImpl implements WaybillService {
             System.out.println(driver);
         }
 
-        //6.掉用Jpush接口
+        //6.掉用Jpush接口给司机推送消息
+        String alias = "";
+        String msgTitle = "派单消息";
+        String msgContent;
+        String regId ;
+        orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
+        //装货地
+        ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
+        String loadSiteName = loadSite.getSiteName();
+       // WaybillItems waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
+        for (DriverReturnDto driver : drivers) {
+            Map<String,String> extraParam = new HashMap<>();
+            extraParam.put("driverId", driver.getId().toString());
+            msgContent = "您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。";
+            regId = driver.getRegistrationId();
+            JpushClientUtil.sendPush(alias,msgTitle,msgContent,regId,extraParam);
+        }
         return ServiceResult.toResult("派单成功");
     }
 
