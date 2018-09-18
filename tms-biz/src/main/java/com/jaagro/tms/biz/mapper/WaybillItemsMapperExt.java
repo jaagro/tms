@@ -3,6 +3,7 @@ package com.jaagro.tms.biz.mapper;
 import com.jaagro.tms.biz.entity.WaybillItems;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tony
@@ -17,7 +18,9 @@ public interface WaybillItemsMapperExt extends WaybillItemsMapper {
     List<WaybillItems> listWaybillItemsByWaybillId(Integer waybillId);
 
     /**
-     * 通过waybillid获取unloadSiteId
+     * 根据waybillId 签收状态 获取卸货地id
+     * @param waybillItems
+     * @return
      */
-    List<Integer> getUnLoadSiteIdByWaybillId(Integer waybillId);
+    List<Map<String,Long>> listWaybillIdIdAndSignStatus(WaybillItems waybillItems);
 }

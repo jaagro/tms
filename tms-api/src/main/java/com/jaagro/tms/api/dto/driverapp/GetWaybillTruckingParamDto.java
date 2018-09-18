@@ -50,12 +50,12 @@ public class GetWaybillTruckingParamDto implements Serializable {
      */
     private List<ConfirmProductDto> confirmProductDtos;
     /**
-     *是否显示提货信息列表
-     */
-    private String showStatus;
-    /**
-     * 提货单URL
+     * 提货单  卸货地URL
      */
     private List<String> imagesUrl;
+    /**
+     * 运单详情
+     */
+    private Integer waybillItemId;
 
 }

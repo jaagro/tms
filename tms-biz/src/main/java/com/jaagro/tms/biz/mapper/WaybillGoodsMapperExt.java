@@ -1,6 +1,5 @@
 package com.jaagro.tms.biz.mapper;
 
-import com.jaagro.tms.api.dto.driverapp.UpdateGoodDto;
 import com.jaagro.tms.api.dto.waybill.GetWaybillGoodsDto;
 import com.jaagro.tms.biz.entity.WaybillGoods;
 
@@ -26,12 +25,5 @@ public interface WaybillGoodsMapperExt extends WaybillGoodsMapper {
      * @return
      */
     List<WaybillGoods> listWaybillGoodsByItemId(Integer itemId);
-
-    /**
-     * 根据货物id 更新装货重量
-     * @param updateGoodDto
-     */
-    void updateGoodLoadWeightById(UpdateGoodDto updateGoodDto);
-
 
 }
