@@ -26,11 +26,8 @@
           parameterType="com.jaagro.tms.biz.entity.Message">
     select
     <include refid="Base_Column_List"/>
-    from app_message
+    from message
     where 1=1
-    <if test="id != null">
-      and id=#{id}
-    </if>
     <if test="to_user_id != null">
       and to_user_id=#{toUserId}
     </if>

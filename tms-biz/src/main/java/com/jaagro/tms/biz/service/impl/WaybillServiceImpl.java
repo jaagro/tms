@@ -372,9 +372,10 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public Map<String, Object> showWaybillTrucking(Integer waybillId) {
-        WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
-        waybillTrackingImages.setWaybillId(waybillId);
-        return ServiceResult.toResult(waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages));
+        ShowWaybillTrackingDto showWaybillTrackingDto = new ShowWaybillTrackingDto();
+        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybillId);
+        showWaybillTrackingDto.setShowTrackingDtos(showTrackingDtos);
+        return ServiceResult.toResult(showWaybillTrackingDto);
     }
 
     /**
