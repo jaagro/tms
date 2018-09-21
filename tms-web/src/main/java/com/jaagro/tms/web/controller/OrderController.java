@@ -1,6 +1,7 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.order.CreateOrderDto;
+import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
 import com.jaagro.tms.api.dto.order.UpdateOrderDto;
 import com.jaagro.tms.api.service.OrderService;
@@ -17,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 
 /**
  * @author baiyiran
@@ -31,7 +34,7 @@ public class OrderController {
     @Autowired
     private CustomerClientService customerService;
     @Autowired
-    private OrdersMapper ordersMapper; 
+    private OrdersMapper ordersMapper;
 
     /**
      * 新增订单
@@ -43,21 +46,27 @@ public class OrderController {
     @PostMapping("/order")
     public BaseResponse createOrder(@RequestBody CreateOrderDto orderDto) {
         if (StringUtils.isEmpty(orderDto.getCustomerId())) {
-            return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空"));
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
         }
         if (StringUtils.isEmpty(orderDto.getLoadSiteId())) {
-            return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "收货id不能为空"));
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "收货id不能为空");
         }
         if (StringUtils.isEmpty(orderDto.getCustomerContractId())) {
-            return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同id不能为空"));
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同id不能为空");
         }
         if (this.customerService.getShowCustomerById(orderDto.getCustomerId()) == null) {
-            return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户不存在"));
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户不存在");
         }
         if (this.customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
-            return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同不存在"));
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同不存在");
         }
-        return BaseResponse.service(orderService.createOrder(orderDto));
+        Map<String, Object> result;
+        try {
+            result = orderService.createOrder(orderDto);
+        } catch (Exception ex) {
+            return BaseResponse.errorInstance(ex.getMessage());
+        }
+        return BaseResponse.service(result);
     }
 
     /**
@@ -70,12 +79,18 @@ public class OrderController {
     @PutMapping("/order")
     public BaseResponse updateOrder(@RequestBody UpdateOrderDto orderDto) {
         if (StringUtils.isEmpty(orderDto.getCustomerId())) {
-            return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空"));
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
         }
         if (this.ordersMapper.selectByPrimaryKey(orderDto.getCustomerId()) == null) {
-            return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在"));
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在");
         }
-        return BaseResponse.successInstance(orderService.updateOrder(orderDto));
+        GetOrderDto getOrderDto;
+        try {
+            getOrderDto = orderService.updateOrder(orderDto);
+        } catch (Exception ex) {
+            return BaseResponse.errorInstance(ex.getMessage());
+        }
+        return BaseResponse.successInstance(getOrderDto);
     }
 
     /**
@@ -88,9 +103,15 @@ public class OrderController {
     @DeleteMapping("/order")
     public BaseResponse deleteOrder(@PathVariable Integer id) {
         if (this.ordersMapper.selectByPrimaryKey(id) == null) {
-            return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在"));
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在");
         }
-        return BaseResponse.service(orderService.deleteOrderById(id));
+        Map<String, Object> result;
+        try {
+            result = orderService.deleteOrderById(id);
+        } catch (Exception ex) {
+            return BaseResponse.errorInstance(ex.getMessage());
+        }
+        return BaseResponse.service(result);
     }
 
     /**
@@ -103,7 +124,7 @@ public class OrderController {
     @GetMapping("/getOrderById/{id}")
     public BaseResponse getOrderById(@PathVariable("id") Integer id) {
         if (this.ordersMapper.selectByPrimaryKey(id) == null) {
-            return BaseResponse.service(ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在"));
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在");
         }
         return BaseResponse.successInstance(orderService.getOrderById(id));
     }
@@ -117,6 +138,12 @@ public class OrderController {
     @ApiOperation("分页查询订单")
     @PostMapping("/listOrders")
     public BaseResponse listOrders(@RequestBody ListOrderCriteriaDto criteriaDto) {
+        if (StringUtils.isEmpty(criteriaDto.getPageNum())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空");
+        }
+        if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
+        }
         return BaseResponse.service(orderService.listOrderByCriteria(criteriaDto));
     }
 
@@ -134,7 +161,7 @@ public class OrderController {
             return BaseResponse.idNull("订单id不能为空");
         }
         if (StringUtils.isEmpty(detailInfo)) {
-            return BaseResponse.idNull("取消理由必填");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "取消理由必填");
         }
         return BaseResponse.service(orderService.cancelOrders(orderId, detailInfo));
     }

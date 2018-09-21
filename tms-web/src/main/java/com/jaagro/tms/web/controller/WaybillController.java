@@ -6,6 +6,7 @@ import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
+import com.sun.xml.internal.rngom.parse.host.Base;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,21 +45,21 @@ public class WaybillController {
         }
         List<TruckDto> truckDtos = waybillDto.getTrucks();
         if (CollectionUtils.isEmpty(truckDtos)) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"车辆为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "车辆为空");
         }
         for (TruckDto truckDto : truckDtos) {
             if (truckDto.getNumber() == null || truckDto.getNumber() <= 0) {
-                return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"车辆数量为空");
+                return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "车辆数量为空");
             }
         }
         List<CreateWaybillItemsPlanDto> waybillItemsDtos = waybillDto.getWaybillItems();
         if (CollectionUtils.isEmpty(waybillItemsDtos)) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"送货地址为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "送货地址为空");
         }
         for (CreateWaybillItemsPlanDto waybillItemsDto : waybillItemsDtos) {
             List<CreateWaybillGoodsPlanDto> goods = waybillItemsDto.getGoods();
             if (CollectionUtils.isEmpty(goods)) {
-                return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"计划配送物品为空");
+                return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "计划配送物品为空");
             }
         }
         try {
@@ -66,7 +67,7 @@ public class WaybillController {
             return BaseResponse.successInstance(result);
         } catch (Exception e) {
             e.printStackTrace();
-            return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(),e.getMessage());
+            return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(), e.getMessage());
 
         }
     }
@@ -108,9 +109,10 @@ public class WaybillController {
 
     /**
      * 创建运单
-     * @Author gavin
+     *
      * @param waybillDtoList
      * @return
+     * @Author gavin
      */
     @ApiOperation("创建运单")
     @PostMapping("/createWaybill")
@@ -121,7 +123,7 @@ public class WaybillController {
             return BaseResponse.successInstance(result);
         } catch (Exception e) {
             e.printStackTrace();
-            return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(),"创建运单失败：" + e.getMessage());
+            return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(), "创建运单失败：" + e.getMessage());
         }
     }
 
@@ -132,7 +134,7 @@ public class WaybillController {
             return BaseResponse.service(waybillService.assignWaybillToTruck(waybillId, truckId));
         } catch (Exception e) {
             e.printStackTrace();
-            return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(),"派单失败:" + e.getMessage());
+            return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(), "派单失败:" + e.getMessage());
         }
     }
 
@@ -143,8 +145,14 @@ public class WaybillController {
      * @return
      */
     @ApiOperation("运单分页查询管理")
-    @PostMapping("/listWaybill")
-    public BaseResponse listWaybill(@RequestBody ListWaybillCriteriaDto criteriaDto) {
+    @PostMapping("/listWaybillByCriteria")
+    public BaseResponse listWaybillByCriteria(@RequestBody ListWaybillCriteriaDto criteriaDto) {
+        if (StringUtils.isEmpty(criteriaDto.getPageNum())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空");
+        }
+        if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
+        }
         return BaseResponse.service(waybillService.listWaybillByCriteria(criteriaDto));
     }
 }
