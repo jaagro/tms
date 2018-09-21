@@ -1,14 +1,11 @@
 package com.jaagro.tms.api.dto.customer;
 
-import com.jaagro.tms.api.dto.waybill.GetWaybillTrackingImagesDto;
-import com.jaagro.tms.api.dto.waybill.ShowGoodsDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author tony
@@ -78,17 +75,4 @@ public class ShowSiteDto implements Serializable {
      * 卸货信息 要求送货时间
      */
     private Date requiredTime;
-
-    /**
-     * 货物列表
-     */
-    private List<ShowGoodsDto> goods;
-
-    /**
-     * 提货单
-     */
-    /**
-     * 卸货单
-     */
-    List<GetWaybillTrackingImagesDto> waybillTrackingImagesDtos;
 }

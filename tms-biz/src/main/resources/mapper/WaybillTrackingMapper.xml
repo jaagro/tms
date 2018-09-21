@@ -15,7 +15,7 @@
         <result column="create_time" property="createTime"/>
     </resultMap>
 
-    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.waybill.ShowTrackingDto">
+    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.ShowTrackingDto">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="waybill_id" property="waybillId" jdbcType="INTEGER"/>
         <result column="old_status" property="oldStatus" jdbcType="VARCHAR"/>
@@ -175,26 +175,4 @@
       create_time = #{createTime}
     where id = #{id,jdbcType=INTEGER}
   </update>
-
-    <select id="selectSingleTime" resultMap="BaseResultMap" parameterType="java.lang.Integer">
-        select
-        <include refid="Base_Column_List"/>
-        from waybill_tracking
-        where
-        <if test="waybillId != null">
-            waybill_id=#{waybillId}
-        </if>
-        <if test="newStatus != null">
-            AND new_status=#{newStatus}
-        </if>
-
-    </select>
-
-    <select id="listWaybillTrackingByWaybillId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
-        select
-        <include refid="Base_Column_List"/>
-        from waybill_tracking
-        where waybill_id=#{waybillId}
-    </select>
-
 </mapper>

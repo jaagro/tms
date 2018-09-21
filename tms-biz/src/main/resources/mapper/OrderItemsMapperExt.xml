@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jaagro.tms.biz.mapper.OrderItemsMapperExt">
+    <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.OrderItems">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="unload_id" property="unloadId" jdbcType="INTEGER"/>
+        <result column="unload_time" property="unloadTime" jdbcType="TIMESTAMP"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="ReturnMap" type="com.jaagro.tms.api.dto.order.GetOrderItemsDto">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="unload_time" property="unloadTime" jdbcType="TIMESTAMP"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <collection property="goods" column="id"
+                    select="com.jaagro.tms.biz.mapper.OrderGoodsMapperExt.listByItemsId"></collection>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, order_id, unload_id, unload_time, enabled, modify_time, modify_user_id
+    </sql>
+
+    <select id="listByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from order_items
+        where order_id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="listItemsByOrderId" resultMap="ReturnMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from order_items
+        where order_id = #{id,jdbcType=INTEGER}
+    </select>
+    <update id="disableByOrderId">
+        update order_items
+        set enabled = 0
+        where order_id = #{orderId}
+    </update>
+
+</mapper>

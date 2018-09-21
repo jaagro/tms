@@ -17,7 +17,7 @@ public class ListWaybillGoodsPlanDto implements Serializable {
      */
     private Integer waybillItemId;
     /**
-     *货物id
+     * 货物id
      */
     private Integer orderGoodsId;
     /**

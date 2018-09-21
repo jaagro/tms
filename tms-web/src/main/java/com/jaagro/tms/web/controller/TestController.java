@@ -11,15 +11,19 @@ import com.jaagro.tms.api.dto.waybill.ListWaybillPlanDto;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.biz.service.SmsClientService;
 import com.jaagro.tms.biz.service.TruckClientService;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
+import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.BeanDifferentUtils;
 import com.jaagro.utils.DifferentResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tony
@@ -37,6 +41,8 @@ public class TestController {
     private WaybillService waybillService;
     @Autowired
     private WaybillPlanService waybillPlanService;
+    @Autowired
+    private SmsClientService smsClientService;
 
     @GetMapping("/test1/{id}")
     public ShowCustomerDto test1(@PathVariable("id") Integer id){
@@ -91,5 +97,24 @@ public class TestController {
     @GetMapping("/test9/{id}")
     public GetWaybillDto test9(@PathVariable("id") Integer id){
         return waybillService.getWaybillById(id);
+    }
+
+    @GetMapping("/test10/{id}/{userType}")
+    public UserInfo test10(@PathVariable("id") Integer id, @PathVariable("userType") String userType){
+        return currentUserService.getUserInfoById(id, userType);
+    }
+
+    @GetMapping("/test11")
+    public BaseResponse test11(){
+        try{
+        Map<String, Object> templateMap = new HashMap<>();
+        templateMap.put("drvierName","driver.getName()");
+            BaseResponse response=smsClientService.sendSMS("13600517630","smsTemplate_assignWaybill", templateMap);
+            return response;
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("ssssaaagavin");
+        }
+        return null;
     }
 }

@@ -1,6 +1,10 @@
 package com.jaagro.tms.api.service;
 
+import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
+import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
+import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
 
 import java.util.List;
 import java.util.Map;
@@ -27,13 +31,21 @@ public interface WaybillService {
     /**
      * 运单轨迹展示
      * @param waybillId
+     * @returne
+     */
+    Map<String, Object> showWaybillTrucking(Integer waybillId);
+
+    /**
+     * 更新运单轨迹
+     * @param dto
      * @return
      */
-    Map<String, Object> showWaybill(Integer waybillId);
+    Map<String, Object> upDateWaybillTrucking(GetWaybillTruckingParamDto dto);
 
 
     /**
      * 创建运单
+     * Author gavin
      * @param waybillDto
      * @return
      */
@@ -56,16 +68,17 @@ public interface WaybillService {
 
     /**
      * 接单详情列表
-     *
+     * @param dto
      * @return
      */
     Map<String, Object> receiptList(GetReceiptParamDto dto);
 
     /**
      * 接单消息列表显示
+     * @param dto
      * @return
      */
-    Map<String, Object> receiptMessage(GetReceiptParamDto dto);
+    Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto);
 
     /**
      * 根据orderId获取order和waybill信息
@@ -81,4 +94,38 @@ public interface WaybillService {
      * @return
      */
     List<GetWaybillDto> listWaybillByOrderId(Integer orderId);
+
+    /**
+     * Author gavin
+     * @param waybillId
+     * @param truckId
+     * @return
+     */
+    Map<String, Object> assignWaybillToTruck(Integer waybillId,Integer truckId);
+
+    /**
+     *显示运单卸货
+     * @param waybillId
+     * @return
+     * Author @Gao.
+     */
+    Map<String, Object> showUnloadSite(Integer waybillId);
+
+    /**
+     * 分页查询运单管理
+     *
+     * @param criteriaDto
+     * @return
+     */
+    Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto);
+
+    /**
+     * 根据waybillId 卸货地Id 查询货物信息
+     * @param
+     * @return
+     */
+    Map<String, Object> showGoodsByWaybillItemId(Integer waybillId);
+
+
+    Map<String, Object> showGoodsByWaybillId(Integer waybillItemId);
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillTrackingImagesMapperExt" >
+  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillTrackingImages" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="waybill_id" property="waybillId" jdbcType="INTEGER" />
+    <result column="site_id" property="siteId" jdbcType="INTEGER" />
+    <result column="waybill_tracking_id" property="waybillTrackingId" jdbcType="INTEGER" />
+    <result column="image_type" property="imageType" jdbcType="INTEGER" />
+    <result column="image_url" property="imageUrl" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="create_user_id" property="createUserId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.GetWaybillTrackingImagesDto" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="waybill_id" property="waybillId" jdbcType="INTEGER" />
+    <result column="site_id" property="siteId" jdbcType="INTEGER" />
+    <result column="waybill_tracking_id" property="waybillTrackingId" jdbcType="INTEGER" />
+    <result column="image_type" property="imageType" jdbcType="INTEGER" />
+    <result column="image_url" property="imageUrl" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="create_user_id" property="createUserId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, waybill_id, site_id,waybill_tracking_id, image_type, image_url, create_time, create_user_id
+  </sql>
+  <select id="listWaybillTrackingImage" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.WaybillTrackingImages" >
+    select
+    <include refid="Base_Column_List" />
+    from waybill_tracking_images
+    where 1=1
+    <if test="siteId != null" >
+      and site_id = #{siteId,jdbcType=INTEGER}
+    </if>
+    <if test="waybillId != null" >
+      and  waybill_id = #{waybillId,jdbcType=INTEGER}
+    </if>
+  </select>
+</mapper>

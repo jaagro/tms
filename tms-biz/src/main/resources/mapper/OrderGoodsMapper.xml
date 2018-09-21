@@ -152,10 +152,4 @@
       modify_user_id = #{modifyUserId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="listByItemsId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select
-    <include refid="Base_Column_List" />
-    from order_goods
-    where order_item_id = #{id,jdbcType=INTEGER}
-  </select>
 </mapper>

@@ -1,12 +1,10 @@
 package com.jaagro.tms.api.dto.waybill;
 
-import com.jaagro.tms.api.dto.base.ShowUserDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * @author tony
@@ -70,17 +68,7 @@ public class GetWaybillGoodsDto implements Serializable {
     private Boolean joinDrug;
 
     /**
-     * 是否有效
+     * 订单货物id
      */
-    private Boolean enabled;
-
-    /**
-     * 修改时间
-     */
-    private Date modifyTime;
-
-    /**
-     * 修改人id
-     */
-    private ShowUserDto modifyUserId;
+    private Integer orderGoodsId;
 }

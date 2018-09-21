@@ -5,6 +5,7 @@ import com.jaagro.utils.DifferentResult;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class BeanDifferentServiceImpl implements BeanDifferentService {
     @Override
     public Map<String, Object> jointDifferentResult(List<DifferentResult> differentResultList) {
-        if (differentResultList != null && differentResultList.size() > 0) {
+        if (CollectionUtils.isEmpty(differentResultList)) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "对比列表为空");
         }
         // 返回的map

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillGoodsMapperExt">
+    <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillGoods">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="waybill_item_id" property="waybillItemId" jdbcType="INTEGER"/>
+        <result column="goods_name" property="goodsName" jdbcType="VARCHAR"/>
+        <result column="order_goods_id" property="orderGoodsId" jdbcType="INTEGER"/>
+        <result column="goods_unit" property="goodsUnit" jdbcType="INTEGER"/>
+        <result column="goods_quantity" property="goodsQuantity" jdbcType="INTEGER"/>
+        <result column="goods_weight" property="goodsWeight" jdbcType="DECIMAL"/>
+        <result column="load_quantity" property="loadQuantity" jdbcType="INTEGER"/>
+        <result column="load_weight" property="loadWeight" jdbcType="DECIMAL"/>
+        <result column="unload_quantity" property="unloadQuantity" jdbcType="INTEGER"/>
+        <result column="unload_weight" property="unloadWeight" jdbcType="DECIMAL"/>
+        <result column="join_drug" property="joinDrug" jdbcType="BIT"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.ShowGoodsDto">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="goods_name" property="goodsName" jdbcType="VARCHAR"/>
+        <result column="goods_unit" property="goodsUnit" jdbcType="INTEGER"/>
+        <result column="goods_quantity" property="goodsQuantity" jdbcType="INTEGER"/>
+        <result column="goods_weight" property="goodsWeight" jdbcType="DECIMAL"/>
+        <result column="load_quantity" property="loadQuantity" jdbcType="INTEGER"/>
+        <result column="load_weight" property="loadWeight" jdbcType="DECIMAL"/>
+        <result column="unload_quantity" property="unloadQuantity" jdbcType="INTEGER"/>
+        <result column="unload_weight" property="unloadWeight" jdbcType="DECIMAL"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, waybill_item_id,order_goods_id, goods_name, goods_unit, goods_quantity, goods_weight, load_quantity,
+    load_weight, unload_quantity, unload_weight, join_drug, enabled, modify_time, modify_user_id
+  </sql>
+    <select id="listWaybillGoodsByItemId" resultType="com.jaagro.tms.biz.entity.WaybillGoods" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill_goods
+        where waybill_item_id = #{itemId,jdbcType=INTEGER}
+    </select>
+
+    <select id="listGoodsByWaybillId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select
+    wg.*
+    from waybill w inner join waybill_items wi on w.id = wi.waybill_id inner join waybill_goods wg on wi.id = wg.waybill_item_id
+    where w.id = #{waybillId}
+  </select>
+
+    <select id="listWaybillGoodsByWaybillItemId" resultMap="DetailInfo" parameterType="java.lang.Integer">
+    select id,goods_name,goods_unit,goods_quantity,goods_weight,load_quantity,load_weight,unload_quantity,unload_weight
+    from waybill_goods
+    where waybill_item_id = #{id,jdbcType=INTEGER}
+  </select>
+
+</mapper>

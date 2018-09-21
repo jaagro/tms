@@ -34,12 +34,4 @@ public interface OrderGoodsMapper {
      * @mbggenerated 2018-08-31
      */
     int updateByPrimaryKey(OrderGoods record);
-
-    /**
-     * 根据订单需求id查询列表
-     *
-     * @param id
-     * @return
-     */
-    List<OrderGoods> listByItemsId(Integer id);
 }
