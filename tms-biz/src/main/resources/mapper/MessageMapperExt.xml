@@ -26,19 +26,13 @@
           parameterType="com.jaagro.tms.biz.entity.Message">
     select
     <include refid="Base_Column_List"/>
-    from app_message
+    from message
     where 1=1
-    <if test="id != null">
-      and id=#{id}
-    </if>
-    <if test="truckId != null">
-      and truck_id=#{truckId}
+    <if test="to_user_id != null">
+      and to_user_id=#{toUserId}
     </if>
     <if test="msgType != null">
-      and msg_type=#{msgType}
-    </if>
-    <if test="waybillId != null">
-      and waybill_id=#{waybillId}
+      or msg_type=1
     </if>
   </select>
 </mapper>
