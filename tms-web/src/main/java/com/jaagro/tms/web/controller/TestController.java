@@ -105,15 +105,16 @@ public class TestController {
     }
 
     @GetMapping("/test11")
-    public void test11(){
+    public BaseResponse test11(){
         try{
         Map<String, Object> templateMap = new HashMap<>();
         templateMap.put("drvierName","driver.getName()");
             BaseResponse response=smsClientService.sendSMS("13600517630","smsTemplate_assignWaybill", templateMap);
-            System.out.println("ssssaaagavin");
+            return response;
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("ssssaaagavin");
         }
+        return null;
     }
 }
