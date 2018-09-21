@@ -25,6 +25,10 @@
         <result column="goods_unit" property="goodsUnit" jdbcType="INTEGER"/>
         <result column="goods_quantity" property="goodsQuantity" jdbcType="INTEGER"/>
         <result column="goods_weight" property="goodsWeight" jdbcType="DECIMAL"/>
+        <result column="load_quantity" property="loadQuantity" jdbcType="INTEGER"/>
+        <result column="load_weight" property="loadWeight" jdbcType="DECIMAL"/>
+        <result column="unload_quantity" property="unloadQuantity" jdbcType="INTEGER"/>
+        <result column="unload_weight" property="unloadWeight" jdbcType="DECIMAL"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, waybill_item_id,order_goods_id, goods_name, goods_unit, goods_quantity, goods_weight, load_quantity,
@@ -45,7 +49,7 @@
   </select>
 
     <select id="listWaybillGoodsByWaybillItemId" resultMap="DetailInfo" parameterType="java.lang.Integer">
-    select id,goods_name,goods_unit,goods_quantity,goods_weight
+    select id,goods_name,goods_unit,goods_quantity,goods_weight,load_quantity,load_weight,unload_quantity,unload_weight
     from waybill_goods
     where waybill_item_id = #{id,jdbcType=INTEGER}
   </select>

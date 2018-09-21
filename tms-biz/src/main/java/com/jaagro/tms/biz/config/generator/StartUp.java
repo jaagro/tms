@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class StartUp {
 
-    public static void main(String[] args) throws URISyntaxException {
+    public static void main(String[] args) {
         try {
             List<String> warnings = new ArrayList<String>();
             boolean overwrite = true;

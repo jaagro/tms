@@ -24,5 +24,5 @@ public interface DriverClientService {
 
 
     @GetMapping("/listDriverByTruckId/{truckId}")
-    public List<DriverReturnDto> listByTruckId(@PathVariable("truckId") Integer truckId);
+    List<DriverReturnDto> listByTruckId(@PathVariable("truckId") Integer truckId);
 }
