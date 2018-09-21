@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author @Gao.
@@ -20,4 +21,8 @@ public class ShowUnLoadSite implements Serializable {
      * 卸货地信息
      */
     private ShowSiteDto showSiteDto;
+    /**
+     * 用于前段显示
+     */
+    private List<ShowUnLoadSite> showUnLoadSites;
 }

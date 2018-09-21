@@ -416,7 +416,6 @@ public class WaybillServiceImpl implements WaybillService {
         WaybillTracking waybillTracking = new WaybillTracking();
         waybillTracking
                 .setWaybillId(waybillId)
-                .setCreateTime(new Date())
                 .setDriverId(currentUser.getId())
                 .setDevice(dto.getDevice())
                 .setTrackingInfo(dto.getTrackingInfo())
@@ -454,10 +453,8 @@ public class WaybillServiceImpl implements WaybillService {
             for (ConfirmProductDto confirmProductDto : confirmProductDtosList) {
                 WaybillGoods waybillGoods = new WaybillGoods();
                 waybillGoods.setId(confirmProductDto.getWaybillGoodId());
-                //单位 羽 头 更新数量
-                boolean flag = (confirmProductDto.getGoodsUnit() == 1 || confirmProductDto.getGoodsUnit() == 2);
                 //更新数量
-                if (flag) {
+                if ( confirmProductDto.getGoodsUnit() == 2) {
                     waybillGoods.setLoadQuantity(confirmProductDto.getLoadQuantity());
                     // 吨 更新重量
                 } else {
@@ -515,9 +512,8 @@ public class WaybillServiceImpl implements WaybillService {
                     WaybillGoods waybillGoods = new WaybillGoods();
                     waybillGoods.setId(unLoadSiteconfirmProductDto.getWaybillGoodId());
                     //单位 羽 头 更新数量
-                    boolean flag = (unLoadSiteconfirmProductDto.getGoodsUnit() == 1 || unLoadSiteconfirmProductDto.getGoodsUnit() == 2);
-                    if (flag) {
-                        waybillGoods.setLoadQuantity(unLoadSiteconfirmProductDto.getUnloadQuantity());
+                    if (unLoadSiteconfirmProductDto.getGoodsUnit() == 2) {
+                        waybillGoods.setUnloadQuantity(unLoadSiteconfirmProductDto.getUnloadQuantity());
                     } else {
                         waybillGoods.setUnloadWeight(unLoadSiteconfirmProductDto.getUnloadWeight());
                     }
@@ -570,8 +566,10 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public Map<String, Object> showGoodsByWaybillItemId(Integer waybillItemId) {
-        List<WaybillGoods> waybillGoods = waybillGoodsMapper.listWaybillGoodsByItemId(waybillItemId);
-        return ServiceResult.toResult(waybillGoods);
+        ShowWaybillGoodDto showWaybillGoodDto = new ShowWaybillGoodDto();
+        List<ShowGoodsDto> showGoodsDtos = waybillGoodsMapper.listWaybillGoodsByWaybillItemId(waybillItemId);
+        showWaybillGoodDto.setShowGoodsDtos(showGoodsDtos);
+        return ServiceResult.toResult(showWaybillGoodDto);
     }
 
     /**
@@ -598,6 +596,7 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public Map<String, Object> showUnloadSite(Integer waybillId) {
+        ShowUnLoadSite showUnLoadSiteDto = new ShowUnLoadSite();
         List<ShowUnLoadSite> showUnLoadSites = new ArrayList<>();
         //显示未签收id
         WaybillItems waybillItemsCondtion = new WaybillItems();
@@ -615,7 +614,8 @@ public class WaybillServiceImpl implements WaybillService {
                     .setWaybillItemId(waybillItemId.intValue());
             showUnLoadSites.add(showUnLoadSite);
         }
-        return ServiceResult.toResult(showUnLoadSites);
+        showUnLoadSiteDto.setShowUnLoadSites(showUnLoadSites);
+        return ServiceResult.toResult(showUnLoadSiteDto);
     }
 
     /**
