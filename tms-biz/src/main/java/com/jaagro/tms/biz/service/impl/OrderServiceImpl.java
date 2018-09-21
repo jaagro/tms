@@ -6,13 +6,12 @@ import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.order.*;
-import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
-import com.jaagro.tms.biz.entity.OrderGoods;
 import com.jaagro.tms.biz.entity.OrderItems;
 import com.jaagro.tms.biz.entity.OrderModifyLog;
 import com.jaagro.tms.biz.entity.Orders;
+import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.UserClientService;
@@ -50,6 +49,8 @@ public class OrderServiceImpl implements OrderService {
     private UserClientService userClientService;
     @Autowired
     private OrderModifyLogMapper modifyLogMapper;
+    @Autowired
+    private WaybillMapperExt waybillMapper;
 
     /**
      * 创建订单
@@ -176,6 +177,18 @@ public class OrderServiceImpl implements OrderService {
                     userDto.setUserName(userInfo.getName());
                     orderDto.setCreatedUserId(userDto);
                 }
+                //派单进度
+                List<Waybill> waybills = waybillMapper.listWaybillByOrderId(orderDto.getId());
+                if (waybills.size() > 0) {
+                    orderDto.setWaybillCount(waybills.size());
+                    //已派单
+                    List<Waybill> waitWaybills = waybillMapper.listWaybillWaitByOrderId(orderDto.getId());
+                    if (waitWaybills.size() > 0) {
+                        orderDto.setWaybillAlready(waitWaybills.size());
+                        orderDto.setWaybillWait(orderDto.getWaybillCount() - orderDto.getWaybillAlready());
+                    }
+                }
+
             }
         }
         return ServiceResult.toResult(new PageInfo<>(orderDtos));
