@@ -1,42 +1,55 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.jaagro.tms.biz.mapper.WaybillItemsMapperExt" >
-  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillItems" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="waybill_id" property="waybillId" jdbcType="INTEGER" />
-    <result column="unload_site_id" property="unloadSiteId" jdbcType="INTEGER" />
-    <result column="required_time" property="requiredTime" jdbcType="TIMESTAMP" />
-    <result column="enabled" property="enabled" jdbcType="BIT" />
-    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
-    <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER" />
-    <result column="sign_status" property="signStatus" jdbcType="INTEGER" />
-  </resultMap>
-  <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.GetWaybillItemsAppDto" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="waybill_id" property="waybillId" jdbcType="INTEGER" />
-    <result column="unload_site_id" property="unloadSiteId" jdbcType="INTEGER" />
-    <result column="required_time" property="requiredTime" jdbcType="TIMESTAMP" />
-    <result column="enabled" property="enabled" jdbcType="BIT" />
-    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
-    <result column="sign_status" property="signStatus" jdbcType="INTEGER" />
-    <collection property="goods" column="id"
-                select="com.jaagro.tms.biz.mapper.WaybillGoodsMapperExt.listWaybillGoodsByWaybillItemId"></collection>
-  </resultMap>
-  <sql id="Base_Column_List" >
-    id, waybill_id, unload_site_id, required_time, enabled, modify_time, modify_user_id, sign_status
-  </sql>
-  <select id="listWaybillItemsByWaybillId" resultType="com.jaagro.tms.biz.entity.WaybillItems">
-    select
-    <include refid="Base_Column_List" />
-    from waybill_items
-    where waybill_id = #{waybillId,jdbcType=INTEGER}
-  </select>
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillItemsMapperExt">
+    <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillItems">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="waybill_id" property="waybillId" jdbcType="INTEGER"/>
+        <result column="unload_site_id" property="unloadSiteId" jdbcType="INTEGER"/>
+        <result column="required_time" property="requiredTime" jdbcType="TIMESTAMP"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
+        <result column="sign_status" property="signStatus" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.GetWaybillItemsAppDto">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="waybill_id" property="waybillId" jdbcType="INTEGER"/>
+        <result column="unload_site_id" property="unloadSiteId" jdbcType="INTEGER"/>
+        <result column="required_time" property="requiredTime" jdbcType="TIMESTAMP"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="sign_status" property="signStatus" jdbcType="INTEGER"/>
+        <collection property="goods" column="id"
+                    select="com.jaagro.tms.biz.mapper.WaybillGoodsMapperExt.listWaybillGoodsByWaybillItemId"></collection>
+    </resultMap>
+    <sql id="Base_Column_List">
+      id, waybill_id, unload_site_id, required_time, enabled, modify_time, modify_user_id, sign_status
+    </sql>
 
-  <select id="listByWaybillId" resultMap="DetailInfo" parameterType="java.lang.Integer" >
-    select
-    <include refid="Base_Column_List" />
-    from waybill_items
-    where waybill_id = #{id,jdbcType=INTEGER}
-  </select>
+    <select id="listWaybillItemsByWaybillId" resultType="com.jaagro.tms.biz.entity.WaybillItems">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill_items
+        where waybill_id = #{waybillId,jdbcType=INTEGER}
+    </select>
+
+    <select id="listByWaybillId" resultMap="DetailInfo" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill_items
+        where waybill_id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="listWaybillIdIdAndSignStatus" resultType="java.util.Map" parameterType="com.jaagro.tms.biz.entity.WaybillItems">
+        select id waybillItemId,unload_site_id unloadSiteId
+        from  waybill_items
+        where 1=1
+        <if test="waybillId != null" >
+           and waybill_id=#{waybillId}
+        </if>
+        <if test="waybillId != null" >
+           and sign_status=#{signStatus}
+        </if>
+    </select>
 
 </mapper>

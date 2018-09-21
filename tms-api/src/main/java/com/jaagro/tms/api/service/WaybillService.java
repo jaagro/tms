@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.service;
 
+import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
 import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
@@ -33,6 +34,13 @@ public interface WaybillService {
      * @return
      */
     Map<String, Object> showWaybillTrucking(Integer waybillId);
+
+    /**
+     * 更新运单轨迹
+     * @param dto
+     * @return
+     */
+    Map<String, Object> upDateWaybillTrucking(GetWaybillTruckingParamDto dto);
 
 
     /**
@@ -96,10 +104,28 @@ public interface WaybillService {
     Map<String, Object> assignWaybillToTruck(Integer waybillId,Integer truckId);
 
     /**
+     *显示运单卸货
+     * @param waybillId
+     * @return
+     * Author @Gao.
+     */
+    Map<String, Object> showUnloadSite(Integer waybillId);
+
+    /**
      * 分页查询运单管理
      *
      * @param criteriaDto
      * @return
      */
     Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto);
+
+    /**
+     * 根据waybillId 卸货地Id 查询货物信息
+     * @param
+     * @return
+     */
+    Map<String, Object> showGoodsByWaybillItemId(Integer waybillId);
+
+
+    Map<String, Object> showGoodsByWaybillId(Integer waybillItemId);
 }

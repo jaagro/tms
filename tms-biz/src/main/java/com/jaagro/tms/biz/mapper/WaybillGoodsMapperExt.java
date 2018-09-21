@@ -12,6 +12,7 @@ public interface WaybillGoodsMapperExt extends WaybillGoodsMapper {
 
     /**
      * 根据运单id获取所有goods列表
+     *
      * @param waybillId
      * @return
      */
@@ -19,8 +20,10 @@ public interface WaybillGoodsMapperExt extends WaybillGoodsMapper {
 
     /**
      * 根据明细id获取goods列表
+     *
      * @param itemId
      * @return
      */
     List<WaybillGoods> listWaybillGoodsByItemId(Integer itemId);
+
 }

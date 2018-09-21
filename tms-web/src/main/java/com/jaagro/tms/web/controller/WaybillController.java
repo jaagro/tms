@@ -2,10 +2,10 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
+import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,25 +40,25 @@ public class WaybillController {
     public BaseResponse createWaybillPlan(@RequestBody CreateWaybillPlanDto waybillDto) {
         Integer orderId = waybillDto.getOrderId();
         if (StringUtils.isEmpty(orderId)) {
-            throw new NullPointerException("订单为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单id不能为空");
         }
         List<TruckDto> truckDtos = waybillDto.getTrucks();
         if (CollectionUtils.isEmpty(truckDtos)) {
-            throw new NullPointerException("车辆为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"车辆为空");
         }
         for (TruckDto truckDto : truckDtos) {
             if (truckDto.getNumber() == null || truckDto.getNumber() <= 0) {
-                throw new NullPointerException("车辆数量为空");
+                return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"车辆数量为空");
             }
         }
         List<CreateWaybillItemsPlanDto> waybillItemsDtos = waybillDto.getWaybillItems();
         if (CollectionUtils.isEmpty(waybillItemsDtos)) {
-            throw new NullPointerException("送货地址为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"送货地址为空");
         }
         for (CreateWaybillItemsPlanDto waybillItemsDto : waybillItemsDtos) {
             List<CreateWaybillGoodsPlanDto> goods = waybillItemsDto.getGoods();
             if (CollectionUtils.isEmpty(goods)) {
-                throw new NullPointerException("计划配送物品为空");
+                return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"计划配送物品为空");
             }
         }
         try {
@@ -66,7 +66,8 @@ public class WaybillController {
             return BaseResponse.successInstance(result);
         } catch (Exception e) {
             e.printStackTrace();
-            return BaseResponse.errorInstance(e.getMessage());
+            return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(),e.getMessage());
+
         }
     }
 
@@ -107,7 +108,7 @@ public class WaybillController {
 
     /**
      * 创建运单
-     *
+     * @Author gavin
      * @param waybillDtoList
      * @return
      */
@@ -120,7 +121,7 @@ public class WaybillController {
             return BaseResponse.successInstance(result);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("创建运单失败:" + e.getMessage());
+            return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(),"创建运单失败：" + e.getMessage());
         }
     }
 
@@ -131,7 +132,7 @@ public class WaybillController {
             return BaseResponse.service(waybillService.assignWaybillToTruck(waybillId, truckId));
         } catch (Exception e) {
             e.printStackTrace();
-            return BaseResponse.errorInstance("派单失败:" + e.getMessage());
+            return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(),"派单失败:" + e.getMessage());
         }
     }
 

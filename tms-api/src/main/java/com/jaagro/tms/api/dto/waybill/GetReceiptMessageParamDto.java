@@ -27,5 +27,14 @@ public class GetReceiptMessageParamDto implements Serializable {
      * waybillId
      */
     private Integer waybillId;
+    /**
+     * 起始页
+     */
+    private Integer pageNum;
+
+    /**
+     * 每页条数
+     */
+    private Integer pageSize;
 
 }
