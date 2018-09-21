@@ -72,6 +72,8 @@ public class WaybillServiceImpl implements WaybillService {
     private MessageMapperExt messageMapper;
     @Autowired
     private UserClientService userClientService;
+//    @Autowired
+//    private SmsClientService smsClientService;
 
     /**
      * @param waybillDtoList
@@ -771,7 +773,7 @@ public class WaybillServiceImpl implements WaybillService {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " ：id不正确");
         }
         if (null == truckClientService.getTruckByIdReturnObject(truckId)) {
-            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " ：id不正确");
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), truckId + " ：id不正确");
         }
         //1.更新订单状态：从已配载(STOWAGE)改为运输中(TRANSPORT)
         Orders orders = new Orders();
@@ -811,8 +813,13 @@ public class WaybillServiceImpl implements WaybillService {
         messageMapper.insertSelective(appMessage);
         //5.发送短信给truckId对应的司机
         List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
-        for (DriverReturnDto driver : drivers) {
-            System.out.println("给司机发短信:"+driver);
+        for(int i = 0;i<drivers.size();i++){
+            DriverReturnDto driver = drivers.get(i);
+            Map<String, Object> templateMap = new HashMap<>();
+            templateMap.put("drvierName",driver.getName());
+//            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(),"smsTemplate_assignWaybill",templateMap);
+//            log.trace("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
+//            System.out.println("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
         }
 
         //6.掉用Jpush接口给司机推送消息
