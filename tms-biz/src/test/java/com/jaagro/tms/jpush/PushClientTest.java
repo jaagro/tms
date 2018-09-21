@@ -55,25 +55,25 @@ public class PushClientTest extends BaseTest {
         }
     }
 
-    @Test
-    public void testSendPushWithCallback() {
-        ClientConfig clientConfig = ClientConfig.getInstance();
-        String host = (String) clientConfig.get(ClientConfig.PUSH_HOST_NAME);
-        final NettyHttpClient client = new NettyHttpClient(ServiceHelper.getBasicAuthorization(APP_KEY, MASTER_SECRET),
-                null, clientConfig);
-        try {
-            URI uri = new URI(host + clientConfig.get(ClientConfig.PUSH_PATH));
-            PushPayload payload = buildPushObject_all_alias_alert();
-            client.sendRequest(HttpMethod.POST, payload.toString(), uri, new NettyHttpClient.BaseCallback() {
-                @Override
-                public void onSucceed(ResponseWrapper responseWrapper) {
-                    LOG.info("Got result: " + responseWrapper.responseContent);
-                }
-            });
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-    }
+//    @Test
+//    public void testSendPushWithCallback() {
+//        ClientConfig clientConfig = ClientConfig.getInstance();
+//        String host = (String) clientConfig.get(ClientConfig.PUSH_HOST_NAME);
+//        final NettyHttpClient client = new NettyHttpClient(ServiceHelper.getBasicAuthorization(APP_KEY, MASTER_SECRET),
+//                null, clientConfig);
+//        try {
+//            URI uri = new URI(host + clientConfig.get(ClientConfig.PUSH_PATH));
+//            PushPayload payload = buildPushObject_all_alias_alert();
+//            client.sendRequest(HttpMethod.POST, payload.toString(), uri, new NettyHttpClient.BaseCallback() {
+//                @Override
+//                public void onSucceed(ResponseWrapper responseWrapper) {
+//                    LOG.info("Got result: " + responseWrapper.responseContent);
+//                }
+//            });
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
     public static PushPayload buildPushObject_all_alias_alert() {
