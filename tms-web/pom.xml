@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>tms-web</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>tms-web</name>
@@ -72,9 +72,9 @@
             <scope>runtime</scope>
         </dependency>
     </dependencies>
-
+    <!--jar包工具-->
     <build>
-        <finalName>${name}-${version}</finalName>  <!--最后的包文件名-->
+        <finalName>${name}-${version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

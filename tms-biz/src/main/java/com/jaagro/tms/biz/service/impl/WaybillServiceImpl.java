@@ -220,6 +220,10 @@ public class WaybillServiceImpl implements WaybillService {
                     .setGoods(getWaybillGoodsDtoList);
             getWaybillItemsDtoList.add(getWaybillItemsDto);
         }
+        //搞懂waybillTracking
+
+
+
         GetWaybillDto getWaybillDto = new GetWaybillDto();
         BeanUtils.copyProperties(waybill, getWaybillDto);
         getWaybillDto
@@ -956,10 +960,5 @@ public class WaybillServiceImpl implements WaybillService {
         } else {
             return userInfo.getId();
         }
-    }
-
-    public static void main(String[] args) {
-
-
     }
 }
