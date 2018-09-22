@@ -7,7 +7,6 @@ import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.waybill.CreateWaybillPlanDto;
 import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
-import com.jaagro.tms.api.dto.waybill.ListWaybillPlanDto;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.CustomerClientService;
@@ -78,7 +77,7 @@ public class TestController {
         return truckTypeClientService.getTruckTypeById(id);
     }
     @PostMapping("/createWaybillPlan")
-    public List<ListWaybillPlanDto> createWaybill(@RequestBody CreateWaybillPlanDto waybillPlanDto){
+    public Map<String,Object> createWaybill(@RequestBody CreateWaybillPlanDto waybillPlanDto){
         return waybillPlanService.createWaybillPlan(waybillPlanDto);
     }
 
@@ -110,10 +109,10 @@ public class TestController {
         Map<String, Object> templateMap = new HashMap<>();
         templateMap.put("drvierName","driver.getName()");
             BaseResponse response=smsClientService.sendSMS("13600517630","smsTemplate_assignWaybill", templateMap);
+            System.out.println("TestHello=============================++++++++++++++");
             return response;
         }catch (Exception e){
             e.printStackTrace();
-            System.out.println("ssssaaagavin");
         }
         return null;
     }

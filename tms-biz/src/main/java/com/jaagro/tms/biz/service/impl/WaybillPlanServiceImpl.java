@@ -51,7 +51,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
     private WaybillGoodsMapperExt waybillGoodsMapper;
 
     @Override
-    public List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto) {
+    public Map<String, Object> createWaybillPlan(CreateWaybillPlanDto waybillDto) {
         Integer orderId = waybillDto.getOrderId();
         List<CreateWaybillItemsPlanDto> waybillItemsDtos = waybillDto.getWaybillItems();
         List<TruckDto> truckDtos = waybillDto.getTrucks();
@@ -66,20 +66,37 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                 middleObject.setOrderItemId(waybillGoodsDto.getOrderItemId());
                 middleObject.setOrderGoodsId(waybillGoodsDto.getGoodsId());
                 middleObject.setProportioning(waybillGoodsDto.getProportioning());
+                middleObject.setUnPlanAmount(0);
                 middleObjects.add(middleObject);
             }
         }
-        List<ListWaybillPlanDto> waybillDtos = null;
+        Map<String, Object> returnMap = new HashMap<>();
+        returnMap.put("waybills", "");
+        returnMap.put("margin", "");
+        List<MiddleObjectVo> return_margin_middleObjects = new ArrayList<>();
+        return_margin_middleObjects.addAll(middleObjects);
+
         if (!CollectionUtils.isEmpty(middleObjects)) {
             try {
-                waybillDtos = wayBillAlgorithm(middleObjects, truckDtos);
+                Map<String, Object> map = wayBillAlgorithm(middleObjects, truckDtos);
+                List<ListWaybillPlanDto> waybillDtos = (List<ListWaybillPlanDto>) map.get("waybills");
+                List<MiddleObjectVo> margin_middleObjects = (List<MiddleObjectVo>) map.get("margin");
+
+                for (MiddleObjectVo margin_middleObject : margin_middleObjects) {
+                    MiddleObjectVo find = return_margin_middleObjects.stream().filter(c -> c.getOrderGoodsId().equals(margin_middleObject.getTruckId())).findAny().get();
+                    BeanUtils.copyProperties(margin_middleObject, find);
+                }
+
+                returnMap.put("waybills", waybillDtos);
+                returnMap.put("margin", return_margin_middleObjects);
             } catch (Exception e) {
                 e.printStackTrace();
                 log.error("计算配运单失败，货物内容={}", middleObjects);
                 throw new RuntimeException("计算配运单失败");
             }
         }
-        return waybillDtos;
+
+        return returnMap;
     }
 
     /**
@@ -144,7 +161,8 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
      * @param truckDtos
      * @return
      */
-    private List<ListWaybillPlanDto> wayBillAlgorithm(List<MiddleObjectVo> middleObjects, List<TruckDto> truckDtos) {
+    private Map<String, Object> wayBillAlgorithm(List<MiddleObjectVo> middleObjects, List<TruckDto> truckDtos) {
+        Map<String, Object> map = new HashMap<>();
         List<MiddleObjectVo> middleObjects_assigned = new ArrayList<>();
         List<ListWaybillPlanDto> waybillDtos = new ArrayList<>();
         //按配送地排序
@@ -196,8 +214,9 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         System.out.println("assigned===" + middleObjects_assigned.toString());
         log.error("货物配运时剩余货物，margin={}", newMiddleObjectsList);
         log.error("货物配运时已经分配的货物，assigned={}", middleObjects_assigned);
-
-        return waybillDtos;
+        map.put("margin", newMiddleObjectsList);
+        map.put("waybills", waybillDtos);
+        return map;
     }
 
     /**
