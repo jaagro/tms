@@ -72,6 +72,7 @@
             <scope>runtime</scope>
         </dependency>
     </dependencies>
+    <!--jar包工具-->
     <build>
         <finalName>${name}-${version}</finalName>
         <plugins>
