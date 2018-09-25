@@ -32,6 +32,26 @@ public class ShowSiteDto implements Serializable {
     private String contact;
 
     /**
+     * 养殖场类型（装货地属性）：1-平养场 2-网养场 3-笼养场
+     */
+    private Integer farmsType;
+
+    /**
+     * 作业时间（装货地属性）
+     */
+    private Integer operationTime;
+
+    /**
+     * 屠宰链数(卸货地属性)
+     */
+    private Integer killChain;
+
+    /**
+     * 开始屠宰时间（卸货地属性）
+     */
+    private Date killTime;
+
+    /**
      * 联系电话
      */
     private String phone;
