@@ -19,4 +19,16 @@ public class TruckDto {
      * 需要车子数量
      */
     private Integer number;
+    /**
+     * 在途时间：单位分钟
+     */
+    private Integer travelTime;
+    /**
+     * 里程数：单位公里
+     */
+    private Integer kilometres;
+    /**
+     * 抓鸡时间
+     */
+    private Integer catchTime;
 }

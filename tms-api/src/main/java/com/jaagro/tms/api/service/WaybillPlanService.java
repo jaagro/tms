@@ -1,7 +1,9 @@
 package com.jaagro.tms.api.service;
 
 import com.jaagro.tms.api.dto.waybill.CreateWaybillPlanDto;
+import com.jaagro.tms.api.dto.waybill.ListWaybillPlanDto;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,17 +16,10 @@ public interface WaybillPlanService {
      * @param waybillDto
      * @return
      */
-    //List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto);
-    Map<String,Object> createWaybillPlan(CreateWaybillPlanDto waybillDto);
+    List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto);
 
 
-    /**
-     * 根据orderId获取订单计划
-     *
-     * @param orderId
-     * @return
-     */
-    Map<String, Object> getWaybillPlanByOrderId(Integer orderId);
+
 
     /**
      * 从配载计划中移除运单【逻辑删除】
