@@ -60,4 +60,12 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @return
      */
     List<ListWaybillDto> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto);
+
+    /**
+     * 根据订单id查询 待派单的运单
+     *
+     * @param orderId
+     * @return
+     */
+    List<Waybill> listWaybillWaitByOrderId(Integer orderId);
 }

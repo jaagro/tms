@@ -52,7 +52,9 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         if (orderItemDto.getGoods() != null && orderItemDto.getGoods().size() > 0) {
             for (CreateOrderGoodsDto goodsDto : orderItemDto.getGoods()
             ) {
-                goodsDto.setOrderItemId(orderItem.getId());
+                goodsDto
+                        .setOrderItemId(orderItem.getId())
+                        .setOrderId(orderItem.getOrderId());
                 this.goodsService.createOrderGood(goodsDto);
             }
         } else {
