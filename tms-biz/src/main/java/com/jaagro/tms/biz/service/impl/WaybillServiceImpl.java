@@ -1,6 +1,5 @@
 package com.jaagro.tms.biz.service.impl;
 
-import com.alibaba.druid.support.json.JSONUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
@@ -14,7 +13,6 @@ import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.truck.DriverReturnDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
-import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
@@ -22,7 +20,6 @@ import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
-import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.slf4j.Logger;
@@ -36,7 +33,6 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -76,8 +72,8 @@ public class WaybillServiceImpl implements WaybillService {
     private MessageMapperExt messageMapper;
     @Autowired
     private UserClientService userClientService;
-    @Autowired
-    private SmsClientService smsClientService;
+//    @Autowired
+//    private SmsClientService smsClientService;
 
 
     /**
@@ -224,31 +220,11 @@ public class WaybillServiceImpl implements WaybillService {
                     .setGoods(getWaybillGoodsDtoList);
             getWaybillItemsDtoList.add(getWaybillItemsDto);
         }
-        //根据waybillId获取WaybillTracking 和 WaybillTrackingImages
-        List<GetTrackingDto> getTrackingDtos = new ArrayList<>();
-        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybill.getId());
-        for (ShowTrackingDto showTrackingDto : showTrackingDtos) {
-            GetTrackingDto getTrackingDto = new GetTrackingDto();
-            BeanUtils.copyProperties(showTrackingDto, getTrackingDto);
-            getTrackingDtos.add(getTrackingDto);
-        }
-        WaybillTrackingImages record = new WaybillTrackingImages();
-        record.setWaybillId(waybill.getId());
-        List<GetWaybillTrackingImagesDto> getWaybillTrackingImagesDtos = waybillTrackingImagesMapper.listWaybillTrackingImage(record);
-        List<GetTrackingImagesDto> getTrackingImagesDtos = new ArrayList<>();
-        for (GetWaybillTrackingImagesDto getWaybillTrackingImagesDto : getWaybillTrackingImagesDtos) {
-            GetTrackingImagesDto getTrackingImagesDto = new GetTrackingImagesDto();
-            BeanUtils.copyProperties(getWaybillTrackingImagesDto, getTrackingImagesDto);
-            getTrackingImagesDtos.add(getTrackingImagesDto);
-        }
-        for (GetTrackingDto getTrackingDto : getTrackingDtos) {
-            List<GetTrackingImagesDto> imageList = getTrackingImagesDtos.stream().filter(c -> c.getWaybillTrackingId().equals(getTrackingDto.getId())).collect(Collectors.toList());
-            getTrackingDto.setImageList(imageList);
-        }
+        //搞懂waybillTracking
+
 
 
         GetWaybillDto getWaybillDto = new GetWaybillDto();
-        getWaybillDto.setTracking(getTrackingDtos);
         BeanUtils.copyProperties(waybill, getWaybillDto);
         getWaybillDto
                 .setLoadSite(loadSiteDto)
@@ -838,7 +814,6 @@ public class WaybillServiceImpl implements WaybillService {
     /**
      * 派单
      * Author: gavin
-     *
      * @param waybillId
      * @param truckId
      * @return
@@ -893,13 +868,13 @@ public class WaybillServiceImpl implements WaybillService {
         messageMapper.insertSelective(appMessage);
         //5.发送短信给truckId对应的司机
         List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
-        for (int i = 0; i < drivers.size(); i++) {
+        for(int i = 0;i<drivers.size();i++){
             DriverReturnDto driver = drivers.get(i);
             Map<String, Object> templateMap = new HashMap<>();
-            templateMap.put("drvierName", driver.getName());
-            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(), "smsTemplate_assignWaybill", templateMap);
-            log.trace("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
-            System.out.println("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
+            templateMap.put("drvierName",driver.getName());
+//            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(),"smsTemplate_assignWaybill",templateMap);
+//            log.trace("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
+//            System.out.println("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
         }
 
         //6.掉用Jpush接口给司机推送消息
@@ -907,7 +882,7 @@ public class WaybillServiceImpl implements WaybillService {
         //装货地
         ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
         String loadSiteName = loadSite.getSiteName();
-        List<WaybillItems> waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
+        List<WaybillItems>  waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
         StringBuffer unLoadSiteNames = new StringBuffer();
         for (WaybillItems waybillItem : waybillItems) {
             //卸货地
@@ -919,13 +894,13 @@ public class WaybillServiceImpl implements WaybillService {
         String msgContent;
         String regId;
         for (DriverReturnDto driver : drivers) {
-            Map<String, String> extraParam = new HashMap<>();
+            Map<String,String> extraParam = new HashMap<>();
             extraParam.put("driverId", driver.getId().toString());
             extraParam.put("waybillId", waybillId.toString());
             //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
-            msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1) + "的运单。";
+            msgContent = "您有新的运单信息待接单，从"+loadSiteName+"到"+unLoadSiteNames.substring(0,unLoadSiteNames.length()-1)+"的运单。";
             regId = driver.getRegistrationId();
-            JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
+            JpushClientUtil.sendPush(alias,msgTitle,msgContent,regId,extraParam);
         }
         return ServiceResult.toResult("派单成功");
     }
@@ -942,7 +917,7 @@ public class WaybillServiceImpl implements WaybillService {
         List<ListWaybillDto> listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-            ) {
+                    ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -985,62 +960,5 @@ public class WaybillServiceImpl implements WaybillService {
         } else {
             return userInfo.getId();
         }
-    }
-
-    public static void main(String[] args) {
-        List<TruckDto> truckDtosA = new ArrayList<>();
-        List<TruckDto> truckDtosB = new ArrayList<>();
-        List<ListTruckTypeDto> truckDtosC = new ArrayList<>();
-        ListTruckTypeDto aa = new ListTruckTypeDto();
-        aa.setId(1);
-        aa.setProductName("奶牛");
-        aa.setTypeName("槽罐车");
-        truckDtosC.add(aa);
-        TruckDto truck1 = new TruckDto();
-        truck1.setTruckId(1);
-        truck1.setCapacity(10);
-        truck1.setNumber(2);
-        TruckDto truck2 = new TruckDto();
-        truck2.setTruckId(2);
-        truck2.setCapacity(20);
-        truck2.setNumber(200);
-        TruckDto truck3 = new TruckDto();
-        truck3.setTruckId(3);
-        truck3.setCapacity(30);
-        truck3.setNumber(300);
-        truckDtosA.add(truck1);
-        truckDtosA.add(truck2);
-        truckDtosA.add(truck3);
-        TruckDto truck4 = new TruckDto();
-        truck4.setTruckId(1);
-        truck4.setCapacity(40);
-        truck4.setNumber(400);
-        truckDtosB.add(truck4);
-        Map<Integer, Object> map = new HashMap<>();
-        map.put(1, truck1);
-        map.put(1, truck2);
-        map.put(3, truck3);
-        map.put(4, truck4);
-        map.put(5, truckDtosA);
-
-        Map<String, List> returnMap = new HashMap<>();
-        returnMap.put("truckDtosB", truckDtosB);
-        returnMap.put("truckDtosA", truckDtosA);
-//        returnMap.put("truckDtosC",truckDtosC);
-        System.out.println("returnMap==+++++++++++++++++++++" + returnMap);
-        System.out.println(JSONUtils.toJSONString(returnMap));
-
-
-        truckDtosB =returnMap.get("truckDtosB");
-
-        for (TruckDto truckDtoB : truckDtosB) {
-            TruckDto find = truckDtosA.stream().filter(c -> c.getTruckId().equals(truckDtoB.getTruckId())).findAny().get();
-            BeanUtils.copyProperties(truckDtoB, find);
-        }
-        returnMap.put("truckDtosB", truckDtosB);
-        returnMap.put("truckDtosA", truckDtosA);
-
-//        System.out.println("returnMap==+++++++++++++++++++++" + returnMap);
-
     }
 }
