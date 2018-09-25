@@ -22,12 +22,10 @@ import com.jaagro.tms.biz.service.*;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.ibatis.jdbc.Null;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -454,7 +452,7 @@ public class WaybillServiceImpl implements WaybillService {
                 WaybillGoods waybillGoods = new WaybillGoods();
                 waybillGoods.setId(confirmProductDto.getWaybillGoodId());
                 //更新数量
-                if ( confirmProductDto.getGoodsUnit() == 2) {
+                if (confirmProductDto.getGoodsUnit() == 2) {
                     waybillGoods.setLoadQuantity(confirmProductDto.getLoadQuantity());
                     // 吨 更新重量
                 } else {
@@ -494,7 +492,7 @@ public class WaybillServiceImpl implements WaybillService {
         }
         //客户签收
         if (WaybillStatus.SIGN.equals(dto.getWaybillStatus())) {
-
+            boolean isSignAll = false;
             //查询出卸货地未签收的
             WaybillItems waybillItemsCondtion = new WaybillItems();
             waybillItemsCondtion
@@ -503,8 +501,8 @@ public class WaybillServiceImpl implements WaybillService {
             List<Map<String, Long>> unSignUnloadSite = waybillItemsMapper.listWaybillIdIdAndSignStatus(waybillItemsCondtion);
             if (!CollectionUtils.isEmpty(unSignUnloadSite)) {
                 waybillTracking
-                        .setNewStatus(WaybillStatus.ACCOMPLISH)
-                        .setOldStatus(WaybillStatus.SIGN);
+                        .setNewStatus(WaybillStatus.SIGN)
+                        .setOldStatus(WaybillStatus.DELIVERY);
                 waybillTrackingMapper.insert(waybillTracking);
                 //更新卸货物信息
                 List<ConfirmProductDto> unLoadSiteConfirmProductDtos = dto.getConfirmProductDtos();
@@ -539,18 +537,25 @@ public class WaybillServiceImpl implements WaybillService {
                         .setSignStatus(SignStatusConstant.SIGN)
                         .setId(unLoadSiteConfirmProductDtos.get(0).getWaybillItemId());
                 waybillItemsMapper.updateByPrimaryKeySelective(waybillItems);
+                return ServiceResult.toResult(isSignAll);
             }
             //如果运单全部签收 更改订单状态 运单状态
             if (CollectionUtils.isEmpty(unSignUnloadSite)) {
+                //更新运单明细
+                waybillTracking
+                        .setNewStatus(WaybillStatus.ACCOMPLISH)
+                        .setOldStatus(WaybillStatus.SIGN);
+                waybillTrackingMapper.insert(waybillTracking);
                 //更改运单状态
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
+                waybillMapper.updateByPrimaryKeySelective(waybill);
                 Orders orderUpdate = new Orders();
                 //更改订单状态
                 orderUpdate
                         .setId(orders.getId())
                         .setOrderStatus(OrderStatus.ACCOMPLISH);
-                ordersMapper.updateByPrimaryKey(orderUpdate);
-                return ServiceResult.toResult(SignStatusConstant.SIGN_ALL);
+                ordersMapper.updateByPrimaryKeySelective(orderUpdate);
+                return ServiceResult.toResult(isSignAll);
             }
             return ServiceResult.toResult("操作成功");
         }
