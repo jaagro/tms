@@ -38,11 +38,23 @@
         <if test="orderStatus != null">
             and order_status = #{orderStatus}
         </if>
-        <if test="createTime != null">
-            <![CDATA[and create_time >= #{createTime}]]>
-        </if>
         <if test="customerId != null">
             and customer_id = #{customerId}
+        </if>
+        <if test="goodsType != null">
+            and goods_type = #{goodsType}
+        </if>
+        <if test="createStartTime != null">
+            <![CDATA[and create_time >= #{createStartTime}]]>
+        </if>
+        <if test="createEndTime != null">
+            <![CDATA[and create_time <= #{createEndTime}]]>
+        </if>
+        <if test="loadStartTime != null">
+            <![CDATA[and load_time >= #{loadStartTime}]]>
+        </if>
+        <if test="loadEndTime != null">
+            <![CDATA[and load_time <= #{loadEndTime}]]>
         </if>
     </select>
 </mapper>
