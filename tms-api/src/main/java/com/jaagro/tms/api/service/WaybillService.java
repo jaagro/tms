@@ -128,4 +128,10 @@ public interface WaybillService {
 
 
     Map<String, Object> showGoodsByWaybillId(Integer waybillItemId);
+
+    /**
+     * 个人中心
+     * @return
+     */
+    Map<String, Object> personalCenter();
 }

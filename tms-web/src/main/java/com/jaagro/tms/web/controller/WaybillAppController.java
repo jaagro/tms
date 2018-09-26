@@ -31,7 +31,7 @@ public class WaybillAppController {
     @PostMapping("/listWaybillApp")
     public BaseResponse listWaybillApp(@RequestBody GetWaybillParamDto dto) {
         if (StringUtils.isEmpty(dto.getWaybillStatus())) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"运单状态参数为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单状态参数为空");
         }
         Map<String, Object> waybill = waybillService.listWaybillByStatus(dto);
         return BaseResponse.service(waybill);
@@ -41,7 +41,7 @@ public class WaybillAppController {
     @GetMapping("/ListWayBillDetailsApp/{waybillId}")
     public BaseResponse listWayBillDetailsApp(@PathVariable Integer waybillId) {
         if (waybillId == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"运单参数不能为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单参数不能为空");
         }
         final Map<String, Object> waybillDetails = waybillService.listWayBillDetails(waybillId);
         return BaseResponse.service(waybillDetails);
@@ -51,7 +51,7 @@ public class WaybillAppController {
     @GetMapping("/showWaybillTruckingApp/{waybillId}")
     public BaseResponse showWaybillTruckingApp(@PathVariable Integer waybillId) {
         if (waybillId == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"运单单参数不能为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单单参数不能为空");
         }
         return BaseResponse.service(waybillService.showWaybillTrucking(waybillId));
     }
@@ -60,7 +60,7 @@ public class WaybillAppController {
     @PostMapping("/updateWaybillTruckingApp")
     public BaseResponse updateWaybillTruckingApp(@RequestBody GetWaybillTruckingParamDto dto) {
         if (dto == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"运单单参数不能为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单单参数不能为空");
         }
         return BaseResponse.service(waybillService.upDateWaybillTrucking(dto));
     }
@@ -69,7 +69,7 @@ public class WaybillAppController {
     @GetMapping("/showGoodsByLoadSiteApp/{waybillId}")
     public BaseResponse showGoodsByLoadSiteApp(@PathVariable Integer waybillId) {
         if (waybillId == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"参数不能为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "参数不能为空");
         }
         return BaseResponse.service(waybillService.showGoodsByWaybillId(waybillId));
     }
@@ -78,7 +78,7 @@ public class WaybillAppController {
     @GetMapping("/showGoodsByUnLoadSiteApp/{waybillItemId}")
     public BaseResponse showGoodsByUnLoadSiteApp(@PathVariable Integer waybillItemId) {
         if (waybillItemId == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"参数不能为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "参数不能为空");
         }
         return BaseResponse.service(waybillService.showGoodsByWaybillItemId(waybillItemId));
     }
@@ -87,7 +87,7 @@ public class WaybillAppController {
     @PostMapping("/showUnloadSiteApp/{waybillId}")
     public BaseResponse showUnloadSiteApp(@PathVariable Integer waybillId) {
         if (waybillId == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"运单参数不能为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单参数不能为空");
         }
         return BaseResponse.service(waybillService.showUnloadSite(waybillId));
     }
@@ -96,7 +96,7 @@ public class WaybillAppController {
     @PostMapping("/receiptListApp")
     public BaseResponse receiptListApp(@RequestBody GetReceiptParamDto dto) {
         if (dto == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"接单参数不能为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "接单参数不能为空");
         }
         return BaseResponse.service(waybillService.receiptList(dto));
     }
@@ -105,7 +105,7 @@ public class WaybillAppController {
     @PostMapping("/upDateReceiptStatusApp")
     public BaseResponse upDateReceiptStatusApp(@RequestBody GetReceiptParamDto dto) {
         if (dto.getWaybillId() == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"接单参数不能为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "接单参数不能为空");
         }
         return BaseResponse.service(waybillService.upDateReceiptStatus(dto));
     }
@@ -114,8 +114,14 @@ public class WaybillAppController {
     @PostMapping("/receiptMessageApp")
     public BaseResponse receiptMessageApp(@RequestBody GetReceiptMessageParamDto dto) {
         if (dto == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(),"接单参数不能为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "接单参数不能为空");
         }
         return BaseResponse.service(waybillService.receiptMessage(dto));
+    }
+
+    @ApiOperation("个人中心")
+    @GetMapping ("personalCenterApp")
+    public BaseResponse personalCenterApp() {
+        return BaseResponse.service(waybillService.personalCenter());
     }
 }
