@@ -595,6 +595,19 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     /**
+     * 个人中心
+     * @return
+     * @Author @Gao.
+     */
+    @Override
+    public Map<String, Object> personalCenter() {
+        ShowPersonalCenter showPersonalCenter = new ShowPersonalCenter();
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        showPersonalCenter.setUserInfo(currentUser);
+        return ServiceResult.toResult(showPersonalCenter);
+    }
+
+    /**
      * 显示货物未签收的卸货地
      *
      * @param waybillId
