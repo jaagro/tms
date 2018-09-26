@@ -22,11 +22,11 @@ public class TruckDto {
     /**
      * 在途时间：单位分钟
      */
-    private Integer travelTime;
+    private int travelTime;
     /**
      * 里程数：单位公里
      */
-    private Integer kilometres;
+    private int kilometres;
     /**
      * 抓鸡时间
      */

@@ -7,6 +7,7 @@ import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.waybill.CreateWaybillPlanDto;
 import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
+import com.jaagro.tms.api.dto.waybill.ListWaybillPlanDto;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.CustomerClientService;
@@ -77,7 +78,7 @@ public class TestController {
         return truckTypeClientService.getTruckTypeById(id);
     }
     @PostMapping("/createWaybillPlan")
-    public Map<String,Object> createWaybill(@RequestBody CreateWaybillPlanDto waybillPlanDto){
+    public List<ListWaybillPlanDto> createWaybill(@RequestBody CreateWaybillPlanDto waybillPlanDto){
         return waybillPlanService.createWaybillPlan(waybillPlanDto);
     }
 

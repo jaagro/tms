@@ -6,7 +6,6 @@ import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
-import com.sun.xml.internal.rngom.parse.host.Base;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +62,7 @@ public class WaybillController {
             }
         }
         try {
-            Map<String,Object> result = waybillPlanService.createWaybillPlan(waybillDto);
+            List<ListWaybillPlanDto> result = waybillPlanService.createWaybillPlan(waybillDto);
             return BaseResponse.successInstance(result);
         } catch (Exception e) {
             e.printStackTrace();

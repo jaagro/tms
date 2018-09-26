@@ -1,5 +1,6 @@
 package com.jaagro.tms.biz.service.impl;
 
+import com.jaagro.tms.api.constant.GoodsType;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
@@ -13,6 +14,7 @@ import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.tms.biz.vo.MiddleObjectVo;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -66,6 +68,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                 middleObject.setOrderItemId(waybillGoodsDto.getOrderItemId());
                 middleObject.setOrderGoodsId(waybillGoodsDto.getGoodsId());
                 middleObject.setProportioning(waybillGoodsDto.getProportioning());
+                middleObject.setUnPlanAmount(0);
                 middleObjects.add(middleObject);
             }
         }
@@ -79,10 +82,41 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                 throw new RuntimeException("计算配运单失败");
             }
         }
-
+        //更新运单货物是生鸡时的装货时间和卸货时间
+        int goodType = waybillDtos.get(0).getGoodType();
+        if (GoodsType.CHICKEN.equals(goodType)) {
+            ShowSiteDto loadSite = customerClientService.getShowSiteById(waybillDtos.get(0).getLoadSiteId());
+            for (int i=0;i< waybillDtos.size();i++) {
+                ListWaybillPlanDto dto = waybillDtos.get(i);
+                ShowSiteDto unloadSite = dto.getWaybillItems().get(0).getShowSiteDto();
+                TruckDto truck = truckDtos.stream().filter(c -> c.getTruckId().equals(dto.getNeedTruckTypeId())).findAny().get();
+                Date killTime = unloadSite.getKillTime();
+                int waitKillTime = 0;
+                if (truck.getKilometres() > 80) {
+                    waitKillTime = 30;
+                } else if (truck.getKilometres() > 30) {
+                    waitKillTime = 25;
+                } else {
+                    waitKillTime = 20;
+                }
+                int times = (truck.getCapacity() * 480 / unloadSite.getKillChain())*i;
+                Date paramDate = DateUtils.addMinutes(killTime, times);
+                Date unloadTime = DateUtils.addMinutes(paramDate, -waitKillTime);
+                Date loadTime = DateUtils.addMinutes(DateUtils.addMinutes(unloadTime, -truck.getTravelTime()), -loadSite.getOperationTime());
+                loadTime = DateUtils.addMinutes(DateUtils.addMinutes(loadTime, -truck.getCatchTime()), -20);
+                dto.setLoadTime(loadTime);
+                dto.getWaybillItems().get(0).setRequiredTime(unloadTime);
+            }
+        }
         return waybillDtos;
     }
 
+    public static void main(String[] args) {
+        Date paramDate = new Date();
+        int waitKillTime = 20;
+        Date newDate = DateUtils.addMinutes(paramDate, 0);
+        System.out.println(newDate);
+    }
 
     /**
      * 从配载计划中移除运单【逻辑删除】
