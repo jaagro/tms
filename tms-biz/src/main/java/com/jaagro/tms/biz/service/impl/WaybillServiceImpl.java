@@ -875,29 +875,8 @@ public class WaybillServiceImpl implements WaybillService {
                 .setReferUserId(userId);
         waybillTrackingMapper.insertSelective(waybillTracking);
 
-        //4.在app消息表插入一条记录
-        Message appMessage = new Message();
-        appMessage.setReferId(waybillId);
-        appMessage.setMsgType(1);
-        appMessage.setMsgStatus(0);
-        appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
-        appMessage.setBody("有从{waybill.load_site_id}到{waybillItem.unload_site_id}的运单");
-        appMessage.setCreateTime(new Date());
-        appMessage.setCreateUserId(userId);
-        appMessage.setFromUserId(userId);
-        messageMapper.insertSelective(appMessage);
-        //5.发送短信给truckId对应的司机
+        //4.掉用Jpush接口给司机推送消息
         List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
-        for (int i = 0; i < drivers.size(); i++) {
-            DriverReturnDto driver = drivers.get(i);
-            Map<String, Object> templateMap = new HashMap<>();
-            templateMap.put("drvierName", driver.getName());
-//            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(),"smsTemplate_assignWaybill",templateMap);
-//            log.trace("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
-//            System.out.println("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
-        }
-
-        //6.掉用Jpush接口给司机推送消息
         orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         //装货地
         ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
@@ -921,6 +900,28 @@ public class WaybillServiceImpl implements WaybillService {
             msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1) + "的运单。";
             regId = driver.getRegistrationId();
             JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
+        }
+
+        //5.在app消息表插入一条司机记录
+        //6.发送短信给truckId对应的司机
+        for (int i = 0; i < drivers.size(); i++) {
+            DriverReturnDto driver = drivers.get(i);
+            Map<String, Object> templateMap = new HashMap<>();
+            templateMap.put("drvierName", driver.getName());
+//            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(),"smsTemplate_assignWaybill",templateMap);
+//            log.trace("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
+//            System.out.println("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
+            Message appMessage = new Message();
+            appMessage.setReferId(waybillId);
+            appMessage.setMsgType(1);
+            appMessage.setMsgStatus(0);
+            appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
+            appMessage.setBody("你有从" + loadSiteName + "到" + unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1) + "的运单。");
+            appMessage.setCreateTime(new Date());
+            appMessage.setCreateUserId(userId);
+            appMessage.setFromUserId(userId);
+            appMessage.setToUserId(driver.getId());
+            messageMapper.insertSelective(appMessage);
         }
         return ServiceResult.toResult("派单成功");
     }
