@@ -51,7 +51,7 @@
 
     </select>
 
-    <select id="listWaybillTrackingByWaybillId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    <select id="listWaybillTrackingByWaybillId" resultMap="DetailInfo" parameterType="java.lang.Integer">
         select
         <include refid="Base_Column_List"/>
         from waybill_tracking

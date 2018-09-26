@@ -6,7 +6,6 @@ import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
-import com.sun.xml.internal.rngom.parse.host.Base;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,7 +104,6 @@ public class WaybillController {
         }
         return BaseResponse.successInstance(result);
     }
-
 
     /**
      * 创建运单
