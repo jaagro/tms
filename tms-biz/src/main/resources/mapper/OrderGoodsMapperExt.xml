@@ -8,7 +8,7 @@
         where order_item_id = #{id,jdbcType=INTEGER}
     </select>
     <update id="disableByItemsId">
-        update from order_goods
+        update order_goods
         set enabled = 0
         where order_item_id = #{itemId}
       </update>

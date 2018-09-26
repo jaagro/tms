@@ -38,7 +38,7 @@
         <if test="orderStatus != null">
             and order_status = #{orderStatus}
         </if>
-        <if test="customerId != null">
+        <if test="customerId != 0">
             and customer_id = #{customerId}
         </if>
         <if test="goodsType != null">
@@ -56,5 +56,6 @@
         <if test="loadEndTime != null">
             <![CDATA[and load_time <= #{loadEndTime}]]>
         </if>
+        order by create_time desc
     </select>
 </mapper>
