@@ -38,7 +38,7 @@
         <if test="orderStatus != null">
             and order_status = #{orderStatus}
         </if>
-        <if test="customerId != 0">
+        <if test="customerId != null and customerId != 0">
             and customer_id = #{customerId}
         </if>
         <if test="goodsType != null">
