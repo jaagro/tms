@@ -132,6 +132,7 @@ public class WaybillServiceImpl implements WaybillService {
                     }
                     waybillGoods.setJoinDrug(createWaybillGoodsDto.getJoinDrug());
                     waybillGoods.setModifyUserId(userId);
+                    waybillGoods.setWaybillId(waybillId);
                     waybillGoodsMapper.insertSelective(waybillGoods);
                     //插入order_goods_margin
                     OrderGoodsMargin orderGoodsMargin = new OrderGoodsMargin();
@@ -142,7 +143,6 @@ public class WaybillServiceImpl implements WaybillService {
                     orderGoodsMarginMapper.insertSelective(orderGoodsMargin);
                 }
             }
-
         }
         return ServiceResult.toResult("运单创建成功");
     }

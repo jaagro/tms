@@ -127,7 +127,7 @@ public class WaybillController {
 
     @ApiOperation("运单派给车辆")
     @PostMapping("/assignWaybillToTruck/{waybillId}/{truckId}")
-    public BaseResponse assignWaybillToTruck(@PathVariable Integer waybillId, Integer truckId) {
+    public BaseResponse assignWaybillToTruck(@PathVariable Integer waybillId, @PathVariable Integer truckId) {
         try {
             return BaseResponse.service(waybillService.assignWaybillToTruck(waybillId, truckId));
         } catch (Exception e) {
