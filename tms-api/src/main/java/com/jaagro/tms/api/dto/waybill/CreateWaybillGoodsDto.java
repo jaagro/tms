@@ -17,6 +17,12 @@ public class CreateWaybillGoodsDto implements Serializable {
      *
      */
     private Integer waybillItemId;
+
+    /**
+     * 运单id
+     */
+    private Integer waybillId;
+
     /**
      *货物id
      */

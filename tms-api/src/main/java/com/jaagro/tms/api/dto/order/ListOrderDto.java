@@ -73,4 +73,19 @@ public class ListOrderDto implements Serializable {
      */
     private ShowUserDto createdUserId;
 
+    /**
+     * 计划派单
+     */
+    private Integer waybillCount;
+
+    /**
+     * 已派单
+     */
+    private Integer waybillAlready;
+
+    /**
+     * 待派单
+     */
+    private Integer waybillWait;
+
 }

@@ -26,34 +26,35 @@
 
         <!--   -->
         <javaTypeResolver type="com.jaagro.tms.biz.config.generator.MyJavaTypeResolverDefaultImpl">
-            <property name="forceBigDecimals" value="false" />
+            <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
 
         <!-- 生成的java bean包路径
         targetProject：目标工程
         -->
-        <javaModelGenerator targetPackage="com.jaagro.tms.biz.entity" targetProject="src/main/java">
-            <property name="enableSubPackages" value="true" />
-            <property name="trimStrings" value="true" />
+        <javaModelGenerator targetPackage="com.jaagro.tms.biz.entity"
+                            targetProject="E:\git\jaagro-platform-tms\tms-biz\src\main\java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
             <property name="" value=""/>
         </javaModelGenerator>
 
         <!-- 生成 mapper.xml文件路径 -->
-        <sqlMapGenerator targetPackage="mapper"  targetProject="src/main/resources">
-            <property name="enableSubPackages" value="true" />
+        <sqlMapGenerator targetPackage="mapper" targetProject="E:\git\jaagro-platform-tms\tms-biz\src\main\resources">
+            <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
 
         <!-- 生成 dao 接口的包路径 -->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="com.jaagro.tms.biz.mapper"  targetProject="src/main/java">
-            <property name="enableSubPackages" value="true" />
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.jaagro.tms.biz.mapper"
+                             targetProject="E:\git\jaagro-platform-tms\tms-biz\src\main\java">
+            <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
         <!--<table tableName="%" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
-        <table tableName="message" domainObjectName="Message" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
-        <!--<table tableName="waybill_items_temp" domainObjectName="WaybillItemsTemp" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
-        <!--<table tableName="waybill_goods_temp" domainObjectName="WaybillGoodsTemp" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
-        <!--<table tableName="waybill_product" domainObjectName="WaybillProduct" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
-        <!--<table tableName="waybill_status" domainObjectName="WaybillStatus" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
-        <!--<table tableName="waybill_validating_status" domainObjectName="WaybillValidatingStatus" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
-        <!--<table tableName="waybill_log" domainObjectName="WaybillLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
+        <table tableName="order_goods" domainObjectName="OrderGoods" enableCountByExample="false"
+               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"></table>
+        <table tableName="waybill_goods" domainObjectName="WaybillGoods" enableCountByExample="false"
+               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"></table>
     </context>
 </generatorConfiguration>

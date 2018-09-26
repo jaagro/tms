@@ -26,6 +26,11 @@ public class GetOrderGoodsDto implements Serializable {
     private Integer orderItemId;
 
     /**
+     * 订单id
+     */
+    private Integer orderId;
+
+    /**
      * 货物名称
      */
     private String goodsName;

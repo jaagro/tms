@@ -3,7 +3,6 @@ package com.jaagro.tms.biz.service.impl;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
-import com.jaagro.tms.api.dto.driverapp.GetWaybillGoodsAppDto;
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillPlanService;
@@ -63,7 +62,8 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             for (CreateWaybillGoodsPlanDto waybillGoodsDto : goods) {
                 MiddleObjectVo middleObject = new MiddleObjectVo();
                 middleObject.setOrderId(orderId);
-                middleObject.setOrderItemId(orderItemId);
+                //middleObject.setOrderItemId(orderItemId);
+                middleObject.setOrderItemId(waybillGoodsDto.getOrderItemId());
                 middleObject.setOrderGoodsId(waybillGoodsDto.getGoodsId());
                 middleObject.setProportioning(waybillGoodsDto.getProportioning());
                 middleObjects.add(middleObject);
@@ -251,6 +251,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     .setGoodsName(orderGoods.getGoodsName())
                     .setGoodsQuantity(orderGoods.getGoodsQuantity())
                     .setGoodsUnit(orderGoods.getGoodsUnit())
+                    .setGoodsType(ordersData.getGoodsType())
                     .setJoinDrug(orderGoods.getJoinDrug());
             if (goodsUnit == 3) {
                 waybillGoodsDto.setGoodsWeight(new BigDecimal(obj.getPlanAmount()));

@@ -19,6 +19,7 @@
     <properties>
         <api.version>0.0.1-RELEASE</api.version>
         <biz.version>0.0.1-RELEASE</biz.version>
+        <docker.image.prefix>hello</docker.image.prefix> <!--镜像前缀，随便取-->
     </properties>
 
     <modules>
@@ -26,5 +27,4 @@
         <module>tms-biz</module>
         <module>tms-web</module>
     </modules>
-
 </project>

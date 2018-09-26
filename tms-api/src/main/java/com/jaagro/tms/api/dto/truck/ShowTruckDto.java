@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.dto.truck;
 
+import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowTruckTypeDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -27,7 +28,7 @@ public class ShowTruckDto implements Serializable {
     /**
      * 关联车辆类型ID
      */
-    private ShowTruckTypeDto truckType;
+    private ListTruckTypeDto truckTypeId;
 
     /**
      * 省
