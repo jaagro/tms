@@ -418,7 +418,8 @@ public class WaybillServiceImpl implements WaybillService {
                 .setDevice(dto.getDevice())
                 .setTrackingInfo(dto.getTrackingInfo())
                 .setLatitude(dto.getLatitude())
-                .setLatitude(dto.getLongitude());
+                .setLatitude(dto.getLongitude())
+                .setCreateTime(new Date());
         //司机出发
         if (WaybillStatus.DEPART.equals(dto.getWaybillStatus())) {
             waybillTracking
@@ -492,7 +493,6 @@ public class WaybillServiceImpl implements WaybillService {
         }
         //客户签收
         if (WaybillStatus.SIGN.equals(dto.getWaybillStatus())) {
-            boolean isSignAll = false;
             //查询出卸货地未签收的
             WaybillItems waybillItemsCondtion = new WaybillItems();
             waybillItemsCondtion
@@ -501,15 +501,22 @@ public class WaybillServiceImpl implements WaybillService {
             List<Map<String, Long>> unSignUnloadSite = waybillItemsMapper.listWaybillIdIdAndSignStatus(waybillItemsCondtion);
             if (!CollectionUtils.isEmpty(unSignUnloadSite)) {
                 waybillTracking
-                        .setNewStatus(WaybillStatus.SIGN)
-                        .setOldStatus(WaybillStatus.DELIVERY);
+                        .setNewStatus(WaybillStatus.ACCOMPLISH)
+                        .setOldStatus(WaybillStatus.SIGN);
                 waybillTrackingMapper.insert(waybillTracking);
+                //如果只有一个卸货地未签,则不更新该状态
+                if (unSignUnloadSite.size() != 1) {
+                    waybillTracking
+                            .setNewStatus(WaybillStatus.DELIVERY)
+                            .setOldStatus(WaybillStatus.DELIVERY);
+                    waybillTrackingMapper.insert(waybillTracking);
+                }
                 //更新卸货物信息
                 List<ConfirmProductDto> unLoadSiteConfirmProductDtos = dto.getConfirmProductDtos();
                 for (ConfirmProductDto unLoadSiteconfirmProductDto : unLoadSiteConfirmProductDtos) {
                     WaybillGoods waybillGoods = new WaybillGoods();
                     waybillGoods.setId(unLoadSiteconfirmProductDto.getWaybillGoodId());
-                    //单位 羽 头 更新数量
+                    //单位 头 更新数量
                     if (unLoadSiteconfirmProductDto.getGoodsUnit() == 2) {
                         waybillGoods.setUnloadQuantity(unLoadSiteconfirmProductDto.getUnloadQuantity());
                     } else {
@@ -537,15 +544,10 @@ public class WaybillServiceImpl implements WaybillService {
                         .setSignStatus(SignStatusConstant.SIGN)
                         .setId(unLoadSiteConfirmProductDtos.get(0).getWaybillItemId());
                 waybillItemsMapper.updateByPrimaryKeySelective(waybillItems);
-                return ServiceResult.toResult(isSignAll);
             }
             //如果运单全部签收 更改订单状态 运单状态
-            if (CollectionUtils.isEmpty(unSignUnloadSite)) {
-                //更新运单明细
-                waybillTracking
-                        .setNewStatus(WaybillStatus.ACCOMPLISH)
-                        .setOldStatus(WaybillStatus.SIGN);
-                waybillTrackingMapper.insert(waybillTracking);
+            if (unSignUnloadSite.size() == 1) {
+
                 //更改运单状态
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
                 waybillMapper.updateByPrimaryKeySelective(waybill);
@@ -555,7 +557,7 @@ public class WaybillServiceImpl implements WaybillService {
                         .setId(orders.getId())
                         .setOrderStatus(OrderStatus.ACCOMPLISH);
                 ordersMapper.updateByPrimaryKeySelective(orderUpdate);
-                return ServiceResult.toResult(isSignAll);
+                return ServiceResult.toResult(SignStatusConstant.SIGN_ALL);
             }
             return ServiceResult.toResult("操作成功");
         }
