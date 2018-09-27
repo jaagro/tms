@@ -80,7 +80,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @param waybillDtoList
      * @return
      * @Author gavin
-     *
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -243,7 +242,6 @@ public class WaybillServiceImpl implements WaybillService {
             getTrackingDto.setImageList(imageList);
         }
 
-
         GetWaybillDto getWaybillDto = new GetWaybillDto();
         getWaybillDto.setTracking(getTrackingDtos);
         BeanUtils.copyProperties(waybill, getWaybillDto);
@@ -353,7 +351,9 @@ public class WaybillServiceImpl implements WaybillService {
             waybillDetailsAppDto.setCustomer(showCustomerDto);
         }
         //是否需要纸质回单
-        waybillDetailsAppDto.setPaperReceipt(orders.getPaperReceipt());
+        if (orders.getPaperReceipt() != null) {
+            waybillDetailsAppDto.setPaperReceipt(orders.getPaperReceipt());
+        }
         //装货信息
         if (null != orders) {
             ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
@@ -623,6 +623,7 @@ public class WaybillServiceImpl implements WaybillService {
 
     /**
      * 个人中心
+     *
      * @return
      * @Author @Gao.
      */
@@ -788,14 +789,14 @@ public class WaybillServiceImpl implements WaybillService {
     public Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         ShowMessageDto showMessageDto = new ShowMessageDto();
-        List<MessageDto> messageDtoList=new ArrayList<>();
+        List<MessageDto> messageDtoList = new ArrayList<>();
         MessageDto messageDto = new MessageDto();
         UserInfo currentUser = currentUserService.getCurrentUser();
         Message message = new Message();
         message.setToUserId(currentUser.getId());
         List<Message> messages = messageMapper.listMessageByCondtion(message);
         for (Message msg : messages) {
-            BeanUtils.copyProperties(msg,messageDto);
+            BeanUtils.copyProperties(msg, messageDto);
             messageDtoList.add(messageDto);
         }
         showMessageDto.setMessageDtoList(messageDtoList);
@@ -909,6 +910,19 @@ public class WaybillServiceImpl implements WaybillService {
 
         //4.掉用Jpush接口给司机推送消息
         List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
+<<<<<<< .merge_file_a19184
+=======
+        for (int i = 0; i < drivers.size(); i++) {
+            DriverReturnDto driver = drivers.get(i);
+            Map<String, Object> templateMap = new HashMap<>();
+            templateMap.put("drvierName", driver.getName());
+//            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(),"smsTemplate_assignWaybill",templateMap);
+//            log.trace("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
+//            System.out.println("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
+        }
+
+        //6.掉用Jpush接口给司机推送消息
+>>>>>>> .merge_file_a11608
         orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         //装货地
         ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
@@ -932,6 +946,7 @@ public class WaybillServiceImpl implements WaybillService {
             msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1) + "的运单。";
             regId = driver.getRegistrationId();
             JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
+<<<<<<< .merge_file_a19184
         }
 
         //5.在app消息表插入一条司机记录
@@ -954,6 +969,8 @@ public class WaybillServiceImpl implements WaybillService {
             appMessage.setFromUserId(userId);
             appMessage.setToUserId(driver.getId());
             messageMapper.insertSelective(appMessage);
+=======
+>>>>>>> .merge_file_a11608
         }
         return ServiceResult.toResult("派单成功");
     }
