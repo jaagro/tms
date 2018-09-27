@@ -33,7 +33,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 /**
  * @author tony
@@ -80,6 +80,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @param waybillDtoList
      * @return
      * @Author gavin
+     *
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -143,6 +144,7 @@ public class WaybillServiceImpl implements WaybillService {
                     orderGoodsMarginMapper.insertSelective(orderGoodsMargin);
                 }
             }
+
         }
         return ServiceResult.toResult("运单创建成功");
     }
@@ -623,7 +625,6 @@ public class WaybillServiceImpl implements WaybillService {
 
     /**
      * 个人中心
-     *
      * @return
      * @Author @Gao.
      */
@@ -867,7 +868,6 @@ public class WaybillServiceImpl implements WaybillService {
     /**
      * 派单
      * Author: gavin
-     *
      * @param waybillId
      * @param truckId
      * @return
