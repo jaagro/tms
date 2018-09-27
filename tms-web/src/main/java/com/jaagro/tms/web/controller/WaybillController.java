@@ -63,7 +63,7 @@ public class WaybillController {
             }
         }
         try {
-            List<ListWaybillPlanDto> result = waybillPlanService.createWaybillPlan(waybillDto);
+            Map<String,Object> result = waybillPlanService.createWaybillPlan(waybillDto);
             return BaseResponse.successInstance(result);
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,7 +105,6 @@ public class WaybillController {
         }
         return BaseResponse.successInstance(result);
     }
-
 
     /**
      * 创建运单

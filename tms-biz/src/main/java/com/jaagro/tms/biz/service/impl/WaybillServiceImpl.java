@@ -13,6 +13,7 @@ import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.truck.DriverReturnDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
+import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
@@ -20,6 +21,7 @@ import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
+import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.slf4j.Logger;
@@ -33,6 +35,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -72,8 +75,8 @@ public class WaybillServiceImpl implements WaybillService {
     private MessageMapperExt messageMapper;
     @Autowired
     private UserClientService userClientService;
-//    @Autowired
-//    private SmsClientService smsClientService;
+    @Autowired
+    private SmsClientService smsClientService;
 
 
     /**
@@ -220,11 +223,31 @@ public class WaybillServiceImpl implements WaybillService {
                     .setGoods(getWaybillGoodsDtoList);
             getWaybillItemsDtoList.add(getWaybillItemsDto);
         }
-        //搞懂waybillTracking
 
-
+        //根据waybillId获取WaybillTracking 和 WaybillTrackingImages
+        List<GetTrackingDto> getTrackingDtos = new ArrayList<>();
+        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybill.getId());
+        for (ShowTrackingDto showTrackingDto : showTrackingDtos) {
+            GetTrackingDto getTrackingDto = new GetTrackingDto();
+            BeanUtils.copyProperties(showTrackingDto, getTrackingDto);
+            getTrackingDtos.add(getTrackingDto);
+        }
+        WaybillTrackingImages record = new WaybillTrackingImages();
+        record.setWaybillId(waybill.getId());
+        List<GetWaybillTrackingImagesDto> getWaybillTrackingImagesDtos = waybillTrackingImagesMapper.listWaybillTrackingImage(record);
+        List<GetTrackingImagesDto> getTrackingImagesDtos = new ArrayList<>();
+        for (GetWaybillTrackingImagesDto getWaybillTrackingImagesDto : getWaybillTrackingImagesDtos) {
+            GetTrackingImagesDto getTrackingImagesDto = new GetTrackingImagesDto();
+            BeanUtils.copyProperties(getWaybillTrackingImagesDto, getTrackingImagesDto);
+            getTrackingImagesDtos.add(getTrackingImagesDto);
+        }
+        for (GetTrackingDto getTrackingDto : getTrackingDtos) {
+            List<GetTrackingImagesDto> imageList = getTrackingImagesDtos.stream().filter(c -> c.getWaybillTrackingId().equals(getTrackingDto.getId())).collect(Collectors.toList());
+            getTrackingDto.setImageList(imageList);
+        }
 
         GetWaybillDto getWaybillDto = new GetWaybillDto();
+        getWaybillDto.setTracking(getTrackingDtos);
         BeanUtils.copyProperties(waybill, getWaybillDto);
         getWaybillDto
                 .setLoadSite(loadSiteDto)
@@ -960,5 +983,10 @@ public class WaybillServiceImpl implements WaybillService {
         } else {
             return userInfo.getId();
         }
+    }
+
+    public static void main(String[] args) {
+
+
     }
 }
