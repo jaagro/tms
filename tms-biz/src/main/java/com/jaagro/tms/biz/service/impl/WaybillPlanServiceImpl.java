@@ -145,7 +145,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     .setOrderGoodsId(wg.getOrderGoodsId());
             int count = orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
             if (count == 0) {
-                log.debug(orderGoodsMargin + " :未被更新");
+                log.debug(orderGoodsMargin + " :余量未被更新");
                 continue;
             }
             orderGoodsMarginList.add(orderGoodsMargin);
