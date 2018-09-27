@@ -27,8 +27,4 @@ public class TruckDto {
      * 里程数：单位公里
      */
     private int kilometres;
-    /**
-     * 抓鸡时间
-     */
-    private Integer catchTime;
 }

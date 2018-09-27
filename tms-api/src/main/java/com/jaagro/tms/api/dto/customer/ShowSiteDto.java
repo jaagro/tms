@@ -95,4 +95,8 @@ public class ShowSiteDto implements Serializable {
      * 卸货信息 要求送货时间
      */
     private Date requiredTime;
+    /**
+     * 货物类型:毛鸡、饲料、母猪、公猪、仔猪、生猪
+     */
+    private int productType;
 }
