@@ -910,8 +910,6 @@ public class WaybillServiceImpl implements WaybillService {
 
         //4.掉用Jpush接口给司机推送消息
         List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
-<<<<<<< .merge_file_a19184
-=======
         for (int i = 0; i < drivers.size(); i++) {
             DriverReturnDto driver = drivers.get(i);
             Map<String, Object> templateMap = new HashMap<>();
@@ -922,7 +920,6 @@ public class WaybillServiceImpl implements WaybillService {
         }
 
         //6.掉用Jpush接口给司机推送消息
->>>>>>> .merge_file_a11608
         orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         //装货地
         ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
@@ -946,7 +943,6 @@ public class WaybillServiceImpl implements WaybillService {
             msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1) + "的运单。";
             regId = driver.getRegistrationId();
             JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
-<<<<<<< .merge_file_a19184
         }
 
         //5.在app消息表插入一条司机记录
@@ -969,8 +965,6 @@ public class WaybillServiceImpl implements WaybillService {
             appMessage.setFromUserId(userId);
             appMessage.setToUserId(driver.getId());
             messageMapper.insertSelective(appMessage);
-=======
->>>>>>> .merge_file_a11608
         }
         return ServiceResult.toResult("派单成功");
     }
