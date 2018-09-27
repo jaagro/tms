@@ -91,7 +91,7 @@
         <if test="id != null">
             and id = #{id,jdbcType=INTEGER}
         </if>
-        <if test="id != null">
+        <if test="truckId != null">
             and truck_Id = #{truckId,jdbcType=INTEGER}
         </if>
     </select>
