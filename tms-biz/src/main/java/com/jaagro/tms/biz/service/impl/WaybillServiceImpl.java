@@ -80,7 +80,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @param waybillDtoList
      * @return
      * @Author gavin
-     *
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -224,7 +223,6 @@ public class WaybillServiceImpl implements WaybillService {
         //搞懂waybillTracking
 
 
-
         GetWaybillDto getWaybillDto = new GetWaybillDto();
         BeanUtils.copyProperties(waybill, getWaybillDto);
         getWaybillDto
@@ -333,7 +331,9 @@ public class WaybillServiceImpl implements WaybillService {
             waybillDetailsAppDto.setCustomer(showCustomerDto);
         }
         //是否需要纸质回单
-        waybillDetailsAppDto.setPaperReceipt(orders.getPaperReceipt());
+        if (orders.getPaperReceipt() != null) {
+            waybillDetailsAppDto.setPaperReceipt(orders.getPaperReceipt());
+        }
         //装货信息
         if (null != orders) {
             ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
@@ -603,6 +603,7 @@ public class WaybillServiceImpl implements WaybillService {
 
     /**
      * 个人中心
+     *
      * @return
      * @Author @Gao.
      */
@@ -768,14 +769,14 @@ public class WaybillServiceImpl implements WaybillService {
     public Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         ShowMessageDto showMessageDto = new ShowMessageDto();
-        List<MessageDto> messageDtoList=new ArrayList<>();
+        List<MessageDto> messageDtoList = new ArrayList<>();
         MessageDto messageDto = new MessageDto();
         UserInfo currentUser = currentUserService.getCurrentUser();
         Message message = new Message();
         message.setToUserId(currentUser.getId());
         List<Message> messages = messageMapper.listMessageByCondtion(message);
         for (Message msg : messages) {
-            BeanUtils.copyProperties(msg,messageDto);
+            BeanUtils.copyProperties(msg, messageDto);
             messageDtoList.add(messageDto);
         }
         showMessageDto.setMessageDtoList(messageDtoList);
@@ -846,6 +847,7 @@ public class WaybillServiceImpl implements WaybillService {
     /**
      * 派单
      * Author: gavin
+     *
      * @param waybillId
      * @param truckId
      * @return
@@ -900,10 +902,10 @@ public class WaybillServiceImpl implements WaybillService {
         messageMapper.insertSelective(appMessage);
         //5.发送短信给truckId对应的司机
         List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
-        for(int i = 0;i<drivers.size();i++){
+        for (int i = 0; i < drivers.size(); i++) {
             DriverReturnDto driver = drivers.get(i);
             Map<String, Object> templateMap = new HashMap<>();
-            templateMap.put("drvierName",driver.getName());
+            templateMap.put("drvierName", driver.getName());
 //            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(),"smsTemplate_assignWaybill",templateMap);
 //            log.trace("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
 //            System.out.println("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
@@ -914,7 +916,7 @@ public class WaybillServiceImpl implements WaybillService {
         //装货地
         ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
         String loadSiteName = loadSite.getSiteName();
-        List<WaybillItems>  waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
+        List<WaybillItems> waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
         StringBuffer unLoadSiteNames = new StringBuffer();
         for (WaybillItems waybillItem : waybillItems) {
             //卸货地
@@ -926,13 +928,13 @@ public class WaybillServiceImpl implements WaybillService {
         String msgContent;
         String regId;
         for (DriverReturnDto driver : drivers) {
-            Map<String,String> extraParam = new HashMap<>();
+            Map<String, String> extraParam = new HashMap<>();
             extraParam.put("driverId", driver.getId().toString());
             extraParam.put("waybillId", waybillId.toString());
             //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
-            msgContent = "您有新的运单信息待接单，从"+loadSiteName+"到"+unLoadSiteNames.substring(0,unLoadSiteNames.length()-1)+"的运单。";
+            msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1) + "的运单。";
             regId = driver.getRegistrationId();
-            JpushClientUtil.sendPush(alias,msgTitle,msgContent,regId,extraParam);
+            JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
         }
         return ServiceResult.toResult("派单成功");
     }
@@ -949,7 +951,7 @@ public class WaybillServiceImpl implements WaybillService {
         List<ListWaybillDto> listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-                    ) {
+            ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
