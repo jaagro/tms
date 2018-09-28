@@ -102,6 +102,7 @@ public class WaybillServiceImpl implements WaybillService {
             Waybill waybill = new Waybill();
             waybill.setOrderId(orderId);
             waybill.setLoadSiteId(createWaybillDto.getLoadSiteId());
+            waybill.setLoadTime(createWaybillDto.getLoadTime());
             waybill.setNeedTruckType(createWaybillDto.getNeedTruckTypeId());
             waybill.setTruckTeamContractId(createWaybillDto.getTruckTeamContractId());
             waybill.setWaybillStatus(WaybillStatus.SEND_TRUCK);
