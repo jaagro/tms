@@ -140,8 +140,11 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         if (null == waybillData) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id无效");
         }
-        if (!waybillData.getWaybillStatus().equals(WaybillStatus.RECEIVE)) {
-            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "只有【待接单】的运单才可以撤销");
+        boolean flag = waybillData.getWaybillStatus().equals(WaybillStatus.RECEIVE) ||
+                waybillData.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK) ||
+                waybillData.getWaybillStatus().equals(WaybillStatus.REJECT);
+        if (!flag) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "只有【待派单/待接单/已拒绝】的运单才可以撤销");
         }
         if (!waybillData.getEnabled()) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id已是注销状态");
