@@ -23,9 +23,9 @@
 
     <select id="listGoodsByWaybillId" resultType="com.jaagro.tms.api.dto.waybill.GetWaybillGoodsDto" parameterType="java.lang.Integer">
     select
-    wg.*
-    from waybill w inner join waybill_items wi on w.id = wi.waybill_id inner join waybill_goods wg on wi.id = wg.waybill_item_id
-    where w.id = #{waybillId}
+    <include refid="Base_Column_List"/>
+    from waybill_goods
+    where waybill_id = #{waybillId}
   </select>
 
     <select id="listWaybillGoodsByWaybillItemId" resultMap="DetailInfo" parameterType="java.lang.Integer">
