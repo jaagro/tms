@@ -820,19 +820,11 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-        ShowMessageDto showMessageDto = new ShowMessageDto();
-        List<MessageDto> messageDtoList = new ArrayList<>();
-        MessageDto messageDto = new MessageDto();
         UserInfo currentUser = currentUserService.getCurrentUser();
         Message message = new Message();
         message.setToUserId(currentUser.getId());
         List<Message> messages = messageMapper.listMessageByCondtion(message);
-        for (Message msg : messages) {
-            BeanUtils.copyProperties(msg, messageDto);
-            messageDtoList.add(messageDto);
-        }
-        showMessageDto.setMessageDtoList(messageDtoList);
-        return ServiceResult.toResult(showMessageDto);
+        return ServiceResult.toResult(new PageInfo<>(messages));
     }
 
     /**
