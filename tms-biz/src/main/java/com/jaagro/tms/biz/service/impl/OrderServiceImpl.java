@@ -134,6 +134,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public GetOrderDto getOrderById(Integer id) {
         Orders order = this.ordersMapper.selectByPrimaryKey(id);
+        if(null == order){
+            throw new NullPointerException(id + " 订单不存在");
+        }
         GetOrderDto orderDto = new GetOrderDto();
         BeanUtils.copyProperties(order, orderDto);
         orderDto
