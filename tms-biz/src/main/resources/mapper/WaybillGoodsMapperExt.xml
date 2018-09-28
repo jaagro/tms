@@ -12,6 +12,7 @@
         <result column="unload_quantity" property="unloadQuantity" jdbcType="INTEGER"/>
         <result column="unload_weight" property="unloadWeight" jdbcType="DECIMAL"/>
     </resultMap>
+
     <select id="listWaybillGoodsByItemId" resultType="com.jaagro.tms.biz.entity.WaybillGoods"
             parameterType="java.lang.Integer">
         select
@@ -20,7 +21,7 @@
         where waybill_item_id = #{itemId,jdbcType=INTEGER}
     </select>
 
-    <select id="listGoodsByWaybillId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    <select id="listGoodsByWaybillId" resultType="com.jaagro.tms.api.dto.waybill.GetWaybillGoodsDto" parameterType="java.lang.Integer">
     select
     wg.*
     from waybill w inner join waybill_items wi on w.id = wi.waybill_id inner join waybill_goods wg on wi.id = wg.waybill_item_id
