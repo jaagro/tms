@@ -2,6 +2,7 @@ package com.jaagro.tms.biz.service.impl;
 
 import com.jaagro.tms.api.dto.order.CreateOrderGoodsDto;
 import com.jaagro.tms.api.dto.order.CreateOrderItemsDto;
+import com.jaagro.tms.api.dto.order.GetOrderGoodsDto;
 import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -112,7 +114,9 @@ public class OrderItemsServiceImpl implements OrderItemsService {
                 items
                         .setModifyUserId(this.currentUserService.getShowUser())
                         .setUnload(this.customerService.getShowSiteById(orderItems.getUnloadId()));
-
+                for (GetOrderGoodsDto goodsDto : items.getGoods()) {
+                    goodsDto.setMargin(new BigDecimal(0));
+                }
             }
         }
         return getOrderItemsDtoList;
