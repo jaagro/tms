@@ -34,7 +34,8 @@
     delete from waybill
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Waybill">
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Waybill"  useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
     insert into waybill (id, order_id, load_site_id, 
       truck_team_contract_id, waybill_status, need_truck_type, 
       truck_id, driver_id, send_time, 
@@ -48,7 +49,8 @@
       #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER}, #{enabled,jdbcType=BIT}, 
       #{loadTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Waybill">
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Waybill"  useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
     insert into waybill
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
