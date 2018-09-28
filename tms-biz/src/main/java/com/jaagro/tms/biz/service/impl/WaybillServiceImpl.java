@@ -365,7 +365,8 @@ public class WaybillServiceImpl implements WaybillService {
             ShowSiteAppDto loadSiteAppDto = new ShowSiteAppDto();
             BeanUtils.copyProperties(loadSite, loadSiteAppDto);
             //提货时间
-            Date loadTime = orders.getLoadTime();
+//            Date loadTime = orders.getLoadTime();
+            Date loadTime = waybillAppDtos.get(0).getLoadTime();
             loadSiteAppDto.setLoadTime(loadTime);
             //货物信息
             List<ShowGoodsDto> showGoodsDtos = new ArrayList<>();
@@ -736,7 +737,7 @@ public class WaybillServiceImpl implements WaybillService {
             Orders orders = ordersMapper.selectByPrimaryKey(waybillAppDto.getOrderId());
             if (null != orders) {
                 //要求提货时间
-                receiptListAppDto.setLoadTime(orders.getLoadTime());
+                receiptListAppDto.setLoadTime(waybillAppDto.getLoadTime());
                 //装货地
                 ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
                 receiptListAppDto.setLoadSite(loadSite);
