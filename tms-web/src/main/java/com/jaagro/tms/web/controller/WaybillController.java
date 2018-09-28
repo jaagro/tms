@@ -6,7 +6,6 @@ import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
-import com.sun.xml.internal.rngom.parse.host.Base;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,7 +105,6 @@ public class WaybillController {
         return BaseResponse.successInstance(result);
     }
 
-
     /**
      * 创建运单
      *
@@ -129,7 +127,7 @@ public class WaybillController {
 
     @ApiOperation("运单派给车辆")
     @PostMapping("/assignWaybillToTruck/{waybillId}/{truckId}")
-    public BaseResponse assignWaybillToTruck(@PathVariable Integer waybillId, Integer truckId) {
+    public BaseResponse assignWaybillToTruck(@PathVariable Integer waybillId, @PathVariable Integer truckId) {
         try {
             return BaseResponse.service(waybillService.assignWaybillToTruck(waybillId, truckId));
         } catch (Exception e) {
