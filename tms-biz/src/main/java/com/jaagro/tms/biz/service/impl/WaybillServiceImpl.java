@@ -32,6 +32,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.*;
 
 
@@ -72,6 +73,8 @@ public class WaybillServiceImpl implements WaybillService {
     private MessageMapperExt messageMapper;
     @Autowired
     private UserClientService userClientService;
+    @Autowired
+    private OssSignUrlClientService ossSignUrlClientService;
 //    @Autowired
 //    private SmsClientService smsClientService;
 
@@ -360,6 +363,12 @@ public class WaybillServiceImpl implements WaybillService {
             waybillTrackingImages.setWaybillId(waybillId);
             waybillTrackingImages.setSiteId(orders.getLoadSiteId());
             List<GetWaybillTrackingImagesDto> loadSiteWaybillTrackingImages = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
+            for (GetWaybillTrackingImagesDto loadSiteWaybillTrackingImage : loadSiteWaybillTrackingImages) {
+                //替换单据url地址
+               String[] strArray={loadSiteWaybillTrackingImage.getImageUrl()};
+                List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
+                loadSiteWaybillTrackingImage.setImageUrl(urls.get(0).toString());
+            }
             loadSiteAppDto.setWaybillTrackingImagesDtos(loadSiteWaybillTrackingImages);
             waybillDetailsAppDto.setLoadSite(loadSiteAppDto);
 
@@ -378,6 +387,12 @@ public class WaybillServiceImpl implements WaybillService {
             waybillTrackingImages.setWaybillId(waybillId);
             waybillTrackingImages.setSiteId(waybillItem.getUnloadSiteId());
             List<GetWaybillTrackingImagesDto> waybillTrackingImagesDtosList = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
+            for (GetWaybillTrackingImagesDto getWaybillTrackingImagesDto : waybillTrackingImagesDtosList) {
+                //替换单据地址
+                String[] strArray1={getWaybillTrackingImagesDto.getImageUrl()};
+                List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray1);
+                getWaybillTrackingImagesDto.setImageUrl(urls.get(0).toString());
+            }
             unloadSiteApp.setWaybillTrackingImagesDtos(waybillTrackingImagesDtosList);
             unloadSiteList.add(unloadSiteApp);
 
@@ -472,16 +487,22 @@ public class WaybillServiceImpl implements WaybillService {
             List<String> imagesUrls = dto.getImagesUrl();
             ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
             if (!CollectionUtils.isEmpty(imagesUrls)) {
-                for (String imagesUrl : imagesUrls) {
+                for (int i = 0; i < imagesUrls.size(); i++) {
                     WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
                     waybillTrackingImages
                             .setWaybillId(waybillId)
                             .setSiteId(loadSite.getId())
                             .setCreateTime(new Date())
                             .setCreateUserId(currentUser.getId())
-                            .setImageType(ImagesTypeConstant.LOAD_BILL)
-                            .setImageUrl(imagesUrl)
+                            .setImageUrl(imagesUrls.get(i))
                             .setWaybillTrackingId(truckByToken.getId());
+                    //出库单
+                    if (i == 0) {
+                        waybillTrackingImages.setImageType(ImagesTypeConstant.OUTBOUND_BILL);
+                    } else if (i == 1) {
+                        //磅单
+                        waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
+                    }
                     waybillTrackingImagesMapper.insert(waybillTrackingImages);
                 }
             }
@@ -533,17 +554,25 @@ public class WaybillServiceImpl implements WaybillService {
                 }
                 //批量插入卸货单
                 List<String> imagesUrls = dto.getImagesUrl();
-                for (String imagesUrl : imagesUrls) {
-                    WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
-                    waybillTrackingImages
-                            .setWaybillId(waybillId)
-                            .setSiteId(unLoadSiteConfirmProductDtos.get(0).getUnLoadSiteId())
-                            .setCreateTime(new Date())
-                            .setCreateUserId(currentUser.getId())
-                            .setImageType(ImagesTypeConstant.UNLOAD_BILL)
-                            .setImageUrl(imagesUrl)
-                            .setWaybillTrackingId(truckByToken.getId());
-                    waybillTrackingImagesMapper.insert(waybillTrackingImages);
+                if (!CollectionUtils.isEmpty(imagesUrls)) {
+                    for (int i = 0; i < imagesUrls.size(); i++) {
+                        WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
+                        waybillTrackingImages
+                                .setWaybillId(waybillId)
+                                .setSiteId(unLoadSiteConfirmProductDtos.get(0).getUnLoadSiteId())
+                                .setCreateTime(new Date())
+                                .setCreateUserId(currentUser.getId())
+                                .setImageUrl(imagesUrls.get(i))
+                                .setWaybillTrackingId(truckByToken.getId());
+                        //签收单
+                        if (i == 0) {
+                            waybillTrackingImages.setImageType(ImagesTypeConstant.SIGN_BILL);
+                        } else if (i == 1) {
+                            //磅单
+                            waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
+                        }
+                        waybillTrackingImagesMapper.insert(waybillTrackingImages);
+                    }
                 }
                 //更新该运单签收
                 WaybillItems waybillItems = new WaybillItems();
