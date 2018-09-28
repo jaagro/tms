@@ -81,7 +81,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @param waybillDtoList
      * @return
      * @Author gavin
-     *
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -145,7 +144,6 @@ public class WaybillServiceImpl implements WaybillService {
                     orderGoodsMarginMapper.insertSelective(orderGoodsMargin);
                 }
             }
-
         }
         return ServiceResult.toResult("运单创建成功");
     }
@@ -911,16 +909,6 @@ public class WaybillServiceImpl implements WaybillService {
 
         //4.掉用Jpush接口给司机推送消息
         List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
-        for (int i = 0; i < drivers.size(); i++) {
-            DriverReturnDto driver = drivers.get(i);
-            Map<String, Object> templateMap = new HashMap<>();
-            templateMap.put("drvierName", driver.getName());
-//            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(),"smsTemplate_assignWaybill",templateMap);
-//            log.trace("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
-//            System.out.println("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
-        }
-
-        //6.掉用Jpush接口给司机推送消息
         orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         //装货地
         ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
