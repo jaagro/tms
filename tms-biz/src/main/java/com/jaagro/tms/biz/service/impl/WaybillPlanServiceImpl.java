@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -136,6 +137,9 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
     public Map<String, Object> removeWaybillFromPlan(Integer waybillId) {
         //判断运单状态是否满足条件
         Waybill waybillData = waybillMapper.selectByPrimaryKey(waybillId);
+        if(null == waybillData){
+            throw new NullPointerException(waybillId + " 运单不存在");
+        }
         List<OrderGoodsMargin> orderGoodsMarginList = new LinkedList<>();
         if (null == waybillData) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id无效");
@@ -158,8 +162,14 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             }
             orderGoodsMargin
                     .setId(orderGoodsMarginData.getId())
-                    .setMargin(wg.getGoodsWeight())
                     .setOrderGoodsId(wg.getOrderGoodsId());
+            Orders orders = ordersMapper.selectByPrimaryKey(waybillData.getOrderId());
+            //饲料
+            if(orders.getGoodsType() == 2){
+                orderGoodsMargin.setMargin(wg.getGoodsWeight());
+            }else {
+                orderGoodsMargin.setMargin(new BigDecimal(wg.getGoodsQuantity()));
+            }
             int count = orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
             if (count == 0) {
                 log.debug(orderGoodsMargin + " :余量未被更新");
