@@ -164,10 +164,10 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             Orders orders = ordersMapper.selectByPrimaryKey(waybillData.getOrderId());
             //饲料
             if (orders.getGoodsType() == 2) {
-                BigDecimal m = orderGoodsMargin.getMargin().add(wg.getGoodsWeight());
+                BigDecimal m = orderGoodsMarginData.getMargin().add(wg.getGoodsWeight());
                 orderGoodsMargin.setMargin(m);
             } else {
-                BigDecimal m = orderGoodsMargin.getMargin().add(new BigDecimal(wg.getGoodsQuantity()));
+                BigDecimal m = orderGoodsMarginData.getMargin().add(new BigDecimal(wg.getGoodsQuantity()));
                 orderGoodsMargin.setMargin(m);
             }
             int count = orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
@@ -297,7 +297,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     .setGoodsUnit(orderGoods.getGoodsUnit())
                     .setGoodsType(ordersData.getGoodsType())
                     .setJoinDrug(orderGoods.getJoinDrug());
-            if (goodsUnit == 3) {
+            if (goodsUnit == 2) {
                 waybillGoodsDto.setGoodsWeight(new BigDecimal(obj.getPlanAmount()));
             } else {
                 waybillGoodsDto.setGoodsQuantity(obj.getPlanAmount());
