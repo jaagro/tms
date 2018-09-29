@@ -81,6 +81,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
+        System.out.println(waybillDtoList);
         Integer userId = getUserId();
         //更新orders表的状态OrderStatus.STOWAGE
         for (CreateWaybillDto createWaybillDto : waybillDtoList) {
