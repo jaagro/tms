@@ -137,9 +137,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
     public Map<String, Object> removeWaybillFromPlan(Integer waybillId) {
         //判断运单状态是否满足条件
         Waybill waybillData = waybillMapper.selectByPrimaryKey(waybillId);
-        if(null == waybillData){
-            throw new NullPointerException(waybillId + " 运单不存在");
-        }
+
         List<OrderGoodsMargin> orderGoodsMarginList = new LinkedList<>();
         if (null == waybillData) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id无效");
@@ -165,10 +163,12 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     .setOrderGoodsId(wg.getOrderGoodsId());
             Orders orders = ordersMapper.selectByPrimaryKey(waybillData.getOrderId());
             //饲料
-            if(orders.getGoodsType() == 2){
-                orderGoodsMargin.setMargin(wg.getGoodsWeight());
-            }else {
-                orderGoodsMargin.setMargin(new BigDecimal(wg.getGoodsQuantity()));
+            if (orders.getGoodsType() == 2) {
+                BigDecimal m = orderGoodsMargin.getMargin().add(wg.getGoodsWeight());
+                orderGoodsMargin.setMargin(m);
+            } else {
+                BigDecimal m = orderGoodsMargin.getMargin().add(new BigDecimal(wg.getGoodsQuantity()));
+                orderGoodsMargin.setMargin(m);
             }
             int count = orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
             if (count == 0) {
