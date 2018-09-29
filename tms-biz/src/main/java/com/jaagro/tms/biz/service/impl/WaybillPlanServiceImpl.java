@@ -1,5 +1,6 @@
 package com.jaagro.tms.biz.service.impl;
 
+import com.jaagro.tms.api.constant.GoodsType;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
@@ -13,10 +14,12 @@ import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.tms.biz.vo.MiddleObjectVo;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -49,6 +52,8 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
     private OrderGoodsMarginMapperExt orderGoodsMarginMapper;
     @Autowired
     private WaybillGoodsMapperExt waybillGoodsMapper;
+    @Autowired
+    private CatchChickenTimeMapperExt catchChickenTimeMapperExt;
 
     @Override
     public List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto) {
@@ -66,6 +71,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                 middleObject.setOrderItemId(waybillGoodsDto.getOrderItemId());
                 middleObject.setOrderGoodsId(waybillGoodsDto.getGoodsId());
                 middleObject.setProportioning(waybillGoodsDto.getProportioning());
+                middleObject.setUnPlanAmount(0);
                 middleObjects.add(middleObject);
             }
         }
@@ -79,18 +85,44 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                 throw new RuntimeException("计算配运单失败");
             }
         }
-        return waybillDtos;
-    }
 
-    /**
-     * 根据orderId获取订单计划
-     *
-     * @param orderId
-     * @return
-     */
-    @Override
-    public Map<String, Object> getWaybillPlanByOrderId(Integer orderId) {
-        return null;
+        //更新运单货物是生鸡时的装货时间和卸货时间
+        int goodType = waybillDtos.get(0).getGoodType();
+        if (GoodsType.CHICKEN.equals(goodType)) {
+            ShowSiteDto loadSite = customerClientService.getShowSiteById(waybillDtos.get(0).getLoadSiteId());
+            if (GoodsType.CHICKEN.equals(loadSite.getProductType())) {
+                for (int i = 0; i < waybillDtos.size(); i++) {
+                    ListWaybillPlanDto dto = waybillDtos.get(i);
+                    ShowSiteDto unloadSite = dto.getWaybillItems().get(0).getShowSiteDto();
+                    TruckDto truck = truckDtos.stream().filter(c -> c.getTruckId().equals(dto.getNeedTruckTypeId())).findAny().get();
+                    Date killTime = unloadSite.getKillTime();
+                    int waitKillTime = 0;
+                    if (truck.getKilometres() > 80) {
+                        waitKillTime = 30;
+                    } else if (truck.getKilometres() > 30) {
+                        waitKillTime = 25;
+                    } else {
+                        waitKillTime = 20;
+                    }
+                    int times = (truck.getCapacity() * 480 / unloadSite.getKillChain()) * i;
+                    Date paramDate = DateUtils.addMinutes(killTime, times);
+                    //计算并重设卸货时间
+                    Date unloadTime = DateUtils.addMinutes(paramDate, -waitKillTime);
+                    dto.getWaybillItems().get(0).setRequiredTime(unloadTime);
+
+                    //计算并重设装货时间
+                    CatchChickenTime catchChickenTime = new CatchChickenTime();
+                    catchChickenTime.setFarmsType(loadSite.getFarmsType());
+                    catchChickenTime.setTruckTypeId(truck.getTruckId());
+                    List<CatchChickenTime> catchChickenTimes = catchChickenTimeMapperExt.listCatchChickenTimeByCriteria(catchChickenTime);
+                    int catchTime = catchChickenTimes.get(0).getCatchTime();
+                    Date loadTime = DateUtils.addMinutes(DateUtils.addMinutes(unloadTime, -truck.getTravelTime()), -loadSite.getOperationTime());
+                    loadTime = DateUtils.addMinutes(DateUtils.addMinutes(loadTime, -catchTime), -20);
+                    dto.setLoadTime(loadTime);
+                }
+            }
+        }
+        return waybillDtos;
     }
 
     /**
@@ -105,12 +137,16 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
     public Map<String, Object> removeWaybillFromPlan(Integer waybillId) {
         //判断运单状态是否满足条件
         Waybill waybillData = waybillMapper.selectByPrimaryKey(waybillId);
+
         List<OrderGoodsMargin> orderGoodsMarginList = new LinkedList<>();
         if (null == waybillData) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id无效");
         }
-        if (!waybillData.getWaybillStatus().equals(WaybillStatus.RECEIVE)) {
-            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "只有【待接单】的运单才可以撤销");
+        boolean flag = waybillData.getWaybillStatus().equals(WaybillStatus.RECEIVE) ||
+                waybillData.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK) ||
+                waybillData.getWaybillStatus().equals(WaybillStatus.REJECT);
+        if (!flag) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "只有【待派单/待接单/已拒绝】的运单才可以撤销");
         }
         if (!waybillData.getEnabled()) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id已是注销状态");
@@ -124,11 +160,19 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             }
             orderGoodsMargin
                     .setId(orderGoodsMarginData.getId())
-                    .setMargin(wg.getGoodsWeight())
                     .setOrderGoodsId(wg.getOrderGoodsId());
+            Orders orders = ordersMapper.selectByPrimaryKey(waybillData.getOrderId());
+            //饲料
+            if (orders.getGoodsType() == 2) {
+                BigDecimal m = orderGoodsMargin.getMargin().add(wg.getGoodsWeight());
+                orderGoodsMargin.setMargin(m);
+            } else {
+                BigDecimal m = orderGoodsMargin.getMargin().add(new BigDecimal(wg.getGoodsQuantity()));
+                orderGoodsMargin.setMargin(m);
+            }
             int count = orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
             if (count == 0) {
-                log.debug(orderGoodsMargin + " :未被更新");
+                log.debug(orderGoodsMargin + " :余量未被更新");
                 continue;
             }
             orderGoodsMarginList.add(orderGoodsMargin);
@@ -253,7 +297,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     .setGoodsUnit(orderGoods.getGoodsUnit())
                     .setGoodsType(ordersData.getGoodsType())
                     .setJoinDrug(orderGoods.getJoinDrug());
-            if (goodsUnit == 3) {
+            if (goodsUnit == 2) {
                 waybillGoodsDto.setGoodsWeight(new BigDecimal(obj.getPlanAmount()));
             } else {
                 waybillGoodsDto.setGoodsQuantity(obj.getPlanAmount());
@@ -265,5 +309,4 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         waybillPlanDto.setWaybillItems(itemsList);
         return waybillPlanDto;
     }
-
 }

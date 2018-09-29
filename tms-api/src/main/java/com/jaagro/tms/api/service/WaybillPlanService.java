@@ -19,13 +19,7 @@ public interface WaybillPlanService {
     List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto);
 
 
-    /**
-     * 根据orderId获取订单计划
-     *
-     * @param orderId
-     * @return
-     */
-    Map<String, Object> getWaybillPlanByOrderId(Integer orderId);
+
 
     /**
      * 从配载计划中移除运单【逻辑删除】
