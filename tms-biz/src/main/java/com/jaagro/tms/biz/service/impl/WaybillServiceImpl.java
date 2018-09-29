@@ -73,10 +73,6 @@ public class WaybillServiceImpl implements WaybillService {
     private MessageMapperExt messageMapper;
     @Autowired
     private UserClientService userClientService;
-//    @Autowired
-//    private SmsClientService smsClientService;
-
-
     /**
      * @param waybillDtoList
      * @return
@@ -126,7 +122,7 @@ public class WaybillServiceImpl implements WaybillService {
                     waybillGoods.setOrderGoodsId(createWaybillGoodsDto.getOrderGoodsId());
                     waybillGoods.setGoodsName(createWaybillGoodsDto.getGoodsName());
                     waybillGoods.setGoodsUnit(createWaybillGoodsDto.getGoodsUnit());
-                    if (createWaybillGoodsDto.getGoodsUnit() == 3) {
+                    if (createWaybillGoodsDto.getGoodsUnit() == 2) {
                         waybillGoods.setGoodsWeight(createWaybillGoodsDto.getGoodsWeight());
                     } else {
                         waybillGoods.setGoodsQuantity(createWaybillGoodsDto.getGoodsQuantity());
