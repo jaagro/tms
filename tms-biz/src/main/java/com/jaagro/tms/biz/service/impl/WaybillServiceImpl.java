@@ -73,10 +73,6 @@ public class WaybillServiceImpl implements WaybillService {
     private MessageMapperExt messageMapper;
     @Autowired
     private UserClientService userClientService;
-//    @Autowired
-//    private SmsClientService smsClientService;
-
-
     /**
      * @param waybillDtoList
      * @return
