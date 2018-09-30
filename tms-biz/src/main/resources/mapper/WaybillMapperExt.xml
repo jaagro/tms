@@ -16,6 +16,7 @@
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
         <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
         <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
+        <result column="load_time" jdbcType="TIMESTAMP" property="loadTime" />
         <collection property="waybillItems" column="id"
                     select="com.jaagro.tms.biz.mapper.WaybillItemsMapperExt.listByWaybillId"></collection>
     </resultMap>
