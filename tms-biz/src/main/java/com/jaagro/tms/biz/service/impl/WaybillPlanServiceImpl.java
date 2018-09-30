@@ -298,7 +298,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     .setGoodsUnit(orderGoods.getGoodsUnit())
                     .setGoodsType(ordersData.getGoodsType())
                     .setJoinDrug(orderGoods.getJoinDrug());
-            if (goodsUnit == 2) {
+            if (goodsUnit == 3) {
                 waybillGoodsDto.setGoodsWeight(new BigDecimal(obj.getPlanAmount()));
             } else {
                 waybillGoodsDto.setGoodsQuantity(obj.getPlanAmount());
