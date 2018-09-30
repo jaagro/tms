@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author tony
@@ -29,6 +30,26 @@ public class ShowSiteDto implements Serializable {
      * 联系人姓名
      */
     private String contact;
+
+    /**
+     * 养殖场类型（装货地属性）：1-平养场 2-网养场 3-笼养场
+     */
+    private Integer farmsType;
+
+    /**
+     * 作业时间（装货地属性）
+     */
+    private Integer operationTime;
+
+    /**
+     * 屠宰链数(卸货地属性)
+     */
+    private Integer killChain;
+
+    /**
+     * 开始屠宰时间（卸货地属性）
+     */
+    private Date killTime;
 
     /**
      * 联系电话
@@ -64,4 +85,18 @@ public class ShowSiteDto implements Serializable {
      * 经度
      */
     private BigDecimal longitude;
+
+    /**
+     * 装货信息 提货要求时间
+     */
+    private Date loadTime;
+
+    /**
+     * 卸货信息 要求送货时间
+     */
+    private Date requiredTime;
+    /**
+     * 货物类型:毛鸡、饲料、母猪、公猪、仔猪、生猪
+     */
+    private int productType;
 }

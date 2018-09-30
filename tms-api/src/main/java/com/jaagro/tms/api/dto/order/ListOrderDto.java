@@ -4,6 +4,7 @@ import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.driverapp.ShowSiteAppDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -71,5 +72,20 @@ public class ListOrderDto implements Serializable {
      * 创建人
      */
     private ShowUserDto createdUserId;
+
+    /**
+     * 计划派单
+     */
+    private Integer waybillCount;
+
+    /**
+     * 已派单
+     */
+    private Integer waybillAlready;
+
+    /**
+     * 待派单
+     */
+    private Integer waybillWait;
 
 }

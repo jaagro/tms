@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.dto.waybill;
 
+import com.jaagro.tms.api.dto.truck.TruckDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -7,25 +8,24 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 配载计划入参dto
- * @author tony
+ * @author gavin
  */
 @Data
 @Accessors(chain = true)
 public class CreateWaybillPlanDto implements Serializable {
 
     /**
-     * 订单id
+     *订单id
      */
     private Integer orderId;
 
     /**
-     * 车型数组
+     * 需求车型列表
      */
-    private int[] truckTypes;
+    private List<TruckDto> trucks;
 
     /**
-     * 订单明细列表
+     * 发货地和对应的货物明细列表 运单明细列表
      */
-    private List<CreateWaybillItemsPlanDto> items;
+    private List<CreateWaybillItemsPlanDto> waybillItems;
 }

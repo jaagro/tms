@@ -30,7 +30,8 @@
     delete from orders
     where id = #{id,jdbcType=INTEGER}
   </delete>
-    <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Orders">
+    <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Orders" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
     insert into orders (id, customer_contract_id, goods_type, 
       order_status, customer_id, load_site_id, 
       load_time, paper_receipt, notes, 
@@ -42,7 +43,8 @@
       #{createTime,jdbcType=TIMESTAMP}, #{createdUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, 
       #{modifyUserId,jdbcType=INTEGER})
   </insert>
-    <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Orders">
+    <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Orders" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
         insert into orders
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -185,32 +187,4 @@
       modify_user_id = #{modifyUserId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-    <select id="listByCriteria" resultMap="BaseResultMap"
-            parameterType="com.jaagro.tms.api.dto.order.ListOrderCriteriaDto">
-        select
-        <include refid="Base_Column_List"/>
-        from orders
-        where 1=1
-        <if test="customerName != null">
-            and (customer_name like concat('%',#{customerName},'%'))
-        </if>
-        <if test="orderStatus != null">
-            and order_status = #{orderStatus,jdbcType=INTEGER}
-        </if>
-        <if test="createUserId != null">
-            and create_userId = #{createUserId,jdbcType=INTEGER}
-        </if>
-        <if test="startCreateTime != null">
-            <![CDATA[and start_create_time >= #{startCreateTime}]]>
-        </if>
-        <if test="endCreateTime != null">
-            <![CDATA[and end_create_time <= #{endCreateTime}]]>
-        </if>
-        <if test="startLoadTime != null">
-            <![CDATA[and start_load_time >= #{startLoadTime}]]>
-        </if>
-        <if test="endLoadTime != null">
-            <![CDATA[and end_load_time <= #{endLoadTime}]]>
-        </if>
-    </select>
 </mapper>

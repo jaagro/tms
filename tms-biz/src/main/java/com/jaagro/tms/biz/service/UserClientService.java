@@ -17,4 +17,13 @@ public interface UserClientService {
      */
     @PostMapping("/getUserByToken")
     UserInfo getUserByToken(@RequestParam("token") String token);
+
+    /**
+     * 通过id获取user
+     * @param id
+     * @param userType
+     * @return
+     */
+    @PostMapping("getUserById")
+    UserInfo getUserInfoById(@RequestParam("id") Integer id, @RequestParam("userType") String userType);
 }

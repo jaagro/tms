@@ -3,7 +3,7 @@ package com.jaagro.tms.api.constant;
 /**
  * @author tony
  */
-public final class ProductType {
+public final class GoodsType {
 
     /**
      * 毛鸡

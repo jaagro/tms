@@ -2,21 +2,25 @@ package com.jaagro.tms.biz.service.impl;
 
 import com.jaagro.tms.api.dto.order.CreateOrderGoodsDto;
 import com.jaagro.tms.api.dto.order.CreateOrderItemsDto;
-import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.api.dto.order.GetOrderGoodsDto;
+import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.biz.entity.OrderItems;
-import com.jaagro.tms.biz.mapper.OrderGoodsMapper;
-import com.jaagro.tms.biz.mapper.OrderItemsMapper;
-import com.jaagro.tms.biz.mapper.OrdersMapper;
+import com.jaagro.tms.biz.mapper.OrderGoodsMapperExt;
+import com.jaagro.tms.biz.mapper.OrderItemsMapperExt;
+import com.jaagro.tms.biz.mapper.OrdersMapperExt;
+import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
-import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,11 +32,11 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     @Autowired
     private CurrentUserService currentUserService;
     @Autowired
-    private OrderItemsMapper orderItemsMapper;
+    private OrderItemsMapperExt orderItemsMapper;
     @Autowired
-    private OrdersMapper ordersMapper;
+    private OrdersMapperExt ordersMapper;
     @Autowired
-    private OrderGoodsMapper orderGoodsMapper;
+    private OrderGoodsMapperExt orderGoodsMapper;
     @Autowired
     private OrderGoodsService goodsService;
     @Autowired
@@ -41,9 +45,6 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createOrderItem(CreateOrderItemsDto orderItemDto) {
-        if (this.ordersMapper.selectByPrimaryKey(orderItemDto.getOrderId()) == null) {
-            throw new NullPointerException("订单明细不存在");
-        }
         if (this.customerService.getShowSiteById(orderItemDto.getUnloadId()) == null) {
             throw new NullPointerException("卸货地不存在");
         }
@@ -53,7 +54,9 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         if (orderItemDto.getGoods() != null && orderItemDto.getGoods().size() > 0) {
             for (CreateOrderGoodsDto goodsDto : orderItemDto.getGoods()
             ) {
-                goodsDto.setOrderItemId(orderItem.getId());
+                goodsDto
+                        .setOrderItemId(orderItem.getId())
+                        .setOrderId(orderItem.getOrderId());
                 this.goodsService.createOrderGood(goodsDto);
             }
         } else {
@@ -62,10 +65,11 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         return ServiceResult.toResult("创建成功");
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> updateItems(CreateOrderItemsDto itemsDto) {
         if (this.ordersMapper.selectByPrimaryKey(itemsDto.getOrderId()) == null) {
-            throw new RuntimeException("订单明细不存在");
+            throw new NullPointerException("订单明细不存在");
         }
         OrderItems orderItems = new OrderItems();
         BeanUtils.copyProperties(itemsDto, orderItems);
@@ -82,14 +86,39 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         return ServiceResult.toResult("修改成功");
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public Map<String, Object> disableById(Integer id) {
-        OrderItems orderItems = this.orderItemsMapper.selectByPrimaryKey(id);
-        if (orderItems == null) {
-            return ServiceResult.error("删除失败");
+    public Map<String, Object> disableByOrderId(Integer orderId) {
+        if (ordersMapper.selectByPrimaryKey(orderId) == null) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在");
         }
-        orderItems.setEnabled(false);
-        this.orderItemsMapper.updateByPrimaryKeySelective(orderItems);
+        List<OrderItems> orderItems = this.orderItemsMapper.listByOrderId(orderId);
+        if (orderItems.size() < 1) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单明细不存在");
+        }
+        this.orderItemsMapper.disableByOrderId(orderId);
+        // goods
+        for (OrderItems items : orderItems
+        ) {
+            this.goodsService.disableByItemsId(items.getId());
+        }
         return ServiceResult.toResult("删除成功");
+    }
+
+    @Override
+    public List<GetOrderItemsDto> listByOrderId(Integer orderId) {
+        List<GetOrderItemsDto> getOrderItemsDtoList = this.orderItemsMapper.listItemsByOrderId(orderId);
+        if (getOrderItemsDtoList != null && getOrderItemsDtoList.size() > 0) {
+            for (GetOrderItemsDto items : getOrderItemsDtoList) {
+                OrderItems orderItems = this.orderItemsMapper.selectByPrimaryKey(items.getId());
+                items
+                        .setModifyUserId(this.currentUserService.getShowUser())
+                        .setUnload(this.customerService.getShowSiteById(orderItems.getUnloadId()));
+                for (GetOrderGoodsDto goodsDto : items.getGoods()) {
+                    goodsDto.setMargin(new BigDecimal(0));
+                }
+            }
+        }
+        return getOrderItemsDtoList;
     }
 }

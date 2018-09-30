@@ -1,4 +1,4 @@
-package com.jaagro.tms.api.dto.waybill;
+package com.jaagro.tms.api.dto.driverapp;
 
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
@@ -27,6 +27,15 @@ public class ListWaybillAppDto implements Serializable {
      *
      */
     private Integer orderId;
+    /**
+     * 接单时间
+     */
+    private Date singleTime;
+
+    /**
+     * 运单号
+     */
+    private Integer waybillId;
 
     /**
      * 装货地

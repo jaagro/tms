@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillFeeAdjustmentMapperExt" >
+  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillFeeAdjustment" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="waybill_id" property="waybillId" jdbcType="INTEGER" />
+    <result column="waybill_item_id" property="waybillItemId" jdbcType="INTEGER" />
+    <result column="adjust_reason" property="adjustReason" jdbcType="INTEGER" />
+    <result column="adjust_type" property="adjustType" jdbcType="INTEGER" />
+    <result column="customer_effect" property="customerEffect" jdbcType="BIT" />
+    <result column="truck_effect" property="truckEffect" jdbcType="BIT" />
+    <result column="notes" property="notes" jdbcType="VARCHAR" />
+    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="created_user_id" property="createdUserId" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, waybill_id, waybill_item_id, adjust_reason, adjust_type, customer_effect, truck_effect, 
+    notes, enabled, create_time, created_user_id, modify_time, modify_user_id
+  </sql>
+</mapper>

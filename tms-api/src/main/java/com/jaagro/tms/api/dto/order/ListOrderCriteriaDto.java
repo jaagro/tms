@@ -24,9 +24,14 @@ public class ListOrderCriteriaDto implements Serializable {
     private int pageSize;
 
     /**
-     * 客户名称 -- 模糊
+     * 货物类型
      */
-    private String customerName;
+    private Integer goodsType;
+
+    /**
+     * 客户id
+     */
+    private Integer customerId;
 
     /**
      * 订单状态
@@ -34,32 +39,23 @@ public class ListOrderCriteriaDto implements Serializable {
     private String orderStatus;
 
     /**
-     * 货物类型
+     * 开单开始时间
      */
-    private Integer productType;
+    private Date createStartTime;
 
     /**
-     * 开单人
+     * 开单截止时间
      */
-    private Integer createUserId;
+    private Date createEndTime;
 
     /**
-     * 起始开单时间
+     * 要求装货开始时间
      */
-    private Date startCreateTime;
+    private Date loadStartTime;
 
     /**
-     * 截止开单时间
+     * 要求装货截止时间
      */
-    private Date endCreateTime;
+    private Date loadEndTime;
 
-    /**
-     * 起始提货时间
-     */
-    private Date startLoadTime;
-
-    /**
-     * 截止提货时间
-     */
-    private Date endLoadTime;
 }

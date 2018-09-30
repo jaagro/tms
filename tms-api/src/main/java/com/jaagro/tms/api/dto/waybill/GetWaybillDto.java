@@ -1,6 +1,6 @@
 package com.jaagro.tms.api.dto.waybill;
 
-import com.jaagro.tms.api.dto.base.ShowTruckTypeDto;
+import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
@@ -48,7 +48,7 @@ public class GetWaybillDto implements Serializable {
     /**
      * 需求车型
      */
-    private ShowTruckTypeDto needTruckType;
+    private ListTruckTypeDto needTruckType;
 
     /**
      * 车辆id
@@ -80,22 +80,12 @@ public class GetWaybillDto implements Serializable {
     private ShowUserDto createdUserId;
 
     /**
-     * 修改时间
-     */
-    private Date modifyTime;
-
-    /**
-     * 修改人id
-     */
-    private ShowUserDto modifyUserId;
-
-    /**
      * 运单明细list
      */
-    private List<GetWaybillItemsDto> waybillItems;
+    private List<GetWaybillItemDto> waybillItems;
 
     /**
      * 运单轨迹
      */
-    private List<ShowTrackingDto> tracking;
+    private List<GetTrackingDto> tracking;
 }

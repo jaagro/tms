@@ -7,19 +7,21 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-/**
- * @author tony
- */
 @Data
 @Accessors(chain = true)
 public class WaybillGoods implements Serializable {
     /**
-     * 
+     *
      */
     private Integer id;
 
     /**
-     * 
+     * 运单id
+     */
+    private Integer waybillId;
+
+    /**
+     *
      */
     private Integer waybillItemId;
 
@@ -82,4 +84,9 @@ public class WaybillGoods implements Serializable {
      * 修改人id
      */
     private Integer modifyUserId;
+
+    /**
+     * 订单货物id
+     */
+    private Integer orderGoodsId;
 }

@@ -1,10 +1,11 @@
-package com.jaagro.tms.api.dto.waybill;
+package com.jaagro.tms.api.dto.driverapp;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author tony
@@ -61,4 +62,9 @@ public class ShowTrackingDto implements Serializable {
      * 修改人id：若是后台人员修改则填写此处
      */
     private Integer referUserId;
+
+    /**
+     * 运单状态修改记录时间
+     */
+    private Date createTime;
 }
