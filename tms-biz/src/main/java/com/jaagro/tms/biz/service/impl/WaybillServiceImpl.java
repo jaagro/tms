@@ -20,6 +20,7 @@ import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
+import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.slf4j.Logger;
@@ -73,6 +74,8 @@ public class WaybillServiceImpl implements WaybillService {
     private MessageMapperExt messageMapper;
     @Autowired
     private UserClientService userClientService;
+    @Autowired
+    private SmsClientService smsClientService;
     /**
      * @param waybillDtoList
      * @return
@@ -940,15 +943,15 @@ public class WaybillServiceImpl implements WaybillService {
             DriverReturnDto driver = drivers.get(i);
             Map<String, Object> templateMap = new HashMap<>();
             templateMap.put("drvierName", driver.getName());
-//            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(),"smsTemplate_assignWaybill",templateMap);
-//            log.trace("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
-//            System.out.println("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
+            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(),"smsTemplate_assignWaybill",templateMap);
+            log.trace("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
+            System.out.println("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
             Message appMessage = new Message();
             appMessage.setReferId(waybillId);
             appMessage.setMsgType(1);
             appMessage.setMsgStatus(0);
             appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
-            appMessage.setBody("你有从" + loadSiteName + "到" + unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1) + "的运单。");
+            appMessage.setBody("您有新的运单信息待接单,从" + loadSiteName + "到" + unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1) + "的运单。");
             appMessage.setCreateTime(new Date());
             appMessage.setCreateUserId(userId);
             appMessage.setFromUserId(userId);
