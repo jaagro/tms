@@ -36,7 +36,7 @@
         update waybill
         set enabled = 0
         where id = #{waybillId}
-        and waybill_status = '待接单'
+--         and waybill_status in ('待派单', '待接单', '已拒单')
     </update>
 
     <select id="listWaybillByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">

@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -136,12 +137,16 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
     public Map<String, Object> removeWaybillFromPlan(Integer waybillId) {
         //判断运单状态是否满足条件
         Waybill waybillData = waybillMapper.selectByPrimaryKey(waybillId);
+
         List<OrderGoodsMargin> orderGoodsMarginList = new LinkedList<>();
         if (null == waybillData) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id无效");
         }
-        if (!waybillData.getWaybillStatus().equals(WaybillStatus.RECEIVE)) {
-            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "只有【待接单】的运单才可以撤销");
+        boolean flag = waybillData.getWaybillStatus().equals(WaybillStatus.RECEIVE) ||
+                waybillData.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK) ||
+                waybillData.getWaybillStatus().equals(WaybillStatus.REJECT);
+        if (!flag) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "只有【待派单/待接单/已拒绝】的运单才可以撤销");
         }
         if (!waybillData.getEnabled()) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id已是注销状态");
@@ -155,8 +160,16 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             }
             orderGoodsMargin
                     .setId(orderGoodsMarginData.getId())
-                    .setMargin(wg.getGoodsWeight())
                     .setOrderGoodsId(wg.getOrderGoodsId());
+            Orders orders = ordersMapper.selectByPrimaryKey(waybillData.getOrderId());
+            //饲料
+            if (orders.getGoodsType() == 2) {
+                BigDecimal m = orderGoodsMargin.getMargin().add(wg.getGoodsWeight());
+                orderGoodsMargin.setMargin(m);
+            } else {
+                BigDecimal m = orderGoodsMargin.getMargin().add(new BigDecimal(wg.getGoodsQuantity()));
+                orderGoodsMargin.setMargin(m);
+            }
             int count = orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
             if (count == 0) {
                 log.debug(orderGoodsMargin + " :余量未被更新");
@@ -284,7 +297,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     .setGoodsUnit(orderGoods.getGoodsUnit())
                     .setGoodsType(ordersData.getGoodsType())
                     .setJoinDrug(orderGoods.getJoinDrug());
-            if (goodsUnit == 3) {
+            if (goodsUnit == 2) {
                 waybillGoodsDto.setGoodsWeight(new BigDecimal(obj.getPlanAmount()));
             } else {
                 waybillGoodsDto.setGoodsQuantity(obj.getPlanAmount());
