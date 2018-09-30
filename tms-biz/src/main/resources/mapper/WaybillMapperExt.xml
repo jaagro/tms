@@ -1,23 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jaagro.tms.biz.mapper.WaybillMapperExt">
-    <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.Waybill">
-        <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
-        <result column="truck_team_contract_id" property="truckTeamContractId" jdbcType="INTEGER"/>
-        <result column="waybill_status" property="waybillStatus" jdbcType="VARCHAR"/>
-        <result column="need_truck_type" property="needTruckType" jdbcType="INTEGER"/>
-        <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
-        <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
-        <result column="send_time" property="sendTime" jdbcType="TIMESTAMP"/>
-        <result column="distance" property="distance" jdbcType="DECIMAL"/>
-        <result column="enabled" property="enabled" jdbcType="BIT"/>
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="created_user_id" property="createdUserId" jdbcType="INTEGER"/>
-        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
-        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
-        <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
-    </resultMap>
     <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.GetWaybillAppDto">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="order_id" property="orderId" jdbcType="INTEGER"/>
@@ -33,6 +16,7 @@
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
         <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
         <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
+        <result column="load_time" jdbcType="TIMESTAMP" property="loadTime" />
         <collection property="waybillItems" column="id"
                     select="com.jaagro.tms.biz.mapper.WaybillItemsMapperExt.listByWaybillId"></collection>
     </resultMap>
@@ -45,10 +29,6 @@
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <sql id="Base_Column_List">
-        id, order_id, truck_team_contract_id, waybill_status, need_truck_type, truck_id, enabled,
-        driver_id, send_time, distance, create_time, created_user_id, modify_time, modify_user_id, load_site_id
-      </sql>
     <sql id="Return_List">
         id, order_id,, waybill_status,, send_time, distance, create_time
     </sql>

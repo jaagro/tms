@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,7 +23,10 @@ public class CreateWaybillDto implements Serializable {
      * 装货地id
      */
     private Integer loadSiteId;
-
+    /**
+     * 装货时间(就是提货时间)
+     */
+    private Date loadTime;
     /**
      * 车队合同id
      */
