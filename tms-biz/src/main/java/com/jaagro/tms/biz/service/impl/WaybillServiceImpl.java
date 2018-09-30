@@ -77,8 +77,8 @@ public class WaybillServiceImpl implements WaybillService {
     private UserClientService userClientService;
     @Autowired
     private OssSignUrlClientService ossSignUrlClientService;
-//    @Autowired
-//    private SmsClientService smsClientService;
+    @Autowired
+    private SmsClientService smsClientService;
 
 
     /**
