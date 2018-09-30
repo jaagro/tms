@@ -151,9 +151,10 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         if (!waybillData.getEnabled()) {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " :id已是注销状态");
         }
-        OrderGoodsMargin orderGoodsMargin = new OrderGoodsMargin();
+
         List<GetWaybillGoodsDto> waybillGoodsDtoList = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
         for (GetWaybillGoodsDto wg : waybillGoodsDtoList) {
+            OrderGoodsMargin orderGoodsMargin = new OrderGoodsMargin();
             OrderGoodsMargin orderGoodsMarginData = orderGoodsMarginMapper.getMarginByGoodsId(wg.getOrderGoodsId());
             if (orderGoodsMarginData == null) {
                 return ServiceResult.error("货物余量表记录为空");
@@ -164,10 +165,10 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             Orders orders = ordersMapper.selectByPrimaryKey(waybillData.getOrderId());
             //饲料
             if (orders.getGoodsType() == 2) {
-                BigDecimal m = orderGoodsMargin.getMargin().add(wg.getGoodsWeight());
+                BigDecimal m = orderGoodsMarginData.getMargin().add(wg.getGoodsWeight());
                 orderGoodsMargin.setMargin(m);
             } else {
-                BigDecimal m = orderGoodsMargin.getMargin().add(new BigDecimal(wg.getGoodsQuantity()));
+                BigDecimal m = orderGoodsMarginData.getMargin().add(new BigDecimal(wg.getGoodsQuantity()));
                 orderGoodsMargin.setMargin(m);
             }
             int count = orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
@@ -178,6 +179,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             orderGoodsMarginList.add(orderGoodsMargin);
         }
         waybillMapper.removeWaybillById(waybillId);
+        System.out.println(orderGoodsMarginList);
         return ServiceResult.toResult(orderGoodsMarginList);
     }
 
