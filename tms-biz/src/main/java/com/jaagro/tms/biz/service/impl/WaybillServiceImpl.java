@@ -145,6 +145,7 @@ public class WaybillServiceImpl implements WaybillService {
                     OrderGoodsMargin orderGoodsMargin;
                     orderGoodsMargin = orderGoodsMarginMapper.getMarginByGoodsId(createWaybillGoodsDto.getOrderGoodsId());
                     if (orderGoodsMargin == null) {
+                        orderGoodsMargin = new OrderGoodsMargin();
                         orderGoodsMargin.setOrderId(orderId);
                         orderGoodsMargin.setOrderItemId(waybillItemsDto.getOrderItemId());
                         orderGoodsMargin.setOrderGoodsId(createWaybillGoodsDto.getOrderGoodsId());
