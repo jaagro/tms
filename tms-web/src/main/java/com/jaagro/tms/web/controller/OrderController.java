@@ -122,9 +122,6 @@ public class OrderController {
     @ApiOperation("查询单条订单")
     @GetMapping("/getOrderById/{id}")
     public BaseResponse getOrderById(@PathVariable("id") Integer id) {
-        if (this.ordersMapper.selectByPrimaryKey(id) == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在");
-        }
         return BaseResponse.successInstance(orderService.getOrderById(id));
     }
 
