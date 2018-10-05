@@ -50,11 +50,11 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
         <!--<table tableName="%" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
-        <table tableName="catch_chicken_time" domainObjectName="CatchChickenTime" enableCountByExample="false"
+        <table tableName="orders" domainObjectName="Orders" enableCountByExample="false"
                enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>
-        <!--<table tableName="waybill_goods" domainObjectName="WaybillGoods" enableCountByExample="false"-->
-               <!--enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"-->
-               <!--selectByExampleQueryId="false"></table>-->
+        <table tableName="waybill" domainObjectName="Waybill" enableCountByExample="false"
+               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+               selectByExampleQueryId="false"></table>
     </context>
 </generatorConfiguration>

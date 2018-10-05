@@ -18,11 +18,12 @@
     <result column="modify_user_id" jdbcType="INTEGER" property="modifyUserId" />
     <result column="enabled" jdbcType="BIT" property="enabled" />
     <result column="load_time" jdbcType="TIMESTAMP" property="loadTime" />
+    <result column="department_id" jdbcType="INTEGER" property="departmentId" />
   </resultMap>
   <sql id="Base_Column_List">
     id, order_id, load_site_id, truck_team_contract_id, waybill_status, need_truck_type, 
     truck_id, driver_id, send_time, distance, create_time, created_user_id, modify_time, 
-    modify_user_id, enabled, load_time
+    modify_user_id, enabled, load_time, department_id
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -34,23 +35,21 @@
     delete from waybill
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Waybill"  useGeneratedKeys="true"
-          keyProperty="id" keyColumn="id">
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Waybill">
     insert into waybill (id, order_id, load_site_id, 
       truck_team_contract_id, waybill_status, need_truck_type, 
       truck_id, driver_id, send_time, 
       distance, create_time, created_user_id, 
       modify_time, modify_user_id, enabled, 
-      load_time)
+      load_time, department_id)
     values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{loadSiteId,jdbcType=INTEGER}, 
       #{truckTeamContractId,jdbcType=INTEGER}, #{waybillStatus,jdbcType=VARCHAR}, #{needTruckType,jdbcType=INTEGER}, 
       #{truckId,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER}, #{sendTime,jdbcType=TIMESTAMP}, 
       #{distance,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{createdUserId,jdbcType=INTEGER}, 
       #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER}, #{enabled,jdbcType=BIT}, 
-      #{loadTime,jdbcType=TIMESTAMP})
+      #{loadTime,jdbcType=TIMESTAMP}, #{departmentId,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Waybill"  useGeneratedKeys="true"
-          keyProperty="id" keyColumn="id">
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Waybill">
     insert into waybill
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -100,6 +99,9 @@
       </if>
       <if test="loadTime != null">
         load_time,
+      </if>
+      <if test="departmentId != null">
+        department_id,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -151,6 +153,9 @@
       <if test="loadTime != null">
         #{loadTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="departmentId != null">
+        #{departmentId,jdbcType=INTEGER},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.Waybill">
@@ -201,6 +206,9 @@
       <if test="loadTime != null">
         load_time = #{loadTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="departmentId != null">
+        department_id = #{departmentId,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -220,7 +228,9 @@
       modify_time = #{modifyTime,jdbcType=TIMESTAMP},
       modify_user_id = #{modifyUserId,jdbcType=INTEGER},
       enabled = #{enabled,jdbcType=BIT},
-      load_time = #{loadTime,jdbcType=TIMESTAMP}
+      load_time = #{loadTime,jdbcType=TIMESTAMP},
+      department_id = #{departmentId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
 </mapper>

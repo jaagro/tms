@@ -64,6 +64,7 @@ public class OrderServiceImpl implements OrderService {
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
         order.setCreatedUserId(currentUserService.getShowUser().getId());
+        order.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
         this.ordersMapper.insertSelective(order);
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
             for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {

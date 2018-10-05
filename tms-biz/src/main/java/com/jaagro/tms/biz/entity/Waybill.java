@@ -3,14 +3,13 @@ package com.jaagro.tms.biz.entity;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-/**
- * @author tony
- */
+
 @Data
 @Accessors(chain = true)
-public class Waybill {
+public class Waybill implements Serializable {
     /**
      * 
      */
@@ -90,5 +89,10 @@ public class Waybill {
      * 要求装货时间
      */
     private Date loadTime;
+
+    /**
+     * 
+     */
+    private Integer departmentId;
 
 }
