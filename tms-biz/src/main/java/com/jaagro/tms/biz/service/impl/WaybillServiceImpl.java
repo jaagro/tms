@@ -238,14 +238,18 @@ public class WaybillServiceImpl implements WaybillService {
         WaybillTrackingImages record = new WaybillTrackingImages();
         record.setWaybillId(waybill.getId());
         List<GetWaybillTrackingImagesDto> getWaybillTrackingImagesDtos = waybillTrackingImagesMapper.listWaybillTrackingImage(record);
+
         List<GetTrackingImagesDto> getTrackingImagesDtos = new ArrayList<>();
         for (GetWaybillTrackingImagesDto getWaybillTrackingImagesDto : getWaybillTrackingImagesDtos) {
             GetTrackingImagesDto getTrackingImagesDto = new GetTrackingImagesDto();
             BeanUtils.copyProperties(getWaybillTrackingImagesDto, getTrackingImagesDto);
             getTrackingImagesDtos.add(getTrackingImagesDto);
         }
+
+        //这个语句查询不出图片
         for (GetTrackingDto getTrackingDto : getTrackingDtos) {
             List<GetTrackingImagesDto> imageList = getTrackingImagesDtos.stream().filter(c -> c.getWaybillTrackingId().equals(getTrackingDto.getId())).collect(Collectors.toList());
+            System.out.println(imageList);
             getTrackingDto.setImageList(imageList);
         }
 
