@@ -7,6 +7,6 @@
 *.iml
 out
 gen
-tms-biz/target/
+/tms-biz/target/
 /tms-web/target/
 /tms-api/target/
