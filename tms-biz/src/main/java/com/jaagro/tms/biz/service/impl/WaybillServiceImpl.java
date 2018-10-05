@@ -112,6 +112,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setWaybillStatus(WaybillStatus.SEND_TRUCK);
             waybill.setCreateTime(new Date());
             waybill.setCreatedUserId(userId);
+            waybill.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
             waybillMapper.insertSelective(waybill);
             int waybillId = waybill.getId();
             List<CreateWaybillItemsDto> waybillItemsList = createWaybillDto.getWaybillItems();
