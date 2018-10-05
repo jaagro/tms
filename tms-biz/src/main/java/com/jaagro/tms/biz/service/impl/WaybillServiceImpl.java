@@ -40,7 +40,6 @@ import java.util.stream.Collectors;
 
 /**
  * @author tony
- *
  */
 @Service
 public class WaybillServiceImpl implements WaybillService {
@@ -142,12 +141,18 @@ public class WaybillServiceImpl implements WaybillService {
                     waybillGoods.setWaybillId(waybillId);
                     waybillGoodsMapper.insertSelective(waybillGoods);
                     //插入order_goods_margin
-                    OrderGoodsMargin orderGoodsMargin = new OrderGoodsMargin();
-                    orderGoodsMargin.setOrderId(orderId);
-                    orderGoodsMargin.setOrderItemId(waybillItemsDto.getOrderItemId());
-                    orderGoodsMargin.setOrderGoodsId(createWaybillGoodsDto.getOrderGoodsId());
-                    orderGoodsMargin.setMargin(BigDecimal.ZERO);
-                    orderGoodsMarginMapper.insertSelective(orderGoodsMargin);
+                    OrderGoodsMargin orderGoodsMargin;
+                    orderGoodsMargin = orderGoodsMarginMapper.getMarginByGoodsId(createWaybillGoodsDto.getOrderGoodsId());
+                    if (orderGoodsMargin == null) {
+                        orderGoodsMargin.setOrderId(orderId);
+                        orderGoodsMargin.setOrderItemId(waybillItemsDto.getOrderItemId());
+                        orderGoodsMargin.setOrderGoodsId(createWaybillGoodsDto.getOrderGoodsId());
+                        orderGoodsMargin.setMargin(BigDecimal.ZERO);
+                        orderGoodsMarginMapper.insertSelective(orderGoodsMargin);
+                    } else {
+                        orderGoodsMargin.setMargin(BigDecimal.ZERO);
+                        orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
+                    }
                 }
             }
         }
@@ -390,7 +395,7 @@ public class WaybillServiceImpl implements WaybillService {
             List<GetWaybillTrackingImagesDto> loadSiteWaybillTrackingImages = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
             for (GetWaybillTrackingImagesDto loadSiteWaybillTrackingImage : loadSiteWaybillTrackingImages) {
                 //替换单据url地址
-               String[] strArray={loadSiteWaybillTrackingImage.getImageUrl()};
+                String[] strArray = {loadSiteWaybillTrackingImage.getImageUrl()};
                 List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
                 loadSiteWaybillTrackingImage.setImageUrl(urls.get(0).toString());
             }
@@ -414,7 +419,7 @@ public class WaybillServiceImpl implements WaybillService {
             List<GetWaybillTrackingImagesDto> waybillTrackingImagesDtosList = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
             for (GetWaybillTrackingImagesDto getWaybillTrackingImagesDto : waybillTrackingImagesDtosList) {
                 //替换单据地址
-                String[] strArray1={getWaybillTrackingImagesDto.getImageUrl()};
+                String[] strArray1 = {getWaybillTrackingImagesDto.getImageUrl()};
                 List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray1);
                 getWaybillTrackingImagesDto.setImageUrl(urls.get(0).toString());
             }
@@ -967,10 +972,10 @@ public class WaybillServiceImpl implements WaybillService {
             DriverReturnDto driver = drivers.get(i);
             Map<String, Object> templateMap = new HashMap<>();
             templateMap.put("drvierName", driver.getName());
-            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(),"SMS_146808609",templateMap);
+            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(), "SMS_146808609", templateMap);
 
-            log.trace("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
-            System.out.println("给司机发短信,driver"+i+"::::"+driver+",短信结果:::"+response);
+            log.trace("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
+            System.out.println("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
             Message appMessage = new Message();
             appMessage.setReferId(waybillId);
             appMessage.setMsgType(1);

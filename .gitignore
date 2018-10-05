@@ -10,5 +10,3 @@ gen
 tms-biz/target/
 /tms-web/target/
 /tms-api/target/
-
-/tms-web/src/main/resources/bootstrap.yml
