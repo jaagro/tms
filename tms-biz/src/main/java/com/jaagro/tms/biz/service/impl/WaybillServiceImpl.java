@@ -74,7 +74,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     private MessageMapperExt messageMapper;
     @Autowired
-    private UserClientService userClientService;
+    private AuthClientService authClientService;
     @Autowired
     private OssSignUrlClientService ossSignUrlClientService;
     @Autowired
@@ -1018,7 +1018,7 @@ public class WaybillServiceImpl implements WaybillService {
                     }
                 }
                 if (waybill.getCreatedUserId() != null) {
-                    UserInfo userInfo = this.userClientService.getUserInfoById(waybill.getCreatedUserId(), "employee");
+                    UserInfo userInfo = this.authClientService.getUserInfoById(waybill.getCreatedUserId(), "employee");
                     if (userInfo != null) {
                         ShowUserDto userDto = new ShowUserDto();
                         userDto.setUserName(userInfo.getName());

@@ -14,7 +14,7 @@ import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
-import com.jaagro.tms.biz.service.UserClientService;
+import com.jaagro.tms.biz.service.AuthClientService;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.springframework.beans.BeanUtils;
@@ -46,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderGoodsMapperExt orderGoodsMapper;
     @Autowired
-    private UserClientService userClientService;
+    private AuthClientService authClientService;
     @Autowired
     private OrderModifyLogMapper modifyLogMapper;
     @Autowired
@@ -117,7 +117,7 @@ public class OrderServiceImpl implements OrderService {
                 .setCustomer(this.customerService.getShowCustomerById(order.getCustomerId()))
                 .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                 .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()));
-        UserInfo userInfo = this.userClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+        UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
         if (userInfo != null) {
             ShowUserDto userDto = new ShowUserDto();
             userDto.setUserName(userInfo.getName());
@@ -146,7 +146,7 @@ public class OrderServiceImpl implements OrderService {
                 .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()))
                 .setOrderItems(this.orderItemsService.listByOrderId(order.getId()));
 
-        UserInfo userInfo = this.userClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+        UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
         if (userInfo != null) {
             ShowUserDto userDto = new ShowUserDto();
             userDto.setUserName(userInfo.getName());
@@ -175,7 +175,7 @@ public class OrderServiceImpl implements OrderService {
                         .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
                         .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                         .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
-                UserInfo userInfo = this.userClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+                UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
                 if (userInfo != null) {
                     ShowUserDto userDto = new ShowUserDto();
                     userDto.setUserName(userInfo.getName());
