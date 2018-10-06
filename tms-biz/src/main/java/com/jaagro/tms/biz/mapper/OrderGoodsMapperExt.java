@@ -23,5 +23,5 @@ public interface OrderGoodsMapperExt extends OrderGoodsMapper {
      *
      * @param id
      */
-    void disableByItemsId(Integer id);
+    int disableByItemsId(Integer id);
 }

@@ -18,6 +18,11 @@ public class GetWaybillGoodsDto implements Serializable {
     private Integer id;
 
     /**
+     * 运单id
+     */
+    private Integer waybillId;
+
+    /**
      *
      */
     private Integer waybillItemId;

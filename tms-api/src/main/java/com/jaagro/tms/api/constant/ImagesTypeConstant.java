@@ -4,11 +4,15 @@ package com.jaagro.tms.api.constant;
  */
 public class ImagesTypeConstant {
     /**
-     * 提货单
+     * 出库单
      */
-    public static final Integer LOAD_BILL = 1;
+    public static final Integer OUTBOUND_BILL = 0;
     /**
-     * 卸货地
+     * 磅单
      */
-    public static final Integer UNLOAD_BILL = 0;
+    public static final Integer POUND_BILL = 1;
+    /**
+     * 签收单
+     */
+    public static final Integer SIGN_BILL = 2;
 }

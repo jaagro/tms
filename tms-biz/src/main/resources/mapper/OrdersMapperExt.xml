@@ -1,21 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jaagro.tms.biz.mapper.OrdersMapperExt">
-    <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.Orders">
-        <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="customer_contract_id" property="customerContractId" jdbcType="INTEGER"/>
-        <result column="goods_type" property="goodsType" jdbcType="INTEGER"/>
-        <result column="order_status" property="orderStatus" jdbcType="VARCHAR"/>
-        <result column="customer_id" property="customerId" jdbcType="INTEGER"/>
-        <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
-        <result column="load_time" property="loadTime" jdbcType="TIMESTAMP"/>
-        <result column="paper_receipt" property="paperReceipt" jdbcType="BIT"/>
-        <result column="notes" property="notes" jdbcType="VARCHAR"/>
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="created_user_id" property="createdUserId" jdbcType="INTEGER"/>
-        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
-        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
-    </resultMap>
+
     <resultMap id="ReturnMap" type="com.jaagro.tms.api.dto.order.ListOrderDto">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="goods_type" property="goodsType" jdbcType="INTEGER"/>
@@ -25,10 +11,6 @@
         <result column="notes" property="notes" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     </resultMap>
-    <sql id="Base_Column_List">
-    id, customer_contract_id, goods_type, order_status, customer_id, load_site_id, load_time, 
-    paper_receipt, notes, create_time, created_user_id, modify_time, modify_user_id
-  </sql>
     <select id="listOrdersByCriteria" resultMap="ReturnMap"
             parameterType="com.jaagro.tms.api.dto.order.ListOrderCriteriaDto">
         select
@@ -38,11 +20,24 @@
         <if test="orderStatus != null">
             and order_status = #{orderStatus}
         </if>
-        <if test="createTime != null">
-            <![CDATA[and create_time >= #{createTime}]]>
-        </if>
-        <if test="customerId != null">
+        <if test="customerId != null and customerId != 0">
             and customer_id = #{customerId}
         </if>
+        <if test="goodsType != null">
+            and goods_type = #{goodsType}
+        </if>
+        <if test="createStartTime != null">
+            <![CDATA[and create_time >= #{createStartTime}]]>
+        </if>
+        <if test="createEndTime != null">
+            <![CDATA[and create_time <= #{createEndTime}]]>
+        </if>
+        <if test="loadStartTime != null">
+            <![CDATA[and load_time >= #{loadStartTime}]]>
+        </if>
+        <if test="loadEndTime != null">
+            <![CDATA[and load_time <= #{loadEndTime}]]>
+        </if>
+        order by create_time desc
     </select>
 </mapper>
