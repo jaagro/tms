@@ -11,7 +11,6 @@
         <result column="notes" property="notes" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     </resultMap>
-
     <select id="listOrdersByCriteria" resultMap="ReturnMap"
             parameterType="com.jaagro.tms.api.dto.order.ListOrderCriteriaDto">
         select
