@@ -1,29 +1,20 @@
 package com.jaagro.tms.biz.service;
 
-import com.jaagro.constant.UserInfo;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Set;
 
 /**
  * @author tony
  */
-@FeignClient(value = "auth")
+@FeignClient("user")
 public interface UserClientService {
-    /**
-     * 获取token相关的用户信息
-     * @param token
-     * @return
-     */
-    @PostMapping("/getUserByToken")
-    UserInfo getUserByToken(@RequestParam("token") String token);
 
     /**
-     * 通过id获取user
-     * @param id
-     * @param userType
+     * 获取当前token可查询的数据范围 -- 依据部门id
      * @return
      */
-    @PostMapping("getUserById")
-    UserInfo getUserInfoById(@RequestParam("id") Integer id, @RequestParam("userType") String userType);
+    @PostMapping("/getDownDepartment")
+    Set<Integer> getDownDepartment();
 }
