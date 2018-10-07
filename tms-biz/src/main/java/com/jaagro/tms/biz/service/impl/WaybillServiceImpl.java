@@ -79,7 +79,8 @@ public class WaybillServiceImpl implements WaybillService {
     private OssSignUrlClientService ossSignUrlClientService;
     @Autowired
     private SmsClientService smsClientService;
-
+    @Autowired
+    private UserClientService userClientService;
     /**
      * @param waybillDtoList
      * @return
@@ -1005,6 +1006,11 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        Set<Integer> departIds = userClientService.getDownDepartment();
+        List<Integer> dids = new ArrayList<>(departIds);
+        if (dids.size()!=0){
+            criteriaDto.setDepartIds(dids);
+        }
         List<ListWaybillDto> listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto

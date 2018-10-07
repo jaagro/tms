@@ -96,6 +96,12 @@
         <if test="createTime != null">
             <![CDATA[and create_time = #{createTime}]]>
         </if>
+        <if test="departIds!=null and departIds.size()>0">
+            and department_id in
+            <foreach collection="departIds" open="(" separator="," close=")" item="did">
+                ${did}
+            </foreach>
+        </if>
         order by create_time desc
     </select>
     <select id="listWaybillWaitByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
