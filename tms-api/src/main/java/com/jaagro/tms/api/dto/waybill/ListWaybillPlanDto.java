@@ -52,4 +52,9 @@ public class ListWaybillPlanDto implements Serializable {
      * s
      */
     private List<ListWaybillItemsPlanDto> waybillItems;
+
+    /**
+     * 运单状态
+     */
+    private String waybillStatus;
 }
