@@ -14,6 +14,7 @@ import com.jaagro.tms.biz.service.TruckTypeClientService;
 import com.jaagro.tms.biz.vo.MiddleObjectVo;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -107,6 +110,16 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     Date paramDate = DateUtils.addMinutes(killTime, times);
                     //计算并重设卸货时间
                     Date unloadTime = DateUtils.addMinutes(paramDate, -waitKillTime);
+                    Date requiredTime = dto.getWaybillItems().get(0).getRequiredTime();
+                    String strDate = DateFormatUtils.format(requiredTime,"yyyy-MM-dd");
+                    String strTime = DateFormatUtils.format(unloadTime,"HH:mm:ss");
+                    String DateTime = strDate +" " +strTime;
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    try {
+                        unloadTime = sdf.parse(DateTime);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                     dto.getWaybillItems().get(0).setRequiredTime(unloadTime);
 
                     //计算并重设装货时间
@@ -117,6 +130,15 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     int catchTime = catchChickenTimes.get(0).getCatchTime();
                     Date loadTime = DateUtils.addMinutes(DateUtils.addMinutes(unloadTime, -truck.getTravelTime()), -loadSite.getOperationTime());
                     loadTime = DateUtils.addMinutes(DateUtils.addMinutes(loadTime, -catchTime), -20);
+                    strDate = DateFormatUtils.format(dto.getLoadTime(),"yyyy-MM-dd");
+                    strTime = DateFormatUtils.format(loadTime,"HH:mm:ss");
+                    DateTime = strDate +" " +strTime;
+                    try {
+                        loadTime = sdf.parse(DateTime);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
                     dto.setLoadTime(loadTime);
                 }
             }

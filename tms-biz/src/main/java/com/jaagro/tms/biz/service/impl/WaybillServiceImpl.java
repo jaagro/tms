@@ -977,7 +977,7 @@ public class WaybillServiceImpl implements WaybillService {
         for (int i = 0; i < drivers.size(); i++) {
             DriverReturnDto driver = drivers.get(i);
             Map<String, Object> templateMap = new HashMap<>();
-            templateMap.put("drvierName", driver.getName());
+            templateMap.put("driverName", driver.getName());
             BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(), "SMS_146803933", templateMap);
             log.trace("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
             System.out.println("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
