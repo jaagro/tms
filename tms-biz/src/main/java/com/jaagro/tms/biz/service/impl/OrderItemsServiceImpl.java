@@ -8,6 +8,7 @@ import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.biz.entity.OrderItems;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapperExt;
+import com.jaagro.tms.biz.mapper.OrderGoodsMarginMapperExt;
 import com.jaagro.tms.biz.mapper.OrderItemsMapperExt;
 import com.jaagro.tms.biz.mapper.OrdersMapperExt;
 import com.jaagro.tms.biz.service.CustomerClientService;
@@ -37,6 +38,8 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     private OrdersMapperExt ordersMapper;
     @Autowired
     private OrderGoodsMapperExt orderGoodsMapper;
+    @Autowired
+    private OrderGoodsMarginMapperExt orderGoodsMarginMapper;
     @Autowired
     private OrderGoodsService goodsService;
     @Autowired
@@ -115,7 +118,8 @@ public class OrderItemsServiceImpl implements OrderItemsService {
                         .setModifyUserId(this.currentUserService.getShowUser())
                         .setUnload(this.customerService.getShowSiteById(orderItems.getUnloadId()));
                 for (GetOrderGoodsDto goodsDto : items.getGoods()) {
-                    goodsDto.setMargin(new BigDecimal(0));
+                    BigDecimal marginData = orderGoodsMarginMapper.getMarginByGoodsId(goodsDto.getId()).getMargin();
+                    goodsDto.setMargin(marginData);
                 }
             }
         }
