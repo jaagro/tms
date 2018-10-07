@@ -5,7 +5,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author tony
@@ -62,6 +62,6 @@ public class ListOrderCriteriaDto implements Serializable {
     /**
      * 登陆人所在部门和下属所有部门
      */
-    private Set departIds;
+    private List<Integer> departIds;
 
 }

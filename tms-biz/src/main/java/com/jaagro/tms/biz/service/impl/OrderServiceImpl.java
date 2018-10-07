@@ -13,8 +13,9 @@ import com.jaagro.tms.biz.entity.OrderModifyLog;
 import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.mapper.*;
-import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.AuthClientService;
+import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.biz.service.UserClientService;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.springframework.beans.BeanUtils;
@@ -23,9 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author tony
@@ -51,6 +50,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderModifyLogMapper modifyLogMapper;
     @Autowired
     private WaybillMapperExt waybillMapper;
+    @Autowired
+    private UserClientService userClientService;
 
     /**
      * 创建订单
@@ -164,6 +165,15 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        Set<Integer> departIds = new HashSet<>();
+        departIds.add(107);
+        departIds.add(100);
+        departIds = userClientService.getDownDepartment();
+        System.out.println("departIds===="+ departIds);
+        List<Integer> dids = new ArrayList<>(departIds);
+        if (departIds.size()!=0){
+            criteriaDto.setDepartIds(dids);
+        }
         List<ListOrderDto> orderDtos = this.ordersMapper.listOrdersByCriteria(criteriaDto);
 
         if (orderDtos != null && orderDtos.size() > 0) {
