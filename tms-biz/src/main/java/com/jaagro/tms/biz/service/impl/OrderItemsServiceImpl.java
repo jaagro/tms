@@ -6,6 +6,7 @@ import com.jaagro.tms.api.dto.order.GetOrderGoodsDto;
 import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
+import com.jaagro.tms.biz.entity.OrderGoodsMargin;
 import com.jaagro.tms.biz.entity.OrderItems;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapperExt;
 import com.jaagro.tms.biz.mapper.OrderGoodsMarginMapperExt;
@@ -118,8 +119,12 @@ public class OrderItemsServiceImpl implements OrderItemsService {
                         .setModifyUserId(this.currentUserService.getShowUser())
                         .setUnload(this.customerService.getShowSiteById(orderItems.getUnloadId()));
                 for (GetOrderGoodsDto goodsDto : items.getGoods()) {
-                    BigDecimal marginData = orderGoodsMarginMapper.getMarginByGoodsId(goodsDto.getId()).getMargin();
-                    goodsDto.setMargin(marginData);
+                    OrderGoodsMargin orderGoodsMarginData = orderGoodsMarginMapper.getMarginByGoodsId(goodsDto.getId());
+                    if (null == orderGoodsMarginData) {
+                        goodsDto.setMargin(new BigDecimal(0));
+                    } else {
+                        goodsDto.setMargin(orderGoodsMarginData.getMargin());
+                    }
                 }
             }
         }
