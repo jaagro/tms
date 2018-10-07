@@ -231,7 +231,7 @@ public class WaybillServiceImpl implements WaybillService {
             //拿到卸货信息
             ShowSiteDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());
             getWaybillItemsDto
-                    .setUnloadSite(unloadSite)
+                    .setShowSiteDto(unloadSite)
                     .setGoods(getWaybillGoodsDtoList);
             getWaybillItemsDtoList.add(getWaybillItemsDto);
         }
