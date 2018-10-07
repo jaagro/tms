@@ -93,11 +93,21 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         if (GoodsType.CHICKEN.equals(goodType)) {
             ShowSiteDto loadSite = customerClientService.getShowSiteById(waybillDtos.get(0).getLoadSiteId());
             if (GoodsType.CHICKEN.equals(loadSite.getProductType())) {
+                ListWaybillPlanDto dtoPrevious = new ListWaybillPlanDto();
                 for (int i = 0; i < waybillDtos.size(); i++) {
                     ListWaybillPlanDto dto = waybillDtos.get(i);
+                    Integer capacity = 0;
+                    Integer needTruckTypeId;
+                    if (i != 0) {
+                        needTruckTypeId = dtoPrevious.getNeedTruckTypeId();
+                        capacity = truckDtos.stream().filter(c -> c.getTruckId().equals(needTruckTypeId)).findAny().get().getCapacity();
+                    }
                     ShowSiteDto unloadSite = dto.getWaybillItems().get(0).getShowSiteDto();
-                    TruckDto truck = truckDtos.stream().filter(c -> c.getTruckId().equals(dto.getNeedTruckTypeId())).findAny().get();
                     Date killTime = unloadSite.getKillTime();
+                    int times = (capacity * 480 / unloadSite.getKillChain()) * i;
+                    Date paramDate = DateUtils.addMinutes(killTime, times);
+                    //计算并重设卸货时间
+                    TruckDto truck = truckDtos.stream().filter(c -> c.getTruckId().equals(dto.getNeedTruckTypeId())).findAny().get();
                     int waitKillTime = 0;
                     if (truck.getKilometres() > 80) {
                         waitKillTime = 30;
@@ -106,17 +116,14 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     } else {
                         waitKillTime = 20;
                     }
-                    int times = (truck.getCapacity() * 480 / unloadSite.getKillChain()) * i;
-                    Date paramDate = DateUtils.addMinutes(killTime, times);
-                    //计算并重设卸货时间
                     Date unloadTime = DateUtils.addMinutes(paramDate, -waitKillTime);
                     Date requiredTime = dto.getWaybillItems().get(0).getRequiredTime();
-                    String strDate = DateFormatUtils.format(requiredTime,"yyyy-MM-dd");
-                    String strTime = DateFormatUtils.format(unloadTime,"HH:mm:ss");
-                    String DateTime = strDate +" " +strTime;
+                    String strDate = DateFormatUtils.format(requiredTime, "yyyy-MM-dd");
+                    String strTime = DateFormatUtils.format(unloadTime, "HH:mm:ss");
+                    String dateTime = strDate + " " + strTime;
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     try {
-                        unloadTime = sdf.parse(DateTime);
+                        unloadTime = sdf.parse(dateTime);
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -130,16 +137,17 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     int catchTime = catchChickenTimes.get(0).getCatchTime();
                     Date loadTime = DateUtils.addMinutes(DateUtils.addMinutes(unloadTime, -truck.getTravelTime()), -loadSite.getOperationTime());
                     loadTime = DateUtils.addMinutes(DateUtils.addMinutes(loadTime, -catchTime), -20);
-                    strDate = DateFormatUtils.format(dto.getLoadTime(),"yyyy-MM-dd");
-                    strTime = DateFormatUtils.format(loadTime,"HH:mm:ss");
-                    DateTime = strDate +" " +strTime;
+                    strDate = DateFormatUtils.format(dto.getLoadTime(), "yyyy-MM-dd");
+                    strTime = DateFormatUtils.format(loadTime, "HH:mm:ss");
+                    dateTime = strDate + " " + strTime;
                     try {
-                        loadTime = sdf.parse(DateTime);
+                        loadTime = sdf.parse(dateTime);
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
 
                     dto.setLoadTime(loadTime);
+                    dtoPrevious = dto;
                 }
             }
         }

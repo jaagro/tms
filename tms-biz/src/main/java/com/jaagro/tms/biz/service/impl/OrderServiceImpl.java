@@ -165,13 +165,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
-        Set<Integer> departIds = new HashSet<>();
-        departIds.add(107);
-        departIds.add(100);
-        departIds = userClientService.getDownDepartment();
-        System.out.println("departIds===="+ departIds);
+        Set<Integer>  departIds = userClientService.getDownDepartment();
         List<Integer> dids = new ArrayList<>(departIds);
-        if (departIds.size()!=0){
+        if (dids.size()!=0){
             criteriaDto.setDepartIds(dids);
         }
         List<ListOrderDto> orderDtos = this.ordersMapper.listOrdersByCriteria(criteriaDto);
