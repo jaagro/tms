@@ -94,60 +94,68 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             ShowSiteDto loadSite = customerClientService.getShowSiteById(waybillDtos.get(0).getLoadSiteId());
             if (GoodsType.CHICKEN.equals(loadSite.getProductType())) {
                 ListWaybillPlanDto dtoPrevious = new ListWaybillPlanDto();
+                Date unloadTimePrevious = new Date();
+                Date loadTimePrevious = new Date();
+                Date loadTime = new Date();
+                Date unloadTime = new Date();
                 for (int i = 0; i < waybillDtos.size(); i++) {
                     ListWaybillPlanDto dto = waybillDtos.get(i);
+                    ShowSiteDto unloadSite = dto.getWaybillItems().get(0).getShowSiteDto();
                     Integer capacity = 0;
                     Integer needTruckTypeId;
                     if (i != 0) {
                         needTruckTypeId = dtoPrevious.getNeedTruckTypeId();
                         capacity = truckDtos.stream().filter(c -> c.getTruckId().equals(needTruckTypeId)).findAny().get().getCapacity();
-                    }
-                    ShowSiteDto unloadSite = dto.getWaybillItems().get(0).getShowSiteDto();
-                    Date killTime = unloadSite.getKillTime();
-                    int times = (capacity * 480 / unloadSite.getKillChain()) * i;
-                    Date paramDate = DateUtils.addMinutes(killTime, times);
-                    //计算并重设卸货时间
-                    TruckDto truck = truckDtos.stream().filter(c -> c.getTruckId().equals(dto.getNeedTruckTypeId())).findAny().get();
-                    int waitKillTime = 0;
-                    if (truck.getKilometres() > 80) {
-                        waitKillTime = 30;
-                    } else if (truck.getKilometres() > 30) {
-                        waitKillTime = 25;
-                    } else {
-                        waitKillTime = 20;
-                    }
-                    Date unloadTime = DateUtils.addMinutes(paramDate, -waitKillTime);
-                    Date requiredTime = dto.getWaybillItems().get(0).getRequiredTime();
-                    String strDate = DateFormatUtils.format(requiredTime, "yyyy-MM-dd");
-                    String strTime = DateFormatUtils.format(unloadTime, "HH:mm:ss");
-                    String dateTime = strDate + " " + strTime;
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    try {
-                        unloadTime = sdf.parse(dateTime);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                        int marginTime =capacity * 480 / unloadSite.getKillChain();
+                        unloadTime = DateUtils.addMinutes(unloadTimePrevious, marginTime);
+                        loadTime = DateUtils.addMinutes(loadTimePrevious, marginTime);
+                    }else{
+                        TruckDto truck = truckDtos.stream().filter(c -> c.getTruckId().equals(dto.getNeedTruckTypeId())).findAny().get();
+                        Date killTime = unloadSite.getKillTime();
+                        int times = (capacity * 480 / unloadSite.getKillChain()) * i;
+                        Date paramDate = DateUtils.addMinutes(killTime, times);
+                        //计算并重设卸货时间
+                        int waitKillTime = 0;
+                        if (truck.getKilometres() > 80) {
+                            waitKillTime = 30;
+                        } else if (truck.getKilometres() > 30) {
+                            waitKillTime = 25;
+                        } else {
+                            waitKillTime = 20;
+                        }
+                        unloadTime = DateUtils.addMinutes(paramDate, -waitKillTime);
+                        Date requiredTime = dto.getWaybillItems().get(0).getRequiredTime();
+                        String strDate = DateFormatUtils.format(requiredTime, "yyyy-MM-dd");
+                        String strTime = DateFormatUtils.format(unloadTime, "HH:mm:ss");
+                        String dateTime = strDate + " " + strTime;
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        try {
+                            unloadTime = sdf.parse(dateTime);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        //计算并重设装货时间
+                        CatchChickenTime catchChickenTime = new CatchChickenTime();
+                        catchChickenTime.setFarmsType(loadSite.getFarmsType());
+                        catchChickenTime.setTruckTypeId(truck.getTruckId());
+                        List<CatchChickenTime> catchChickenTimes = catchChickenTimeMapperExt.listCatchChickenTimeByCriteria(catchChickenTime);
+                        int catchTime = catchChickenTimes.get(0).getCatchTime();
+                        loadTime = DateUtils.addMinutes(DateUtils.addMinutes(unloadTime, -truck.getTravelTime()), -loadSite.getOperationTime());
+                        loadTime = DateUtils.addMinutes(DateUtils.addMinutes(loadTime, -catchTime), -20);
+                        strDate = DateFormatUtils.format(dto.getLoadTime(), "yyyy-MM-dd");
+                        strTime = DateFormatUtils.format(loadTime, "HH:mm:ss");
+                        dateTime = strDate + " " + strTime;
+                        try {
+                            loadTime = sdf.parse(dateTime);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
                     dto.getWaybillItems().get(0).setRequiredTime(unloadTime);
-
-                    //计算并重设装货时间
-                    CatchChickenTime catchChickenTime = new CatchChickenTime();
-                    catchChickenTime.setFarmsType(loadSite.getFarmsType());
-                    catchChickenTime.setTruckTypeId(truck.getTruckId());
-                    List<CatchChickenTime> catchChickenTimes = catchChickenTimeMapperExt.listCatchChickenTimeByCriteria(catchChickenTime);
-                    int catchTime = catchChickenTimes.get(0).getCatchTime();
-                    Date loadTime = DateUtils.addMinutes(DateUtils.addMinutes(unloadTime, -truck.getTravelTime()), -loadSite.getOperationTime());
-                    loadTime = DateUtils.addMinutes(DateUtils.addMinutes(loadTime, -catchTime), -20);
-                    strDate = DateFormatUtils.format(dto.getLoadTime(), "yyyy-MM-dd");
-                    strTime = DateFormatUtils.format(loadTime, "HH:mm:ss");
-                    dateTime = strDate + " " + strTime;
-                    try {
-                        loadTime = sdf.parse(dateTime);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
                     dto.setLoadTime(loadTime);
                     dtoPrevious = dto;
+                    unloadTimePrevious = unloadTime;
+                    loadTimePrevious = loadTime;
                 }
             }
         }
