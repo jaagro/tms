@@ -74,12 +74,13 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     private MessageMapperExt messageMapper;
     @Autowired
-    private UserClientService userClientService;
+    private AuthClientService authClientService;
     @Autowired
     private OssSignUrlClientService ossSignUrlClientService;
     @Autowired
     private SmsClientService smsClientService;
-
+    @Autowired
+    private UserClientService userClientService;
     /**
      * @param waybillDtoList
      * @return
@@ -230,7 +231,7 @@ public class WaybillServiceImpl implements WaybillService {
             //拿到卸货信息
             ShowSiteDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());
             getWaybillItemsDto
-                    .setUnloadSite(unloadSite)
+                    .setShowSiteDto(unloadSite)
                     .setGoods(getWaybillGoodsDtoList);
             getWaybillItemsDtoList.add(getWaybillItemsDto);
         }
@@ -977,7 +978,7 @@ public class WaybillServiceImpl implements WaybillService {
         for (int i = 0; i < drivers.size(); i++) {
             DriverReturnDto driver = drivers.get(i);
             Map<String, Object> templateMap = new HashMap<>();
-            templateMap.put("drvierName", driver.getName());
+            templateMap.put("driverName", driver.getName());
             BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(), "SMS_146803933", templateMap);
             log.trace("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
             System.out.println("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
@@ -1005,6 +1006,11 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        Set<Integer> departIds = userClientService.getDownDepartment();
+        List<Integer> dids = new ArrayList<>(departIds);
+        if (dids.size()!=0){
+            criteriaDto.setDepartIds(dids);
+        }
         List<ListWaybillDto> listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
@@ -1018,7 +1024,7 @@ public class WaybillServiceImpl implements WaybillService {
                     }
                 }
                 if (waybill.getCreatedUserId() != null) {
-                    UserInfo userInfo = this.userClientService.getUserInfoById(waybill.getCreatedUserId(), "employee");
+                    UserInfo userInfo = this.authClientService.getUserInfoById(waybill.getCreatedUserId(), "employee");
                     if (userInfo != null) {
                         ShowUserDto userDto = new ShowUserDto();
                         userDto.setUserName(userInfo.getName());
