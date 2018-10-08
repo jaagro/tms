@@ -35,6 +35,11 @@ public class ListWaybillCriteriaDto implements Serializable {
     private Integer id;
 
     /**
+     * 订单编号
+     */
+    private Integer orderId;
+
+    /**
      * 派单时间
      */
     private Date createTime;
