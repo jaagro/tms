@@ -93,6 +93,9 @@
         <if test="id != null">
             and id = #{id}
         </if>
+        <if test="orderId != null">
+            and order_id = #{orderId}
+        </if>
         <if test="createTime != null">
             <![CDATA[and create_time = #{createTime}]]>
         </if>
