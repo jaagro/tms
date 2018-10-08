@@ -49,5 +49,5 @@ public interface CustomerClientService {
      * @return
      */
     @GetMapping("/getCustomerContactByCustomerId/{customerId}")
-    CustomerContactsReturnDto getCustomerContactByCustomerId(@PathVariable Integer customerId);
+    CustomerContactsReturnDto getCustomerContactByCustomerId(@PathVariable("customerId") Integer customerId);
 }
