@@ -81,6 +81,7 @@ public class WaybillServiceImpl implements WaybillService {
     private SmsClientService smsClientService;
     @Autowired
     private UserClientService userClientService;
+
     /**
      * @param waybillDtoList
      * @return
@@ -89,7 +90,10 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
-        System.out.println(waybillDtoList);
+        String departmentId = currentUserService.getCurrentUser().getDepartmentId().toString();
+        if (StringUtils.isEmpty(departmentId)) {
+            throw new NullPointerException("当前用户的部门为空，没有权限做运单");
+        }
         Integer userId = getUserId();
         //更新orders表的状态OrderStatus.STOWAGE
         for (CreateWaybillDto createWaybillDto : waybillDtoList) {
@@ -103,6 +107,9 @@ public class WaybillServiceImpl implements WaybillService {
             break;
         }
         for (CreateWaybillDto createWaybillDto : waybillDtoList) {
+            if (StringUtils.isEmpty(createWaybillDto.getLoadSiteId())) {
+                throw new NullPointerException("装货地id为空");
+            }
             Integer orderId = createWaybillDto.getOrderId();
             Waybill waybill = new Waybill();
             waybill.setOrderId(orderId);
@@ -118,6 +125,9 @@ public class WaybillServiceImpl implements WaybillService {
             int waybillId = waybill.getId();
             List<CreateWaybillItemsDto> waybillItemsList = createWaybillDto.getWaybillItems();
             for (CreateWaybillItemsDto waybillItemsDto : waybillItemsList) {
+                if (StringUtils.isEmpty(waybillItemsDto.getUnloadSiteId())) {
+                    throw new NullPointerException("卸货地id为空");
+                }
                 WaybillItems waybillItem = new WaybillItems();
                 waybillItem.setWaybillId(waybillId);
                 waybillItem.setUnloadSiteId(waybillItemsDto.getUnloadSiteId());
@@ -1008,7 +1018,7 @@ public class WaybillServiceImpl implements WaybillService {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
         Set<Integer> departIds = userClientService.getDownDepartment();
         List<Integer> dids = new ArrayList<>(departIds);
-        if (dids.size()!=0){
+        if (dids.size() != 0) {
             criteriaDto.setDepartIds(dids);
         }
         List<ListWaybillDto> listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
