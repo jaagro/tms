@@ -142,11 +142,11 @@ public class OrderServiceImpl implements OrderService {
         GetOrderDto orderDto = new GetOrderDto();
         BeanUtils.copyProperties(order, orderDto);
         orderDto
+                .setContactsDto(this.customerService.getCustomerContactByCustomerId(order.getCustomerId()))
                 .setCustomer(this.customerService.getShowCustomerById(order.getCustomerId()))
                 .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                 .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()))
                 .setOrderItems(this.orderItemsService.listByOrderId(order.getId()));
-
         UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
         if (userInfo != null) {
             ShowUserDto userDto = new ShowUserDto();
