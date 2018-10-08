@@ -83,6 +83,10 @@ public class GetWaybillAppDto implements Serializable {
      */
     private Integer modifyUserId;
     /**
+     * 要求提货时间
+     */
+    private Date loadTime;
+    /**
      * 运单明细list
      */
     private List<GetWaybillItemsAppDto> waybillItems;

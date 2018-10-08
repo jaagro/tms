@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tony
@@ -57,5 +58,10 @@ public class ListOrderCriteriaDto implements Serializable {
      * 要求装货截止时间
      */
     private Date loadEndTime;
+
+    /**
+     * 登陆人所在部门和下属所有部门
+     */
+    private List<Integer> departIds;
 
 }

@@ -88,4 +88,9 @@ public class GetWaybillDto implements Serializable {
      * 运单轨迹
      */
     private List<GetTrackingDto> tracking;
+
+    /**
+     * 装货时间
+     */
+    private Date loadTime;
 }

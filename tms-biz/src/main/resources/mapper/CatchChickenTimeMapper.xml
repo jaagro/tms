@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jaagro.tms.biz.mapper.CatchChickenTimeMapperExt" >
+  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.CatchChickenTime" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="farms_type" property="farmsType" jdbcType="INTEGER" />
+    <result column="truck_type_id" property="truckTypeId" jdbcType="INTEGER" />
+    <result column="catch_time" property="catchTime" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, farms_type, truck_type_id, catch_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from catch_chicken_time
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from catch_chicken_time
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.CatchChickenTime" >
+    insert into catch_chicken_time (id, farms_type, truck_type_id, 
+      catch_time)
+    values (#{id,jdbcType=INTEGER}, #{farmsType,jdbcType=INTEGER}, #{truckTypeId,jdbcType=INTEGER}, 
+      #{catchTime,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.CatchChickenTime" >
+    insert into catch_chicken_time
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="farmsType != null" >
+        farms_type,
+      </if>
+      <if test="truckTypeId != null" >
+        truck_type_id,
+      </if>
+      <if test="catchTime != null" >
+        catch_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="farmsType != null" >
+        #{farmsType,jdbcType=INTEGER},
+      </if>
+      <if test="truckTypeId != null" >
+        #{truckTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="catchTime != null" >
+        #{catchTime,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.CatchChickenTime" >
+    update catch_chicken_time
+    <set >
+      <if test="farmsType != null" >
+        farms_type = #{farmsType,jdbcType=INTEGER},
+      </if>
+      <if test="truckTypeId != null" >
+        truck_type_id = #{truckTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="catchTime != null" >
+        catch_time = #{catchTime,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.CatchChickenTime" >
+    update catch_chicken_time
+    set farms_type = #{farmsType,jdbcType=INTEGER},
+      truck_type_id = #{truckTypeId,jdbcType=INTEGER},
+      catch_time = #{catchTime,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

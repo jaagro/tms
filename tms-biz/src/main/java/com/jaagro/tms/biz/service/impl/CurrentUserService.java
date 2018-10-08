@@ -2,11 +2,10 @@ package com.jaagro.tms.biz.service.impl;
 
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
-import com.jaagro.tms.biz.service.UserClientService;
+import com.jaagro.tms.biz.service.AuthClientService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 public class CurrentUserService {
     @Autowired
-    private UserClientService tokenClient;
+    private AuthClientService tokenClient;
     @Autowired
     private HttpServletRequest request;
 

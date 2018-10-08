@@ -110,10 +110,10 @@ public class TestController {
         Map<String, Object> templateMap = new HashMap<>();
         templateMap.put("drvierName","driver.getName()");
             BaseResponse response=smsClientService.sendSMS("13600517630","smsTemplate_assignWaybill", templateMap);
+            System.out.println("TestHello=============================++++++++++++++");
             return response;
         }catch (Exception e){
             e.printStackTrace();
-            System.out.println("ssssaaagavin");
         }
         return null;
     }

@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tony
@@ -42,5 +43,8 @@ public class ListWaybillCriteriaDto implements Serializable {
      * 派单时间
      */
     private Date createTime;
-
+    /**
+     * 登陆人所在部门和下属所有部门
+     */
+    private List<Integer> departIds;
 }

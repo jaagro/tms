@@ -13,6 +13,7 @@ import com.jaagro.tms.biz.entity.OrderModifyLog;
 import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.mapper.*;
+import com.jaagro.tms.biz.service.AuthClientService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.UserClientService;
 import com.jaagro.utils.ResponseStatusCode;
@@ -23,9 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author tony
@@ -46,11 +45,13 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderGoodsMapperExt orderGoodsMapper;
     @Autowired
-    private UserClientService userClientService;
+    private AuthClientService authClientService;
     @Autowired
     private OrderModifyLogMapper modifyLogMapper;
     @Autowired
     private WaybillMapperExt waybillMapper;
+    @Autowired
+    private UserClientService userClientService;
 
     /**
      * 创建订单
@@ -64,6 +65,7 @@ public class OrderServiceImpl implements OrderService {
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
         order.setCreatedUserId(currentUserService.getShowUser().getId());
+        order.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
         this.ordersMapper.insertSelective(order);
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
             for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
@@ -116,7 +118,7 @@ public class OrderServiceImpl implements OrderService {
                 .setCustomer(this.customerService.getShowCustomerById(order.getCustomerId()))
                 .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                 .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()));
-        UserInfo userInfo = this.userClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+        UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
         if (userInfo != null) {
             ShowUserDto userDto = new ShowUserDto();
             userDto.setUserName(userInfo.getName());
@@ -134,6 +136,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public GetOrderDto getOrderById(Integer id) {
         Orders order = this.ordersMapper.selectByPrimaryKey(id);
+        if(null == order){
+            throw new NullPointerException(id + " 订单不存在");
+        }
         GetOrderDto orderDto = new GetOrderDto();
         BeanUtils.copyProperties(order, orderDto);
         orderDto
@@ -142,7 +147,7 @@ public class OrderServiceImpl implements OrderService {
                 .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()))
                 .setOrderItems(this.orderItemsService.listByOrderId(order.getId()));
 
-        UserInfo userInfo = this.userClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+        UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
         if (userInfo != null) {
             ShowUserDto userDto = new ShowUserDto();
             userDto.setUserName(userInfo.getName());
@@ -160,6 +165,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        Set<Integer>  departIds = userClientService.getDownDepartment();
+        List<Integer> dids = new ArrayList<>(departIds);
+        if (dids.size()!=0){
+            criteriaDto.setDepartIds(dids);
+        }
         List<ListOrderDto> orderDtos = this.ordersMapper.listOrdersByCriteria(criteriaDto);
 
         if (orderDtos != null && orderDtos.size() > 0) {
@@ -171,7 +181,7 @@ public class OrderServiceImpl implements OrderService {
                         .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
                         .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                         .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
-                UserInfo userInfo = this.userClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+                UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
                 if (userInfo != null) {
                     ShowUserDto userDto = new ShowUserDto();
                     userDto.setUserName(userInfo.getName());

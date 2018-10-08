@@ -33,7 +33,7 @@ public class GetWaybillItemDto implements Serializable {
     /**
      * 卸货地对象
      */
-    private ShowSiteDto unloadSite;
+    private ShowSiteDto showSiteDto;
 
     /**
      * 要求送达时间

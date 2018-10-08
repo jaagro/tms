@@ -5,13 +5,9 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
-
-/**
- * @author tony
- */
 @Data
 @Accessors(chain = true)
-public class Orders implements Serializable {
+public class Orders  implements Serializable {
     /**
      * 
      */
@@ -76,4 +72,10 @@ public class Orders implements Serializable {
      * 修改人id
      */
     private Integer modifyUserId;
+
+    /**
+     * 部门id
+     */
+    private Integer departmentId;
+
 }

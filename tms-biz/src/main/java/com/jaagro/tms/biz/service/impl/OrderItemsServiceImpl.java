@@ -2,21 +2,25 @@ package com.jaagro.tms.biz.service.impl;
 
 import com.jaagro.tms.api.dto.order.CreateOrderGoodsDto;
 import com.jaagro.tms.api.dto.order.CreateOrderItemsDto;
+import com.jaagro.tms.api.dto.order.GetOrderGoodsDto;
 import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
-import com.jaagro.tms.biz.mapper.*;
-import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
+import com.jaagro.tms.biz.entity.OrderGoodsMargin;
 import com.jaagro.tms.biz.entity.OrderItems;
+import com.jaagro.tms.biz.mapper.OrderGoodsMapperExt;
+import com.jaagro.tms.biz.mapper.OrderGoodsMarginMapperExt;
+import com.jaagro.tms.biz.mapper.OrderItemsMapperExt;
+import com.jaagro.tms.biz.mapper.OrdersMapperExt;
+import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
-import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +39,8 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     private OrdersMapperExt ordersMapper;
     @Autowired
     private OrderGoodsMapperExt orderGoodsMapper;
+    @Autowired
+    private OrderGoodsMarginMapperExt orderGoodsMarginMapper;
     @Autowired
     private OrderGoodsService goodsService;
     @Autowired
@@ -112,7 +118,14 @@ public class OrderItemsServiceImpl implements OrderItemsService {
                 items
                         .setModifyUserId(this.currentUserService.getShowUser())
                         .setUnload(this.customerService.getShowSiteById(orderItems.getUnloadId()));
-
+                for (GetOrderGoodsDto goodsDto : items.getGoods()) {
+                    OrderGoodsMargin orderGoodsMarginData = orderGoodsMarginMapper.getMarginByGoodsId(goodsDto.getId());
+                    if (null == orderGoodsMarginData) {
+                        goodsDto.setMargin(new BigDecimal(0));
+                    } else {
+                        goodsDto.setMargin(orderGoodsMarginData.getMargin());
+                    }
+                }
             }
         }
         return getOrderItemsDtoList;
