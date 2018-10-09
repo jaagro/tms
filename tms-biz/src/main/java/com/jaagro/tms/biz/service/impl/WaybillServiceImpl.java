@@ -561,7 +561,7 @@ public class WaybillServiceImpl implements WaybillService {
         if (WaybillStatus.DELIVERY.equals(dto.getWaybillStatus())) {
             waybillTracking
                     .setNewStatus(WaybillStatus.SIGN)
-                    .setOldStatus(waybill.getWaybillStatus());
+                    .setOldStatus(WaybillStatus.DELIVERY);
             waybillTrackingMapper.insert(waybillTracking);
             waybill.setWaybillStatus(WaybillStatus.SIGN);
             waybillMapper.updateByPrimaryKey(waybill);
@@ -575,17 +575,14 @@ public class WaybillServiceImpl implements WaybillService {
                     .setSignStatus(SignStatusConstant.UNSIGN);
             List<Map<String, Long>> unSignUnloadSite = waybillItemsMapper.listWaybillIdIdAndSignStatus(waybillItemsCondtion);
             if (!CollectionUtils.isEmpty(unSignUnloadSite)) {
-                waybillTracking
-                        .setNewStatus(WaybillStatus.ACCOMPLISH)
-                        .setOldStatus(WaybillStatus.SIGN);
-                waybillTrackingMapper.insert(waybillTracking);
-                //如果只有一个卸货地未签,则不更新该状态
-                if (unSignUnloadSite.size() != 1) {
-                    waybillTracking
-                            .setNewStatus(WaybillStatus.DELIVERY)
-                            .setOldStatus(WaybillStatus.DELIVERY);
-                    waybillTrackingMapper.insert(waybillTracking);
+                waybillTracking.setOldStatus(WaybillStatus.SIGN);
+                if (unSignUnloadSite.size() == 1) {
+                    waybillTracking.setNewStatus(WaybillStatus.ACCOMPLISH);
+
+                } else {
+                    waybillTracking.setNewStatus(WaybillStatus.DELIVERY);
                 }
+                waybillTrackingMapper.insert(waybillTracking);
                 //更新卸货物信息
                 List<ConfirmProductDto> unLoadSiteConfirmProductDtos = dto.getConfirmProductDtos();
                 for (ConfirmProductDto unLoadSiteconfirmProductDto : unLoadSiteConfirmProductDtos) {
