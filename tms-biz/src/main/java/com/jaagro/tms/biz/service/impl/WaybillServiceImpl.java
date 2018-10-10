@@ -943,6 +943,7 @@ public class WaybillServiceImpl implements WaybillService {
         //2.更新waybill
         waybill.setTruckId(truckId);
         waybill.setWaybillStatus(waybillNewStatus);
+        waybill.setSendTime(new Date());
         waybill.setModifyTime(new Date());
         waybill.setModifyUserId(userId);
         waybillMapper.updateByPrimaryKeySelective(waybill);
