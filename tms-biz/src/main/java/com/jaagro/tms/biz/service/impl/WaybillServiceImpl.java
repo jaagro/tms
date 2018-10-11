@@ -625,19 +625,30 @@ public class WaybillServiceImpl implements WaybillService {
                         .setId(unLoadSiteConfirmProductDtos.get(0).getWaybillItemId());
                 waybillItemsMapper.updateByPrimaryKeySelective(waybillItems);
             }
-            //如果运单全部签收 更改订单状态 运单状态
+            //如果运单全部签收 运单状态
             if (unSignUnloadSite.size() == 1) {
-
                 //更改运单状态
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
                 waybillMapper.updateByPrimaryKeySelective(waybill);
+                return ServiceResult.toResult(SignStatusConstant.SIGN_ALL);
+            }
+            //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
+            List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
+            int count = 0;
+            for (Waybill w : waybills) {
+                if ("已完成".equals(w.getWaybillStatus())) {
+                    count++;
+                }
+            }
+            if (waybills.size() == count) {
                 Orders orderUpdate = new Orders();
                 //更改订单状态
                 orderUpdate
                         .setId(orders.getId())
                         .setOrderStatus(OrderStatus.ACCOMPLISH);
                 ordersMapper.updateByPrimaryKeySelective(orderUpdate);
-                return ServiceResult.toResult(SignStatusConstant.SIGN_ALL);
+            } else {
+                log.debug("当前订单下的运单未全部操作完毕，不修改状态");
             }
             return ServiceResult.toResult("操作成功");
         }
