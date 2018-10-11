@@ -105,6 +105,7 @@
                 ${did}
             </foreach>
         </if>
+        and waybill_status not in ('待派单','待接单')
         order by create_time desc
     </select>
     <select id="listWaybillWaitByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">

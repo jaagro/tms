@@ -561,7 +561,7 @@ public class WaybillServiceImpl implements WaybillService {
         if (WaybillStatus.DELIVERY.equals(dto.getWaybillStatus())) {
             waybillTracking
                     .setNewStatus(WaybillStatus.SIGN)
-                    .setOldStatus(waybill.getWaybillStatus());
+                    .setOldStatus(WaybillStatus.DELIVERY);
             waybillTrackingMapper.insert(waybillTracking);
             waybill.setWaybillStatus(WaybillStatus.SIGN);
             waybillMapper.updateByPrimaryKey(waybill);
@@ -575,17 +575,14 @@ public class WaybillServiceImpl implements WaybillService {
                     .setSignStatus(SignStatusConstant.UNSIGN);
             List<Map<String, Long>> unSignUnloadSite = waybillItemsMapper.listWaybillIdIdAndSignStatus(waybillItemsCondtion);
             if (!CollectionUtils.isEmpty(unSignUnloadSite)) {
-                waybillTracking
-                        .setNewStatus(WaybillStatus.ACCOMPLISH)
-                        .setOldStatus(WaybillStatus.SIGN);
-                waybillTrackingMapper.insert(waybillTracking);
-                //如果只有一个卸货地未签,则不更新该状态
-                if (unSignUnloadSite.size() != 1) {
-                    waybillTracking
-                            .setNewStatus(WaybillStatus.DELIVERY)
-                            .setOldStatus(WaybillStatus.DELIVERY);
-                    waybillTrackingMapper.insert(waybillTracking);
+                waybillTracking.setOldStatus(WaybillStatus.SIGN);
+                if (unSignUnloadSite.size() == 1) {
+                    waybillTracking.setNewStatus(WaybillStatus.ACCOMPLISH);
+
+                } else {
+                    waybillTracking.setNewStatus(WaybillStatus.DELIVERY);
                 }
+                waybillTrackingMapper.insert(waybillTracking);
                 //更新卸货物信息
                 List<ConfirmProductDto> unLoadSiteConfirmProductDtos = dto.getConfirmProductDtos();
                 for (ConfirmProductDto unLoadSiteconfirmProductDto : unLoadSiteConfirmProductDtos) {
@@ -628,19 +625,30 @@ public class WaybillServiceImpl implements WaybillService {
                         .setId(unLoadSiteConfirmProductDtos.get(0).getWaybillItemId());
                 waybillItemsMapper.updateByPrimaryKeySelective(waybillItems);
             }
-            //如果运单全部签收 更改订单状态 运单状态
+            //如果运单全部签收 运单状态
             if (unSignUnloadSite.size() == 1) {
-
                 //更改运单状态
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
                 waybillMapper.updateByPrimaryKeySelective(waybill);
+                return ServiceResult.toResult(SignStatusConstant.SIGN_ALL);
+            }
+            //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
+            List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
+            int count = 0;
+            for (Waybill w : waybills) {
+                if ("已完成".equals(w.getWaybillStatus())) {
+                    count++;
+                }
+            }
+            if (waybills.size() == count) {
                 Orders orderUpdate = new Orders();
                 //更改订单状态
                 orderUpdate
                         .setId(orders.getId())
                         .setOrderStatus(OrderStatus.ACCOMPLISH);
                 ordersMapper.updateByPrimaryKeySelective(orderUpdate);
-                return ServiceResult.toResult(SignStatusConstant.SIGN_ALL);
+            } else {
+                log.debug("当前订单下的运单未全部操作完毕，不修改状态");
             }
             return ServiceResult.toResult("操作成功");
         }
@@ -943,6 +951,7 @@ public class WaybillServiceImpl implements WaybillService {
         //2.更新waybill
         waybill.setTruckId(truckId);
         waybill.setWaybillStatus(waybillNewStatus);
+        waybill.setSendTime(new Date());
         waybill.setModifyTime(new Date());
         waybill.setModifyUserId(userId);
         waybillMapper.updateByPrimaryKeySelective(waybill);
