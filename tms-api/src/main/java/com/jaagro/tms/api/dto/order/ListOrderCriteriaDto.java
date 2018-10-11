@@ -64,4 +64,9 @@ public class ListOrderCriteriaDto implements Serializable {
      */
     private List<Integer> departIds;
 
+    /**
+     * 区分待派单列表和订单列表
+     */
+    private String waitOrders;
+
 }

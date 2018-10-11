@@ -44,6 +44,9 @@
             ${did}
         </foreach>
         </if>
+        <if test="waitOrders != null">
+            and order_status != #{waitOrders}
+        </if>
         order by create_time desc
     </select>
 </mapper>

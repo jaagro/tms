@@ -171,7 +171,6 @@ public class OrderServiceImpl implements OrderService {
             criteriaDto.setDepartIds(dids);
         }
         List<ListOrderDto> orderDtos = this.ordersMapper.listOrdersByCriteria(criteriaDto);
-
         if (orderDtos != null && orderDtos.size() > 0) {
             for (ListOrderDto orderDto : orderDtos
             ) {
