@@ -45,7 +45,7 @@
         </foreach>
         </if>
         <if test="waitOrders != null">
-            and order_status != #{waitOrders}
+            and order_status not in ('已下单','取消')
         </if>
         order by create_time desc
     </select>
