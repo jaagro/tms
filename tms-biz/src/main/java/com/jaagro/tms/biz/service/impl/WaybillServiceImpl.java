@@ -124,16 +124,15 @@ public class WaybillServiceImpl implements WaybillService {
             waybillMapper.insertSelective(waybill);
             int waybillId = waybill.getId();
             List<CreateWaybillItemsDto> waybillItemsList = createWaybillDto.getWaybillItems();
-            for (CreateWaybillItemsDto waybillItemsDto : waybillItemsList) {
+
+             for (int i=0;i<waybillItemsList.size();i++){
+
+                 CreateWaybillItemsDto waybillItemsDto =  waybillItemsList.get(i);
                 if (StringUtils.isEmpty(waybillItemsDto.getUnloadSiteId())) {
                     throw new NullPointerException("卸货地id为空");
                 }
-
-
-                List<WaybillItems> waybillItemsDoList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
-                WaybillItems waybillItems = waybillItemsDoList.stream().filter(c -> c.getUnloadSiteId().equals(waybillItemsDto.getUnloadSiteId())).collect(Collectors.toList()).get(0);
-                int waybillItemsId = 0;
-                if (null == waybillItems) {
+                 int waybillItemsId = 0;
+                if(i==0){
                     WaybillItems waybillItem = new WaybillItems();
                     waybillItem.setWaybillId(waybillId);
                     waybillItem.setUnloadSiteId(waybillItemsDto.getUnloadSiteId());
@@ -141,9 +140,22 @@ public class WaybillServiceImpl implements WaybillService {
                     waybillItem.setModifyUserId(userId);
                     waybillItemsMapper.insertSelective(waybillItem);
                     waybillItemsId = waybillItem.getId();
-                } else {
-                    waybillItemsId = waybillItems.getId();
+                }else{
+                    List<WaybillItems> waybillItemsDoList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
+                    WaybillItems waybillItems = waybillItemsDoList.stream().filter(c -> c.getUnloadSiteId().equals(waybillItemsDto.getUnloadSiteId())).collect(Collectors.toList()).get(0);
+                    if (null == waybillItems) {
+                        WaybillItems waybillItem = new WaybillItems();
+                        waybillItem.setWaybillId(waybillId);
+                        waybillItem.setUnloadSiteId(waybillItemsDto.getUnloadSiteId());
+                        waybillItem.setRequiredTime(waybillItemsDto.getRequiredTime());
+                        waybillItem.setModifyUserId(userId);
+                        waybillItemsMapper.insertSelective(waybillItem);
+                        waybillItemsId = waybillItem.getId();
+                    }else{
+                        waybillItemsId = waybillItems.getId();
+                    }
                 }
+
 
                 List<CreateWaybillGoodsDto> createWaybillGoodsDtoList = waybillItemsDto.getGoods();
                 for (CreateWaybillGoodsDto createWaybillGoodsDto : createWaybillGoodsDtoList) {
