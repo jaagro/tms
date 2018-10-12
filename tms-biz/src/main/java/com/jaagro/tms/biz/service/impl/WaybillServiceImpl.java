@@ -128,13 +128,22 @@ public class WaybillServiceImpl implements WaybillService {
                 if (StringUtils.isEmpty(waybillItemsDto.getUnloadSiteId())) {
                     throw new NullPointerException("卸货地id为空");
                 }
-                WaybillItems waybillItem = new WaybillItems();
-                waybillItem.setWaybillId(waybillId);
-                waybillItem.setUnloadSiteId(waybillItemsDto.getUnloadSiteId());
-                waybillItem.setRequiredTime(waybillItemsDto.getRequiredTime());
-                waybillItem.setModifyUserId(userId);
-                waybillItemsMapper.insertSelective(waybillItem);
-                int waybillItemsId = waybillItem.getId();
+
+
+                List<WaybillItems> waybillItemsDoList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
+                WaybillItems waybillItems = waybillItemsDoList.stream().filter(c -> c.getUnloadSiteId().equals(waybillItemsDto.getUnloadSiteId())).collect(Collectors.toList()).get(0);
+                int waybillItemsId = 0;
+                if (null == waybillItems) {
+                    WaybillItems waybillItem = new WaybillItems();
+                    waybillItem.setWaybillId(waybillId);
+                    waybillItem.setUnloadSiteId(waybillItemsDto.getUnloadSiteId());
+                    waybillItem.setRequiredTime(waybillItemsDto.getRequiredTime());
+                    waybillItem.setModifyUserId(userId);
+                    waybillItemsMapper.insertSelective(waybillItem);
+                    waybillItemsId = waybillItem.getId();
+                } else {
+                    waybillItemsId = waybillItems.getId();
+                }
 
                 List<CreateWaybillGoodsDto> createWaybillGoodsDtoList = waybillItemsDto.getGoods();
                 for (CreateWaybillGoodsDto createWaybillGoodsDto : createWaybillGoodsDtoList) {
@@ -1033,7 +1042,7 @@ public class WaybillServiceImpl implements WaybillService {
         List<ListWaybillDto> listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-            ) {
+                    ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
