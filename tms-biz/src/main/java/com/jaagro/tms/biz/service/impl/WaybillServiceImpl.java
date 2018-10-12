@@ -142,8 +142,9 @@ public class WaybillServiceImpl implements WaybillService {
                     waybillItemsId = waybillItem.getId();
                 }else{
                     List<WaybillItems> waybillItemsDoList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
-                    WaybillItems waybillItems = waybillItemsDoList.stream().filter(c -> c.getUnloadSiteId().equals(waybillItemsDto.getUnloadSiteId())).collect(Collectors.toList()).get(0);
-                    if (null == waybillItems) {
+                    List<WaybillItems> list = waybillItemsDoList.stream().filter(c -> c.getUnloadSiteId().equals(waybillItemsDto.getUnloadSiteId())).collect(Collectors.toList());
+                    if(CollectionUtils.isEmpty(list))
+                    {
                         WaybillItems waybillItem = new WaybillItems();
                         waybillItem.setWaybillId(waybillId);
                         waybillItem.setUnloadSiteId(waybillItemsDto.getUnloadSiteId());
@@ -152,7 +153,7 @@ public class WaybillServiceImpl implements WaybillService {
                         waybillItemsMapper.insertSelective(waybillItem);
                         waybillItemsId = waybillItem.getId();
                     }else{
-                        waybillItemsId = waybillItems.getId();
+                        waybillItemsId = list.get(0).getId();
                     }
                 }
 
