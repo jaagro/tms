@@ -125,14 +125,14 @@ public class WaybillServiceImpl implements WaybillService {
             int waybillId = waybill.getId();
             List<CreateWaybillItemsDto> waybillItemsList = createWaybillDto.getWaybillItems();
 
-             for (int i=0;i<waybillItemsList.size();i++){
+            for (int i = 0; i < waybillItemsList.size(); i++) {
 
-                 CreateWaybillItemsDto waybillItemsDto =  waybillItemsList.get(i);
+                CreateWaybillItemsDto waybillItemsDto = waybillItemsList.get(i);
                 if (StringUtils.isEmpty(waybillItemsDto.getUnloadSiteId())) {
                     throw new NullPointerException("卸货地id为空");
                 }
-                 int waybillItemsId = 0;
-                if(i==0){
+                int waybillItemsId = 0;
+                if (i == 0) {
                     WaybillItems waybillItem = new WaybillItems();
                     waybillItem.setWaybillId(waybillId);
                     waybillItem.setUnloadSiteId(waybillItemsDto.getUnloadSiteId());
@@ -140,11 +140,10 @@ public class WaybillServiceImpl implements WaybillService {
                     waybillItem.setModifyUserId(userId);
                     waybillItemsMapper.insertSelective(waybillItem);
                     waybillItemsId = waybillItem.getId();
-                }else{
+                } else {
                     List<WaybillItems> waybillItemsDoList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
                     List<WaybillItems> list = waybillItemsDoList.stream().filter(c -> c.getUnloadSiteId().equals(waybillItemsDto.getUnloadSiteId())).collect(Collectors.toList());
-                    if(CollectionUtils.isEmpty(list))
-                    {
+                    if (CollectionUtils.isEmpty(list)) {
                         WaybillItems waybillItem = new WaybillItems();
                         waybillItem.setWaybillId(waybillId);
                         waybillItem.setUnloadSiteId(waybillItemsDto.getUnloadSiteId());
@@ -152,7 +151,7 @@ public class WaybillServiceImpl implements WaybillService {
                         waybillItem.setModifyUserId(userId);
                         waybillItemsMapper.insertSelective(waybillItem);
                         waybillItemsId = waybillItem.getId();
-                    }else{
+                    } else {
                         waybillItemsId = list.get(0).getId();
                     }
                 }
@@ -998,8 +997,9 @@ public class WaybillServiceImpl implements WaybillService {
         for (WaybillItems waybillItem : waybillItems) {
             //卸货地
             ShowSiteDto unLoadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
-            unLoadSiteNames.append(unLoadSite.getSiteName());
+            unLoadSiteNames.append(unLoadSite.getSiteName() + "、");
         }
+        String unloadSiteName = unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1);
         String alias = "";
         String msgTitle = "派单消息";
         String msgContent;
@@ -1009,7 +1009,7 @@ public class WaybillServiceImpl implements WaybillService {
             extraParam.put("driverId", driver.getId().toString());
             extraParam.put("waybillId", waybillId.toString());
             //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
-            msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1) + "的运单。";
+            msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
             regId = driver.getRegistrationId();
             JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
         }
@@ -1028,7 +1028,7 @@ public class WaybillServiceImpl implements WaybillService {
             appMessage.setMsgType(1);
             appMessage.setMsgStatus(0);
             appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
-            appMessage.setBody("您有新的运单信息待接单,从" + loadSiteName + "到" + unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1) + "的运单。");
+            appMessage.setBody("您有新的运单信息待接单,从" + loadSiteName + "到" + unloadSiteName + "的运单。");
             appMessage.setCreateTime(new Date());
             appMessage.setCreateUserId(userId);
             appMessage.setFromUserId(userId);
@@ -1037,6 +1037,7 @@ public class WaybillServiceImpl implements WaybillService {
         }
         return ServiceResult.toResult("派单成功");
     }
+
 
     /**
      * 分页查询运单
