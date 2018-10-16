@@ -1025,7 +1025,7 @@ public class WaybillServiceImpl implements WaybillService {
             System.out.println("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
             Message appMessage = new Message();
             appMessage.setReferId(waybillId);
-            appMessage.setMsgType(1);
+            appMessage.setMsgType(2);// 消息类型：1-系统通知 2-运单相关 3-账务相关
             appMessage.setMsgStatus(0);
             appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
             appMessage.setBody("您有新的运单信息待接单,从" + loadSiteName + "到" + unloadSiteName + "的运单。");
