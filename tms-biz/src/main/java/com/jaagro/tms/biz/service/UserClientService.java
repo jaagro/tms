@@ -3,7 +3,7 @@ package com.jaagro.tms.biz.service;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author tony
@@ -16,5 +16,5 @@ public interface UserClientService {
      * @return
      */
     @PostMapping("/getDownDepartment")
-    Set<Integer> getDownDepartment();
+    List<Integer> getDownDepartment();
 }
