@@ -16,7 +16,7 @@
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
         <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
         <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
-        <result column="load_time" jdbcType="TIMESTAMP" property="loadTime" />
+        <result column="load_time" jdbcType="TIMESTAMP" property="loadTime"/>
         <collection property="waybillItems" column="id"
                     select="com.jaagro.tms.biz.mapper.WaybillItemsMapperExt.listByWaybillId"></collection>
     </resultMap>
@@ -130,4 +130,28 @@
         and enabled = 1
         and waybill_status not in ('待派单')
     </select>
+
+    <select id="listOverTimeWaybills" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        FROM
+        waybill
+        WHERE
+        enabled = 1
+        AND waybill_status = '待接单'
+        AND send_time IS NOT NULL
+        <![CDATA[
+        and send_time < DATE_SUB(NOW(),INTERVAL 30 MINUTE)
+        and create_time > DATE_SUB(NOW(), INTERVAL 2 DAY)
+        ]]>
+    </select>
+
+    <update id="batchUpdateWaybillStatus" parameterType="java.util.List">
+        update waybill
+        set waybill_status='已拒单',modify_time=now(),modify_user_id=99999999 where id in
+        <foreach collection="list" item="waybill" index="index" separator="," open="(" close=")">
+            #{waybill.id}
+        </foreach>
+    </update>
+
 </mapper>
