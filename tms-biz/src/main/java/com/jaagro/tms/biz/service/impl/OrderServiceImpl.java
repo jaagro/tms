@@ -136,7 +136,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public GetOrderDto getOrderById(Integer id) {
         Orders order = this.ordersMapper.selectByPrimaryKey(id);
-        if(null == order){
+        if (null == order) {
             throw new NullPointerException(id + " 订单不存在");
         }
         GetOrderDto orderDto = new GetOrderDto();
@@ -165,13 +165,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
-        Set<Integer>  departIds = userClientService.getDownDepartment();
+        Set<Integer> departIds = userClientService.getDownDepartment();
         List<Integer> dids = new ArrayList<>(departIds);
-        if (dids.size()!=0){
+        if (dids.size() != 0) {
             criteriaDto.setDepartIds(dids);
         }
         List<ListOrderDto> orderDtos = this.ordersMapper.listOrdersByCriteria(criteriaDto);
-
         if (orderDtos != null && orderDtos.size() > 0) {
             for (ListOrderDto orderDto : orderDtos
             ) {

@@ -17,7 +17,7 @@
         <if test="newStatus != null">
             and new_status=#{newStatus}
         </if>
-
+        limit 1
     </select>
 
     <select id="listWaybillTrackingByWaybillId" resultMap="DetailInfo" parameterType="java.lang.Integer">
