@@ -20,6 +20,9 @@
         <if test="orderStatus != null">
             and order_status = #{orderStatus}
         </if>
+        <if test="orderId != null ">
+            and id = #{orderId}
+        </if>
         <if test="customerId != null and customerId != 0">
             and customer_id = #{customerId}
         </if>
