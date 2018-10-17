@@ -25,6 +25,11 @@ public class ListOrderCriteriaDto implements Serializable {
     private int pageSize;
 
     /**
+     * 订单编号
+     */
+    private Integer orderId;
+
+    /**
      * 货物类型
      */
     private Integer goodsType;
