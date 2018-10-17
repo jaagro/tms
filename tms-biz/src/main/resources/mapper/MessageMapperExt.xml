@@ -30,5 +30,6 @@
         where enabled=1
         and (to_user_id=#{toUserId} or from_user_type=0)
         and msg_type in(1,2)
+        order by create_time desc
     </select>
 </mapper>

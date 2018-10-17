@@ -16,7 +16,7 @@
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
         <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
         <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
-        <result column="load_time" jdbcType="TIMESTAMP" property="loadTime" />
+        <result column="load_time" jdbcType="TIMESTAMP" property="loadTime"/>
         <collection property="waybillItems" column="id"
                     select="com.jaagro.tms.biz.mapper.WaybillItemsMapperExt.listByWaybillId"></collection>
     </resultMap>
@@ -47,14 +47,26 @@
         where order_id = #{orderId,jdbcType=INTEGER} and enabled = 1
     </select>
     <select id="selectWaybillByCarrierStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
-        select
+        <!--select
         <include refid="Base_Column_List"/>
         from waybill
         where enabled = 1
         and waybill_status in ('待出发','前往装货地','待装货','待送达','待签收')
         <if test="driverId != null">
             and driver_id = #{driverId,jdbcType=INTEGER}
+        </if>-->
+        select wb.*
+        from waybill wb
+        inner join waybill_tracking wt
+        on (wb.id=wt.waybill_id)
+        where enabled = 1
+        and wb.waybill_status
+        in ('待出发','前往装货地','待装货','待送达','待签收')
+        <if test="driverId != null">
+            and wb.driver_id = #{driverId,jdbcType=INTEGER}
         </if>
+        and wt.new_status='待出发'
+        order by wt.create_time DESC
 
     </select>
     <select id="selectWaybillByStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
@@ -74,6 +86,7 @@
         <if test="truckId != null">
             and truck_Id = #{truckId,jdbcType=INTEGER}
         </if>
+        order by create_time DESC
     </select>
     <select id="listWaybillIdByOrderId" resultType="java.lang.Integer">
         select id
@@ -105,6 +118,7 @@
                 ${did}
             </foreach>
         </if>
+        and waybill_status not in ('待派单','待接单')
         order by create_time desc
     </select>
     <select id="listWaybillWaitByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
@@ -116,4 +130,28 @@
         and enabled = 1
         and waybill_status not in ('待派单')
     </select>
+
+    <select id="listOverTimeWaybills" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        FROM
+        waybill
+        WHERE
+        enabled = 1
+        AND waybill_status = '待接单'
+        AND send_time IS NOT NULL
+        <![CDATA[
+        and send_time < DATE_SUB(NOW(),INTERVAL 30 MINUTE)
+        and create_time > DATE_SUB(NOW(), INTERVAL 2 DAY)
+        ]]>
+    </select>
+
+    <update id="batchUpdateWaybillStatus" parameterType="java.util.List">
+        update waybill
+        set waybill_status='已拒单',modify_time=now(),modify_user_id=99999999 where id in
+        <foreach collection="list" item="waybill" index="index" separator="," open="(" close=")">
+            #{waybill.id}
+        </foreach>
+    </update>
+
 </mapper>

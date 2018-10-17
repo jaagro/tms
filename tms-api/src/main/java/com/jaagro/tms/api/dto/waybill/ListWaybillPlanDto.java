@@ -57,4 +57,8 @@ public class ListWaybillPlanDto implements Serializable {
      * 运单状态
      */
     private String waybillStatus;
+    /**
+     * 运单货物的总量
+     */
+    private int totalAmout;
 }

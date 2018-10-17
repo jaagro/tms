@@ -1,5 +1,6 @@
 package com.jaagro.tms.web.controller;
 
+import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.order.CreateOrderDto;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
@@ -171,6 +172,7 @@ public class OrderController {
     @ApiOperation("待派单列表分页")
     @PostMapping("/listToSendOrders")
     public BaseResponse listToSendOrders(@RequestBody ListOrderCriteriaDto criteriaDto) {
+        criteriaDto.setWaitOrders(OrderStatus.PLACE_ORDER);
         return BaseResponse.service(orderService.listOrderByCriteria(criteriaDto));
     }
 }

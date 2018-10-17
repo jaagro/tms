@@ -20,6 +20,9 @@
         <if test="orderStatus != null">
             and order_status = #{orderStatus}
         </if>
+        <if test="orderId != null ">
+            and id = #{orderId}
+        </if>
         <if test="customerId != null and customerId != 0">
             and customer_id = #{customerId}
         </if>
@@ -43,6 +46,9 @@
         <foreach collection="departIds" open="(" separator="," close=")" item="did">
             ${did}
         </foreach>
+        </if>
+        <if test="waitOrders != null">
+            and order_status not in ('已下单','取消')
         </if>
         order by create_time desc
     </select>
