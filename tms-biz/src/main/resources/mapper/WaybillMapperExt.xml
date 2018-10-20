@@ -141,7 +141,7 @@
         AND waybill_status = '待接单'
         AND send_time IS NOT NULL
         <![CDATA[
-        and send_time < DATE_SUB(NOW(),INTERVAL 30 MINUTE)
+        and send_time < DATE_SUB(NOW(),INTERVAL 12 HOUR)
         and create_time > DATE_SUB(NOW(), INTERVAL 2 DAY)
         ]]>
     </select>

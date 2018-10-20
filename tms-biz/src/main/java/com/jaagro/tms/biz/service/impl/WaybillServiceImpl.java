@@ -291,7 +291,7 @@ public class WaybillServiceImpl implements WaybillService {
             System.out.println(imageList);
             getTrackingDto.setImageList(imageList);
         }
-
+       Orders ordersData = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         GetWaybillDto getWaybillDto = new GetWaybillDto();
         getWaybillDto.setTracking(getTrackingDtos);
         BeanUtils.copyProperties(waybill, getWaybillDto);
@@ -300,7 +300,8 @@ public class WaybillServiceImpl implements WaybillService {
                 .setNeedTruckType(truckTypeDto)
                 .setTruckId(truckDto)
                 .setDriverId(showDriverDto)
-                .setWaybillItems(getWaybillItemsDtoList);
+                .setWaybillItems(getWaybillItemsDtoList)
+                .setGoodType(ordersData.getGoodsType());
         return getWaybillDto;
     }
 
