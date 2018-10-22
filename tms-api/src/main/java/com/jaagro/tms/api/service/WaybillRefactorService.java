@@ -14,7 +14,6 @@ import java.util.Map;
 public interface WaybillRefactorService {
 
 
-
     /**
      * 根据id获取waybill对象
      * @param id
