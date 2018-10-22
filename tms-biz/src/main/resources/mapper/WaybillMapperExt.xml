@@ -37,7 +37,6 @@
         update waybill
         set enabled = 0
         where id = #{waybillId}
---         and waybill_status in ('待派单', '待接单', '已拒单')
     </update>
 
     <select id="listWaybillByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
@@ -47,14 +46,6 @@
         where order_id = #{orderId,jdbcType=INTEGER} and enabled = 1
     </select>
     <select id="selectWaybillByCarrierStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
-        <!--select
-        <include refid="Base_Column_List"/>
-        from waybill
-        where enabled = 1
-        and waybill_status in ('待出发','前往装货地','待装货','待送达','待签收')
-        <if test="driverId != null">
-            and driver_id = #{driverId,jdbcType=INTEGER}
-        </if>-->
         select wb.*
         from waybill wb
         inner join waybill_tracking wt

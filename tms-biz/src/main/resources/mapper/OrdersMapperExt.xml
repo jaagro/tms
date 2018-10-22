@@ -16,7 +16,7 @@
         select
         <include refid="Base_Column_List"/>
         from orders
-        where 1=1
+        where 1=1 and enabled = 1
         <if test="orderStatus != null">
             and order_status = #{orderStatus}
         </if>
