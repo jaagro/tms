@@ -179,7 +179,8 @@ public class OrderServiceImpl implements OrderService {
                 orderDto
                         .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
                         .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
-                        .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                        .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()))
+                        .setDepartmentName(userClientService.getDeptNameById(order.getDepartmentId()));
                 UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
                 if (userInfo != null) {
                     ShowUserDto userDto = new ShowUserDto();
