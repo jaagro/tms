@@ -3,40 +3,24 @@ package com.jaagro.tms.biz.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
-import com.jaagro.tms.api.constant.*;
-import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
-import com.jaagro.tms.api.dto.base.ShowUserDto;
+import com.jaagro.tms.api.constant.WaybillConstant;
+import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.driverapp.*;
-import com.jaagro.tms.api.dto.order.GetOrderDto;
-import com.jaagro.tms.api.dto.truck.DriverReturnDto;
-import com.jaagro.tms.api.dto.truck.ShowDriverDto;
-import com.jaagro.tms.api.dto.truck.ShowTruckDto;
-import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillRefactorService;
-import com.jaagro.tms.api.service.WaybillService;
-import com.jaagro.tms.biz.entity.*;
-import com.jaagro.tms.biz.jpush.JpushClientUtil;
+import com.jaagro.tms.biz.entity.Orders;
+import com.jaagro.tms.biz.entity.Waybill;
+import com.jaagro.tms.biz.entity.WaybillTracking;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
-import com.jaagro.utils.BaseResponse;
-import com.jaagro.utils.ResponseStatusCode;
-import com.jaagro.utils.ServiceResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import java.math.BigDecimal;
-import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -49,39 +33,13 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     @Autowired
     private CurrentUserService currentUserService;
     @Autowired
-    private TruckTypeClientService truckTypeClientService;
-    @Autowired
     private CustomerClientService customerClientService;
     @Autowired
     private WaybillMapperExt waybillMapper;
     @Autowired
-    private WaybillItemsMapperExt waybillItemsMapper;
-    @Autowired
-    private WaybillGoodsMapperExt waybillGoodsMapper;
-    @Autowired
     private OrdersMapperExt ordersMapper;
     @Autowired
-    private WaybillTrackingImagesMapperExt waybillTrackingImagesMapper;
-    @Autowired
     private WaybillTrackingMapperExt waybillTrackingMapper;
-    @Autowired
-    private OrderGoodsMarginMapperExt orderGoodsMarginMapper;
-    @Autowired
-    private OrderService orderService;
-    @Autowired
-    private DriverClientService driverClientService;
-    @Autowired
-    private TruckClientService truckClientService;
-    @Autowired
-    private MessageMapperExt messageMapper;
-    @Autowired
-    private AuthClientService authClientService;
-    @Autowired
-    private OssSignUrlClientService ossSignUrlClientService;
-    @Autowired
-    private SmsClientService smsClientService;
-    @Autowired
-    private UserClientService userClientService;
 
     /**
      * 根据状态查询我的运单信息
@@ -124,23 +82,6 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         return null;
     }
 
-
-
-    private Integer getUserId() {
-        UserInfo userInfo = null;
-        try {
-            userInfo = currentUserService.getCurrentUser();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            log.error("获取当前用户失败：currentUserService.getCurrentUser()");
-            return 999999999;
-        }
-        if (null == userInfo) {
-            return 999999999;
-        } else {
-            return userInfo.getId();
-        }
-    }
 
     /**
      * 运单列表公共方法

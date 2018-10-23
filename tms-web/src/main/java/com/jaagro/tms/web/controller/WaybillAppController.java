@@ -37,7 +37,6 @@ public class WaybillAppController {
         if (StringUtils.isEmpty(dto.getWaybillStatus())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单状态参数为空");
         }
-//        Map<String, Object> waybill = waybillService.listWaybillByStatus(dto);
         PageInfo  waybill= waybillRefactorService.listWaybillByStatus(dto);
         return BaseResponse.successInstance(waybill);
     }
