@@ -193,26 +193,6 @@ public class WaybillServiceImpl implements WaybillService {
         return ServiceResult.toResult("运单创建成功");
     }
 
-    /**
-     * 根据订单号获取运单列表
-     *
-     * @param orderId
-     * @return
-     */
-    @Override
-    public List<GetWaybillDto> listWaybillByOrderId(Integer orderId) {
-        List<Waybill> waybillList = waybillMapper.listWaybillByOrderId(orderId);
-        if (waybillList == null) {
-            throw new NullPointerException("当前订单无有效运单");
-        }
-        List<GetWaybillDto> getWaybills = new ArrayList<>();
-        for (Waybill waybill : waybillList) {
-            GetWaybillDto getWaybillDto = new GetWaybillDto();
-            BeanUtils.copyProperties(waybill, getWaybillDto);
-            getWaybills.add(getWaybillDto);
-        }
-        return getWaybills;
-    }
 
     /**
      * 根据id获取waybill对象

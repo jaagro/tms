@@ -78,13 +78,6 @@ public interface WaybillService {
      */
     GetWaybillPlanDto getOrderAndWaybill(Integer orderId);
 
-    /**
-     * 根据订单号获取运单列表
-     *
-     * @param orderId
-     * @return
-     */
-    List<GetWaybillDto> listWaybillByOrderId(Integer orderId);
 
     /**
      * Author gavin
@@ -111,13 +104,21 @@ public interface WaybillService {
     Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto);
 
     /**
-     * 根据waybillId 卸货地Id 查询货物信息
+     * 根据waybillItemId 查询卸货地货物信息
+     *
      * @param
      * @return
+     * @Author @Gao.
      */
     Map<String, Object> showGoodsByWaybillItemId(Integer waybillId);
 
-
+    /**
+     * 根据waybillId 查询装货地货物信息
+     *
+     * @param
+     * @return
+     * @Author @Gao.
+     */
     Map<String, Object> showGoodsByWaybillId(Integer waybillItemId);
 
     /**

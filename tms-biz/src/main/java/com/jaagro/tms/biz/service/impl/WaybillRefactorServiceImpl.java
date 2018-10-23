@@ -8,6 +8,7 @@ import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.driverapp.*;
+import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
 import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.entity.Waybill;
@@ -16,6 +17,7 @@ import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -142,5 +144,26 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             }
         }
         return listWaybillAppDtos;
+    }
+
+    /**
+     * 根据订单号获取运单列表
+     *
+     * @param orderId
+     * @return
+     */
+    @Override
+    public List<GetWaybillDto> listWaybillByOrderId(Integer orderId) {
+        List<Waybill> waybillList = waybillMapper.listWaybillByOrderId(orderId);
+        if (waybillList == null) {
+            throw new NullPointerException("当前订单无有效运单");
+        }
+        List<GetWaybillDto> getWaybills = new ArrayList<>();
+        for (Waybill waybill : waybillList) {
+            GetWaybillDto getWaybillDto = new GetWaybillDto();
+            BeanUtils.copyProperties(waybill, getWaybillDto);
+            getWaybills.add(getWaybillDto);
+        }
+        return getWaybills;
     }
 }
