@@ -1,9 +1,11 @@
 package com.jaagro.tms.web.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
 import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
 import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
 import com.jaagro.tms.api.dto.waybill.GetReceiptMessageParamDto;
+import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
@@ -26,6 +28,8 @@ public class WaybillAppController {
 
     @Autowired
     private WaybillService waybillService;
+    @Autowired
+    private WaybillRefactorService waybillRefactorService;
 
     @ApiOperation("我的运单")
     @PostMapping("/listWaybillApp")
@@ -33,9 +37,10 @@ public class WaybillAppController {
         if (StringUtils.isEmpty(dto.getWaybillStatus())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单状态参数为空");
         }
-        Map<String, Object> waybill = waybillService.listWaybillByStatus(dto);
-        return BaseResponse.service(waybill);
+        PageInfo  waybill= waybillRefactorService.listWaybillByStatus(dto);
+        return BaseResponse.successInstance(waybill);
     }
+
 
     @ApiOperation("运单详情")
     @GetMapping("/ListWayBillDetailsApp/{waybillId}")
@@ -44,7 +49,7 @@ public class WaybillAppController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单参数不能为空");
         }
         final Map<String, Object> waybillDetails = waybillService.listWayBillDetails(waybillId);
-        return BaseResponse.service(waybillDetails);
+        return BaseResponse.successInstance(waybillDetails);
     }
 
     @ApiOperation("运单轨迹")

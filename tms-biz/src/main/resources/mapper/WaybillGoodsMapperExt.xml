@@ -26,13 +26,13 @@
     select
     <include refid="Base_Column_List"/>
     from waybill_goods
-    where waybill_id = #{waybillId}
+    where waybill_id = #{waybillId} and enabled=1
   </select>
 
     <select id="listWaybillGoodsByWaybillItemId" resultMap="DetailInfo" parameterType="java.lang.Integer">
     select id,goods_name,goods_unit,goods_quantity,goods_weight,load_quantity,load_weight,unload_quantity,unload_weight,join_drug
     from waybill_goods
-    where waybill_item_id = #{id,jdbcType=INTEGER}
+    where waybill_item_id = #{id,jdbcType=INTEGER} and enabled=1
   </select>
 
 </mapper>
