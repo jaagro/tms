@@ -54,7 +54,6 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private UserClientService userClientService;
 
-
     /**
      * 创建订单
      *
@@ -67,9 +66,7 @@ public class OrderServiceImpl implements OrderService {
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
         order.setCreatedUserId(currentUserService.getShowUser().getId());
-        //填充订单部门id->装货地的部门id
-        ShowSiteDto showSiteDto = customerService.getShowSiteById(order.getLoadSiteId());
-        order.setDepartmentId(showSiteDto.getId());
+        order.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
         this.ordersMapper.insertSelective(order);
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
             for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
@@ -183,8 +180,11 @@ public class OrderServiceImpl implements OrderService {
                 orderDto
                         .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
                         .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
-                        .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()))
-                        .setDepartmentName(userClientService.getDeptNameById(order.getDepartmentId()));
+                        .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                //归属网点名称
+                ShowSiteDto showSiteDto = this.customerService.getShowSiteById(order.getLoadSiteId());
+                orderDto.setDepartmentName(this.userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                //创单人
                 UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
                 if (userInfo != null) {
                     ShowUserDto userDto = new ShowUserDto();
