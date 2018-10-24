@@ -34,9 +34,9 @@
     </sql>
 
     <update id="removeWaybillById">
-        update waybill
-        set enabled = 0
-        where id = #{waybillId}
+        update waybill set enabled = 0 where id = #{waybillId};
+        update waybill_items set enabled = 0 where waybill_id = #{waybillId};
+        update waybill_goods set enabled = 0 where waybill_id = #{waybillId};
     </update>
 
     <select id="listWaybillByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
@@ -50,7 +50,7 @@
         from waybill wb
         inner join waybill_tracking wt
         on (wb.id=wt.waybill_id)
-        where enabled = 1
+        where wb.enabled = 1
         and wb.waybill_status
         in ('待出发','前往装货地','待装货','待送达','待签收')
         <if test="driverId != null">
