@@ -19,7 +19,7 @@
         select
         <include refid="Base_Column_List"/>
         from waybill_goods
-        where waybill_item_id = #{itemId,jdbcType=INTEGER}
+        where waybill_item_id = #{itemId,jdbcType=INTEGER} and enabled=1
     </select>
 
     <select id="listGoodsByWaybillId" resultType="com.jaagro.tms.api.dto.waybill.GetWaybillGoodsDto" parameterType="java.lang.Integer">
