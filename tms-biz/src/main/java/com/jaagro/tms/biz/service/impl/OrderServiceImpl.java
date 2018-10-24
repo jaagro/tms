@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
@@ -53,6 +54,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private UserClientService userClientService;
 
+
     /**
      * 创建订单
      *
@@ -65,7 +67,9 @@ public class OrderServiceImpl implements OrderService {
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
         order.setCreatedUserId(currentUserService.getShowUser().getId());
-        order.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
+        //填充订单部门id->装货地的部门id
+        ShowSiteDto showSiteDto = customerService.getShowSiteById(order.getLoadSiteId());
+        order.setDepartmentId(showSiteDto.getId());
         this.ordersMapper.insertSelective(order);
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
             for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
