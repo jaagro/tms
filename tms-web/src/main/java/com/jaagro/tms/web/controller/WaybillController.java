@@ -3,7 +3,6 @@ package com.jaagro.tms.web.controller;
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillPlanService;
-import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
@@ -29,8 +28,6 @@ public class WaybillController {
     private WaybillService waybillService;
     @Autowired
     private WaybillPlanService waybillPlanService;
-    @Autowired
-    private WaybillRefactorService waybillRefactorService;
 
     /**
      * 创建运单计划
@@ -157,39 +154,4 @@ public class WaybillController {
         return BaseResponse.service(waybillService.listWaybillByCriteria(criteriaDto));
     }
 
-    /**
-     * @Author Gavin
-     *
-     * @param orderId
-     * @return
-     */
-    @ApiOperation("根据订单号查询运单详情列表")
-    @PostMapping("/listWaybillDetailByOrderId/{orderId}")
-    public BaseResponse listWaybillDetailByOrderId(@PathVariable Integer orderId) {
-        try {
-            List<GetWaybillDetailDto> waybillDetailDtos = waybillRefactorService.listWaybillDetailByOrderId(orderId);
-            return BaseResponse.successInstance(waybillDetailDtos);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(), "查询运单详情列表失败:" + e.getMessage());
-        }
-    }
-
-    /**
-     * 根据id查询运单相关的所有对象
-     * @Author Gavin
-     * @param waybillId
-     * @return
-     */
-    @ApiOperation("根据运单号查询运单详情")
-    @PostMapping("/getWaybillDetailById/{waybillId}")
-    public BaseResponse getWaybillDetailById(@PathVariable Integer waybillId) {
-        try {
-            GetWaybillDetailDto waybillDetailDto = waybillRefactorService.getWaybillDetailById(waybillId);
-            return BaseResponse.successInstance(waybillDetailDto);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(), "查询运单详情失败:" + e.getMessage());
-        }
-    }
 }
