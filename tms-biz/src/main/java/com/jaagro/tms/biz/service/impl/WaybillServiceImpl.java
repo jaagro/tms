@@ -965,6 +965,7 @@ public class WaybillServiceImpl implements WaybillService {
                 .setCreateTime(new Date())
                 .setOldStatus(waybillOldStatus)
                 .setNewStatus(waybillNewStatus)
+                .setTrackingInfo("已派单 ，运单号为【"+waybillId+"】")
                 .setReferUserId(userId);
         waybillTrackingMapper.insertSelective(waybillTracking);
 
