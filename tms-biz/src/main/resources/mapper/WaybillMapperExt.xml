@@ -112,6 +112,12 @@
         <if test="createTime != null">
             <![CDATA[and create_time = #{createTime}]]>
         </if>
+        <if test="truckIds != null">
+            and truck_id in
+            <foreach collection="truckIds" open="(" separator="," close=")" item="truckId">
+                ${truckId}
+            </foreach>
+        </if>
         <if test="departIds!=null and departIds.size()>0">
             and department_id in
             <foreach collection="departIds" open="(" separator="," close=")" item="did">
@@ -141,7 +147,7 @@
         AND waybill_status = '待接单'
         AND send_time IS NOT NULL
         <![CDATA[
-        and send_time < DATE_SUB(NOW(),INTERVAL 30 MINUTE)
+        and send_time < DATE_SUB(NOW(),INTERVAL 12 HOUR)
         and create_time > DATE_SUB(NOW(), INTERVAL 2 DAY)
         ]]>
     </select>
