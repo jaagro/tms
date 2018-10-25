@@ -8,6 +8,8 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
+
 /**
  * @author tony
  */
@@ -49,4 +51,13 @@ public interface CustomerClientService {
      */
     @GetMapping("/getCustomerContactByCustomerId/{customerId}")
     CustomerContactsReturnDto getCustomerContactByCustomerId(@PathVariable("customerId") Integer customerId);
+
+    /**
+     * 根据车牌号模糊查询车辆id列表
+     *
+     * @param truckNumber
+     * @return
+     */
+    @GetMapping("/getTruckIdsByTruckNum/{truckNumber}")
+    List<Integer> getTruckIdsByTruckNum(@PathVariable(value = "truckNumber") String truckNumber);
 }

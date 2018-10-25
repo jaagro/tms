@@ -56,5 +56,5 @@ public class ListWaybillCriteriaDto implements Serializable {
     /**
      * 车辆id数组 （用于查询条件有车牌号的情况）
      */
-    private Integer[] truckId;
+    private List<Integer> truckIds;
 }

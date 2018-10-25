@@ -4,6 +4,7 @@ import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
+import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -28,6 +29,8 @@ public class WaybillController {
     private WaybillService waybillService;
     @Autowired
     private WaybillPlanService waybillPlanService;
+    @Autowired
+    private CustomerClientService customerClientService;
 
     /**
      * 创建运单计划
@@ -151,8 +154,11 @@ public class WaybillController {
         if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
-        if(){
-
+        if (!StringUtils.isEmpty(criteriaDto.getTruckNumber())) {
+            List<Integer> truckIds = this.customerClientService.getTruckIdsByTruckNum(criteriaDto.getTruckNumber());
+            if (truckIds != null) {
+                criteriaDto.setTruckIds(truckIds);
+            }
         }
         return BaseResponse.service(waybillService.listWaybillByCriteria(criteriaDto));
     }

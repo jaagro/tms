@@ -112,6 +112,9 @@
         <if test="createTime != null">
             <![CDATA[and create_time = #{createTime}]]>
         </if>
+        <if test="truckIds != null">
+            and truck_id in #{truckIds}
+        </if>
         <if test="departIds!=null and departIds.size()>0">
             and department_id in
             <foreach collection="departIds" open="(" separator="," close=")" item="did">
