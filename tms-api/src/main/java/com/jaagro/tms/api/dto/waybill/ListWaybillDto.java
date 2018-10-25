@@ -42,11 +42,6 @@ public class ListWaybillDto implements Serializable {
     private ShowTruckDto truck;
 
     /**
-     * 车辆id
-     */
-    private Integer truckId;
-
-    /**
      * 司机id
      */
     private ShowDriverDto driver;

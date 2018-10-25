@@ -23,7 +23,6 @@
     <resultMap id="ReturnMap" type="com.jaagro.tms.api.dto.waybill.ListWaybillDto">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="order_id" property="orderId" jdbcType="INTEGER"/>
-        <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
         <result column="waybill_status" property="waybillStatus" jdbcType="VARCHAR"/>
         <result column="send_time" property="sendTime" jdbcType="TIMESTAMP"/>
         <result column="distance" property="distance" jdbcType="DECIMAL"/>
