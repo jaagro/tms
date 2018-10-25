@@ -133,6 +133,7 @@ public class OrderController {
             GetOrderDto getOrderDto = orderRefactorService.getOrderById(id);
             if (getOrderDto != null) {
                 BeanUtils.copyProperties(getOrderDto, orderVo);
+                BeanUtils.copyProperties(getOrderDto.getContactsDto(),orderVo.getContactsDto());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
