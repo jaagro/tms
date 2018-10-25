@@ -151,6 +151,9 @@ public class WaybillController {
         if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
+        if(){
+
+        }
         return BaseResponse.service(waybillService.listWaybillByCriteria(criteriaDto));
     }
 }

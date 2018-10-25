@@ -47,4 +47,14 @@ public class ListWaybillCriteriaDto implements Serializable {
      * 登陆人所在部门和下属所有部门
      */
     private List<Integer> departIds;
+
+    /**
+     * 车牌号
+     */
+    private String truckNumber;
+
+    /**
+     * 车辆id数组 （用于查询条件有车牌号的情况）
+     */
+    private Integer[] truckId;
 }
