@@ -5,14 +5,17 @@ import com.jaagro.tms.api.dto.order.CreateOrderDto;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
 import com.jaagro.tms.api.dto.order.UpdateOrderDto;
+import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.biz.mapper.OrdersMapper;
 import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.web.vo.order.OrderVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.aspectj.lang.annotation.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
@@ -35,6 +38,8 @@ public class OrderController {
     private CustomerClientService customerService;
     @Autowired
     private OrdersMapper ordersMapper;
+    @Autowired
+    private OrderRefactorService orderRefactorService;
 
     /**
      * 新增订单
@@ -123,7 +128,17 @@ public class OrderController {
     @ApiOperation("查询单条订单")
     @GetMapping("/getOrderById/{id}")
     public BaseResponse getOrderById(@PathVariable("id") Integer id) {
-        return BaseResponse.successInstance(orderService.getOrderById(id));
+        OrderVo orderVo = new OrderVo();
+        try {
+            GetOrderDto getOrderDto = orderRefactorService.getOrderById(id);
+            if (getOrderDto != null) {
+                BeanUtils.copyProperties(getOrderDto, orderVo);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), ex.getMessage());
+        }
+        return BaseResponse.successInstance(orderVo);
     }
 
     /**
