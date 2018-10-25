@@ -88,14 +88,6 @@ public interface WaybillService {
     GetWaybillPlanDto getOrderAndWaybill(Integer orderId);
 
     /**
-     * 根据订单号获取运单列表
-     *
-     * @param orderId
-     * @return
-     */
-    List<GetWaybillDto> listWaybillByOrderId(Integer orderId);
-
-    /**
      * Author gavin
      * @param waybillId
      * @param truckId
