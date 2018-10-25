@@ -836,7 +836,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking
                     .setOldStatus(WaybillStatus.RECEIVE)
-                    .setNewStatus(WaybillStatus.REJECT);
+                    .setNewStatus(WaybillStatus.REJECT).setTrackingInfo("运单已被【"+currentUser.getName()+"】取消");
             waybillTrackingMapper.insertSelective(waybillTracking);
             return ServiceResult.toResult(ReceiptConstant.OPERATION_SUCCESS);
             //接单
