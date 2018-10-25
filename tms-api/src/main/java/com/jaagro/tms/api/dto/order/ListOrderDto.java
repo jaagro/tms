@@ -49,6 +49,16 @@ public class ListOrderDto implements Serializable {
     private ShowSiteDto loadSite;
 
     /**
+     * 部门id
+     */
+    private Integer departmentId;
+
+    /**
+     * 部门名称
+     */
+    private String departmentName;
+
+    /**
      * 要求装货时间
      */
     private Date loadTime;
