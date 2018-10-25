@@ -7,6 +7,7 @@ import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
@@ -58,6 +59,6 @@ public interface CustomerClientService {
      * @param truckNumber
      * @return
      */
-    @GetMapping("/getTruckIdsByTruckNum/{truckNumber}")
-    List<Integer> getTruckIdsByTruckNum(@PathVariable(value = "truckNumber") String truckNumber);
+    @PostMapping("/getTruckIdsByTruckNum/{truckNumber}")
+    List<Integer> getTruckIdsByTruckNum(@PathVariable("truckNumber") String truckNumber);
 }

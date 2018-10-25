@@ -23,6 +23,7 @@
     <resultMap id="ReturnMap" type="com.jaagro.tms.api.dto.waybill.ListWaybillDto">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
         <result column="waybill_status" property="waybillStatus" jdbcType="VARCHAR"/>
         <result column="send_time" property="sendTime" jdbcType="TIMESTAMP"/>
         <result column="distance" property="distance" jdbcType="DECIMAL"/>
@@ -113,7 +114,10 @@
             <![CDATA[and create_time = #{createTime}]]>
         </if>
         <if test="truckIds != null">
-            and truck_id in #{truckIds}
+            and truck_id in
+            <foreach collection="truckIds" open="(" separator="," close=")" item="truckId">
+                ${truckId}
+            </foreach>
         </if>
         <if test="departIds!=null and departIds.size()>0">
             and department_id in
