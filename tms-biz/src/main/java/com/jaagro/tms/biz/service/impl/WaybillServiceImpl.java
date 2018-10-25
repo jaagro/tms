@@ -548,7 +548,7 @@ public class WaybillServiceImpl implements WaybillService {
                             .setCreateTime(new Date())
                             .setCreateUserId(currentUser.getId())
                             .setImageUrl(imagesUrls.get(i))
-                            .setWaybillTrackingId(truckByToken.getId());
+                            .setWaybillTrackingId(waybillTracking.getId());
                     //出库单
                     if (i == 0) {
                         waybillTrackingImages.setImageType(ImagesTypeConstant.OUTBOUND_BILL);
@@ -618,7 +618,7 @@ public class WaybillServiceImpl implements WaybillService {
                                 .setCreateTime(new Date())
                                 .setCreateUserId(currentUser.getId())
                                 .setImageUrl(imagesUrls.get(i))
-                                .setWaybillTrackingId(truckByToken.getId());
+                                .setWaybillTrackingId(waybillTracking.getId());
                         //签收单
                         if (i == 0) {
                             waybillTrackingImages.setImageType(ImagesTypeConstant.SIGN_BILL);
