@@ -249,7 +249,7 @@ public class WaybillServiceImpl implements WaybillService {
         }
         //根据waybillId获取WaybillTracking 和 WaybillTrackingImages
         List<GetTrackingDto> getTrackingDtos = new ArrayList<>();
-        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybill.getId());
+        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybill.getId());
         for (ShowTrackingDto showTrackingDto : showTrackingDtos) {
             GetTrackingDto getTrackingDto = new GetTrackingDto();
             BeanUtils.copyProperties(showTrackingDto, getTrackingDto);
@@ -641,7 +641,6 @@ public class WaybillServiceImpl implements WaybillService {
                 //更改运单状态
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
                 waybillMapper.updateByPrimaryKeySelective(waybill);
-                return ServiceResult.toResult(SignStatusConstant.SIGN_ALL);
             }
             //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
             List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
