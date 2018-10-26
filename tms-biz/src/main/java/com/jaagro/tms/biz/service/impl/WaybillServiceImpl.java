@@ -269,7 +269,12 @@ public class WaybillServiceImpl implements WaybillService {
         //这个语句查询不出图片
         for (GetTrackingDto getTrackingDto : getTrackingDtos) {
             List<GetTrackingImagesDto> imageList = getTrackingImagesDtos.stream().filter(c -> c.getWaybillTrackingId().equals(getTrackingDto.getId())).collect(Collectors.toList());
-            System.out.println(imageList);
+            for (GetTrackingImagesDto getTrackingImagesDto : imageList) {
+                String[] strArray = {getTrackingImagesDto.getImageUrl()};
+                List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
+                getTrackingImagesDto.setImageUrl(urls.get(0).toString());
+            }
+
             getTrackingDto.setImageList(imageList);
         }
        Orders ordersData = ordersMapper.selectByPrimaryKey(waybill.getOrderId());

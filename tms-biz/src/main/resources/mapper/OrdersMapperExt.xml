@@ -43,13 +43,18 @@
         </if>
         <if test="departIds!=null and departIds.size()>0">
             and department_id in
-        <foreach collection="departIds" open="(" separator="," close=")" item="did">
-            ${did}
-        </foreach>
+            <foreach collection="departIds" open="(" separator="," close=")" item="did">
+                ${did}
+            </foreach>
         </if>
         <if test="waitOrders != null">
             and order_status not in ('已下单','取消')
         </if>
         order by create_time desc
+    </select>
+    <select id="getOrderIdsByCustomerId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select id from orders
+        where customer_id = #{customerId}
+        and order_status not in ('已下单','取消')
     </select>
 </mapper>
