@@ -159,13 +159,13 @@ public class WaybillController {
         }
         if (!StringUtils.isEmpty(criteriaDto.getTruckNumber())) {
             List<Integer> truckIds = this.customerClientService.getTruckIdsByTruckNum(criteriaDto.getTruckNumber());
-            if (truckIds != null) {
+            if (truckIds.size() > 0) {
                 criteriaDto.setTruckIds(truckIds);
             }
         }
         if (criteriaDto.getCustomerId() != null) {
             List<Integer> orderIds = this.orderService.getOrderIdsByCustomerId(criteriaDto.getCustomerId());
-            if (orderIds != null) {
+            if (orderIds.size() > 0) {
                 criteriaDto.setOrderIds(orderIds);
             }
         }
