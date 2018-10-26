@@ -269,7 +269,12 @@ public class WaybillServiceImpl implements WaybillService {
         //这个语句查询不出图片
         for (GetTrackingDto getTrackingDto : getTrackingDtos) {
             List<GetTrackingImagesDto> imageList = getTrackingImagesDtos.stream().filter(c -> c.getWaybillTrackingId().equals(getTrackingDto.getId())).collect(Collectors.toList());
-            System.out.println(imageList);
+            for (GetTrackingImagesDto getTrackingImagesDto : imageList) {
+                String[] strArray = {getTrackingImagesDto.getImageUrl()};
+                List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
+                getTrackingImagesDto.setImageUrl(urls.get(0).toString());
+            }
+
             getTrackingDto.setImageList(imageList);
         }
        Orders ordersData = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
@@ -548,7 +553,7 @@ public class WaybillServiceImpl implements WaybillService {
                             .setCreateTime(new Date())
                             .setCreateUserId(currentUser.getId())
                             .setImageUrl(imagesUrls.get(i))
-                            .setWaybillTrackingId(truckByToken.getId());
+                            .setWaybillTrackingId(waybillTracking.getId());
                     //出库单
                     if (i == 0) {
                         waybillTrackingImages.setImageType(ImagesTypeConstant.OUTBOUND_BILL);
@@ -618,7 +623,7 @@ public class WaybillServiceImpl implements WaybillService {
                                 .setCreateTime(new Date())
                                 .setCreateUserId(currentUser.getId())
                                 .setImageUrl(imagesUrls.get(i))
-                                .setWaybillTrackingId(truckByToken.getId());
+                                .setWaybillTrackingId(waybillTracking.getId());
                         //签收单
                         if (i == 0) {
                             waybillTrackingImages.setImageType(ImagesTypeConstant.SIGN_BILL);
