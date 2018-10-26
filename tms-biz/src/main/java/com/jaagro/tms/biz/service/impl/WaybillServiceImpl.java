@@ -485,7 +485,6 @@ public class WaybillServiceImpl implements WaybillService {
 
         Integer waybillId = dto.getWaybillId();
         UserInfo currentUser = currentUserService.getCurrentUser();
-        ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
@@ -641,12 +640,6 @@ public class WaybillServiceImpl implements WaybillService {
                         .setId(unLoadSiteConfirmProductDtos.get(0).getWaybillItemId());
                 waybillItemsMapper.updateByPrimaryKeySelective(waybillItems);
             }
-            //如果运单全部签收 运单状态
-            if (unSignUnloadSite.size() == 1) {
-                //更改运单状态
-                waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
-                waybillMapper.updateByPrimaryKeySelective(waybill);
-            }
             //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
             List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
             int count = 0;
@@ -665,6 +658,14 @@ public class WaybillServiceImpl implements WaybillService {
             } else {
                 log.debug("当前订单下的运单未全部操作完毕，不修改状态");
             }
+            //如果运单全部签收 运单状态
+            if (unSignUnloadSite.size() == 1) {
+                //更改运单状态
+                waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
+                waybillMapper.updateByPrimaryKeySelective(waybill);
+                return ServiceResult.toResult(SignStatusConstant.SIGN_ALL);
+            }
+
             return ServiceResult.toResult("操作成功");
         }
         return ServiceResult.toResult("操作异常");
