@@ -646,7 +646,6 @@ public class WaybillServiceImpl implements WaybillService {
                 //更改运单状态
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
                 waybillMapper.updateByPrimaryKeySelective(waybill);
-                return ServiceResult.toResult(SignStatusConstant.SIGN_ALL);
             }
             //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
             List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
@@ -841,12 +840,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking
                     .setOldStatus(WaybillStatus.RECEIVE)
-<<<<<<<<< Temporary merge branch 1
                     .setNewStatus(WaybillStatus.REJECT).setTrackingInfo("运单已被【"+currentUser.getName()+"】取消");
-=========
-                    .setNewStatus(WaybillStatus.REJECT)
-                    .setTrackingInfo("运单已被【"+currentUser.getName()+"】取消");
->>>>>>>>> Temporary merge branch 2
             waybillTrackingMapper.insertSelective(waybillTracking);
             return ServiceResult.toResult(ReceiptConstant.OPERATION_SUCCESS);
             //接单
