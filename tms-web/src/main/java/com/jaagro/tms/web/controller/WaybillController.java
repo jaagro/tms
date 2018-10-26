@@ -157,18 +157,6 @@ public class WaybillController {
         if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
-        if (!StringUtils.isEmpty(criteriaDto.getTruckNumber())) {
-            List<Integer> truckIds = this.customerClientService.getTruckIdsByTruckNum(criteriaDto.getTruckNumber());
-            if (truckIds.size() > 0) {
-                criteriaDto.setTruckIds(truckIds);
-            }
-        }
-        if (criteriaDto.getCustomerId() != null) {
-            List<Integer> orderIds = this.orderService.getOrderIdsByCustomerId(criteriaDto.getCustomerId());
-            if (orderIds.size() > 0) {
-                criteriaDto.setOrderIds(orderIds);
-            }
-        }
         return BaseResponse.service(waybillService.listWaybillByCriteria(criteriaDto));
     }
 }
