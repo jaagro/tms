@@ -40,9 +40,15 @@ public class ListWaybillCriteriaDto implements Serializable {
     private Integer orderId;
 
     /**
-     * 派单时间
+     * 派单起始时间
      */
-    private Date createTime;
+    private Date createStartTime;
+
+    /**
+     * 派单结束时间
+     */
+    private Date createEndTime;
+
     /**
      * 登陆人所在部门和下属所有部门
      */
