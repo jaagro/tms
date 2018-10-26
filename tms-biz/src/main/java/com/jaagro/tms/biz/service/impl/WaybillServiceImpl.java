@@ -249,7 +249,7 @@ public class WaybillServiceImpl implements WaybillService {
         }
         //根据waybillId获取WaybillTracking 和 WaybillTrackingImages
         List<GetTrackingDto> getTrackingDtos = new ArrayList<>();
-        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybill.getId());
+        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybill.getId());
         for (ShowTrackingDto showTrackingDto : showTrackingDtos) {
             GetTrackingDto getTrackingDto = new GetTrackingDto();
             BeanUtils.copyProperties(showTrackingDto, getTrackingDto);
@@ -548,7 +548,7 @@ public class WaybillServiceImpl implements WaybillService {
                             .setCreateTime(new Date())
                             .setCreateUserId(currentUser.getId())
                             .setImageUrl(imagesUrls.get(i))
-                            .setWaybillTrackingId(truckByToken.getId());
+                            .setWaybillTrackingId(waybillTracking.getId());
                     //出库单
                     if (i == 0) {
                         waybillTrackingImages.setImageType(ImagesTypeConstant.OUTBOUND_BILL);
@@ -618,7 +618,7 @@ public class WaybillServiceImpl implements WaybillService {
                                 .setCreateTime(new Date())
                                 .setCreateUserId(currentUser.getId())
                                 .setImageUrl(imagesUrls.get(i))
-                                .setWaybillTrackingId(truckByToken.getId());
+                                 .setWaybillTrackingId(waybillTracking.getId());
                         //签收单
                         if (i == 0) {
                             waybillTrackingImages.setImageType(ImagesTypeConstant.SIGN_BILL);
@@ -636,12 +636,11 @@ public class WaybillServiceImpl implements WaybillService {
                         .setId(unLoadSiteConfirmProductDtos.get(0).getWaybillItemId());
                 waybillItemsMapper.updateByPrimaryKeySelective(waybillItems);
             }
-            //如果运单全部签收 运单状态
+            //如果运单全部签收 更改运单状态
             if (unSignUnloadSite.size() == 1) {
                 //更改运单状态
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
                 waybillMapper.updateByPrimaryKeySelective(waybill);
-                return ServiceResult.toResult(SignStatusConstant.SIGN_ALL);
             }
             //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
             List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
@@ -836,7 +835,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking
                     .setOldStatus(WaybillStatus.RECEIVE)
-                    .setNewStatus(WaybillStatus.REJECT).setTrackingInfo("运单已被【"+currentUser.getName()+"】取消");
+                    .setNewStatus(WaybillStatus.REJECT);
             waybillTrackingMapper.insertSelective(waybillTracking);
             return ServiceResult.toResult(ReceiptConstant.OPERATION_SUCCESS);
             //接单

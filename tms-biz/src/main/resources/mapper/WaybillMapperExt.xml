@@ -100,7 +100,7 @@
         *
         from waybill
         where enabled = 1
-        <if test="waybillStatus != null">
+        <if test="waybillStatus != null and waybillStatus != ''">
             and waybill_status = #{waybillStatus}
         </if>
         <if test="id != null">
