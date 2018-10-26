@@ -100,7 +100,7 @@
         *
         from waybill
         where enabled = 1
-        <if test="waybillStatus != null">
+        <if test="waybillStatus != null and waybillStatus != ''">
             and waybill_status = #{waybillStatus}
         </if>
         <if test="id != null">
@@ -109,13 +109,28 @@
         <if test="orderId != null">
             and order_id = #{orderId}
         </if>
-        <if test="createTime != null">
-            <![CDATA[and create_time = #{createTime}]]>
+        <if test="createStartTime != null">
+            <![CDATA[and create_time >= #{createStartTime}]]>
+        </if>
+        <if test="createEndTime != null">
+            <![CDATA[and create_time <= #{createEndTime}]]>
+        </if>
+        <if test="truckIds != null">
+            and truck_id in
+            <foreach collection="truckIds" open="(" separator="," close=")" item="truckId">
+                ${truckId}
+            </foreach>
         </if>
         <if test="departIds!=null and departIds.size()>0">
             and department_id in
             <foreach collection="departIds" open="(" separator="," close=")" item="did">
                 ${did}
+            </foreach>
+        </if>
+        <if test="orderIds != null">
+            and order_id in
+            <foreach collection="orderIds" open="(" separator="," close=")" item="orderId">
+                ${orderId}
             </foreach>
         </if>
         and waybill_status not in ('待派单','待接单')

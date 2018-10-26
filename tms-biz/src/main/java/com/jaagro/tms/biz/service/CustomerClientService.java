@@ -4,10 +4,12 @@ import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
-import com.jaagro.utils.BaseResponse;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.List;
 
 /**
  * @author tony
@@ -50,4 +52,13 @@ public interface CustomerClientService {
      */
     @GetMapping("/getCustomerContactByCustomerId/{customerId}")
     CustomerContactsReturnDto getCustomerContactByCustomerId(@PathVariable("customerId") Integer customerId);
+
+    /**
+     * 根据车牌号模糊查询车辆id列表
+     *
+     * @param truckNumber
+     * @return
+     */
+    @PostMapping("/getTruckIdsByTruckNum/{truckNumber}")
+    List<Integer> getTruckIdsByTruckNum(@PathVariable("truckNumber") String truckNumber);
 }
