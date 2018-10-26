@@ -2,6 +2,7 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.CustomerClientService;
@@ -31,6 +32,8 @@ public class WaybillController {
     private WaybillPlanService waybillPlanService;
     @Autowired
     private CustomerClientService customerClientService;
+    @Autowired
+    private OrderService orderService;
 
     /**
      * 创建运单计划
@@ -156,8 +159,14 @@ public class WaybillController {
         }
         if (!StringUtils.isEmpty(criteriaDto.getTruckNumber())) {
             List<Integer> truckIds = this.customerClientService.getTruckIdsByTruckNum(criteriaDto.getTruckNumber());
-            if (truckIds != null) {
+            if (truckIds.size() > 0) {
                 criteriaDto.setTruckIds(truckIds);
+            }
+        }
+        if (criteriaDto.getCustomerId() != null) {
+            List<Integer> orderIds = this.orderService.getOrderIdsByCustomerId(criteriaDto.getCustomerId());
+            if (orderIds.size() > 0) {
+                criteriaDto.setOrderIds(orderIds);
             }
         }
         return BaseResponse.service(waybillService.listWaybillByCriteria(criteriaDto));

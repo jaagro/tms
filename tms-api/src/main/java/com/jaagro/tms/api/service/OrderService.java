@@ -59,4 +59,12 @@ public interface OrderService {
      */
     Map<String, Object> cancelOrders(Integer orderId, String detailInfo);
 
+    /**
+     * 根据客户id查询订单id数组
+     *
+     * @param customerId
+     * @return
+     */
+    List<Integer> getOrderIdsByCustomerId(Integer customerId);
+
 }
