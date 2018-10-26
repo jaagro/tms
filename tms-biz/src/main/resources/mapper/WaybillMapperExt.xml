@@ -124,6 +124,12 @@
                 ${did}
             </foreach>
         </if>
+        <if test="orderIds != null">
+            and order_id in
+            <foreach collection="orderIds" open="(" separator="," close=")" item="orderId">
+                ${orderId}
+            </foreach>
+        </if>
         and waybill_status not in ('待派单','待接单')
         order by create_time desc
     </select>

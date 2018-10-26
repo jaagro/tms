@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author tony
  */
-public interface OrdersMapperExt extends OrdersMapper{
+public interface OrdersMapperExt extends OrdersMapper {
 
     /**
      * 分页查询 返回实体类包含详细信息
@@ -18,4 +18,12 @@ public interface OrdersMapperExt extends OrdersMapper{
      * @return
      */
     List<ListOrderDto> listOrdersByCriteria(ListOrderCriteriaDto criteriaDto);
+
+    /**
+     * 根据客户id查询订单id数组
+     *
+     * @param customerId
+     * @return
+     */
+    List<Integer> getOrderIdsByCustomerId(Integer customerId);
 }

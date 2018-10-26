@@ -257,4 +257,16 @@ public class OrderServiceImpl implements OrderService {
         }
         return ServiceResult.toResult("取消订单成功");
     }
+
+    /**
+     * 根据客户id查询订单id数组
+     *
+     * @param customerId
+     * @return
+     */
+    @Override
+    public List<Integer> getOrderIdsByCustomerId(Integer customerId) {
+        return this.ordersMapper.getOrderIdsByCustomerId(customerId);
+    }
+
 }
