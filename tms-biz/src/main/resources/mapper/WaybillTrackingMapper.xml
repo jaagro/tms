@@ -42,7 +42,8 @@
     delete from waybill_tracking
     where id = #{id,jdbcType=INTEGER}
   </delete>
-    <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillTracking">
+    <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillTracking" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
     insert into waybill_tracking (id, waybill_id, old_status, 
       new_status, driver_id, latitude, 
       longitude, tracking_info, device, 
@@ -52,7 +53,8 @@
       #{longitude,jdbcType=DECIMAL}, #{trackingInfo,jdbcType=VARCHAR}, #{device,jdbcType=VARCHAR}, 
       #{referUserId,jdbcType=INTEGER},#{createTime})
   </insert>
-    <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillTracking">
+    <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillTracking" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
         insert into waybill_tracking
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">

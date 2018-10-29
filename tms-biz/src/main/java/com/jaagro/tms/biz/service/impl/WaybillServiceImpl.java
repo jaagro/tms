@@ -193,26 +193,6 @@ public class WaybillServiceImpl implements WaybillService {
         return ServiceResult.toResult("运单创建成功");
     }
 
-    /**
-     * 根据订单号获取运单列表
-     *
-     * @param orderId
-     * @return
-     */
-    @Override
-    public List<GetWaybillDto> listWaybillByOrderId(Integer orderId) {
-        List<Waybill> waybillList = waybillMapper.listWaybillByOrderId(orderId);
-        if (waybillList == null) {
-            throw new NullPointerException("当前订单无有效运单");
-        }
-        List<GetWaybillDto> getWaybills = new ArrayList<>();
-        for (Waybill waybill : waybillList) {
-            GetWaybillDto getWaybillDto = new GetWaybillDto();
-            BeanUtils.copyProperties(waybill, getWaybillDto);
-            getWaybills.add(getWaybillDto);
-        }
-        return getWaybills;
-    }
 
     /**
      * 根据id获取waybill对象
@@ -254,10 +234,25 @@ public class WaybillServiceImpl implements WaybillService {
             BeanUtils.copyProperties(items, getWaybillItemsDto);
             List<GetWaybillGoodsDto> getWaybillGoodsDtoList = new LinkedList<>();
             List<WaybillGoods> waybillGoodsList = waybillGoodsMapper.listWaybillGoodsByItemId(items.getId());
+            if (null == getWaybillItemsDto.getTotalQuantity()) {
+                getWaybillItemsDto.setTotalQuantity(0);
+            }
+            if (null == getWaybillItemsDto.getTotalWeight()) {
+                getWaybillItemsDto.setTotalWeight(new BigDecimal(0));
+            }
             for (WaybillGoods wg : waybillGoodsList) {
                 GetWaybillGoodsDto getWaybillGoodsDto = new GetWaybillGoodsDto();
                 BeanUtils.copyProperties(wg, getWaybillGoodsDto);
                 getWaybillGoodsDtoList.add(getWaybillGoodsDto);
+                if (null == wg.getGoodsQuantity()) {
+                    wg.setGoodsQuantity(0);
+                }
+                if (null == wg.getGoodsWeight()) {
+                    wg.setGoodsWeight(new BigDecimal(0));
+                }
+                getWaybillItemsDto
+                        .setTotalQuantity(getWaybillItemsDto.getTotalQuantity() + wg.getGoodsQuantity())
+                        .setTotalWeight(getWaybillItemsDto.getTotalWeight().add(wg.getGoodsWeight()));
             }
             //拿到卸货信息
             ShowSiteDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());
@@ -288,10 +283,15 @@ public class WaybillServiceImpl implements WaybillService {
         //这个语句查询不出图片
         for (GetTrackingDto getTrackingDto : getTrackingDtos) {
             List<GetTrackingImagesDto> imageList = getTrackingImagesDtos.stream().filter(c -> c.getWaybillTrackingId().equals(getTrackingDto.getId())).collect(Collectors.toList());
-            System.out.println(imageList);
+            for (GetTrackingImagesDto getTrackingImagesDto : imageList) {
+                String[] strArray = {getTrackingImagesDto.getImageUrl()};
+                List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
+                getTrackingImagesDto.setImageUrl(urls.get(0).toString());
+            }
+
             getTrackingDto.setImageList(imageList);
         }
-
+        Orders ordersData = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         GetWaybillDto getWaybillDto = new GetWaybillDto();
         getWaybillDto.setTracking(getTrackingDtos);
         BeanUtils.copyProperties(waybill, getWaybillDto);
@@ -300,7 +300,8 @@ public class WaybillServiceImpl implements WaybillService {
                 .setNeedTruckType(truckTypeDto)
                 .setTruckId(truckDto)
                 .setDriverId(showDriverDto)
-                .setWaybillItems(getWaybillItemsDtoList);
+                .setWaybillItems(getWaybillItemsDtoList)
+                .setGoodType(ordersData.getGoodsType());
         return getWaybillDto;
     }
 
@@ -498,9 +499,9 @@ public class WaybillServiceImpl implements WaybillService {
 
         Integer waybillId = dto.getWaybillId();
         UserInfo currentUser = currentUserService.getCurrentUser();
-        ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
+        ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
         WaybillTracking waybillTracking = new WaybillTracking();
         waybillTracking
                 .setWaybillId(waybillId)
@@ -514,7 +515,8 @@ public class WaybillServiceImpl implements WaybillService {
         if (WaybillStatus.DEPART.equals(dto.getWaybillStatus())) {
             waybillTracking
                     .setNewStatus(WaybillStatus.ARRIVE_LOAD_SITE)
-                    .setOldStatus(waybill.getWaybillStatus());
+                    .setOldStatus(waybill.getWaybillStatus())
+                    .setTrackingInfo("司机【" + currentUser.getName() + "】已出发");
             waybillTrackingMapper.insert(waybillTracking);
             waybill.setWaybillStatus(WaybillStatus.ARRIVE_LOAD_SITE);
             waybillMapper.updateByPrimaryKey(waybill);
@@ -524,7 +526,8 @@ public class WaybillServiceImpl implements WaybillService {
         if (WaybillStatus.ARRIVE_LOAD_SITE.equals(dto.getWaybillStatus())) {
             waybillTracking
                     .setNewStatus(WaybillStatus.LOAD_PRODUCT)
-                    .setOldStatus(waybill.getWaybillStatus());
+                    .setOldStatus(waybill.getWaybillStatus())
+                    .setTrackingInfo("已到达提货地【" + loadSite.getSiteName() + "】");
             waybillTrackingMapper.insert(waybillTracking);
             waybill.setWaybillStatus(WaybillStatus.LOAD_PRODUCT);
             waybillMapper.updateByPrimaryKey(waybill);
@@ -536,7 +539,7 @@ public class WaybillServiceImpl implements WaybillService {
             List<ConfirmProductDto> confirmProductDtosList = dto.getConfirmProductDtos();
             waybillTracking
                     .setNewStatus(WaybillStatus.DELIVERY)
-                    .setOldStatus(waybill.getWaybillStatus());
+                    .setOldStatus(waybill.getWaybillStatus()).setTrackingInfo("在【" + loadSite.getSiteName() + "】已提货");
             waybillTrackingMapper.insert(waybillTracking);
             //更新货物信息
             for (ConfirmProductDto confirmProductDto : confirmProductDtosList) {
@@ -553,7 +556,7 @@ public class WaybillServiceImpl implements WaybillService {
             }
             //批量插入提货单
             List<String> imagesUrls = dto.getImagesUrl();
-            ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
+
             if (!CollectionUtils.isEmpty(imagesUrls)) {
                 for (int i = 0; i < imagesUrls.size(); i++) {
                     WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
@@ -563,7 +566,7 @@ public class WaybillServiceImpl implements WaybillService {
                             .setCreateTime(new Date())
                             .setCreateUserId(currentUser.getId())
                             .setImageUrl(imagesUrls.get(i))
-                            .setWaybillTrackingId(truckByToken.getId());
+                            .setWaybillTrackingId(waybillTracking.getId());
                     //出库单
                     if (i == 0) {
                         waybillTrackingImages.setImageType(ImagesTypeConstant.OUTBOUND_BILL);
@@ -582,13 +585,16 @@ public class WaybillServiceImpl implements WaybillService {
         if (WaybillStatus.DELIVERY.equals(dto.getWaybillStatus())) {
             waybillTracking
                     .setNewStatus(WaybillStatus.SIGN)
-                    .setOldStatus(WaybillStatus.DELIVERY);
+                    .setOldStatus(WaybillStatus.DELIVERY)
+                    .setTrackingInfo("司机已到达卸货地");
             waybillTrackingMapper.insert(waybillTracking);
             waybill.setWaybillStatus(WaybillStatus.SIGN);
             waybillMapper.updateByPrimaryKey(waybill);
         }
         //客户签收
         if (WaybillStatus.SIGN.equals(dto.getWaybillStatus())) {
+            List<ConfirmProductDto> unLoadSiteConfirmProductDtos = dto.getConfirmProductDtos();
+            ShowSiteDto showSiteById = customerClientService.getShowSiteById(unLoadSiteConfirmProductDtos.get(0).getUnLoadSiteId());
             //查询出卸货地未签收的
             WaybillItems waybillItemsCondtion = new WaybillItems();
             waybillItemsCondtion
@@ -598,14 +604,16 @@ public class WaybillServiceImpl implements WaybillService {
             if (!CollectionUtils.isEmpty(unSignUnloadSite)) {
                 waybillTracking.setOldStatus(WaybillStatus.SIGN);
                 if (unSignUnloadSite.size() == 1) {
-                    waybillTracking.setNewStatus(WaybillStatus.ACCOMPLISH);
-
+                    waybillTracking
+                            .setNewStatus(WaybillStatus.ACCOMPLISH)
+                            .setTrackingInfo("已签收，签收地为【" + showSiteById.getSiteName() + "】");
                 } else {
-                    waybillTracking.setNewStatus(WaybillStatus.DELIVERY);
+                    waybillTracking
+                            .setNewStatus(WaybillStatus.DELIVERY)
+                            .setTrackingInfo("已签收，签收地为【" + showSiteById.getSiteName() + "】");
                 }
                 waybillTrackingMapper.insert(waybillTracking);
                 //更新卸货物信息
-                List<ConfirmProductDto> unLoadSiteConfirmProductDtos = dto.getConfirmProductDtos();
                 for (ConfirmProductDto unLoadSiteconfirmProductDto : unLoadSiteConfirmProductDtos) {
                     WaybillGoods waybillGoods = new WaybillGoods();
                     waybillGoods.setId(unLoadSiteconfirmProductDto.getWaybillGoodId());
@@ -628,7 +636,7 @@ public class WaybillServiceImpl implements WaybillService {
                                 .setCreateTime(new Date())
                                 .setCreateUserId(currentUser.getId())
                                 .setImageUrl(imagesUrls.get(i))
-                                .setWaybillTrackingId(truckByToken.getId());
+                                .setWaybillTrackingId(waybillTracking.getId());
                         //签收单
                         if (i == 0) {
                             waybillTrackingImages.setImageType(ImagesTypeConstant.SIGN_BILL);
@@ -651,26 +659,28 @@ public class WaybillServiceImpl implements WaybillService {
                 //更改运单状态
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
                 waybillMapper.updateByPrimaryKeySelective(waybill);
+
+                //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
+                List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
+                int count = 0;
+                for (Waybill w : waybills) {
+                    if ("已完成".equals(w.getWaybillStatus())) {
+                        count++;
+                    }
+                }
+                if (waybills.size() == count) {
+                    Orders orderUpdate = new Orders();
+                    //更改订单状态
+                    orderUpdate
+                            .setId(orders.getId())
+                            .setOrderStatus(OrderStatus.ACCOMPLISH);
+                    ordersMapper.updateByPrimaryKeySelective(orderUpdate);
+                } else {
+                    log.debug("当前订单下的运单未全部操作完毕，不修改状态");
+                }
                 return ServiceResult.toResult(SignStatusConstant.SIGN_ALL);
             }
-            //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
-            List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
-            int count = 0;
-            for (Waybill w : waybills) {
-                if ("已完成".equals(w.getWaybillStatus())) {
-                    count++;
-                }
-            }
-            if (waybills.size() == count) {
-                Orders orderUpdate = new Orders();
-                //更改订单状态
-                orderUpdate
-                        .setId(orders.getId())
-                        .setOrderStatus(OrderStatus.ACCOMPLISH);
-                ordersMapper.updateByPrimaryKeySelective(orderUpdate);
-            } else {
-                log.debug("当前订单下的运单未全部操作完毕，不修改状态");
-            }
+
             return ServiceResult.toResult("操作成功");
         }
         return ServiceResult.toResult("操作异常");
@@ -828,6 +838,7 @@ public class WaybillServiceImpl implements WaybillService {
         Integer waybillId = dto.getWaybillId();
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         UserInfo currentUser = currentUserService.getCurrentUser();
+        ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         if (null != waybill.getDriverId()) {
             return ServiceResult.toResult(ReceiptConstant.ALREADY_RECEIVED);
         }
@@ -837,7 +848,6 @@ public class WaybillServiceImpl implements WaybillService {
                 .setCreateTime(new Date())
                 .setDriverId(currentUser.getId())
                 .setDevice(dto.getDevice())
-                .setTrackingInfo(dto.getTrackingInfo())
                 .setLatitude(dto.getLatitude())
                 .setLatitude(dto.getLongitude());
         //拒单
@@ -846,7 +856,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking
                     .setOldStatus(WaybillStatus.RECEIVE)
-                    .setNewStatus(WaybillStatus.REJECT);
+                    .setNewStatus(WaybillStatus.REJECT).setTrackingInfo("运单已被【" + currentUser.getName() + "】取消");
             waybillTrackingMapper.insertSelective(waybillTracking);
             return ServiceResult.toResult(ReceiptConstant.OPERATION_SUCCESS);
             //接单
@@ -857,6 +867,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking.setOldStatus(WaybillStatus.RECEIVE);
             waybillTracking.setNewStatus(WaybillStatus.DEPART);
+            waybillTracking.setTrackingInfo("司机【" + currentUser.getName() + "】已接单，车牌号为【" + truckByToken.getTruckNumber() + "】");
             waybillTrackingMapper.insertSelective(waybillTracking);
             return ServiceResult.toResult(ReceiptConstant.OPERATION_SUCCESS);
         }
@@ -983,6 +994,7 @@ public class WaybillServiceImpl implements WaybillService {
                 .setCreateTime(new Date())
                 .setOldStatus(waybillOldStatus)
                 .setNewStatus(waybillNewStatus)
+                .setTrackingInfo("已派单 ，运单号为【" + waybillId + "】")
                 .setReferUserId(userId);
         waybillTrackingMapper.insertSelective(waybillTracking);
 
@@ -1052,10 +1064,27 @@ public class WaybillServiceImpl implements WaybillService {
         if (departIds.size() != 0) {
             criteriaDto.setDepartIds(departIds);
         }
-        List<ListWaybillDto> listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
+        List<ListWaybillDto> listWaybillDto = new ArrayList<>();
+        if (!StringUtils.isEmpty(criteriaDto.getTruckNumber())) {
+            List<Integer> truckIds = this.customerClientService.getTruckIdsByTruckNum(criteriaDto.getTruckNumber());
+            if (truckIds.size() > 0) {
+                criteriaDto.setTruckIds(truckIds);
+            } else {
+                return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
+            }
+        }
+        if (criteriaDto.getCustomerId() != null) {
+            List<Integer> orderIds = this.orderService.getOrderIdsByCustomerId(criteriaDto.getCustomerId());
+            if (orderIds.size() > 0) {
+                criteriaDto.setOrderIds(orderIds);
+            } else {
+                return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
+            }
+        }
+        listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-                    ) {
+            ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {

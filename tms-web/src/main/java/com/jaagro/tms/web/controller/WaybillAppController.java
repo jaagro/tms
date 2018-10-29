@@ -7,7 +7,6 @@ import com.jaagro.tms.api.dto.waybill.GetReceiptMessageParamDto;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
-import com.jaagro.utils.ServiceResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

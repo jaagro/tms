@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
@@ -180,6 +181,10 @@ public class OrderServiceImpl implements OrderService {
                         .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
                         .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
                         .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                //归属网点名称
+                ShowSiteDto showSiteDto = this.customerService.getShowSiteById(order.getLoadSiteId());
+                orderDto.setDepartmentName(this.userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                //创单人
                 UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
                 if (userInfo != null) {
                     ShowUserDto userDto = new ShowUserDto();
@@ -252,4 +257,16 @@ public class OrderServiceImpl implements OrderService {
         }
         return ServiceResult.toResult("取消订单成功");
     }
+
+    /**
+     * 根据客户id查询订单id数组
+     *
+     * @param customerId
+     * @return
+     */
+    @Override
+    public List<Integer> getOrderIdsByCustomerId(Integer customerId) {
+        return this.ordersMapper.getOrderIdsByCustomerId(customerId);
+    }
+
 }

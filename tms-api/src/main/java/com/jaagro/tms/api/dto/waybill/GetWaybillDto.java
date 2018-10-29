@@ -93,4 +93,8 @@ public class GetWaybillDto implements Serializable {
      * 装货时间
      */
     private Date loadTime;
+    /**
+     * 货物类型
+     */
+    private Integer goodType;
 }
