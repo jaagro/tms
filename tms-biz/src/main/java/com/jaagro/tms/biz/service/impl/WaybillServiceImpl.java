@@ -234,10 +234,25 @@ public class WaybillServiceImpl implements WaybillService {
             BeanUtils.copyProperties(items, getWaybillItemsDto);
             List<GetWaybillGoodsDto> getWaybillGoodsDtoList = new LinkedList<>();
             List<WaybillGoods> waybillGoodsList = waybillGoodsMapper.listWaybillGoodsByItemId(items.getId());
+            if (null == getWaybillItemsDto.getTotalQuantity()) {
+                getWaybillItemsDto.setTotalQuantity(0);
+            }
+            if (null == getWaybillItemsDto.getTotalWeight()) {
+                getWaybillItemsDto.setTotalWeight(new BigDecimal(0));
+            }
             for (WaybillGoods wg : waybillGoodsList) {
                 GetWaybillGoodsDto getWaybillGoodsDto = new GetWaybillGoodsDto();
                 BeanUtils.copyProperties(wg, getWaybillGoodsDto);
                 getWaybillGoodsDtoList.add(getWaybillGoodsDto);
+                if (null == wg.getGoodsQuantity()) {
+                    wg.setGoodsQuantity(0);
+                }
+                if (null == wg.getGoodsWeight()) {
+                    wg.setGoodsWeight(new BigDecimal(0));
+                }
+                getWaybillItemsDto
+                        .setTotalQuantity(getWaybillItemsDto.getTotalQuantity() + wg.getGoodsQuantity())
+                        .setTotalWeight(getWaybillItemsDto.getTotalWeight().add(wg.getGoodsWeight()));
             }
             //拿到卸货信息
             ShowSiteDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());
@@ -286,7 +301,9 @@ public class WaybillServiceImpl implements WaybillService {
                 .setTruckId(truckDto)
                 .setDriverId(showDriverDto)
                 .setWaybillItems(getWaybillItemsDtoList)
-                .setGoodType(ordersData.getGoodsType());
+                .setGoodType(ordersData.getGoodsType())
+                .setTotalQuantity(getWaybillDto.getWaybillItems().stream().mapToInt(GetWaybillItemDto::getTotalQuantity).sum())
+                .setTotalWeight(getWaybillDto.getWaybillItems().stream().map(GetWaybillItemDto::getTotalWeight).reduce(BigDecimal.ZERO, BigDecimal::add));
         return getWaybillDto;
     }
 
