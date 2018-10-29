@@ -614,6 +614,7 @@ public class WaybillServiceImpl implements WaybillService {
                 List<String> imagesUrls = dto.getImagesUrl();
                 if (!CollectionUtils.isEmpty(imagesUrls)) {
                     for (int i = 0; i < imagesUrls.size(); i++) {
+                        String imagesUrl = imagesUrls.get(i);
                         WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
                         waybillTrackingImages
                                 .setWaybillId(waybillId)
@@ -624,8 +625,18 @@ public class WaybillServiceImpl implements WaybillService {
                                 .setWaybillTrackingId(waybillTracking.getId());
                         //签收单
                         if (i == 0) {
+                            if (ImagesTypeConstant.NO_URL.equals(imagesUrl)) {
+                                waybillTrackingImages.setImageUrl(null);
+                            } else {
+                                waybillTrackingImages.setImageUrl(imagesUrl);
+                            }
                             waybillTrackingImages.setImageType(ImagesTypeConstant.SIGN_BILL);
                         } else if (i == 1) {
+                            if (ImagesTypeConstant.NO_URL.equals(imagesUrl)) {
+                                waybillTrackingImages.setImageUrl(null);
+                            } else {
+                                waybillTrackingImages.setImageUrl(imagesUrl);
+                            }
                             //磅单
                             waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
                         }
