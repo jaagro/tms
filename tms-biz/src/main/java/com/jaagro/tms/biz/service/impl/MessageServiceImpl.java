@@ -32,7 +32,7 @@ public class MessageServiceImpl implements MessageService {
      * @return
      */
     @Override
-    public PageInfo<List<MessageReturnDto>>  listMessageByCriteriaDto(ListMessageCriteriaDto criteriaDto) {
+    public List<MessageReturnDto> listMessageByCriteriaDto(ListMessageCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(),criteriaDto.getPageSize());
         List<Message> messageList = messageMapperExt.listMessageByCriteriaDto(criteriaDto);
         if (CollectionUtils.isEmpty(messageList)){
