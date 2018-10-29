@@ -6,13 +6,11 @@ import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
 import com.jaagro.tms.api.dto.order.UpdateOrderDto;
 import com.jaagro.tms.api.service.OrderService;
-import com.jaagro.tms.biz.mapper.OrdersMapper;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
@@ -24,7 +22,6 @@ import java.util.Map;
 /**
  * @author baiyiran
  */
-@Aspect
 @RestController
 @Api(description = "订单管理", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrderController {
@@ -33,8 +30,6 @@ public class OrderController {
     private OrderService orderService;
     @Autowired
     private CustomerClientService customerService;
-    @Autowired
-    private OrdersMapper ordersMapper;
 
     /**
      * 新增订单
@@ -64,6 +59,7 @@ public class OrderController {
         try {
             result = orderService.createOrder(orderDto);
         } catch (Exception ex) {
+            ex.printStackTrace();
             return BaseResponse.errorInstance(ex.getMessage());
         }
         return BaseResponse.service(result);
@@ -81,13 +77,11 @@ public class OrderController {
         if (StringUtils.isEmpty(orderDto.getCustomerId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
         }
-        if (this.ordersMapper.selectByPrimaryKey(orderDto.getCustomerId()) == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在");
-        }
         GetOrderDto getOrderDto;
         try {
             getOrderDto = orderService.updateOrder(orderDto);
         } catch (Exception ex) {
+            ex.printStackTrace();
             return BaseResponse.errorInstance(ex.getMessage());
         }
         return BaseResponse.successInstance(getOrderDto);
@@ -102,13 +96,11 @@ public class OrderController {
     @ApiOperation("删除订单")
     @DeleteMapping("/order")
     public BaseResponse deleteOrder(@PathVariable Integer id) {
-        if (this.ordersMapper.selectByPrimaryKey(id) == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单不存在");
-        }
         Map<String, Object> result;
         try {
             result = orderService.deleteOrderById(id);
         } catch (Exception ex) {
+            ex.printStackTrace();
             return BaseResponse.errorInstance(ex.getMessage());
         }
         return BaseResponse.service(result);
