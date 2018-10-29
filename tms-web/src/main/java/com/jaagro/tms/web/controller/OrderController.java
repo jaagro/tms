@@ -1,6 +1,7 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.constant.OrderStatus;
+import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
 import com.jaagro.tms.api.dto.order.CreateOrderDto;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
@@ -9,6 +10,7 @@ import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.biz.mapper.OrdersMapper;
 import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.web.vo.order.CustomerContactsVo;
 import com.jaagro.tms.web.vo.order.OrderVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
@@ -133,7 +135,18 @@ public class OrderController {
             GetOrderDto getOrderDto = orderRefactorService.getOrderById(id);
             if (getOrderDto != null) {
                 BeanUtils.copyProperties(getOrderDto, orderVo);
-                BeanUtils.copyProperties(getOrderDto.getContactsDto(),orderVo.getContactsDto());
+
+//                CustomerContactsVo contactsVo = new CustomerContactsVo();
+//                BeanUtils.copyProperties(getOrderDto.getContactsDto(), contactsVo);
+//                orderVo.setContactsDto(contactsVo);
+
+//                BeanUtils.copyProperties(, orderVo.getContactsDto());
+//                BeanUtils.copyProperties(getOrderDto.getCreatedUser(), orderVo.getCreatedUser());
+//                BeanUtils.copyProperties(getOrderDto.getCustomer(), orderVo.getCustomer());
+//                BeanUtils.copyProperties(getOrderDto.getLoadSiteId(), orderVo.getLoadSiteId());
+//                BeanUtils.copyProperties(getOrderDto.getModifyUser(), orderVo.getModifyUser());
+//                BeanUtils.copyProperties(getOrderDto.getCustomerContract(), orderVo.getCustomerContract());
+//                BeanUtils.copyProperties(getOrderDto.getOrderItems(), orderVo.getOrderItems());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
