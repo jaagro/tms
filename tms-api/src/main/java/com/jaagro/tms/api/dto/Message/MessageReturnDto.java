@@ -1,17 +1,21 @@
-package com.jaagro.tms.biz.entity;
+package com.jaagro.tms.api.dto.Message;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.Date;
+
 /**
- * @author tony
+ * 消息返回
+ * @author yj
+ * @date 2018/10/29
  */
 @Data
 @Accessors(chain = true)
-public class Message {
+public class MessageReturnDto implements Serializable{
     /**
-     * 
+     * 消息id
      */
     private Integer id;
 
@@ -71,23 +75,22 @@ public class Message {
     private Boolean enabled;
 
     /**
-     * 
+     * 创建时间
      */
     private Date createTime;
 
     /**
-     * 
+     * 创建人
      */
     private Integer createUserId;
 
     /**
-     * 
+     * 修改时间
      */
     private Date modifyTime;
 
     /**
-     * 
+     * 修改人
      */
     private Integer modifyUserId;
-
 }
