@@ -32,18 +32,9 @@ public class MessageServiceImpl implements MessageService {
      * @return
      */
     @Override
-    public List<MessageReturnDto> listMessageByCriteriaDto(ListMessageCriteriaDto criteriaDto) {
+    public PageInfo<MessageReturnDto> listMessageByCriteriaDto(ListMessageCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(),criteriaDto.getPageSize());
-        List<Message> messageList = messageMapperExt.listMessageByCriteriaDto(criteriaDto);
-        if (CollectionUtils.isEmpty(messageList)){
-            return null;
-        }
-        List<MessageReturnDto> messageReturnDtoList = new ArrayList<>();
-        for(Message message : messageList){
-            MessageReturnDto dto = new MessageReturnDto();
-            BeanUtils.copyProperties(message,dto);
-            messageReturnDtoList.add(dto);
-        }
-        return new PageInfo<>(messageReturnDtoList);
+        List<MessageReturnDto> messageList = messageMapperExt.listMessageByCriteriaDto(criteriaDto);
+        return new PageInfo<MessageReturnDto>(messageList);
     }
 }

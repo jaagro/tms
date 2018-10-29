@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.service;
 
+import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.MessageReturnDto;
 
@@ -15,5 +16,5 @@ public interface MessageService {
      * @param criteriaDto
      * @return
      */
-    List<MessageReturnDto> listMessageByCriteriaDto(ListMessageCriteriaDto criteriaDto);
+    PageInfo<MessageReturnDto> listMessageByCriteriaDto(ListMessageCriteriaDto criteriaDto);
 }
