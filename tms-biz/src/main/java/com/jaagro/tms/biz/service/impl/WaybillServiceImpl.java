@@ -237,6 +237,9 @@ public class WaybillServiceImpl implements WaybillService {
                 GetWaybillGoodsDto getWaybillGoodsDto = new GetWaybillGoodsDto();
                 BeanUtils.copyProperties(wg, getWaybillGoodsDto);
                 getWaybillGoodsDtoList.add(getWaybillGoodsDto);
+                getWaybillItemsDto
+                        .setTotalQuQuantity(getWaybillItemsDto.getTotalQuQuantity() + wg.getGoodsQuantity())
+                        .setTotalWeight(getWaybillItemsDto.getTotalWeight().add(wg.getGoodsWeight()));
             }
             //拿到卸货信息
             ShowSiteDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());

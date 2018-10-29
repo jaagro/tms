@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +45,17 @@ public class GetWaybillItemDto implements Serializable {
      * 签收状态
      */
     private Boolean signStatus;
+
+    /**
+     * 合计重量
+     */
+    private BigDecimal totalWeight;
+
+    /**
+     * 合计数量
+     */
+    private Integer totalQuQuantity;
+
     /**
      * 货物列表
      */
