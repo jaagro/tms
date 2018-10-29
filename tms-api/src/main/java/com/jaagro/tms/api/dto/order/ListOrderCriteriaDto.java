@@ -25,6 +25,11 @@ public class ListOrderCriteriaDto implements Serializable {
     private int pageSize;
 
     /**
+     * 订单编号
+     */
+    private Integer orderId;
+
+    /**
      * 货物类型
      */
     private Integer goodsType;
@@ -63,5 +68,10 @@ public class ListOrderCriteriaDto implements Serializable {
      * 登陆人所在部门和下属所有部门
      */
     private List<Integer> departIds;
+
+    /**
+     * 区分待派单列表和订单列表
+     */
+    private String waitOrders;
 
 }

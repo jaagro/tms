@@ -252,6 +252,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         waybillPlanDto.setWaybillPlanTime(new Date());
         waybillPlanDto.setGoodType(ordersData.getGoodsType());
         List<ListWaybillItemsPlanDto> itemsList = new ArrayList<>();
+        int totalAmount =0;
         for (MiddleObjectVo obj : assignList) {
             OrderGoods orderGoods = orderGoodsMapper.selectByPrimaryKey(obj.getOrderGoodsId());
             Integer goodsUnit = orderGoods.getGoodsUnit();
@@ -279,10 +280,12 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             } else {
                 waybillGoodsDto.setGoodsQuantity(obj.getPlanAmount());
             }
+            totalAmount = totalAmount + obj.getPlanAmount();
             goodsList.add(waybillGoodsDto);
             waybillItemsPlanDto.setGoods(goodsList);
             itemsList.add(waybillItemsPlanDto);
         }
+        waybillPlanDto.setTotalAmout(totalAmount);
         waybillPlanDto.setWaybillItems(itemsList);
         return waybillPlanDto;
     }

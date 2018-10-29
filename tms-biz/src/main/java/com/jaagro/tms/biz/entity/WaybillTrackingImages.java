@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+
 /**
  * @author tony
  */
@@ -23,12 +24,17 @@ public class WaybillTrackingImages {
     /**
      * 
      */
-    private Integer waybillTrackingId;
+    private Integer waybillItemId;
 
     /**
-     * 装货 卸货id
+     * 
      */
     private Integer siteId;
+
+    /**
+     * 
+     */
+    private Integer waybillTrackingId;
 
     /**
      * 图片类型：1-装货单 2- 卸货单
@@ -49,4 +55,6 @@ public class WaybillTrackingImages {
      * 创建人
      */
     private Integer createUserId;
+
+
 }

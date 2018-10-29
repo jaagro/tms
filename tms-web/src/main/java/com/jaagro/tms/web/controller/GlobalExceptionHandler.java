@@ -1,23 +1,19 @@
 package com.jaagro.tms.web.controller;
 
+import com.jaagro.utils.BaseResponse;
+import com.jaagro.utils.ResponseStatusCode;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value=Exception.class)
     @ResponseBody
-    private Map<String,Object> exceptionHandler(HttpServletRequest request, Exception ex){
-        Map<String,Object> modelMap = new HashMap<>();
-        modelMap.put("success",false);
-        modelMap.put("errCode","500");
-        modelMap.put("errMsg",ex.getMessage());
-        return modelMap;
+    private BaseResponse exceptionHandler(HttpServletRequest request, Exception ex){
+        return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(), ex.getMessage());
     }
 }

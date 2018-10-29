@@ -27,7 +27,7 @@ public abstract class JpushClientUtil {
     protected static final Logger log = LoggerFactory.getLogger(JpushClientUtil.class);
 
     protected static final String APP_KEY = "3ff0ace6ce40fcae6f18eb27";
-    protected static final String MASTER_SECRET = "05f523c0d6c3d81220ad6741";
+    protected static final String MASTER_SECRET = "424e702fb7f2f98c350c97e8";
     private static JPushClient jPushClient = new JPushClient(MASTER_SECRET, APP_KEY);
 
     /**
