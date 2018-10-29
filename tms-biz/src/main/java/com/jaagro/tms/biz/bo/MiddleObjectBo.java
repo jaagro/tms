@@ -1,4 +1,4 @@
-package com.jaagro.tms.biz.vo;
+package com.jaagro.tms.biz.bo;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class MiddleObjectVo {
+public class MiddleObjectBo {
     private Integer orderId;
     private Integer truckId;
     private Integer orderItemId;

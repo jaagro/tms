@@ -30,7 +30,7 @@
         select
         <include refid="Base_Column_List"/>
         from waybill_items
-        where waybill_id = #{waybillId,jdbcType=INTEGER}
+        where waybill_id = #{waybillId,jdbcType=INTEGER} and enabled=1
     </select>
 
     <select id="listByWaybillId" resultMap="DetailInfo" parameterType="java.lang.Integer">
@@ -43,7 +43,7 @@
     <select id="listWaybillIdIdAndSignStatus" resultType="java.util.Map" parameterType="com.jaagro.tms.biz.entity.WaybillItems">
         select id waybillItemId,unload_site_id unloadSiteId
         from  waybill_items
-        where 1=1
+        where 1=1 and enabled=1
         <if test="waybillId != null" >
            and waybill_id=#{waybillId}
         </if>
