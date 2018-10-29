@@ -21,5 +21,6 @@ public interface MessageMapperExt extends  MessageMapper{
     */
    List<MessageReturnDto> listMessageByCriteriaDto(ListMessageCriteriaDto criteriaDto);
 
+
    
 }
