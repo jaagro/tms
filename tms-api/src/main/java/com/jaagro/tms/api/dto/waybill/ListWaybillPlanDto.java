@@ -60,5 +60,5 @@ public class ListWaybillPlanDto implements Serializable {
     /**
      * 运单货物的总量
      */
-    private int totalAmout;
+    private int totalAmount;
 }

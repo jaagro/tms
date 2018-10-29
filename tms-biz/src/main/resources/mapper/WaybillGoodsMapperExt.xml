@@ -11,6 +11,7 @@
         <result column="load_weight" property="loadWeight" jdbcType="DECIMAL"/>
         <result column="unload_quantity" property="unloadQuantity" jdbcType="INTEGER"/>
         <result column="unload_weight" property="unloadWeight" jdbcType="DECIMAL"/>
+        <result column="join_drug" property="joinDrug"/>
     </resultMap>
 
     <select id="listWaybillGoodsByItemId" resultType="com.jaagro.tms.biz.entity.WaybillGoods"
@@ -18,20 +19,20 @@
         select
         <include refid="Base_Column_List"/>
         from waybill_goods
-        where waybill_item_id = #{itemId,jdbcType=INTEGER}
+        where waybill_item_id = #{itemId,jdbcType=INTEGER} and enabled=1
     </select>
 
     <select id="listGoodsByWaybillId" resultType="com.jaagro.tms.api.dto.waybill.GetWaybillGoodsDto" parameterType="java.lang.Integer">
     select
     <include refid="Base_Column_List"/>
     from waybill_goods
-    where waybill_id = #{waybillId}
+    where waybill_id = #{waybillId} and enabled=1
   </select>
 
     <select id="listWaybillGoodsByWaybillItemId" resultMap="DetailInfo" parameterType="java.lang.Integer">
-    select id,goods_name,goods_unit,goods_quantity,goods_weight,load_quantity,load_weight,unload_quantity,unload_weight
+    select id,goods_name,goods_unit,goods_quantity,goods_weight,load_quantity,load_weight,unload_quantity,unload_weight,join_drug
     from waybill_goods
-    where waybill_item_id = #{id,jdbcType=INTEGER}
+    where waybill_item_id = #{id,jdbcType=INTEGER} and enabled=1
   </select>
 
 </mapper>

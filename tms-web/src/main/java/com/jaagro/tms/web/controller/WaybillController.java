@@ -2,8 +2,10 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
+import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -28,6 +30,10 @@ public class WaybillController {
     private WaybillService waybillService;
     @Autowired
     private WaybillPlanService waybillPlanService;
+    @Autowired
+    private CustomerClientService customerClientService;
+    @Autowired
+    private OrderService orderService;
 
     /**
      * 创建运单计划
@@ -152,5 +158,22 @@ public class WaybillController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
         return BaseResponse.service(waybillService.listWaybillByCriteria(criteriaDto));
+    }
+
+
+    /**
+     * 撤回待接单的运单
+     * @Author gavin
+     * @param waybillId
+     * @return
+     */
+    @ApiOperation("撤回等待接单的运单")
+    @PostMapping("/withdrawWaybill/{waybillId}")
+    public BaseResponse withdrawWaybill(@PathVariable Integer waybillId){
+        boolean result = waybillService.withdrawWaybill(waybillId);
+        if(!result){
+         return BaseResponse.errorInstance("撤回失败");
+        }
+        return BaseResponse.successInstance("撤回成功");
     }
 }

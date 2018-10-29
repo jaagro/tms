@@ -1,4 +1,4 @@
-package com.jaagro.tms.api.dto.customer;
+package com.jaagro.tms.web.vo.order;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -8,18 +8,14 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * @author tony
+ * @author baiyiran
+ * @Date 2018/10/22
  */
 @Data
 @Accessors(chain = true)
-public class ShowSiteDto implements Serializable {
+public class SiteVo implements Serializable {
 
     private Integer id;
-
-    /**
-     * 归属网点
-     */
-    private Integer deptId;
 
     /**
      * 地址类型：1-装货点，2-卸货点
@@ -104,4 +100,5 @@ public class ShowSiteDto implements Serializable {
      * 货物类型:毛鸡、饲料、母猪、公猪、仔猪、生猪
      */
     private int productType;
+
 }
