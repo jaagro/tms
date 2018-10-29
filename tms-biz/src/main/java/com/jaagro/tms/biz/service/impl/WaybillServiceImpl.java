@@ -301,7 +301,9 @@ public class WaybillServiceImpl implements WaybillService {
                 .setTruckId(truckDto)
                 .setDriverId(showDriverDto)
                 .setWaybillItems(getWaybillItemsDtoList)
-                .setGoodType(ordersData.getGoodsType());
+                .setGoodType(ordersData.getGoodsType())
+                .setTotalQuantity(getWaybillDto.getWaybillItems().stream().mapToInt(GetWaybillItemDto::getTotalQuantity).sum())
+                .setTotalWeight(getWaybillDto.getWaybillItems().stream().map(GetWaybillItemDto::getTotalWeight).reduce(BigDecimal.ZERO, BigDecimal::add));
         return getWaybillDto;
     }
 
