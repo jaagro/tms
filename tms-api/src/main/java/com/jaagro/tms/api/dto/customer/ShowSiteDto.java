@@ -17,6 +17,11 @@ public class ShowSiteDto implements Serializable {
     private Integer id;
 
     /**
+     * 归属网点
+     */
+    private Integer deptId;
+
+    /**
      * 地址类型：1-装货点，2-卸货点
      */
     private Integer siteType;

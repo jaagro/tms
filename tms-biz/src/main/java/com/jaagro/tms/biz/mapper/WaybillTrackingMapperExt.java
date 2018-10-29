@@ -24,4 +24,13 @@ public interface WaybillTrackingMapperExt extends WaybillTrackingMapper{
      * @return
      */
     List<ShowTrackingDto> listWaybillTrackingByWaybillId(Integer waybillId);
+
+    /**
+     * add by Gavin
+     * 根据运单id获取运单轨迹按id倒序
+     * @param waybillId
+     * @return
+     */
+
+    List<ShowTrackingDto> getWaybillTrackingByWaybillId(Integer waybillId);
 }

@@ -1,8 +1,10 @@
 package com.jaagro.tms.api.service;
 
-import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
 import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
+import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
+import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,13 @@ import java.util.Map;
  * @author tony
  */
 public interface WaybillService {
+
+    /**
+     * 根据状态查询我的运单信息
+     * @param dto
+     * @return
+     */
+    Map<String, Object> listWaybillByStatus(GetWaybillParamDto dto);
 
     /**
      * 查询订单详情页
@@ -78,7 +87,6 @@ public interface WaybillService {
      */
     GetWaybillPlanDto getOrderAndWaybill(Integer orderId);
 
-
     /**
      * Author gavin
      * @param waybillId
@@ -104,21 +112,13 @@ public interface WaybillService {
     Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto);
 
     /**
-     * 根据waybillItemId 查询卸货地货物信息
-     *
+     * 根据waybillId 卸货地Id 查询货物信息
      * @param
      * @return
-     * @Author @Gao.
      */
     Map<String, Object> showGoodsByWaybillItemId(Integer waybillId);
 
-    /**
-     * 根据waybillId 查询装货地货物信息
-     *
-     * @param
-     * @return
-     * @Author @Gao.
-     */
+
     Map<String, Object> showGoodsByWaybillId(Integer waybillItemId);
 
     /**

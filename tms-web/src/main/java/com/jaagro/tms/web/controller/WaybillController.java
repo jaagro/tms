@@ -2,8 +2,10 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
+import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -28,6 +30,10 @@ public class WaybillController {
     private WaybillService waybillService;
     @Autowired
     private WaybillPlanService waybillPlanService;
+    @Autowired
+    private CustomerClientService customerClientService;
+    @Autowired
+    private OrderService orderService;
 
     /**
      * 创建运单计划

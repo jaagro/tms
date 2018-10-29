@@ -40,11 +40,37 @@ public class ListWaybillCriteriaDto implements Serializable {
     private Integer orderId;
 
     /**
-     * 派单时间
+     * 派单起始时间
      */
-    private Date createTime;
+    private Date createStartTime;
+
+    /**
+     * 派单结束时间
+     */
+    private Date createEndTime;
+
     /**
      * 登陆人所在部门和下属所有部门
      */
     private List<Integer> departIds;
+
+    /**
+     * 车牌号
+     */
+    private String truckNumber;
+
+    /**
+     * 车辆id数组 （用于查询条件有车牌号的情况）
+     */
+    private List<Integer> truckIds;
+
+    /**
+     * 客户id
+     */
+    private Integer customerId;
+
+    /**
+     * 订单id数组 （用于查询条件有客户的情况）
+     */
+    private List<Integer> orderIds;
 }
