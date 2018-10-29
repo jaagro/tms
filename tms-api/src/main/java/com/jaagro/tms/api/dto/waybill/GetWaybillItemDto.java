@@ -54,7 +54,7 @@ public class GetWaybillItemDto implements Serializable {
     /**
      * 合计数量
      */
-    private Integer totalQuQuantity;
+    private Integer totalQuantity;
 
     /**
      * 货物列表
