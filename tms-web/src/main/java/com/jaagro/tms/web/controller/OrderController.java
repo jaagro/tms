@@ -10,8 +10,7 @@ import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.biz.mapper.OrdersMapper;
 import com.jaagro.tms.biz.service.CustomerClientService;
-import com.jaagro.tms.web.vo.order.CustomerContactsVo;
-import com.jaagro.tms.web.vo.order.OrderVo;
+import com.jaagro.tms.web.vo.order.*;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -135,18 +134,34 @@ public class OrderController {
             GetOrderDto getOrderDto = orderRefactorService.getOrderById(id);
             if (getOrderDto != null) {
                 BeanUtils.copyProperties(getOrderDto, orderVo);
-
-//                CustomerContactsVo contactsVo = new CustomerContactsVo();
-//                BeanUtils.copyProperties(getOrderDto.getContactsDto(), contactsVo);
-//                orderVo.setContactsDto(contactsVo);
-
-//                BeanUtils.copyProperties(, orderVo.getContactsDto());
-//                BeanUtils.copyProperties(getOrderDto.getCreatedUser(), orderVo.getCreatedUser());
-//                BeanUtils.copyProperties(getOrderDto.getCustomer(), orderVo.getCustomer());
-//                BeanUtils.copyProperties(getOrderDto.getLoadSiteId(), orderVo.getLoadSiteId());
-//                BeanUtils.copyProperties(getOrderDto.getModifyUser(), orderVo.getModifyUser());
-//                BeanUtils.copyProperties(getOrderDto.getCustomerContract(), orderVo.getCustomerContract());
-//                BeanUtils.copyProperties(getOrderDto.getOrderItems(), orderVo.getOrderItems());
+                //联系人
+                CustomerContactsVo contactsVo = new CustomerContactsVo();
+                BeanUtils.copyProperties(getOrderDto.getContactsDto(), contactsVo);
+                orderVo.setContactsDto(contactsVo);
+                //创建人
+                UserVo userVo = new UserVo();
+                BeanUtils.copyProperties(getOrderDto.getCreatedUser(), userVo);
+                orderVo.setCreatedUser(userVo);
+                //客户
+                CustomerVo customerVo = new CustomerVo();
+                BeanUtils.copyProperties(getOrderDto.getCustomer(), customerVo);
+                orderVo.setCustomer(customerVo);
+                //装货地
+                SiteVo siteVo = new SiteVo();
+                BeanUtils.copyProperties(getOrderDto.getLoadSiteId(), siteVo);
+                orderVo.setLoadSiteId(siteVo);
+                //修改人
+                if (getOrderDto.getModifyUser() != null) {
+                    UserVo userModifyVo = new UserVo();
+                    BeanUtils.copyProperties(getOrderDto.getModifyUser(), userModifyVo);
+                    orderVo.setModifyUser(userModifyVo);
+                }
+                //客户合同
+                ShowCustomerContractVo showCustomerContractVo = new ShowCustomerContractVo();
+                BeanUtils.copyProperties(getOrderDto.getCustomerContract(), showCustomerContractVo);
+                orderVo.setCustomerContract(showCustomerContractVo);
+                //订单详情
+                BeanUtils.copyProperties(getOrderDto.getOrderItems(), orderVo.getOrderItems());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
