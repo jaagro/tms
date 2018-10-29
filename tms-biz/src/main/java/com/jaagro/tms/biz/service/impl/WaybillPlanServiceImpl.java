@@ -285,7 +285,8 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             waybillItemsPlanDto.setGoods(goodsList);
             itemsList.add(waybillItemsPlanDto);
         }
-        waybillPlanDto.setTotalAmount(totalAmount);
+        waybillPlanDto.setTotalQuantity(totalAmount);
+        waybillPlanDto.setTotalWeight(new BigDecimal(totalAmount));
         waybillPlanDto.setWaybillItems(itemsList);
         return waybillPlanDto;
     }
