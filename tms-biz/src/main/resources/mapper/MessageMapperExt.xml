@@ -32,4 +32,11 @@
         and msg_type in(1,2)
         order by create_time desc
     </select>
+
+    <delete id="deleteMessage">
+        update message set enabled=0 ,modify_time=now() where refer_id=#{waybillId} and to_user_id in
+        <foreach collection="driverIds" open="(" separator="," close=")" item="driverId">
+            ${driverId}
+        </foreach>
+    </delete>
 </mapper>

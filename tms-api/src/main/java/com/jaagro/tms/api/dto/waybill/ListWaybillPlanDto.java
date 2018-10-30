@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class ListWaybillPlanDto implements Serializable {
     private Integer truckTeamContractId;
     /**
      * 发货地和对应的货物明细列表 运单明细列表
-     * s
+     *
      */
     private List<ListWaybillItemsPlanDto> waybillItems;
 
@@ -57,8 +58,13 @@ public class ListWaybillPlanDto implements Serializable {
      * 运单状态
      */
     private String waybillStatus;
+
     /**
      * 运单货物的总量
      */
-    private int totalAmout;
+    private Integer totalQuantity;
+    /**
+     * 运单货物的总量
+     */
+    private BigDecimal totalWeight;
 }

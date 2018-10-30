@@ -5,7 +5,7 @@
         select
         <include refid="Base_Column_List"/>
         from order_goods
-        where order_item_id = #{id,jdbcType=INTEGER}
+        where order_item_id = #{id,jdbcType=INTEGER} and enabled = 1
     </select>
     <update id="disableByItemsId">
         update order_goods
