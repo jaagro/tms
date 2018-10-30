@@ -1,13 +1,9 @@
 package com.jaagro.tms.web.controller;
 
-import com.jaagro.tms.api.constant.OrderStatus;
-import com.jaagro.tms.api.dto.order.CreateOrderDto;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
-import com.jaagro.tms.api.dto.order.UpdateOrderDto;
 import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
-import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.web.vo.order.*;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
@@ -19,96 +15,17 @@ import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
-
 /**
  * @author baiyiran
  */
 @RestController
-@Api(description = "订单管理", produces = MediaType.APPLICATION_JSON_VALUE)
-public class OrderController {
+@Api(description = "微信小程序订单管理", produces = MediaType.APPLICATION_JSON_VALUE)
+public class WeChatAppletOrderController {
 
     @Autowired
     private OrderService orderService;
     @Autowired
-    private CustomerClientService customerService;
-    @Autowired
     private OrderRefactorService orderRefactorService;
-
-    /**
-     * 新增订单
-     *
-     * @param orderDto
-     * @return
-     */
-    @ApiOperation("新增订单")
-    @PostMapping("/order")
-    public BaseResponse createOrder(@RequestBody CreateOrderDto orderDto) {
-        if (StringUtils.isEmpty(orderDto.getCustomerId())) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
-        }
-        if (StringUtils.isEmpty(orderDto.getLoadSiteId())) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "收货id不能为空");
-        }
-        if (StringUtils.isEmpty(orderDto.getCustomerContractId())) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同id不能为空");
-        }
-        if (this.customerService.getShowCustomerById(orderDto.getCustomerId()) == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户不存在");
-        }
-        if (this.customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同不存在");
-        }
-        Map<String, Object> result;
-        try {
-            result = orderService.createOrder(orderDto);
-        } catch (Exception ex) {
-            return BaseResponse.errorInstance(ex.getMessage());
-        }
-        return BaseResponse.service(result);
-    }
-
-    /**
-     * 修改订单
-     *
-     * @param orderDto
-     * @return
-     */
-    @ApiOperation("修改订单")
-    @PutMapping("/order")
-    public BaseResponse updateOrder(@RequestBody UpdateOrderDto orderDto) {
-        if (StringUtils.isEmpty(orderDto.getCustomerId())) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
-        }
-        GetOrderDto getOrderDto;
-        try {
-            getOrderDto = orderService.updateOrder(orderDto);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return BaseResponse.errorInstance(ex.getMessage());
-        }
-        return BaseResponse.successInstance(getOrderDto);
-    }
-
-    /**
-     * 删除订单
-     *
-     * @param id
-     * @return
-     */
-    @ApiOperation("删除订单")
-    @DeleteMapping("/order")
-    public BaseResponse deleteOrder(@PathVariable Integer id) {
-        Map<String, Object> result;
-        try {
-            result = orderService.deleteOrderById(id);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return BaseResponse.errorInstance(ex.getMessage());
-        }
-        return BaseResponse.service(result);
-    }
 
     /**
      * 查询单条订单
@@ -117,7 +34,7 @@ public class OrderController {
      * @return
      */
     @ApiOperation("查询单条订单")
-    @GetMapping("/getOrderById/{id}")
+    @GetMapping("/getWeChatOrderById/{id}")
     public BaseResponse getOrderById(@PathVariable("id") Integer id) {
         OrderVo orderVo = new OrderVo();
         try {
@@ -167,7 +84,7 @@ public class OrderController {
      * @return
      */
     @ApiOperation("分页查询订单")
-    @PostMapping("/listOrders")
+    @PostMapping("/listWeChatOrders")
     public BaseResponse listOrders(@RequestBody ListOrderCriteriaDto criteriaDto) {
         if (StringUtils.isEmpty(criteriaDto.getPageNum())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空");
@@ -186,7 +103,7 @@ public class OrderController {
      * @return
      */
     @ApiOperation("取消订单")
-    @PostMapping("/cancelOrders/{orderId}/{detailInfo}")
+    @PostMapping("/cancelWeChatOrder/{orderId}/{detailInfo}")
     public BaseResponse cancelOrders(@PathVariable("orderId") Integer orderId, @PathVariable("detailInfo") String detailInfo) {
         if (StringUtils.isEmpty(orderId)) {
             return BaseResponse.idNull("订单id不能为空");
@@ -197,16 +114,4 @@ public class OrderController {
         return BaseResponse.service(orderService.cancelOrders(orderId, detailInfo));
     }
 
-    /**
-     * 待派单列表分页
-     *
-     * @param criteriaDto
-     * @return
-     */
-    @ApiOperation("待派单列表分页")
-    @PostMapping("/listToSendOrders")
-    public BaseResponse listToSendOrders(@RequestBody ListOrderCriteriaDto criteriaDto) {
-        criteriaDto.setWaitOrders(OrderStatus.PLACE_ORDER);
-        return BaseResponse.service(orderService.listOrderByCriteria(criteriaDto));
-    }
 }
