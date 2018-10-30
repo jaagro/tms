@@ -18,27 +18,6 @@ public class MessageReturnDto implements Serializable{
      * 消息id
      */
     private Integer id;
-
-    /**
-     * 消息发送者id：0-系统
-     */
-    private Integer fromUserId;
-
-    /**
-     * 消息发送者类型：0-系统
-     */
-    private Integer fromUserType;
-
-    /**
-     * 消息接受者id：0-系统
-     */
-    private Integer toUserId;
-
-    /**
-     * 消息接受者类型：0-系统
-     */
-    private Integer toUserType;
-
     /**
      * 消息头
      */
@@ -55,9 +34,9 @@ public class MessageReturnDto implements Serializable{
     private Integer msgType;
 
     /**
-     * 消息类别：1-通知 2-公告
+     * 消息来源:1-APP,2-小程序,3-站内
      */
-    private Integer type;
+    private Integer msgSource;
 
     /**
      * 关联id
@@ -68,29 +47,9 @@ public class MessageReturnDto implements Serializable{
      * 消息状态：0-未读 1-已读
      */
     private Integer msgStatus;
-
-    /**
-     * 是否有效：1-有效 0-无效
-     */
-    private Boolean enabled;
-
     /**
      * 创建时间
      */
     private Date createTime;
 
-    /**
-     * 创建人
-     */
-    private Integer createUserId;
-
-    /**
-     * 修改时间
-     */
-    private Date modifyTime;
-
-    /**
-     * 修改人
-     */
-    private Integer modifyUserId;
 }

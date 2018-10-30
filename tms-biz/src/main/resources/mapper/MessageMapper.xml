@@ -10,7 +10,7 @@
     <result column="header" property="header" jdbcType="VARCHAR" />
     <result column="body" property="body" jdbcType="VARCHAR" />
     <result column="msg_type" property="msgType" jdbcType="INTEGER" />
-    <result column="type" property="msgType" jdbcType="INTEGER" />
+    <result column="msg_source" property="msgSource" jdbcType="INTEGER" />
     <result column="refer_id" property="referId" jdbcType="INTEGER" />
     <result column="msg_status" property="msgStatus" jdbcType="INTEGER" />
     <result column="enabled" property="enabled" jdbcType="TINYINT" />
@@ -20,7 +20,7 @@
     <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, from_user_id, from_user_type, to_user_id, to_user_type, header, body, msg_type, type,
+    id, from_user_id, from_user_type, to_user_id, to_user_type, header, body, msg_type, msg_source,
     refer_id, msg_status, enabled, create_time, create_user_id, modify_time, modify_user_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -36,13 +36,13 @@
   <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Message" >
     insert into message (id, from_user_id, from_user_type, 
       to_user_id, to_user_type, header, 
-      body, msg_type, type, refer_id,
+      body, msg_type, msg_source, refer_id,
       msg_status, enabled, create_time, 
       create_user_id, modify_time, modify_user_id
       )
     values (#{id,jdbcType=INTEGER}, #{fromUserId,jdbcType=INTEGER}, #{fromUserType,jdbcType=INTEGER}, 
       #{toUserId,jdbcType=INTEGER}, #{toUserType,jdbcType=INTEGER}, #{header,jdbcType=VARCHAR}, 
-      #{body,jdbcType=VARCHAR}, #{msgType,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{referId,jdbcType=INTEGER},
+      #{body,jdbcType=VARCHAR}, #{msgType,jdbcType=INTEGER}, #{msgSource,jdbcType=INTEGER}, #{referId,jdbcType=INTEGER},
       #{msgStatus,jdbcType=INTEGER}, #{enabled,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
       #{createUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER}
       )
@@ -75,7 +75,7 @@
         msg_type,
       </if>
       <if test="type != null" >
-        type,
+        msg_source,
       </if>
       <if test="referId != null" >
         refer_id,
@@ -124,8 +124,8 @@
       <if test="msgType != null" >
         #{msgType,jdbcType=INTEGER},
       </if>
-      <if test="type != null" >
-        #{type,jdbcType=INTEGER},
+      <if test="msgSource != null" >
+        #{msgSource,jdbcType=INTEGER},
       </if>
       <if test="referId != null" >
         #{referId,jdbcType=INTEGER},
@@ -174,8 +174,8 @@
       <if test="msgType != null" >
         msg_type = #{msgType,jdbcType=INTEGER},
       </if>
-      <if test="type != null" >
-        type = #{type,jdbcType=INTEGER},
+      <if test="msgSource != null" >
+        msg_source = #{msgSource,jdbcType=INTEGER},
       </if>
       <if test="referId != null" >
         refer_id = #{referId,jdbcType=INTEGER},
@@ -210,7 +210,7 @@
       header = #{header,jdbcType=VARCHAR},
       body = #{body,jdbcType=VARCHAR},
       msg_type = #{msgType,jdbcType=INTEGER},
-      type = #{type,jdbcType=INTEGER},
+      msg_source = #{msgSource,jdbcType=INTEGER},
       refer_id = #{referId,jdbcType=INTEGER},
       msg_status = #{msgStatus,jdbcType=INTEGER},
       enabled = #{enabled,jdbcType=TINYINT},
