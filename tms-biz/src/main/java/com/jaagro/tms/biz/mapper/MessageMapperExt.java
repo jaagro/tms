@@ -17,6 +17,7 @@ public interface MessageMapperExt extends  MessageMapper{
 
    /**
     * 根据条件查消息
+    * @Author yj
     * @param criteriaDto
     * @return
     */
@@ -33,6 +34,7 @@ public interface MessageMapperExt extends  MessageMapper{
 
    /**
     * 将消息置为已读
+    * @Author yj
     * @param messageIdList
     * @param  modifyUserId
     * @return
