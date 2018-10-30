@@ -40,6 +40,13 @@ public class MessageServiceImpl implements MessageService {
         PageHelper.startPage(criteriaDto.getPageNum(),criteriaDto.getPageSize());
         criteriaDto.setToUserId(currentUserService.getCurrentUser() == null ? null : currentUserService.getCurrentUser().getId());
         List<MessageReturnDto> messageList = messageMapperExt.listMessageByCriteriaDto(criteriaDto);
+        for(MessageReturnDto messageReturnDto : messageList){
+            if (messageReturnDto.getMsgType() == 1){
+                messageReturnDto.setMsgCategory(2);
+            }else{
+                messageReturnDto.setMsgCategory(1);
+            }
+        }
         return new PageInfo<MessageReturnDto>(messageList);
     }
 
@@ -76,6 +83,14 @@ public class MessageServiceImpl implements MessageService {
         criteriaDto.setToUserId(currentUserId);
         ListMessageCriteriaDto dto = new ListMessageCriteriaDto();
         BeanUtils.copyProperties(criteriaDto,dto);
-        return messageMapperExt.listMessageByCriteriaDto(dto);
+        List<MessageReturnDto> messageReturnDtos = messageMapperExt.listMessageByCriteriaDto(dto);
+        for(MessageReturnDto messageReturnDto : messageReturnDtos){
+            if (messageReturnDto.getMsgType() == 1){
+                messageReturnDto.setMsgCategory(2);
+            }else{
+                messageReturnDto.setMsgCategory(1);
+            }
+        }
+        return messageReturnDtos;
     }
 }

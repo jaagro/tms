@@ -28,6 +28,12 @@ public class ListUnReadMsgCriteriaDto {
     private Integer msgSource;
 
     /**
+     * 类别: 1-通知 2-公告
+     */
+    @Min(value=1,message="{msgCategory.Min}")
+    private Integer msgCategory;
+
+    /**
      * 消息接受者id：0-系统
      */
     private Integer toUserId;
