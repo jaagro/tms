@@ -37,7 +37,10 @@ public class MessageReturnDto implements Serializable{
      * 消息来源:1-APP,2-小程序,3-站内
      */
     private Integer msgSource;
-
+    /**
+     * 类别: 1-通知 2-公告
+     */
+    private Integer msgCategory;
     /**
      * 关联id
      */
