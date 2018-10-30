@@ -74,7 +74,7 @@
       <if test="msgType != null" >
         msg_type,
       </if>
-      <if test="type != null" >
+      <if test="msgSource != null" >
         msg_source,
       </if>
       <if test="referId != null" >
