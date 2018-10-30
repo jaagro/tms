@@ -1,9 +1,6 @@
 package com.jaagro.tms.web.vo.chat;
 
-import com.jaagro.tms.api.dto.truck.ShowDriverDto;
-import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.waybill.GetTrackingDto;
-import com.jaagro.tms.api.dto.waybill.GetWaybillItemDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -17,7 +14,6 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 public class WaybillDetailVo {
-
     /**
      *
      */
@@ -29,23 +25,27 @@ public class WaybillDetailVo {
     /**
      * 装货地
      */
-    private ShowSiteVo showSiteVo;
+    private ShowSiteVo loadSiteVo;
 
     /**
-     * 运单指派的车辆详情
+     * 指派车辆的车牌号码
      */
-    private ShowTruckDto assginedTruckDto;
+    private String truckNumber;
 
     /**
-     * 司机详情
+     * 司机名
      */
-    private ShowDriverDto driverDto;
+    private String name;
 
+    /**
+     * 手机号码
+     */
+    private String phoneNumber;
 
     /**
      * 运单明细list
      */
-    private List<GetWaybillItemDto> waybillItems;
+    private List<WaybillItemVo> waybillItems;
 
     /**
      * 运单轨迹
