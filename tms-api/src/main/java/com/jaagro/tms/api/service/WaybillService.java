@@ -126,4 +126,13 @@ public interface WaybillService {
      * @return
      */
     Map<String, Object> personalCenter();
+
+    /**
+     * 撤回待接单的运单
+     * @Author gavin
+     * @param waybillId
+     * @return
+     */
+    boolean withdrawWaybill(Integer waybillId);
+
 }

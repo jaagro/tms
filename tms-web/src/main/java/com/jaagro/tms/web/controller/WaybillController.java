@@ -159,4 +159,21 @@ public class WaybillController {
         }
         return BaseResponse.service(waybillService.listWaybillByCriteria(criteriaDto));
     }
+
+
+    /**
+     * 撤回待接单的运单
+     * @Author gavin
+     * @param waybillId
+     * @return
+     */
+    @ApiOperation("撤回等待接单的运单")
+    @PostMapping("/withdrawWaybill/{waybillId}")
+    public BaseResponse withdrawWaybill(@PathVariable Integer waybillId){
+        boolean result = waybillService.withdrawWaybill(waybillId);
+        if(!result){
+         return BaseResponse.errorInstance("撤回失败");
+        }
+        return BaseResponse.successInstance("撤回成功");
+    }
 }

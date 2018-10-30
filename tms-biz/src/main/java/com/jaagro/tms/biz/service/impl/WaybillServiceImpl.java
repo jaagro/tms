@@ -234,10 +234,25 @@ public class WaybillServiceImpl implements WaybillService {
             BeanUtils.copyProperties(items, getWaybillItemsDto);
             List<GetWaybillGoodsDto> getWaybillGoodsDtoList = new LinkedList<>();
             List<WaybillGoods> waybillGoodsList = waybillGoodsMapper.listWaybillGoodsByItemId(items.getId());
+            if (null == getWaybillItemsDto.getTotalQuantity()) {
+                getWaybillItemsDto.setTotalQuantity(0);
+            }
+            if (null == getWaybillItemsDto.getTotalWeight()) {
+                getWaybillItemsDto.setTotalWeight(new BigDecimal(0));
+            }
             for (WaybillGoods wg : waybillGoodsList) {
                 GetWaybillGoodsDto getWaybillGoodsDto = new GetWaybillGoodsDto();
                 BeanUtils.copyProperties(wg, getWaybillGoodsDto);
                 getWaybillGoodsDtoList.add(getWaybillGoodsDto);
+                if (null == wg.getGoodsQuantity()) {
+                    wg.setGoodsQuantity(0);
+                }
+                if (null == wg.getGoodsWeight()) {
+                    wg.setGoodsWeight(new BigDecimal(0));
+                }
+                getWaybillItemsDto
+                        .setTotalQuantity(getWaybillItemsDto.getTotalQuantity() + wg.getGoodsQuantity())
+                        .setTotalWeight(getWaybillItemsDto.getTotalWeight().add(wg.getGoodsWeight()));
             }
             //拿到卸货信息
             ShowSiteDto unloadSite = customerClientService.getShowSiteById(items.getUnloadSiteId());
@@ -286,7 +301,9 @@ public class WaybillServiceImpl implements WaybillService {
                 .setTruckId(truckDto)
                 .setDriverId(showDriverDto)
                 .setWaybillItems(getWaybillItemsDtoList)
-                .setGoodType(ordersData.getGoodsType());
+                .setGoodType(ordersData.getGoodsType())
+                .setTotalQuantity(getWaybillDto.getWaybillItems().stream().mapToInt(GetWaybillItemDto::getTotalQuantity).sum())
+                .setTotalWeight(getWaybillDto.getWaybillItems().stream().map(GetWaybillItemDto::getTotalWeight).reduce(BigDecimal.ZERO, BigDecimal::add));
         return getWaybillDto;
     }
 
@@ -1098,6 +1115,51 @@ public class WaybillServiceImpl implements WaybillService {
         return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
     }
 
+    /**
+     * 撤回待接单的运单
+     * @Author gavin
+     * @param waybillId
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean withdrawWaybill(Integer waybillId) {
+        if(null==waybillId)
+        {
+            throw new NullPointerException("运单Id不能为空");
+        }
+        Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+        if(null==waybill)
+        {
+            throw new NullPointerException("运单不存在");
+        }
+        if(!WaybillStatus.RECEIVE.equals(waybill.getWaybillStatus())){
+            throw new RuntimeException("只有待接单的运单才可以撤回以便重新派单");
+        }
+        try {
+            Integer userId = getUserId();
+            Integer truckId = waybill.getTruckId();
+            //1。把所派车辆置空、状态改为带派单
+            waybill.setTruckId(0);
+            waybill.setWaybillStatus(WaybillStatus.SEND_TRUCK);
+            waybill.setModifyTime(new Date());
+            waybill.setModifyUserId(userId);
+            waybillMapper.updateByPrimaryKeySelective(waybill);
+            //2.删除司机的短信
+            List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
+            Set<Integer> driverIdSet = new HashSet<>();
+            for (int i = 0; i < drivers.size(); i++) {
+                driverIdSet.add(drivers.get(i).getId());
+            }
+            List<Integer> driverIds = new ArrayList<Integer>(driverIdSet);
+            messageMapper.deleteMessage(waybillId, driverIds);
+        }catch(Exception ex ){
+            log.error("删除司机短信失败,运单id:{},原因{}",waybillId,ex.getMessage());
+            throw ex;
+        }
+
+        return true;
+    }
     private Integer getUserId() {
         UserInfo userInfo = null;
         try {

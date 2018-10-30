@@ -14,11 +14,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author tony
+ * @author Gavin
  */
 @Data
 @Accessors(chain = true)
-public class GetWaybillDto implements Serializable {
+public class GetWaybillDetailDto implements Serializable {
 
     /**
      *
@@ -34,11 +34,14 @@ public class GetWaybillDto implements Serializable {
      * 车队合同id
      */
     private Integer truckTeamContractId;
-
+    /**
+     * 装货地id
+     */
+    private Integer loadSiteId;
     /**
      * 装货地
      */
-    private ShowSiteDto loadSite;
+    private ShowSiteDto loadSiteDto;
 
     /**
      * 运单状态：待派车、待司机接单、已接单、司机已出发、司机到达装货地、运输中、卸货完成、已完成，取消
@@ -48,17 +51,27 @@ public class GetWaybillDto implements Serializable {
     /**
      * 需求车型
      */
-    private ListTruckTypeDto needTruckType;
-
+    private Integer needTruckTypeId;
     /**
-     * 车辆id
+     * 需求车型
      */
-    private ShowTruckDto truckId;
-
+    private ListTruckTypeDto needTruckTypeDto;
     /**
-     * 司机id
+     * 运单指派的车辆id
      */
-    private ShowDriverDto driverId;
+    private Integer truckId;
+    /**
+     * 运单指派的车辆详情
+     */
+    private ShowTruckDto assginedTruckDto;
+    /**
+     * 接单司机id
+     */
+    private Integer driverId;
+    /**
+     * 司机详情
+     */
+    private ShowDriverDto driverDto;
     /**
      * 任务推送司机时间
      */
@@ -78,7 +91,20 @@ public class GetWaybillDto implements Serializable {
      * 创建人
      */
     private ShowUserDto createdUserId;
+    /**
+     * 修改时间
+     */
+    private Date modifyTime;
 
+    /**
+     * 修改人id
+     */
+    private Integer modifyUserId;
+
+    /**
+     * 是否有效
+     */
+    private Boolean enabled;
     /**
      * 运单明细list
      */
@@ -89,10 +115,6 @@ public class GetWaybillDto implements Serializable {
      */
     private List<GetTrackingDto> tracking;
 
-    private Integer totalQuantity;
-
-    private BigDecimal totalWeight;
-
     /**
      * 装货时间
      */
@@ -101,4 +123,8 @@ public class GetWaybillDto implements Serializable {
      * 货物类型
      */
     private Integer goodType;
+    /**
+     *
+     */
+    private Integer departmentId;
 }
