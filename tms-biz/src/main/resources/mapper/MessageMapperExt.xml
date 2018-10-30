@@ -1,27 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jaagro.tms.biz.mapper.MessageMapperExt">
-    <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.Message">
-        <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="from_user_id" property="fromUserId" jdbcType="INTEGER"/>
-        <result column="from_user_type" property="fromUserType" jdbcType="INTEGER"/>
-        <result column="to_user_id" property="toUserId" jdbcType="INTEGER"/>
-        <result column="to_user_type" property="toUserType" jdbcType="INTEGER"/>
-        <result column="header" property="header" jdbcType="VARCHAR"/>
-        <result column="body" property="body" jdbcType="VARCHAR"/>
-        <result column="msg_type" property="msgType" jdbcType="INTEGER"/>
-        <result column="refer_id" property="referId" jdbcType="INTEGER"/>
-        <result column="msg_status" property="msgStatus" jdbcType="INTEGER"/>
-        <result column="enabled" property="enabled" jdbcType="TINYINT"/>
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="create_user_id" property="createUserId" jdbcType="INTEGER"/>
-        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
-        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
+    <resultMap id="ReturnMap" type="com.jaagro.tms.api.dto.Message.MessageReturnDto" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="header" property="header" jdbcType="VARCHAR" />
+        <result column="body" property="body" jdbcType="VARCHAR" />
+        <result column="msg_type" property="msgType" jdbcType="INTEGER" />
+        <result column="msg_source" property="msgSource" jdbcType="INTEGER" />
+        <result column="refer_id" property="referId" jdbcType="INTEGER" />
+        <result column="msg_status" property="msgStatus" jdbcType="INTEGER" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     </resultMap>
-    <sql id="Base_Column_List">
-    id, from_user_id, from_user_type, to_user_id, to_user_type, header, body, msg_type, 
-    refer_id, msg_status, enabled, create_time, create_user_id, modify_time, modify_user_id
-  </sql>
     <select id="listMessageByCondtion" resultMap="BaseResultMap"
             parameterType="com.jaagro.tms.biz.entity.Message">
         select
@@ -30,13 +19,46 @@
         where enabled=1
         and (to_user_id=#{toUserId} or from_user_type=0)
         and msg_type in(1,2)
+        and msg_source = 1
         order by create_time desc
     </select>
-
+    <select id="listMessageByCriteriaDto" resultMap="ReturnMap"
+            parameterType="com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto">
+        select
+        <include refid="Base_Column_List"/>
+        from message
+        where enabled=1
+        <if test="toUserId != null">
+            and (to_user_id=#{toUserId} or from_user_type=0)
+        </if>
+        <if test="msgType != null">
+            and msg_type=#{msgType}
+        </if>
+        <if test="msgSource != null">
+            and msg_source=#{msgSource}
+        </if>
+        <if test="msgStatus != null">
+        and msg_status=#{msgStatus}
+      </if>
+        order by create_time desc
+    </select>
+    <update id="readMessages">
+        update message
+        <set>
+            msg_status = 1,
+            modify_time = now(),
+            modify_user_id = #{modifyUserId}
+        </set>
+        where id in
+        <foreach collection="messageIdList" open="(" separator="," close=")" item="id">
+            ${id}
+        </foreach>
+    </update>
     <delete id="deleteMessage">
         update message set enabled=0 ,modify_time=now() where refer_id=#{waybillId} and to_user_id in
         <foreach collection="driverIds" open="(" separator="," close=")" item="driverId">
             ${driverId}
         </foreach>
     </delete>
+
 </mapper>
