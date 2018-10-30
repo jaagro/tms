@@ -173,8 +173,7 @@ public class OrderServiceImpl implements OrderService {
         }
         List<ListOrderDto> orderDtos = this.ordersMapper.listOrdersByCriteria(criteriaDto);
         if (orderDtos != null && orderDtos.size() > 0) {
-            for (ListOrderDto orderDto : orderDtos
-            ) {
+            for (ListOrderDto orderDto : orderDtos) {
                 Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
                 BeanUtils.copyProperties(order, orderDto);
                 orderDto
