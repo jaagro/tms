@@ -5,30 +5,15 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 
 /**
- * 分页查询消息条件
+ * 查询未读消息条件
  * @author yj
- * @date 2018/10/29
+ * @date 2018/10/30
  */
 @Data
 @Accessors(chain = true)
-public class ListMessageCriteriaDto implements Serializable{
-    /**
-     * 当前页
-     */
-    @NotNull(message = "{pageNum.NotNull}")
-    @Min(value = 1,message = "{pageNum.Min}")
-    private Integer pageNum;
-
-    /**
-     * 每页的数量
-     */
-    @NotNull(message = "{pageSize.NotNull}")
-    @Min(value = 1,message = "{pageSize.Min}")
-    private Integer pageSize;
-
+public class ListUnReadMsgCriteriaDto {
     /**
      * 消息类型：1-系统通知(公告) 2-运单相关 3-账务相关
      */
