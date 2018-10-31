@@ -1,11 +1,14 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.order.GetOrderDto;
+import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
 import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
+import com.jaagro.tms.web.vo.chat.WeChatOrderItemsVo;
 import com.jaagro.tms.web.vo.chat.WeChatOrderVo;
-import com.jaagro.tms.web.vo.order.*;
+import com.jaagro.tms.web.vo.order.CustomerVo;
+import com.jaagro.tms.web.vo.order.SiteVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -15,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author baiyiran
@@ -51,7 +57,20 @@ public class WeChatAppletOrderController {
                 BeanUtils.copyProperties(getOrderDto.getLoadSiteId(), siteVo);
                 chatOrderVo.setLoadSiteId(siteVo);
                 //订单详情
-                BeanUtils.copyProperties(getOrderDto.getOrderItems(), chatOrderVo.getOrderItems());
+                List<GetOrderItemsDto> orderItemsDtos = getOrderDto.getOrderItems();
+                List<WeChatOrderItemsVo> weChatOrderItemsVos = new ArrayList<>();
+                if (orderItemsDtos.size() > 0) {
+                    for (GetOrderItemsDto orderItemsDto : orderItemsDtos) {
+                        WeChatOrderItemsVo itemsVo = new WeChatOrderItemsVo();
+                        BeanUtils.copyProperties(orderItemsDto, itemsVo);
+                        //卸货地转换
+                        SiteVo vo = new SiteVo();
+                        BeanUtils.copyProperties(orderItemsDto.getUnload(), vo);
+                        itemsVo.setUnload(vo);
+                        weChatOrderItemsVos.add(itemsVo);
+                    }
+                    chatOrderVo.setOrderItems(weChatOrderItemsVos);
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
