@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,18 +35,6 @@ public class MessageController {
     @ApiOperation("消息列表")
     public BaseResponse listMessages(@RequestBody @Validated ListMessageCriteriaDto criteriaDto) {
         log.debug("listMessages,{}",criteriaDto);
-        if (criteriaDto.getPageNum() == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空");
-        }
-        if (criteriaDto.getPageSize() == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
-        }
-        if (criteriaDto.getPageNum() == 0) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为0");
-        }
-        if (criteriaDto.getPageSize() == 0) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为0");
-        }
         PageInfo<MessageReturnDto> messageReturnDtoPageInfo = messageService.listMessageByCriteriaDto(criteriaDto);
         return BaseResponse.successInstance(messageReturnDtoPageInfo);
     }
@@ -53,6 +42,9 @@ public class MessageController {
     @PostMapping("/readMessages")
     @ApiOperation("将消息置为已读")
     public BaseResponse readMessages(@RequestBody List<Integer> messageIdList){
+        if (CollectionUtils.isEmpty(messageIdList)){
+            return BaseResponse.errorInstance("消息id列表不能为空");
+        }
         boolean success = messageService.readMessages(messageIdList);
         if (success){
             return BaseResponse.successInstance("已成功将消息置为已读");
@@ -63,12 +55,6 @@ public class MessageController {
     @PostMapping("/listUnreadMessages")
     @ApiOperation("获取未读消息")
     public BaseResponse listUnreadMessages(@RequestBody @Validated ListUnReadMsgCriteriaDto criteriaDto){
-        if (criteriaDto.getMsgSource() == null){
-            return BaseResponse.errorInstance("消息来源不能为空");
-        }
-        if (criteriaDto.getMsgSource() == 0){
-            return BaseResponse.errorInstance("消息来源不能为0");
-        }
         List<MessageReturnDto> messageReturnDtos = messageService.listUnreadMessages(criteriaDto);
         return BaseResponse.successInstance(messageReturnDtos);
     }
