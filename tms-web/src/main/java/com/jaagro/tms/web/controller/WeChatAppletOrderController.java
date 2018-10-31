@@ -99,24 +99,4 @@ public class WeChatAppletOrderController {
         }
         return BaseResponse.service(orderRefactorService.listWeChatOrderByCriteria(criteriaDto));
     }
-
-    /**
-     * 取消订单
-     *
-     * @param orderId
-     * @param detailInfo
-     * @return
-     */
-    @ApiOperation("取消订单")
-    @PostMapping("/cancelWeChatOrder/{orderId}/{detailInfo}")
-    public BaseResponse cancelOrders(@PathVariable("orderId") Integer orderId, @PathVariable("detailInfo") String detailInfo) {
-        if (StringUtils.isEmpty(orderId)) {
-            return BaseResponse.idNull("订单id不能为空");
-        }
-        if (StringUtils.isEmpty(detailInfo)) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "取消理由必填");
-        }
-        return BaseResponse.service(orderService.cancelOrders(orderId, detailInfo));
-    }
-
 }
