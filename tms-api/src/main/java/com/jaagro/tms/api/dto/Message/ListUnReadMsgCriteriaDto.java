@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * 查询未读消息条件
@@ -13,7 +14,7 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @Accessors(chain = true)
-public class ListUnReadMsgCriteriaDto {
+public class ListUnReadMsgCriteriaDto implements Serializable{
     /**
      * 消息类型：1-系统通知(公告) 2-运单相关 3-账务相关
      */

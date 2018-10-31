@@ -3,6 +3,7 @@ package com.jaagro.tms.biz.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.dto.Message.CreateMessageDto;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.ListUnReadMsgCriteriaDto;
 import com.jaagro.tms.api.dto.Message.MessageReturnDto;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -74,7 +76,7 @@ public class MessageServiceImpl implements MessageService {
      */
     @Override
     public List<MessageReturnDto> listUnreadMessages(ListUnReadMsgCriteriaDto criteriaDto) {
-        if (criteriaDto.getMsgStatus() == null || criteriaDto.getMsgStatus() == 0){
+        if (criteriaDto.getMsgStatus() == null){
             // 消息状态: 0-未读,1-已读
             criteriaDto.setMsgStatus(0);
         }
@@ -92,5 +94,27 @@ public class MessageServiceImpl implements MessageService {
             }
         }
         return messageReturnDtos;
+    }
+
+    /**
+     * 创建消息
+     *
+     * @param createMessageDto
+     * @return
+     */
+    @Override
+    public boolean createMessage(CreateMessageDto createMessageDto) {
+        Message message = new Message();
+        BeanUtils.copyProperties(createMessageDto,message);
+        message.setCreateTime(new Date());
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        Integer currentUserId = currentUser == null ? null : currentUser.getId();
+        message.setCreateUserId(currentUserId);
+        message.setEnabled(true);
+        messageMapperExt.insertSelective(message);
+        if (message.getId() != null && message.getId() > 0){
+            return true;
+        }
+        return false;
     }
 }
