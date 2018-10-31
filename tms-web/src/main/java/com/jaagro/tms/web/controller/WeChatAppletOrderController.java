@@ -5,6 +5,7 @@ import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
 import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
+import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import com.jaagro.tms.web.vo.chat.WeChatOrderItemsVo;
 import com.jaagro.tms.web.vo.chat.WeChatOrderVo;
 import com.jaagro.tms.web.vo.order.CustomerVo;
@@ -33,6 +34,8 @@ public class WeChatAppletOrderController {
     private OrderService orderService;
     @Autowired
     private OrderRefactorService orderRefactorService;
+    @Autowired
+    private CurrentUserService userService;
 
     /**
      * 查询单条订单
@@ -94,11 +97,7 @@ public class WeChatAppletOrderController {
         if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
-//        if (StringUtils.isEmpty(criteriaDto.getCustomerId())) {
-//            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
-//        }
-        //暂时数据
-        criteriaDto.setCustomerId(244);
+        criteriaDto.setCustomerId(this.userService.getCurrentUser().getId());
         return BaseResponse.service(orderRefactorService.listWeChatOrderByCriteria(criteriaDto));
     }
 }
