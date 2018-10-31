@@ -1,6 +1,5 @@
-package com.jaagro.tms.web.vo.chat;
+package com.jaagro.tms.api.dto.order;
 
-import com.jaagro.tms.web.vo.order.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -10,11 +9,10 @@ import java.util.List;
 
 /**
  * @author baiyiran
- * @Date 2018/10/30
  */
 @Data
 @Accessors(chain = true)
-public class WeChatOrderVo implements Serializable {
+public class WeChatListOrderDto implements Serializable {
 
     /**
      *
@@ -32,23 +30,28 @@ public class WeChatOrderVo implements Serializable {
     private String orderStatus;
 
     /**
-     * 客户id
-     */
-    private CustomerVo customer;
-
-    /**
      * 装货地id
      */
-    private SiteVo loadSiteId;
+    private WeChatOrderSiteDto loadSite;
 
     /**
-     * 创建时间
+     * 要求装货时间
+     */
+    private Date loadTime;
+
+    /**
+     * 下单时间
      */
     private Date createTime;
 
     /**
-     * 订单列表
+     * 是否需要纸质回单
      */
-    private List<WeChatOrderItemsVo> orderItems;
+    private Boolean paperReceipt;
+
+    /**
+     * 订单详情
+     */
+    private List<WeChatListOrderItemsDto> orderItemsDtos;
 
 }

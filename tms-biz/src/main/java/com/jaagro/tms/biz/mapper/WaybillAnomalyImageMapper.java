@@ -1,8 +1,8 @@
 package com.jaagro.tms.biz.mapper;
 
-import com.jaagro.tms.biz.entity.WaybillFeeAdjustment;
+import com.jaagro.tms.biz.entity.WaybillAnomalyImage;
 
-public interface WaybillFeeAdjustmentMapper {
+public interface WaybillAnomalyImageMapper {
     /**
      *
      * @mbggenerated 2018-10-31
@@ -13,29 +13,29 @@ public interface WaybillFeeAdjustmentMapper {
      *
      * @mbggenerated 2018-10-31
      */
-    int insert(WaybillFeeAdjustment record);
+    int insert(WaybillAnomalyImage record);
 
     /**
      *
      * @mbggenerated 2018-10-31
      */
-    int insertSelective(WaybillFeeAdjustment record);
+    int insertSelective(WaybillAnomalyImage record);
 
     /**
      *
      * @mbggenerated 2018-10-31
      */
-    WaybillFeeAdjustment selectByPrimaryKey(Integer id);
+    WaybillAnomalyImage selectByPrimaryKey(Integer id);
 
     /**
      *
      * @mbggenerated 2018-10-31
      */
-    int updateByPrimaryKeySelective(WaybillFeeAdjustment record);
+    int updateByPrimaryKeySelective(WaybillAnomalyImage record);
 
     /**
      *
      * @mbggenerated 2018-10-31
      */
-    int updateByPrimaryKey(WaybillFeeAdjustment record);
+    int updateByPrimaryKey(WaybillAnomalyImage record);
 }

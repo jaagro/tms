@@ -8,13 +8,14 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * @author tony
+ * 运单轨迹
+ * @author yj
  */
 @Data
 @Accessors(chain = true)
-public class WaybillTracking implements Serializable {
+public class WaybillTracking implements Serializable{
     /**
-     * 
+     *
      */
     private Integer id;
 
@@ -22,6 +23,11 @@ public class WaybillTracking implements Serializable {
      * 
      */
     private Integer waybillId;
+
+    /**
+     * 跟踪类型：1-运输轨迹 2-补录轨迹
+     */
+    private Integer trackingType;
 
     /**
      * 修改前状态
@@ -67,4 +73,5 @@ public class WaybillTracking implements Serializable {
      * 运单状态修改记录时间
      */
     private Date createTime;
+
 }

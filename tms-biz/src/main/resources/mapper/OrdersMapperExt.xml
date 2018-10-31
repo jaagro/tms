@@ -11,6 +11,14 @@
         <result column="notes" property="notes" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     </resultMap>
+    <resultMap id="WeChatReturnMap" type="com.jaagro.tms.api.dto.order.WeChatListOrderDto">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="goods_type" property="goodsType" jdbcType="INTEGER"/>
+        <result column="order_status" property="orderStatus" jdbcType="VARCHAR"/>
+        <result column="load_time" property="loadTime" jdbcType="TIMESTAMP"/>
+        <result column="paper_receipt" property="paperReceipt" jdbcType="BIT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
     <select id="listOrdersByCriteria" resultMap="ReturnMap"
             parameterType="com.jaagro.tms.api.dto.order.ListOrderCriteriaDto">
         select
@@ -49,6 +57,25 @@
         </if>
         <if test="waitOrders != null">
             and order_status not in ('已下单','取消')
+        </if>
+        order by create_time desc
+    </select>
+    <select id="getOrderIdsByCustomerId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select id from orders
+        where customer_id = #{customerId}
+        and order_status not in ('已下单','取消')
+    </select>
+    <select id="listWeChatOrdersByCriteria" resultMap="WeChatReturnMap"
+            parameterType="com.jaagro.tms.api.dto.order.ListOrderCriteriaDto">
+        select
+        <include refid="Base_Column_List"/>
+        from orders
+        where 1=1
+        <if test="orderStatus != null and orderStatus != ''">
+            and order_status = #{orderStatus}
+        </if>
+        <if test="customerId != null">
+            and customer_id = #{customerId}
         </if>
         order by create_time desc
     </select>

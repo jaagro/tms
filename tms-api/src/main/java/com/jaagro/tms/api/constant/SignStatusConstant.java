@@ -3,7 +3,7 @@ package com.jaagro.tms.api.constant;
 /**
  * @author @Gao.
  */
-public class SignStatusConstant {
+public final class SignStatusConstant {
     /**
      * 签收
      */

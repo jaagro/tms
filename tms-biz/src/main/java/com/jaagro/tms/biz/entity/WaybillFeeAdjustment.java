@@ -18,6 +18,16 @@ public class WaybillFeeAdjustment implements Serializable {
     private Integer id;
 
     /**
+     * 关联类型：1-客户侧 2-运力侧
+     */
+    private Integer relevanceType;
+
+    /**
+     * 关联id: waybill_customer_fee/waybill_truck_fee
+     */
+    private Integer relevanceId;
+
+    /**
      * 
      */
     private Integer waybillId;
