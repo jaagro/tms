@@ -1,8 +1,9 @@
 package com.jaagro.tms.api.constant;
+
 /**
  * @author @Gao.
  */
-public class MsgStatusConstant {
+public final class MsgStatusConstant {
     /**
      * 已读
      */
