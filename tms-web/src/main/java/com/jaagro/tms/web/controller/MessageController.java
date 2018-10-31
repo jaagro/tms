@@ -1,6 +1,7 @@
 package com.jaagro.tms.web.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.jaagro.tms.api.dto.Message.CreateMessageDto;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.ListUnReadMsgCriteriaDto;
 import com.jaagro.tms.api.dto.Message.MessageReturnDto;
@@ -57,5 +58,15 @@ public class MessageController {
     public BaseResponse listUnreadMessages(@RequestBody @Validated ListUnReadMsgCriteriaDto criteriaDto){
         List<MessageReturnDto> messageReturnDtos = messageService.listUnreadMessages(criteriaDto);
         return BaseResponse.successInstance(messageReturnDtos);
+    }
+
+    @PostMapping("/createMessage")
+    @ApiOperation("创建消息")
+    public BaseResponse createMessage(@RequestBody @Validated CreateMessageDto createMessageDto){
+        boolean success = messageService.createMessage(createMessageDto);
+        if (success){
+            return BaseResponse.successInstance("创建消息成功");
+        }
+        return BaseResponse.errorInstance("创建消息失败");
     }
 }

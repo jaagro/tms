@@ -1,6 +1,7 @@
 package com.jaagro.tms.api.service;
 
 import com.github.pagehelper.PageInfo;
+import com.jaagro.tms.api.dto.Message.CreateMessageDto;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.ListUnReadMsgCriteriaDto;
 import com.jaagro.tms.api.dto.Message.MessageReturnDto;
@@ -8,6 +9,7 @@ import com.jaagro.tms.api.dto.Message.MessageReturnDto;
 import java.util.List;
 
 /**
+ * 消息服务
  * @author yj
  * @date 2018/10/29
  */
@@ -32,4 +34,11 @@ public interface MessageService {
      * @return
      */
     List<MessageReturnDto> listUnreadMessages(ListUnReadMsgCriteriaDto criteriaDto);
+
+    /**
+     * 创建消息
+     * @param createMessageDto
+     * @return
+     */
+    boolean createMessage(CreateMessageDto createMessageDto);
 }
