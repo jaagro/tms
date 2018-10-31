@@ -94,9 +94,11 @@ public class WeChatAppletOrderController {
         if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
-        if (StringUtils.isEmpty(criteriaDto.getCustomerId())) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
-        }
+//        if (StringUtils.isEmpty(criteriaDto.getCustomerId())) {
+//            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
+//        }
+        //暂时数据
+        criteriaDto.setCustomerId(244);
         return BaseResponse.service(orderRefactorService.listWeChatOrderByCriteria(criteriaDto));
     }
 }
