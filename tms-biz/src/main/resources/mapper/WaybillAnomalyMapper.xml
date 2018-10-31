@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillAnomalyMapperExt" >
+  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillAnomaly" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="waybill_id" property="waybillId" jdbcType="INTEGER" />
+    <result column="anomaly_type_id" property="anomalyTypeId" jdbcType="INTEGER" />
+    <result column="anomaly_desc" property="anomalyDesc" jdbcType="VARCHAR" />
+    <result column="processing_status" property="processingStatus" jdbcType="VARCHAR" />
+    <result column="processing _desc" property="processingDesc" jdbcType="VARCHAR" />
+    <result column="audit _status" property="auditStatus" jdbcType="VARCHAR" />
+    <result column="audit_desc" property="auditDesc" jdbcType="VARCHAR" />
+    <result column="verified_status" property="verifiedStatus" jdbcType="BIT" />
+    <result column="adjust_status" property="adjustStatus" jdbcType="BIT" />
+    <result column="create_user_id" property="createUserId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="processor_user _id" property="processorUserId" jdbcType="INTEGER" />
+    <result column="processor_time" property="processorTime" jdbcType="TIMESTAMP" />
+    <result column="audit_user_id" property="auditUserId" jdbcType="INTEGER" />
+    <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP" />
+    <result column="enabled" property="enabled" jdbcType="BIT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, waybill_id, anomaly_type_id, anomaly_desc, processing_status, "processing _desc", 
+    "audit _status", audit_desc, verified_status, adjust_status, create_user_id, create_time, 
+    "processor_user _id", processor_time, audit_user_id, audit_time, enabled
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from waybill_anomaly
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from waybill_anomaly
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillAnomaly" >
+    insert into waybill_anomaly (id, waybill_id, anomaly_type_id, 
+      anomaly_desc, processing_status, "processing _desc", 
+      "audit _status", audit_desc, verified_status, 
+      adjust_status, create_user_id, create_time, 
+      "processor_user _id", processor_time, audit_user_id, 
+      audit_time, enabled)
+    values (#{id,jdbcType=INTEGER}, #{waybillId,jdbcType=INTEGER}, #{anomalyTypeId,jdbcType=INTEGER}, 
+      #{anomalyDesc,jdbcType=VARCHAR}, #{processingStatus,jdbcType=VARCHAR}, #{processingDesc,jdbcType=VARCHAR}, 
+      #{auditStatus,jdbcType=VARCHAR}, #{auditDesc,jdbcType=VARCHAR}, #{verifiedStatus,jdbcType=BIT}, 
+      #{adjustStatus,jdbcType=BIT}, #{createUserId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{processorUserId,jdbcType=INTEGER}, #{processorTime,jdbcType=TIMESTAMP}, #{auditUserId,jdbcType=INTEGER}, 
+      #{auditTime,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillAnomaly" >
+    insert into waybill_anomaly
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="waybillId != null" >
+        waybill_id,
+      </if>
+      <if test="anomalyTypeId != null" >
+        anomaly_type_id,
+      </if>
+      <if test="anomalyDesc != null" >
+        anomaly_desc,
+      </if>
+      <if test="processingStatus != null" >
+        processing_status,
+      </if>
+      <if test="processingDesc != null" >
+        "processing _desc",
+      </if>
+      <if test="auditStatus != null" >
+        "audit _status",
+      </if>
+      <if test="auditDesc != null" >
+        audit_desc,
+      </if>
+      <if test="verifiedStatus != null" >
+        verified_status,
+      </if>
+      <if test="adjustStatus != null" >
+        adjust_status,
+      </if>
+      <if test="createUserId != null" >
+        create_user_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="processorUserId != null" >
+        "processor_user _id",
+      </if>
+      <if test="processorTime != null" >
+        processor_time,
+      </if>
+      <if test="auditUserId != null" >
+        audit_user_id,
+      </if>
+      <if test="auditTime != null" >
+        audit_time,
+      </if>
+      <if test="enabled != null" >
+        enabled,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="waybillId != null" >
+        #{waybillId,jdbcType=INTEGER},
+      </if>
+      <if test="anomalyTypeId != null" >
+        #{anomalyTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="anomalyDesc != null" >
+        #{anomalyDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="processingStatus != null" >
+        #{processingStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processingDesc != null" >
+        #{processingDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="auditStatus != null" >
+        #{auditStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="auditDesc != null" >
+        #{auditDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="verifiedStatus != null" >
+        #{verifiedStatus,jdbcType=BIT},
+      </if>
+      <if test="adjustStatus != null" >
+        #{adjustStatus,jdbcType=BIT},
+      </if>
+      <if test="createUserId != null" >
+        #{createUserId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processorUserId != null" >
+        #{processorUserId,jdbcType=INTEGER},
+      </if>
+      <if test="processorTime != null" >
+        #{processorTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditUserId != null" >
+        #{auditUserId,jdbcType=INTEGER},
+      </if>
+      <if test="auditTime != null" >
+        #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="enabled != null" >
+        #{enabled,jdbcType=BIT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.WaybillAnomaly" >
+    update waybill_anomaly
+    <set >
+      <if test="waybillId != null" >
+        waybill_id = #{waybillId,jdbcType=INTEGER},
+      </if>
+      <if test="anomalyTypeId != null" >
+        anomaly_type_id = #{anomalyTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="anomalyDesc != null" >
+        anomaly_desc = #{anomalyDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="processingStatus != null" >
+        processing_status = #{processingStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="processingDesc != null" >
+        "processing _desc" = #{processingDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="auditStatus != null" >
+        "audit _status" = #{auditStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="auditDesc != null" >
+        audit_desc = #{auditDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="verifiedStatus != null" >
+        verified_status = #{verifiedStatus,jdbcType=BIT},
+      </if>
+      <if test="adjustStatus != null" >
+        adjust_status = #{adjustStatus,jdbcType=BIT},
+      </if>
+      <if test="createUserId != null" >
+        create_user_id = #{createUserId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="processorUserId != null" >
+        "processor_user _id" = #{processorUserId,jdbcType=INTEGER},
+      </if>
+      <if test="processorTime != null" >
+        processor_time = #{processorTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditUserId != null" >
+        audit_user_id = #{auditUserId,jdbcType=INTEGER},
+      </if>
+      <if test="auditTime != null" >
+        audit_time = #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="enabled != null" >
+        enabled = #{enabled,jdbcType=BIT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.WaybillAnomaly" >
+    update waybill_anomaly
+    set waybill_id = #{waybillId,jdbcType=INTEGER},
+      anomaly_type_id = #{anomalyTypeId,jdbcType=INTEGER},
+      anomaly_desc = #{anomalyDesc,jdbcType=VARCHAR},
+      processing_status = #{processingStatus,jdbcType=VARCHAR},
+      "processing _desc" = #{processingDesc,jdbcType=VARCHAR},
+      "audit _status" = #{auditStatus,jdbcType=VARCHAR},
+      audit_desc = #{auditDesc,jdbcType=VARCHAR},
+      verified_status = #{verifiedStatus,jdbcType=BIT},
+      adjust_status = #{adjustStatus,jdbcType=BIT},
+      create_user_id = #{createUserId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      "processor_user _id" = #{processorUserId,jdbcType=INTEGER},
+      processor_time = #{processorTime,jdbcType=TIMESTAMP},
+      audit_user_id = #{auditUserId,jdbcType=INTEGER},
+      audit_time = #{auditTime,jdbcType=TIMESTAMP},
+      enabled = #{enabled,jdbcType=BIT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.jaagro.tms.biz.mapper.WaybillFeeAdjustmentMapper" >
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillFeeAdjustmentMapperExt" >
   <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillFeeAdjustment" >
     <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="relevance_type" property="relevanceType" jdbcType="INTEGER" />
+    <result column="relevance_id" property="relevanceId" jdbcType="INTEGER" />
     <result column="waybill_id" property="waybillId" jdbcType="INTEGER" />
     <result column="waybill_item_id" property="waybillItemId" jdbcType="INTEGER" />
     <result column="adjust_reason" property="adjustReason" jdbcType="INTEGER" />
@@ -17,8 +19,9 @@
     <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, waybill_id, waybill_item_id, adjust_reason, adjust_type, customer_effect, truck_effect, 
-    notes, enabled, create_time, created_user_id, modify_time, modify_user_id
+    id, relevance_type, relevance_id, waybill_id, waybill_item_id, adjust_reason, adjust_type, 
+    customer_effect, truck_effect, notes, enabled, create_time, created_user_id, modify_time, 
+    modify_user_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -31,22 +34,30 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillFeeAdjustment" >
-    insert into waybill_fee_adjustment (id, waybill_id, waybill_item_id, 
-      adjust_reason, adjust_type, customer_effect, 
-      truck_effect, notes, enabled, 
-      create_time, created_user_id, modify_time, 
-      modify_user_id)
-    values (#{id,jdbcType=INTEGER}, #{waybillId,jdbcType=INTEGER}, #{waybillItemId,jdbcType=INTEGER}, 
-      #{adjustReason,jdbcType=INTEGER}, #{adjustType,jdbcType=INTEGER}, #{customerEffect,jdbcType=BIT}, 
-      #{truckEffect,jdbcType=BIT}, #{notes,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{createdUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, 
-      #{modifyUserId,jdbcType=INTEGER})
+    insert into waybill_fee_adjustment (id, relevance_type, relevance_id, 
+      waybill_id, waybill_item_id, adjust_reason, 
+      adjust_type, customer_effect, truck_effect, 
+      notes, enabled, create_time, 
+      created_user_id, modify_time, modify_user_id
+      )
+    values (#{id,jdbcType=INTEGER}, #{relevanceType,jdbcType=INTEGER}, #{relevanceId,jdbcType=INTEGER}, 
+      #{waybillId,jdbcType=INTEGER}, #{waybillItemId,jdbcType=INTEGER}, #{adjustReason,jdbcType=INTEGER}, 
+      #{adjustType,jdbcType=INTEGER}, #{customerEffect,jdbcType=BIT}, #{truckEffect,jdbcType=BIT}, 
+      #{notes,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{createdUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillFeeAdjustment" >
     insert into waybill_fee_adjustment
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
+      </if>
+      <if test="relevanceType != null" >
+        relevance_type,
+      </if>
+      <if test="relevanceId != null" >
+        relevance_id,
       </if>
       <if test="waybillId != null" >
         waybill_id,
@@ -89,6 +100,12 @@
       <if test="id != null" >
         #{id,jdbcType=INTEGER},
       </if>
+      <if test="relevanceType != null" >
+        #{relevanceType,jdbcType=INTEGER},
+      </if>
+      <if test="relevanceId != null" >
+        #{relevanceId,jdbcType=INTEGER},
+      </if>
       <if test="waybillId != null" >
         #{waybillId,jdbcType=INTEGER},
       </if>
@@ -130,6 +147,12 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.WaybillFeeAdjustment" >
     update waybill_fee_adjustment
     <set >
+      <if test="relevanceType != null" >
+        relevance_type = #{relevanceType,jdbcType=INTEGER},
+      </if>
+      <if test="relevanceId != null" >
+        relevance_id = #{relevanceId,jdbcType=INTEGER},
+      </if>
       <if test="waybillId != null" >
         waybill_id = #{waybillId,jdbcType=INTEGER},
       </if>
@@ -171,7 +194,9 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.WaybillFeeAdjustment" >
     update waybill_fee_adjustment
-    set waybill_id = #{waybillId,jdbcType=INTEGER},
+    set relevance_type = #{relevanceType,jdbcType=INTEGER},
+      relevance_id = #{relevanceId,jdbcType=INTEGER},
+      waybill_id = #{waybillId,jdbcType=INTEGER},
       waybill_item_id = #{waybillItemId,jdbcType=INTEGER},
       adjust_reason = #{adjustReason,jdbcType=INTEGER},
       adjust_type = #{adjustType,jdbcType=INTEGER},
