@@ -35,7 +35,8 @@
     delete from waybill_anomaly
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillAnomaly" >
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillAnomaly" useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
     insert into waybill_anomaly (id, waybill_id, anomaly_type_id, 
       anomaly_desc, processing_status, "processing _desc", 
       "audit _status", audit_desc, verified_status, 
@@ -49,7 +50,8 @@
       #{processorUserId,jdbcType=INTEGER}, #{processorTime,jdbcType=TIMESTAMP}, #{auditUserId,jdbcType=INTEGER}, 
       #{auditTime,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT})
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillAnomaly" >
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillAnomaly" useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id" >
     insert into waybill_anomaly
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
