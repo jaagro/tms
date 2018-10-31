@@ -1,6 +1,5 @@
 package com.jaagro.tms.web.vo.chat;
 
-import com.jaagro.tms.api.dto.waybill.GetTrackingImagesDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -9,7 +8,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author tony
+ * @author gavin
+ * @Date 2018/10/31
  */
 @Data
 @Accessors(chain = true)
@@ -28,5 +28,5 @@ public class WaybillTrackingVo implements Serializable {
     /**
      * 图片列表
      */
-    private List<GetTrackingImagesDto> imageList;
+    private List<WaybillTrackingImagesVo> imageList;
 }

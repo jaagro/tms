@@ -1,6 +1,5 @@
 package com.jaagro.tms.web.vo.chat;
 
-import com.jaagro.tms.api.dto.waybill.GetTrackingDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -8,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Author gavin
+ * @Author gavin
  * 微信小程序运单详情vo
  */
 @Data
@@ -18,6 +17,10 @@ public class WaybillDetailVo {
      *
      */
     private Integer id;
+    /**
+     * 货物类型
+     */
+    private Integer goodType;
     /**
      * 装货时间
      */
@@ -33,14 +36,14 @@ public class WaybillDetailVo {
     private String truckNumber;
 
     /**
-     * 司机名
+     * 司机名字
      */
-    private String name;
+    private String driverName;
 
     /**
-     * 手机号码
+     * 司机手机号码
      */
-    private String phoneNumber;
+    private String driverPhoneNumber;
 
     /**
      * 运单明细list
@@ -50,11 +53,6 @@ public class WaybillDetailVo {
     /**
      * 运单轨迹
      */
-    private List<GetTrackingDto> tracking;
-
-    /**
-     * 货物类型
-     */
-    private Integer goodType;
+    private List<WaybillTrackingVo> tracking;
 
 }

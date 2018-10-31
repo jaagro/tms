@@ -220,7 +220,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         List<GetWaybillItemDto> getWaybillItemsDtoList=getWaybillItemsAndGoods(waybill.getId());
         //根据waybillId获取WaybillTracking
         List<GetTrackingDto> getTrackingDtos = new ArrayList<>();
-        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybill.getId());
+        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybill.getId());
         for (ShowTrackingDto showTrackingDto : showTrackingDtos) {
             GetTrackingDto getTrackingDto = new GetTrackingDto();
             BeanUtils.copyProperties(showTrackingDto, getTrackingDto);
