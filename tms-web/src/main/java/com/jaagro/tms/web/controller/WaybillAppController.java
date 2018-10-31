@@ -47,8 +47,7 @@ public class WaybillAppController {
         if (waybillId == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单参数不能为空");
         }
-        final Map<String, Object> waybillDetails = waybillService.listWayBillDetails(waybillId);
-        return BaseResponse.successInstance(waybillDetails);
+        return BaseResponse.service(waybillService.listWayBillDetails(waybillId));
     }
 
     @ApiOperation("运单轨迹")
