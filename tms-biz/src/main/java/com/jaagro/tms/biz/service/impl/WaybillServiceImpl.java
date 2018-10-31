@@ -263,7 +263,7 @@ public class WaybillServiceImpl implements WaybillService {
         }
         //根据waybillId获取WaybillTracking 和 WaybillTrackingImages
         List<GetTrackingDto> getTrackingDtos = new ArrayList<>();
-        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybill.getId());
+        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybill.getId());
         for (ShowTrackingDto showTrackingDto : showTrackingDtos) {
             GetTrackingDto getTrackingDto = new GetTrackingDto();
             BeanUtils.copyProperties(showTrackingDto, getTrackingDto);

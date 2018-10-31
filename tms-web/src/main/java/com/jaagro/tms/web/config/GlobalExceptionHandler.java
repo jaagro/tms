@@ -1,4 +1,4 @@
-package com.jaagro.tms.web.controller;
+package com.jaagro.tms.web.config;
 
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;

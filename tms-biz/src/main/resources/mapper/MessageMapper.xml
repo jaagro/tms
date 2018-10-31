@@ -33,7 +33,8 @@
     delete from message
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Message" >
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Message" useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
     insert into message (id, from_user_id, from_user_type, 
       to_user_id, to_user_type, header, 
       body, msg_type, msg_source, refer_id,
@@ -47,7 +48,8 @@
       #{createUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Message" >
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Message" useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
     insert into message
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >

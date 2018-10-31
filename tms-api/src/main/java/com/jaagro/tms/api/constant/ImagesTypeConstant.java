@@ -1,8 +1,9 @@
 package com.jaagro.tms.api.constant;
+
 /**
  * @author @Gao.
  */
-public class ImagesTypeConstant {
+public final class ImagesTypeConstant {
     /**
      * 出库单
      */
