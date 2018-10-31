@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class WaybillItemVo implements Serializable {
+public class WaybillItemsVo implements Serializable {
     /**
      * 卸货地对象
      */

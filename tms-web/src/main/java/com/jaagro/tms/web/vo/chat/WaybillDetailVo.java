@@ -48,7 +48,7 @@ public class WaybillDetailVo {
     /**
      * 运单明细list
      */
-    private List<WaybillItemVo> waybillItems;
+    private List<WaybillItemsVo> waybillItems;
 
     /**
      * 运单轨迹

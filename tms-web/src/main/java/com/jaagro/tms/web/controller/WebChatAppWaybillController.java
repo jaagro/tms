@@ -48,7 +48,7 @@ public class WebChatAppWaybillController {
             detailVo.setLoadSiteVo(loadSiteVo);
             //运单item
             List<GetWaybillItemDto> waybillItemDtos = detailDto.getWaybillItems();
-            List<WaybillItemVo> waybillItemVos = new ArrayList<>();
+            List<WaybillItemsVo> waybillItemsVos = new ArrayList<>();
 
             for (GetWaybillItemDto waybillItemDto : waybillItemDtos) {
                 List<GetWaybillGoodsDto> goodsDtos = waybillItemDto.getGoods();
@@ -58,17 +58,17 @@ public class WebChatAppWaybillController {
                     BeanUtils.copyProperties(goodsDto, waybillGoodsVo);
                     goodVos.add(waybillGoodsVo);
                 }
-                WaybillItemVo waybillItemVo = new WaybillItemVo();
-                BeanUtils.copyProperties(waybillItemDto,waybillItemVo);
+                WaybillItemsVo waybillItemsVo = new WaybillItemsVo();
+                BeanUtils.copyProperties(waybillItemDto, waybillItemsVo);
                 //运单卸货地
                 ShowSiteVo uploadSiteVo = new ShowSiteVo();
                 BeanUtils.copyProperties(waybillItemDto.getShowSiteDto(),uploadSiteVo);
-                waybillItemVo.setUploadSiteVo(uploadSiteVo);
+                waybillItemsVo.setUploadSiteVo(uploadSiteVo);
                 //运单货物
-                waybillItemVo.setGoods(goodVos);
-                waybillItemVos.add(waybillItemVo);
+                waybillItemsVo.setGoods(goodVos);
+                waybillItemsVos.add(waybillItemsVo);
             }
-            detailVo.setWaybillItems(waybillItemVos);
+            detailVo.setWaybillItems(waybillItemsVos);
             //运单轨迹以及图片
             List<GetTrackingDto> trackingDtos = detailDto.getTracking();
             List<WaybillTrackingVo> trackingVos = new ArrayList<>();
