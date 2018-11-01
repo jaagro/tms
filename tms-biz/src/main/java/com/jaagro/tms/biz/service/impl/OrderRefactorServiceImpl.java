@@ -14,6 +14,7 @@ import com.jaagro.tms.biz.mapper.OrderItemsMapperExt;
 import com.jaagro.tms.biz.mapper.OrdersMapperExt;
 import com.jaagro.tms.biz.service.AuthClientService;
 import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +85,12 @@ public class OrderRefactorServiceImpl implements OrderRefactorService {
     @Override
     public Map<String, Object> listWeChatOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        if (criteriaDto.getCustomerId() == null) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "获取当前用户失败");
+        }
+        if (criteriaDto.getCustomerType() == null) {
+            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "获取当前用户类型失败");
+        }
         List<WeChatListOrderDto> orderDtos = this.ordersMapper.listWeChatOrdersByCriteria(criteriaDto);
         if (orderDtos != null && orderDtos.size() > 0) {
             for (WeChatListOrderDto listOrderDto : orderDtos) {

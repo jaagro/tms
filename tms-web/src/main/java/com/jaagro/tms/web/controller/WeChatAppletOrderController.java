@@ -1,10 +1,12 @@
 package com.jaagro.tms.web.controller;
 
+import com.jaagro.tms.api.dto.base.GetCustomerUserDto;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
 import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
+import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import com.jaagro.tms.web.vo.chat.WeChatOrderItemsVo;
 import com.jaagro.tms.web.vo.chat.WeChatOrderVo;
@@ -36,6 +38,8 @@ public class WeChatAppletOrderController {
     private OrderRefactorService orderRefactorService;
     @Autowired
     private CurrentUserService userService;
+    @Autowired
+    private CustomerClientService customerClientService;
 
     /**
      * 查询单条订单
@@ -97,7 +101,12 @@ public class WeChatAppletOrderController {
         if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
-        criteriaDto.setCustomerId(this.userService.getCurrentUser().getId());
+        //获得customer_user中的关联用户id
+        GetCustomerUserDto customerUserDto = this.userService.getCustomerUserById();
+        if (customerUserDto != null) {
+            criteriaDto.setCustomerId(customerUserDto.getRelevanceId());
+            criteriaDto.setCustomerType(customerUserDto.getCustomerType());
+        }
         return BaseResponse.service(orderRefactorService.listWeChatOrderByCriteria(criteriaDto));
     }
 }
