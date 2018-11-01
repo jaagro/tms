@@ -1,7 +1,7 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.base.GetCustomerUserDto;
-import com.jaagro.tms.biz.entity.Location;
+import com.jaagro.tms.api.dto.waybill.LocationDto;
 import com.jaagro.tms.biz.mapper.LocationMapperExt;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +33,10 @@ public class TestController {
     @GetMapping("/insertBatch")
     public void insertBatch() {
         long start = System.currentTimeMillis();
-        List<Location> list = new ArrayList<>();
-        Location loc;
+        List<LocationDto> list = new ArrayList<>();
+        LocationDto loc;
         for (int i = 0; i < 400; i++) {
-            loc = new Location();
+            loc = new LocationDto();
             loc.setLatitude(new BigDecimal(i));
             loc.setLongitude(new BigDecimal(i));
             loc.setLocationTime(new Date());
