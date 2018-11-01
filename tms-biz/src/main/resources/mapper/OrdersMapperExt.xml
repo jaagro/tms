@@ -76,13 +76,15 @@
         <if test="orderStatus != null and orderStatus != ''">
             and order_status = #{orderStatus}
         </if>
-        <if test="customerId != null">
+        <if test="customerType != null and customerType = 1 and customerId != null">
             and customer_id = #{customerId}
         </if>
-        and o.customer_id = 244
-        and o.load_site_id in ()
-        and t.unload_id in ()
-
+        <if test="customerType != null and customerType = 2 and customerId != null">
+            and o.load_site_id = #{customerId}
+        </if>
+        <if test="customerType != null and customerType = 3 and customerId != null">
+            and t.unload_id = #{customerId}
+        </if>
         GROUP BY o.id
         order by o.create_time desc
     </select>
