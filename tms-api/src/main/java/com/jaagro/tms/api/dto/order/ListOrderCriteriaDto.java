@@ -40,6 +40,11 @@ public class ListOrderCriteriaDto implements Serializable {
     private Integer customerId;
 
     /**
+     * 客户类型
+     */
+    private Integer customerType;
+
+    /**
      * 订单状态
      */
     private String orderStatus;

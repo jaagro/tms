@@ -67,16 +67,25 @@
     </select>
     <select id="listWeChatOrdersByCriteria" resultMap="WeChatReturnMap"
             parameterType="com.jaagro.tms.api.dto.order.ListOrderCriteriaDto">
-        select
-        <include refid="Base_Column_List"/>
-        from orders
+        SELECT
+        o.*
+        FROM
+        orders o
+        left JOIN order_items t ON o.id = t.order_id
         where 1=1
         <if test="orderStatus != null and orderStatus != ''">
             and order_status = #{orderStatus}
         </if>
-        <if test="customerId != null">
+        <if test="customerType != null and customerType == 1 and customerId != null">
             and customer_id = #{customerId}
         </if>
-        order by create_time desc
+        <if test="customerType != null and customerType == 2 and customerId != null">
+            and o.load_site_id = #{customerId}
+        </if>
+        <if test="customerType != null and customerType == 3 and customerId != null">
+            and t.unload_id = #{customerId}
+        </if>
+        GROUP BY o.id
+        order by o.create_time desc
     </select>
 </mapper>
