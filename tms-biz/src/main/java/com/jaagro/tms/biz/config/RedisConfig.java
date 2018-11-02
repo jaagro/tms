@@ -3,6 +3,7 @@ package com.jaagro.tms.biz.config;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.interceptor.KeyGenerator;
@@ -19,6 +20,12 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
  */
 @Configuration
 public class RedisConfig extends CachingConfigurerSupport {
+
+    /**
+     * 缓存过期时间
+     */
+    @Value("${cache.expiration}")
+    private long cacheExpiration;
 
     /**
      * 定义缓存数据 key 生成策略的bean 包名+类名+方法名+所有参数
@@ -47,7 +54,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     public CacheManager cacheManager(@SuppressWarnings("rawtypes") RedisTemplate redisTemplate) {
         RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
         //设置缓存保留时间（seconds）
-        cacheManager.setDefaultExpiration(60 * 60 * 12);
+        cacheManager.setDefaultExpiration(cacheExpiration);
         return cacheManager;
     }
 
