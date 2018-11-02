@@ -10,6 +10,8 @@ import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.UserClientService;
 import com.jaagro.tms.web.vo.chat.*;
+import com.jaagro.tms.web.vo.pc.*;
+import com.jaagro.tms.web.vo.pc.ListOrderItemsVo;
 import com.jaagro.tms.web.vo.pc.ListOrderVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
@@ -127,7 +129,7 @@ public class OrderController {
     @ApiOperation("查询单条订单")
     @GetMapping("/getOrderById/{id}")
     public BaseResponse getOrderById(@PathVariable("id") Integer id) {
-        OrderVo orderVo = new OrderVo();
+        GetOrderVo orderVo = new GetOrderVo();
         try {
             GetOrderDto getOrderDto = orderRefactorService.getOrderById(id);
             if (getOrderDto != null) {
@@ -158,8 +160,36 @@ public class OrderController {
                 ShowCustomerContractVo showCustomerContractVo = new ShowCustomerContractVo();
                 BeanUtils.copyProperties(getOrderDto.getCustomerContract(), showCustomerContractVo);
                 orderVo.setCustomerContract(showCustomerContractVo);
-                //订单详情
-                BeanUtils.copyProperties(getOrderDto.getOrderItems(), orderVo.getOrderItems());
+                /**
+                 * 订单需求Dto转换Vo
+                 */
+                List<GetOrderItemsDto> itemsDtoList = getOrderDto.getOrderItems();
+                List<GetOrderItemsVo> itemsVoList = new ArrayList<>();
+                if (itemsDtoList.size() > 0) {
+                    for (GetOrderItemsDto itemsDto : itemsDtoList) {
+                        GetOrderItemsVo itemsVo = new GetOrderItemsVo();
+                        BeanUtils.copyProperties(itemsDto, itemsVo);
+                        //卸货地转换
+                        SiteVo vo = new SiteVo();
+                        BeanUtils.copyProperties(itemsDto.getUnload(), vo);
+                        itemsVo.setUnload(vo);
+                        itemsVoList.add(itemsVo);
+                        /**
+                         * 订单需求明细Dto转换为Vo
+                         */
+                        if (itemsDto.getGoods().size() > 0) {
+                            List<GetOrderGoodsDto> goodsDtoList = itemsDto.getGoods();
+                            List<GetOrderGoodsVo> goodsVoList = new ArrayList<>();
+                            for (GetOrderGoodsDto goodsDto : goodsDtoList) {
+                                GetOrderGoodsVo goodsVo = new GetOrderGoodsVo();
+                                BeanUtils.copyProperties(goodsDto, goodsVo);
+                                goodsVoList.add(goodsVo);
+                            }
+                            itemsVo.setGoodsVoList(goodsVoList);
+                        }
+                    }
+                    orderVo.setItemsVoList(itemsVoList);
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -188,11 +218,15 @@ public class OrderController {
         if (dids.size() != 0) {
             criteriaDto.setDepartIds(dids);
         }
-        List<ListOrderDto> orderDtoList = orderService.listOrderByCriteria(criteriaDto);
+        //得到订单分页
+        PageInfo pageInfo = orderService.listOrderByCriteria(criteriaDto);
+        List<ListOrderDto> orderDtoList = pageInfo.getList();
         List<ListOrderVo> orderVoList = new ArrayList<>();
+        //替换为vo
         if (orderDtoList.size() > 0) {
-            BeanUtils.copyProperties(orderDtoList, orderVoList);
-            for (ListOrderVo orderVo : orderVoList) {
+            for (ListOrderDto orderDto : orderDtoList) {
+                ListOrderVo orderVo = new ListOrderVo();
+                BeanUtils.copyProperties(orderDto, orderVo);
                 //循环拷贝Orders下的各个对象
                 /*Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
                 BeanUtils.copyProperties(order, orderDto);
@@ -221,9 +255,37 @@ public class OrderController {
                         orderVo.setWaybillWait(orderVo.getWaybillCount() - orderVo.getWaybillAlready());
                     }
                 }
+                /**
+                 * 替换订单需求Dto为Vo
+                 */
+                List<ListOrderItemsDto> itemsDtoList = orderDto.getOrderItemsDtoList();
+                List<ListOrderItemsVo> itemsVoList = new ArrayList<>();
+                if (itemsDtoList.size() > 0) {
+                    for (ListOrderItemsDto itemsDto : itemsDtoList) {
+                        ListOrderItemsVo itemsVo = new ListOrderItemsVo();
+                        BeanUtils.copyProperties(itemsDto, itemsVo);
+                        itemsVoList.add(itemsVo);
+                        /**
+                         * 替换订单需求明细Dto为Vo
+                         */
+                        List<GetOrderGoodsDto> goodsDtoList = itemsDto.getOrderGoodsDtoList();
+                        List<GetOrderGoodsVo> goodsVoList = new ArrayList<>();
+                        if (goodsDtoList.size() > 0) {
+                            for (GetOrderGoodsDto goodsDto : goodsDtoList) {
+                                GetOrderGoodsVo goodsVo = new GetOrderGoodsVo();
+                                BeanUtils.copyProperties(goodsDto, goodsVo);
+                                goodsVoList.add(goodsVo);
+                            }
+                            itemsVo.setGoods(goodsVoList);
+                        }
+                    }
+                    orderVo.setOrderItemsVoList(itemsVoList);
+                }
+                orderVoList.add(orderVo);
             }
         }
-        return BaseResponse.successInstance(new PageInfo<>(orderVoList));
+        pageInfo.setList(orderVoList);
+        return BaseResponse.successInstance(pageInfo);
     }
 
     /**
@@ -262,11 +324,15 @@ public class OrderController {
         if (dids.size() != 0) {
             criteriaDto.setDepartIds(dids);
         }
-        List<ListOrderDto> orderDtoList = orderService.listOrderByCriteria(criteriaDto);
+        //得到订单分页
+        PageInfo pageInfo = orderService.listOrderByCriteria(criteriaDto);
+        List<ListOrderDto> orderDtoList = pageInfo.getList();
         List<ListOrderVo> orderVoList = new ArrayList<>();
+        //替换为vo
         if (orderDtoList.size() > 0) {
-            BeanUtils.copyProperties(orderDtoList, orderVoList);
-            for (ListOrderVo orderVo : orderVoList) {
+            for (ListOrderDto orderDto : orderDtoList) {
+                ListOrderVo orderVo = new ListOrderVo();
+                BeanUtils.copyProperties(orderDto, orderVo);
                 //循环拷贝Orders下的各个对象
                 /*Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
                 BeanUtils.copyProperties(order, orderDto);
@@ -284,8 +350,36 @@ public class OrderController {
                     userDto.setUserName(userInfo.getName());
                     orderDto.setCreatedUserId(userDto);
                 }*/
+                /**
+                 * 替换订单需求Dto为Vo
+                 */
+                List<ListOrderItemsDto> itemsDtoList = orderDto.getOrderItemsDtoList();
+                List<ListOrderItemsVo> itemsVoList = new ArrayList<>();
+                if (itemsDtoList.size() > 0) {
+                    for (ListOrderItemsDto itemsDto : itemsDtoList) {
+                        ListOrderItemsVo itemsVo = new ListOrderItemsVo();
+                        BeanUtils.copyProperties(itemsDto, itemsVo);
+                        itemsVoList.add(itemsVo);
+                        /**
+                         * 替换订单需求明细Dto为Vo
+                         */
+                        List<GetOrderGoodsDto> goodsDtoList = itemsDto.getOrderGoodsDtoList();
+                        List<GetOrderGoodsVo> goodsVoList = new ArrayList<>();
+                        if (goodsDtoList.size() > 0) {
+                            for (GetOrderGoodsDto goodsDto : goodsDtoList) {
+                                GetOrderGoodsVo goodsVo = new GetOrderGoodsVo();
+                                BeanUtils.copyProperties(goodsDto, goodsVo);
+                                goodsVoList.add(goodsVo);
+                            }
+                            itemsVo.setGoods(goodsVoList);
+                        }
+                    }
+                    orderVo.setOrderItemsVoList(itemsVoList);
+                }
+                orderVoList.add(orderVo);
             }
         }
-        return BaseResponse.successInstance(new PageInfo<>(orderVoList));
+        pageInfo.setList(orderVoList);
+        return BaseResponse.successInstance(pageInfo);
     }
 }

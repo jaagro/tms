@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author baiyiran
@@ -96,5 +97,10 @@ public class ListOrderVo implements Serializable {
      * 待派单
      */
     private Integer waybillWait;
+
+    /**
+     * 订单需求列表
+     */
+    private List<ListOrderItemsVo> orderItemsVoList;
 
 }

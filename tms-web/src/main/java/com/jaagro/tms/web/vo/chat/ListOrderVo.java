@@ -1,6 +1,5 @@
-package com.jaagro.tms.web.vo.pc;
+package com.jaagro.tms.web.vo.chat;
 
-import com.jaagro.tms.web.vo.chat.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -9,11 +8,12 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author tony
+ * @author baiyiran
+ * @Date 2018/10/22
  */
 @Data
 @Accessors(chain = true)
-public class GetOrderVo implements Serializable {
+public class ListOrderVo implements Serializable {
 
     /**
      *
@@ -88,5 +88,6 @@ public class GetOrderVo implements Serializable {
     /**
      * 订单列表
      */
-    private List<GetOrderItemsVo> itemsVoList;
+    private List<ListOrderItemsVo> itemsVoList;
+
 }

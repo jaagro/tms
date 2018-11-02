@@ -1191,7 +1191,7 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public List<ListWaybillDto> listWaybillByOrderId(Integer orderId) {
-        return waybillMapper.listWaybillByOrderId(orderId);
+        return waybillMapper.listWaybillDtoByOrderId(orderId);
     }
 
     /**

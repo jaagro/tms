@@ -2,7 +2,6 @@ package com.jaagro.tms.web.vo.pc;
 
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
-import com.jaagro.tms.api.dto.order.GetOrderGoodsDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -55,5 +54,5 @@ public class ListOrderItemsVo implements Serializable {
     /**
      * 货物列表
      */
-    private List<GetOrderGoodsDto> goods;
+    private List<GetOrderGoodsVo> goods;
 }

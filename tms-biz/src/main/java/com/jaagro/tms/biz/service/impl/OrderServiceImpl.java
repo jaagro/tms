@@ -170,12 +170,18 @@ public class OrderServiceImpl implements OrderService {
      * @param criteriaDto 查询条件 json
      * @return 订单列表
      */
-    @Cacheable
     @Override
-    public List<ListOrderDto> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
+    public PageInfo listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
         List<ListOrderDto> orderDtos = this.ordersMapper.listOrdersByCriteria(criteriaDto);
-        return orderDtos;
+        if (orderDtos.size() > 0) {
+            //填充订单详情
+            for (ListOrderDto orderDto : orderDtos) {
+                List<ListOrderItemsDto> itemsDtoList = orderItemsService.listItemsByOrderId(orderDto.getId());
+                orderDto.setOrderItemsDtoList(itemsDtoList);
+            }
+        }
+        return new PageInfo(orderDtos);
     }
 
     /**

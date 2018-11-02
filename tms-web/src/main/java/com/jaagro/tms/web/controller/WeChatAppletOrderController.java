@@ -1,17 +1,13 @@
 package com.jaagro.tms.web.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.base.GetCustomerUserDto;
-import com.jaagro.tms.api.dto.order.GetOrderDto;
-import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
-import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
+import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
-import com.jaagro.tms.web.vo.chat.WeChatOrderItemsVo;
-import com.jaagro.tms.web.vo.chat.WeChatOrderVo;
-import com.jaagro.tms.web.vo.chat.CustomerVo;
-import com.jaagro.tms.web.vo.chat.SiteVo;
+import com.jaagro.tms.web.vo.chat.*;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -63,20 +59,35 @@ public class WeChatAppletOrderController {
                 SiteVo siteVo = new SiteVo();
                 BeanUtils.copyProperties(getOrderDto.getLoadSiteId(), siteVo);
                 chatOrderVo.setLoadSiteId(siteVo);
-                //订单详情
-                List<GetOrderItemsDto> orderItemsDtos = getOrderDto.getOrderItems();
-                List<WeChatOrderItemsVo> weChatOrderItemsVos = new ArrayList<>();
-                if (orderItemsDtos.size() > 0) {
-                    for (GetOrderItemsDto orderItemsDto : orderItemsDtos) {
+                /**
+                 * 订单详情Dto转换为Vo
+                 */
+                List<GetOrderItemsDto> orderItemsDtoList = getOrderDto.getOrderItems();
+                List<WeChatOrderItemsVo> orderItemsVoList = new ArrayList<>();
+                if (orderItemsDtoList.size() > 0) {
+                    for (GetOrderItemsDto orderItemsDto : orderItemsDtoList) {
                         WeChatOrderItemsVo itemsVo = new WeChatOrderItemsVo();
                         BeanUtils.copyProperties(orderItemsDto, itemsVo);
                         //卸货地转换
                         SiteVo vo = new SiteVo();
                         BeanUtils.copyProperties(orderItemsDto.getUnload(), vo);
                         itemsVo.setUnload(vo);
-                        weChatOrderItemsVos.add(itemsVo);
+                        orderItemsVoList.add(itemsVo);
+                        /**
+                         * 订单需求明细Dto转换为Vo
+                         */
+                        List<GetOrderGoodsDto> goodsDtoList = orderItemsDto.getGoods();
+                        List<WeChatOrderGoodsVo> goodsVoList = new ArrayList<>();
+                        if (goodsDtoList.size() > 0) {
+                            for (GetOrderGoodsDto goodsDto : goodsDtoList) {
+                                WeChatOrderGoodsVo goodsVo = new WeChatOrderGoodsVo();
+                                BeanUtils.copyProperties(goodsDto, goodsVo);
+                                goodsVoList.add(goodsVo);
+                            }
+                            itemsVo.setGoods(goodsVoList);
+                        }
                     }
-                    chatOrderVo.setOrderItems(weChatOrderItemsVos);
+                    chatOrderVo.setOrderItems(orderItemsVoList);
                 }
             }
         } catch (Exception ex) {
@@ -107,6 +118,62 @@ public class WeChatAppletOrderController {
             criteriaDto.setCustomerId(customerUserDto.getRelevanceId());
             criteriaDto.setCustomerType(customerUserDto.getCustomerType());
         }
-        return BaseResponse.service(orderRefactorService.listWeChatOrderByCriteria(criteriaDto));
+        //得到订单分页
+        PageInfo pageInfo = orderService.listOrderByCriteria(criteriaDto);
+        List<ListOrderDto> orderDtoList = pageInfo.getList();
+        List<ListOrderVo> orderVoList = new ArrayList<>();
+        //替换为vo
+        if (orderDtoList.size() > 0) {
+            for (ListOrderDto orderDto : orderDtoList) {
+                ListOrderVo orderVo = new ListOrderVo();
+                BeanUtils.copyProperties(orderDto, orderVo);
+                //循环拷贝Orders下的各个对象
+                /*Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
+                BeanUtils.copyProperties(order, orderDto);
+                orderDto
+                        .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
+                        .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
+                        .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                //归属网点名称
+                ShowSiteDto showSiteDto = this.customerService.getShowSiteById(order.getLoadSiteId());
+                orderDto.setDepartmentName(this.userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                //创单人
+                UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+                if (userInfo != null) {
+                    ShowUserDto userDto = new ShowUserDto();
+                    userDto.setUserName(userInfo.getName());
+                    orderDto.setCreatedUserId(userDto);
+                }*/
+                /**
+                 * 替换订单需求Dto为Vo
+                 */
+                List<ListOrderItemsDto> itemsDtoList = orderDto.getOrderItemsDtoList();
+                List<ListOrderItemsVo> itemsVoList = new ArrayList<>();
+                if (itemsDtoList.size() > 0) {
+                    for (ListOrderItemsDto itemsDto : itemsDtoList) {
+                        ListOrderItemsVo itemsVo = new ListOrderItemsVo();
+                        BeanUtils.copyProperties(itemsDto, itemsVo);
+                        itemsVoList.add(itemsVo);
+                        /**
+                         * 替换订单需求明细Dto为Vo
+                         */
+                        List<GetOrderGoodsDto> goodsDtoList = itemsDto.getOrderGoodsDtoList();
+                        List<OrderGoodsVo> goodsVoList = new ArrayList<>();
+                        if (goodsDtoList.size() > 0) {
+                            for (GetOrderGoodsDto goodsDto : goodsDtoList) {
+                                OrderGoodsVo goodsVo = new OrderGoodsVo();
+                                BeanUtils.copyProperties(goodsDto, goodsVo);
+                                goodsVoList.add(goodsVo);
+                            }
+                            itemsVo.setGoods(goodsVoList);
+                        }
+                    }
+                    orderVo.setItemsVoList(itemsVoList);
+                }
+                orderVoList.add(orderVo);
+            }
+        }
+        pageInfo.setList(orderVoList);
+        return BaseResponse.successInstance(pageInfo);
     }
 }

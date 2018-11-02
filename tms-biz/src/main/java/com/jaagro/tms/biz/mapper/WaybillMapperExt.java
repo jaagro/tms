@@ -26,7 +26,15 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @param orderId
      * @return
      */
-    List<ListWaybillDto> listWaybillByOrderId(Integer orderId);
+    List<Waybill> listWaybillByOrderId(Integer orderId);
+
+    /**
+     * 根据订单id获取运单
+     *
+     * @param orderId
+     * @return
+     */
+    List<ListWaybillDto> listWaybillDtoByOrderId(Integer orderId);
 
     /**
      * 查询未完成的运单
