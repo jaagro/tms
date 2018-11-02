@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ import java.util.Map;
 /**
  * @author baiyiran
  */
+@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "order")
 @Service
 public class OrderRefactorServiceImpl implements OrderRefactorService {
 
@@ -52,6 +55,7 @@ public class OrderRefactorServiceImpl implements OrderRefactorService {
      * @param id 订单id
      * @return order对象
      */
+    @Cacheable
     @Override
     public GetOrderDto getOrderById(Integer id) {
         Orders order = this.ordersMapper.selectByPrimaryKey(id);
@@ -81,6 +85,7 @@ public class OrderRefactorServiceImpl implements OrderRefactorService {
      * @param criteriaDto 查询条件 json
      * @return 订单列表
      */
+    @Cacheable
     @Override
     public Map<String, Object> listWeChatOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());

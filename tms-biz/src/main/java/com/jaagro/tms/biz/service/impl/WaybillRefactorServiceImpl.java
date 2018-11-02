@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 /**
  * @author tony
  */
+@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "waybill")
 @Service
 public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     private static final Logger log = LoggerFactory.getLogger(WaybillRefactorServiceImpl.class);
@@ -62,10 +65,12 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
 
     /**
      * 根据状态查询我的运单信息
-     * @Author @Gao.
+     *
      * @param dto
      * @return
+     * @Author @Gao.
      */
+    @Cacheable
     @Override
     public PageInfo listWaybillByStatus(GetWaybillParamDto dto) {
 
@@ -79,7 +84,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
             List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByCarrierStatus(waybill);
             listWaybillAppDtos = listWaybill(waybillDtos, currentUserId);
-            return  new PageInfo<>(listWaybillAppDtos);
+            return new PageInfo<>(listWaybillAppDtos);
         }
         //已完成运单
         if (WaybillConstant.ACCOMPLISH.equals(dto.getWaybillStatus())) {
@@ -169,6 +174,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
      * @return
      * @Author Gavin
      */
+    @Cacheable
     @Override
     public List<GetWaybillDetailDto> listWaybillDetailByOrderId(Integer orderId) {
         List<Waybill> waybillList = waybillMapper.listWaybillByOrderId(orderId);
@@ -177,7 +183,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         }
         List<GetWaybillDetailDto> getWaybills = new ArrayList<>();
         for (Waybill waybill : waybillList) {
-            GetWaybillDetailDto waybillDetailDto =getWaybillDetailById(waybill.getId());
+            GetWaybillDetailDto waybillDetailDto = getWaybillDetailById(waybill.getId());
 
             getWaybills.add(waybillDetailDto);
         }
@@ -186,11 +192,13 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
 
     /**
      * 根据id获取waybill相关的所有对象
-     * @Author Gavin
+     *
      * @param id
      * @return
+     * @Author Gavin
      */
 
+    @Cacheable
     @Override
     public GetWaybillDetailDto getWaybillDetailById(Integer id) {
         //拿到waybill对象
@@ -217,7 +225,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             truckDto = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
         }
         //获取waybillItem以及对应的货物列表
-        List<GetWaybillItemDto> getWaybillItemsDtoList=getWaybillItemsAndGoods(waybill.getId());
+        List<GetWaybillItemDto> getWaybillItemsDtoList = getWaybillItemsAndGoods(waybill.getId());
         //根据waybillId获取WaybillTracking
         List<GetTrackingDto> getTrackingDtos = new ArrayList<>();
         List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybill.getId());
@@ -259,13 +267,13 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     }
 
     /**
-     *
      * 根据waybillId获取Items和goods
-     * @Author Gavin
+     *
      * @param waybillId
      * @return
+     * @Author Gavin
      */
-    public List<GetWaybillItemDto> getWaybillItemsAndGoods(Integer waybillId){
+    private List<GetWaybillItemDto> getWaybillItemsAndGoods(Integer waybillId) {
         List<GetWaybillItemDto> getWaybillItemsDtoList = new ArrayList<>();
         List<WaybillItems> waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
         for (WaybillItems waybillItems : waybillItemsList) {

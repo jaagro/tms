@@ -17,6 +17,9 @@ import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,7 @@ import java.util.Map;
 /**
  * @author baiyiran
  */
+@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "orderItems")
 @Service
 public class OrderItemsServiceImpl implements OrderItemsService {
 
@@ -46,6 +50,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     @Autowired
     private CustomerClientService customerService;
 
+    @CacheEvict(cacheNames = "orderItems", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createOrderItem(CreateOrderItemsDto orderItemDto) {
@@ -69,6 +74,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         return ServiceResult.toResult("创建成功");
     }
 
+    @CacheEvict(cacheNames = "orderItems", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> updateItems(CreateOrderItemsDto itemsDto) {
@@ -90,6 +96,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         return ServiceResult.toResult("修改成功");
     }
 
+    @CacheEvict(cacheNames = "orderItems", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> disableByOrderId(Integer orderId) {
@@ -109,6 +116,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         return ServiceResult.toResult("删除成功");
     }
 
+    @Cacheable
     @Override
     public List<GetOrderItemsDto> listByOrderId(Integer orderId) {
         List<GetOrderItemsDto> getOrderItemsDtoList = this.orderItemsMapper.listItemsByOrderId(orderId);
