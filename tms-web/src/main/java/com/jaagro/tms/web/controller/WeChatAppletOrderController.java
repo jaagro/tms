@@ -2,6 +2,7 @@ package com.jaagro.tms.web.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.base.GetCustomerUserDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
@@ -36,6 +37,7 @@ public class WeChatAppletOrderController {
     private CurrentUserService userService;
     @Autowired
     private CustomerClientService customerClientService;
+
 
     /**
      * 查询单条订单
@@ -127,23 +129,11 @@ public class WeChatAppletOrderController {
             for (ListOrderDto orderDto : orderDtoList) {
                 ListOrderVo orderVo = new ListOrderVo();
                 BeanUtils.copyProperties(orderDto, orderVo);
-                //循环拷贝Orders下的各个对象
-                /*Orders order = ordersMapper.selectByPrimaryKey(orderDto.getId());
-                BeanUtils.copyProperties(order, orderDto);
-                orderDto
-                        .setCustomerId(customerService.getShowCustomerById(order.getCustomerId()))
-                        .setCustomerContract(customerService.getShowCustomerContractById(order.getCustomerContractId()))
-                        .setLoadSite(customerService.getShowSiteById(order.getLoadSiteId()));
-                //归属网点名称
-                ShowSiteDto showSiteDto = customerService.getShowSiteById(order.getLoadSiteId());
-                orderDto.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
-                //创单人
-                UserInfo userInfo = authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
-                if (userInfo != null) {
-                    ShowUserDto userDto = new ShowUserDto();
-                    userDto.setUserName(userInfo.getName());
-                    orderDto.setCreatedUserId(userDto);
-                }*/
+                //装货地
+                ShowSiteDto showSiteDto = customerClientService.getShowSiteById(orderDto.getLoadSiteId());
+                SiteVo siteVo = new SiteVo();
+                BeanUtils.copyProperties(showSiteDto, siteVo);
+                orderVo.setLoadSiteId(siteVo);
                 /**
                  * 替换订单需求Dto为Vo
                  */
@@ -153,6 +143,10 @@ public class WeChatAppletOrderController {
                     for (ListOrderItemsDto itemsDto : itemsDtoList) {
                         ListOrderItemsVo itemsVo = new ListOrderItemsVo();
                         BeanUtils.copyProperties(itemsDto, itemsVo);
+                        ShowSiteDto siteDto = customerClientService.getShowSiteById(orderDto.getLoadSiteId());
+                        SiteVo vo = new SiteVo();
+                        BeanUtils.copyProperties(siteDto, vo);
+                        itemsVo.setUnload(vo);
                         itemsVoList.add(itemsVo);
                         /**
                          * 替换订单需求明细Dto为Vo

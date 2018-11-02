@@ -36,21 +36,6 @@ public class ListOrderItemsVo implements Serializable {
     private Date unloadTime;
 
     /**
-     * 是否有效
-     */
-    private Boolean enabled;
-
-    /**
-     * 修改时间
-     */
-    private Date modifyTime;
-
-    /**
-     * 修改人id
-     */
-    private UserVo modifyUserId;
-
-    /**
      * 货物列表
      */
     private List<ListOrderGoodsVo> goods;
