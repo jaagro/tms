@@ -113,7 +113,7 @@ public class WeChatAppletOrderController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
         //获得customer_user中的关联用户id
-        GetCustomerUserDto customerUserDto = this.userService.getCustomerUserById();
+        GetCustomerUserDto customerUserDto = userService.getCustomerUserById();
         if (customerUserDto != null) {
             criteriaDto.setCustomerId(customerUserDto.getRelevanceId());
             criteriaDto.setCustomerType(customerUserDto.getCustomerType());
@@ -128,17 +128,17 @@ public class WeChatAppletOrderController {
                 ListOrderVo orderVo = new ListOrderVo();
                 BeanUtils.copyProperties(orderDto, orderVo);
                 //循环拷贝Orders下的各个对象
-                /*Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
+                /*Orders order = ordersMapper.selectByPrimaryKey(orderDto.getId());
                 BeanUtils.copyProperties(order, orderDto);
                 orderDto
-                        .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
-                        .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
-                        .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                        .setCustomerId(customerService.getShowCustomerById(order.getCustomerId()))
+                        .setCustomerContract(customerService.getShowCustomerContractById(order.getCustomerContractId()))
+                        .setLoadSite(customerService.getShowSiteById(order.getLoadSiteId()));
                 //归属网点名称
-                ShowSiteDto showSiteDto = this.customerService.getShowSiteById(order.getLoadSiteId());
-                orderDto.setDepartmentName(this.userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                ShowSiteDto showSiteDto = customerService.getShowSiteById(order.getLoadSiteId());
+                orderDto.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
                 //创单人
-                UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+                UserInfo userInfo = authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
                 if (userInfo != null) {
                     ShowUserDto userDto = new ShowUserDto();
                     userDto.setUserName(userInfo.getName());

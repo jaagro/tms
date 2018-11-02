@@ -71,10 +71,10 @@ public class OrderController {
         if (StringUtils.isEmpty(orderDto.getCustomerContractId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同id不能为空");
         }
-        if (this.customerService.getShowCustomerById(orderDto.getCustomerId()) == null) {
+        if (customerService.getShowCustomerById(orderDto.getCustomerId()) == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户不存在");
         }
-        if (this.customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
+        if (customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同不存在");
         }
         Map<String, Object> result;
@@ -235,14 +235,14 @@ public class OrderController {
                 ListOrderVo orderVo = new ListOrderVo();
                 BeanUtils.copyProperties(orderDto, orderVo);
                 orderVo
-                        .setCustomerId(this.customerService.getShowCustomerById(orderDto.getCustomerId()))
-                        .setCustomerContract(this.customerService.getShowCustomerContractById(orderDto.getCustomerContractId()))
-                        .setLoadSite(this.customerService.getShowSiteById(orderDto.getLoadSiteId()));
+                        .setCustomerId(customerService.getShowCustomerById(orderDto.getCustomerId()))
+                        .setCustomerContract(customerService.getShowCustomerContractById(orderDto.getCustomerContractId()))
+                        .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()));
                 //归属网点名称
-                ShowSiteDto showSiteDto = this.customerService.getShowSiteById(orderDto.getLoadSiteId());
-                orderVo.setDepartmentName(this.userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
+                orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
                 //创单人
-                UserInfo userInfo = this.authClientService.getUserInfoById(orderDto.getCreatedUserId(), "employee");
+                UserInfo userInfo = authClientService.getUserInfoById(orderDto.getCreatedUserId(), "employee");
                 if (userInfo != null) {
                     ShowUserDto userDto = new ShowUserDto();
                     userDto.setUserName(userInfo.getName());
@@ -338,14 +338,14 @@ public class OrderController {
                 ListOrderVo orderVo = new ListOrderVo();
                 BeanUtils.copyProperties(orderDto, orderVo);
                 orderVo
-                        .setCustomerId(this.customerService.getShowCustomerById(orderDto.getCustomerId()))
-                        .setCustomerContract(this.customerService.getShowCustomerContractById(orderDto.getCustomerContractId()))
-                        .setLoadSite(this.customerService.getShowSiteById(orderDto.getLoadSiteId()));
+                        .setCustomerId(customerService.getShowCustomerById(orderDto.getCustomerId()))
+                        .setCustomerContract(customerService.getShowCustomerContractById(orderDto.getCustomerContractId()))
+                        .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()));
                 //归属网点名称
-                ShowSiteDto showSiteDto = this.customerService.getShowSiteById(orderDto.getLoadSiteId());
-                orderVo.setDepartmentName(this.userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
+                orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
                 //创单人
-                UserInfo userInfo = this.authClientService.getUserInfoById(orderDto.getCreatedUserId(), "employee");
+                UserInfo userInfo = authClientService.getUserInfoById(orderDto.getCreatedUserId(), "employee");
                 if (userInfo != null) {
                     ShowUserDto userDto = new ShowUserDto();
                     userDto.setUserName(userInfo.getName());
