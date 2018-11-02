@@ -15,4 +15,12 @@
             #{loc.speed,jdbcType=DECIMAL}, #{loc.angle,jdbcType=DECIMAL}, #{loc.locationTime,jdbcType=TIMESTAMP})
         </foreach>
     </insert>
+
+    <select id="listLocationsByWaybillId" parameterType="java.lang.Integer"
+            resultType="com.jaagro.tms.api.dto.waybill.ShowLocationDto">
+        select
+          id,latitude, longitude,location_time
+        from location
+        where waybill_id = #{waybillId,jdbcType=INTEGER} order by id desc
+    </select>
 </mapper>
