@@ -1,14 +1,16 @@
 package com.jaagro.tms.web.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
-import com.jaagro.tms.api.dto.order.CreateOrderDto;
-import com.jaagro.tms.api.dto.order.GetOrderDto;
-import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
-import com.jaagro.tms.api.dto.order.UpdateOrderDto;
+import com.jaagro.tms.api.dto.order.*;
+import com.jaagro.tms.api.dto.waybill.ListWaybillDto;
 import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
+import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.CustomerClientService;
-import com.jaagro.tms.web.vo.order.*;
+import com.jaagro.tms.biz.service.UserClientService;
+import com.jaagro.tms.web.vo.chat.*;
+import com.jaagro.tms.web.vo.pc.ListOrderVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -19,6 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -35,6 +39,10 @@ public class OrderController {
     private CustomerClientService customerService;
     @Autowired
     private OrderRefactorService orderRefactorService;
+    @Autowired
+    private UserClientService userClientService;
+    @Autowired
+    private WaybillService waybillService;
 
     /**
      * 新增订单
@@ -175,7 +183,47 @@ public class OrderController {
         if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
-        return BaseResponse.service(orderService.listOrderByCriteria(criteriaDto));
+        List<Integer> departIds = userClientService.getDownDepartment();
+        List<Integer> dids = new ArrayList<>(departIds);
+        if (dids.size() != 0) {
+            criteriaDto.setDepartIds(dids);
+        }
+        List<ListOrderDto> orderDtoList = orderService.listOrderByCriteria(criteriaDto);
+        List<ListOrderVo> orderVoList = new ArrayList<>();
+        if (orderDtoList.size() > 0) {
+            BeanUtils.copyProperties(orderDtoList, orderVoList);
+            for (ListOrderVo orderVo : orderVoList) {
+                //循环拷贝Orders下的各个对象
+                /*Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
+                BeanUtils.copyProperties(order, orderDto);
+                orderDto
+                        .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
+                        .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
+                        .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                //归属网点名称
+                ShowSiteDto showSiteDto = this.customerService.getShowSiteById(order.getLoadSiteId());
+                orderDto.setDepartmentName(this.userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                //创单人
+                UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+                if (userInfo != null) {
+                    ShowUserDto userDto = new ShowUserDto();
+                    userDto.setUserName(userInfo.getName());
+                    orderDto.setCreatedUserId(userDto);
+                }*/
+                //派单进度
+                List<ListWaybillDto> waybills = waybillService.listWaybillByOrderId(orderVo.getId());
+                if (waybills.size() > 0) {
+                    orderVo.setWaybillCount(waybills.size());
+                    //已派单
+                    List<ListWaybillDto> waitWaybills = waybillService.listWaybillWaitByOrderId(orderVo.getId());
+                    if (waitWaybills.size() > 0) {
+                        orderVo.setWaybillAlready(waitWaybills.size());
+                        orderVo.setWaybillWait(orderVo.getWaybillCount() - orderVo.getWaybillAlready());
+                    }
+                }
+            }
+        }
+        return BaseResponse.successInstance(new PageInfo<>(orderVoList));
     }
 
     /**
@@ -206,7 +254,38 @@ public class OrderController {
     @ApiOperation("待派单列表分页")
     @PostMapping("/listToSendOrders")
     public BaseResponse listToSendOrders(@RequestBody ListOrderCriteriaDto criteriaDto) {
+        //区分订单列表和待派单列表
         criteriaDto.setWaitOrders(OrderStatus.PLACE_ORDER);
-        return BaseResponse.service(orderService.listOrderByCriteria(criteriaDto));
+        //部门隔离
+        List<Integer> departIds = userClientService.getDownDepartment();
+        List<Integer> dids = new ArrayList<>(departIds);
+        if (dids.size() != 0) {
+            criteriaDto.setDepartIds(dids);
+        }
+        List<ListOrderDto> orderDtoList = orderService.listOrderByCriteria(criteriaDto);
+        List<ListOrderVo> orderVoList = new ArrayList<>();
+        if (orderDtoList.size() > 0) {
+            BeanUtils.copyProperties(orderDtoList, orderVoList);
+            for (ListOrderVo orderVo : orderVoList) {
+                //循环拷贝Orders下的各个对象
+                /*Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
+                BeanUtils.copyProperties(order, orderDto);
+                orderDto
+                        .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
+                        .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
+                        .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                //归属网点名称
+                ShowSiteDto showSiteDto = this.customerService.getShowSiteById(order.getLoadSiteId());
+                orderDto.setDepartmentName(this.userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                //创单人
+                UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+                if (userInfo != null) {
+                    ShowUserDto userDto = new ShowUserDto();
+                    userDto.setUserName(userInfo.getName());
+                    orderDto.setCreatedUserId(userDto);
+                }*/
+            }
+        }
+        return BaseResponse.successInstance(new PageInfo<>(orderVoList));
     }
 }

@@ -1108,7 +1108,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-                    ) {
+            ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1181,6 +1181,28 @@ public class WaybillServiceImpl implements WaybillService {
         }
 
         return true;
+    }
+
+    /**
+     * 根据订单id获取运单
+     *
+     * @param orderId
+     * @return
+     */
+    @Override
+    public List<ListWaybillDto> listWaybillByOrderId(Integer orderId) {
+        return waybillMapper.listWaybillByOrderId(orderId);
+    }
+
+    /**
+     * 根据订单id查询 待派单的运单
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public List<ListWaybillDto> listWaybillWaitByOrderId(Integer id) {
+        return waybillMapper.listWaybillDtoWaitByOrderId(id);
     }
 
     private Integer getUserId() {

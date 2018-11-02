@@ -9,11 +9,11 @@ import java.util.List;
 
 /**
  * @author baiyiran
- * @Date 2018/10/30
+ * @Date 2018/10/22
  */
 @Data
 @Accessors(chain = true)
-public class WeChatOrderItemsVo implements Serializable {
+public class OrderItemsVo implements Serializable {
 
     /**
      *
@@ -36,8 +36,23 @@ public class WeChatOrderItemsVo implements Serializable {
     private Date unloadTime;
 
     /**
+     * 是否有效
+     */
+    private Boolean enabled;
+
+    /**
+     * 修改时间
+     */
+    private Date modifyTime;
+
+    /**
+     * 修改人id
+     */
+    private UserVo modifyUserId;
+
+    /**
      * 货物列表
      */
-    private List<WeChatOrderGoodsVo> goods;
+    private List<OrderGoodsVo> goods;
 
 }

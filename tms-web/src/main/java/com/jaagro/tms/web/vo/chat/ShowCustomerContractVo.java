@@ -1,4 +1,4 @@
-package com.jaagro.tms.web.vo.order;
+package com.jaagro.tms.web.vo.chat;
 
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;

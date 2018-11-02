@@ -1,5 +1,11 @@
-package com.jaagro.tms.api.dto.order;
+package com.jaagro.tms.web.vo.pc;
 
+import com.jaagro.tms.api.dto.base.ShowUserDto;
+import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
+import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
+import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -12,7 +18,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class ListOrderDto implements Serializable {
+public class GetOrderVo implements Serializable {
 
     /**
      *
@@ -22,7 +28,12 @@ public class ListOrderDto implements Serializable {
     /**
      * 客户合同id
      */
-    private Integer customerContractId;
+    private ShowCustomerContractDto customerContract;
+
+    /**
+     * 客户联系人
+     */
+    private CustomerContactsReturnDto contactsDto;
 
     /**
      * 货物类型
@@ -37,12 +48,12 @@ public class ListOrderDto implements Serializable {
     /**
      * 客户id
      */
-    private Integer customerId;
+    private ShowCustomerDto customer;
 
     /**
      * 装货地id
      */
-    private Integer loadSiteId;
+    private ShowSiteDto loadSiteId;
 
     /**
      * 要求装货时间
@@ -67,7 +78,7 @@ public class ListOrderDto implements Serializable {
     /**
      * 创建人
      */
-    private Integer createdUserId;
+    private ShowUserDto createdUser;
 
     /**
      * 修改时间
@@ -77,17 +88,10 @@ public class ListOrderDto implements Serializable {
     /**
      * 修改人id
      */
-    private Integer modifyUserId;
+    private ShowUserDto modifyUser;
 
     /**
-     * 部门id
+     * 订单列表
      */
-    private Integer departmentId;
-
-    /**
-     * 订单需求列表
-     */
-    private List<ListOrderItemsDto> orderItemsDtoList;
-
-
+    private List<GetOrderItemsDto> orderItems;
 }

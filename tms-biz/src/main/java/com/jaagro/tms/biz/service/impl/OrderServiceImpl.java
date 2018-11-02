@@ -172,47 +172,10 @@ public class OrderServiceImpl implements OrderService {
      */
     @Cacheable
     @Override
-    public Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
+    public List<ListOrderDto> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
-        List<Integer> departIds = userClientService.getDownDepartment();
-        List<Integer> dids = new ArrayList<>(departIds);
-        if (dids.size() != 0) {
-            criteriaDto.setDepartIds(dids);
-        }
         List<ListOrderDto> orderDtos = this.ordersMapper.listOrdersByCriteria(criteriaDto);
-        if (orderDtos != null && orderDtos.size() > 0) {
-            for (ListOrderDto orderDto : orderDtos) {
-                Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
-                BeanUtils.copyProperties(order, orderDto);
-                orderDto
-                        .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
-                        .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
-                        .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
-                //归属网点名称
-                ShowSiteDto showSiteDto = this.customerService.getShowSiteById(order.getLoadSiteId());
-                orderDto.setDepartmentName(this.userClientService.getDeptNameById(showSiteDto.getDeptId()));
-                //创单人
-                UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
-                if (userInfo != null) {
-                    ShowUserDto userDto = new ShowUserDto();
-                    userDto.setUserName(userInfo.getName());
-                    orderDto.setCreatedUserId(userDto);
-                }
-                //派单进度
-                List<Waybill> waybills = waybillMapper.listWaybillByOrderId(orderDto.getId());
-                if (waybills.size() > 0) {
-                    orderDto.setWaybillCount(waybills.size());
-                    //已派单
-                    List<Waybill> waitWaybills = waybillMapper.listWaybillWaitByOrderId(orderDto.getId());
-                    if (waitWaybills.size() > 0) {
-                        orderDto.setWaybillAlready(waitWaybills.size());
-                        orderDto.setWaybillWait(orderDto.getWaybillCount() - orderDto.getWaybillAlready());
-                    }
-                }
-
-            }
-        }
-        return ServiceResult.toResult(new PageInfo<>(orderDtos));
+        return orderDtos;
     }
 
     /**

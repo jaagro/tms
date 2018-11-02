@@ -1,19 +1,21 @@
-package com.jaagro.tms.web.vo.order;
+package com.jaagro.tms.web.vo.pc;
 
+import com.jaagro.tms.api.dto.base.ShowUserDto;
+import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
+import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author baiyiran
- * @Date 2018/10/22
  */
 @Data
 @Accessors(chain = true)
-public class OrderVo implements Serializable {
+public class ListOrderVo implements Serializable {
 
     /**
      *
@@ -23,12 +25,7 @@ public class OrderVo implements Serializable {
     /**
      * 客户合同id
      */
-    private ShowCustomerContractVo customerContract;
-
-    /**
-     * 客户联系人
-     */
-    private CustomerContactsVo contactsDto;
+    private ShowCustomerContractDto customerContract;
 
     /**
      * 货物类型
@@ -43,12 +40,22 @@ public class OrderVo implements Serializable {
     /**
      * 客户id
      */
-    private CustomerVo customer;
+    private ShowCustomerDto customerId;
 
     /**
      * 装货地id
      */
-    private SiteVo loadSiteId;
+    private ShowSiteDto loadSite;
+
+    /**
+     * 部门id
+     */
+    private Integer departmentId;
+
+    /**
+     * 部门名称
+     */
+    private String departmentName;
 
     /**
      * 要求装货时间
@@ -73,21 +80,21 @@ public class OrderVo implements Serializable {
     /**
      * 创建人
      */
-    private UserVo createdUser;
+    private ShowUserDto createdUserId;
 
     /**
-     * 修改时间
+     * 计划派单
      */
-    private Date modifyTime;
+    private Integer waybillCount;
 
     /**
-     * 修改人id
+     * 已派单
      */
-    private UserVo modifyUser;
+    private Integer waybillAlready;
 
     /**
-     * 订单列表
+     * 待派单
      */
-    private List<OrderItemsVo> orderItems;
+    private Integer waybillWait;
 
 }

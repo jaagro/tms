@@ -1,5 +1,8 @@
-package com.jaagro.tms.web.vo.order;
+package com.jaagro.tms.web.vo.pc;
 
+import com.jaagro.tms.api.dto.base.ShowUserDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.order.GetOrderGoodsDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -9,11 +12,10 @@ import java.util.List;
 
 /**
  * @author baiyiran
- * @Date 2018/10/22
  */
 @Data
 @Accessors(chain = true)
-public class OrderItemsVo implements Serializable {
+public class ListOrderItemsVo implements Serializable {
 
     /**
      *
@@ -28,7 +30,7 @@ public class OrderItemsVo implements Serializable {
     /**
      * 卸货地id
      */
-    private SiteVo unload;
+    private ShowSiteDto unload;
 
     /**
      * 要求卸货时间
@@ -48,11 +50,10 @@ public class OrderItemsVo implements Serializable {
     /**
      * 修改人id
      */
-    private UserVo modifyUserId;
+    private ShowUserDto modifyUserId;
 
     /**
      * 货物列表
      */
-    private List<OrderGoodsVo> goods;
-
+    private List<GetOrderGoodsDto> goods;
 }

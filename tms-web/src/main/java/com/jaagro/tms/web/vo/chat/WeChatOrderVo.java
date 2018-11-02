@@ -1,6 +1,5 @@
 package com.jaagro.tms.web.vo.chat;
 
-import com.jaagro.tms.web.vo.order.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
