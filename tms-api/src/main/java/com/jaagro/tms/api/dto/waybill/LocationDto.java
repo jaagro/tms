@@ -14,7 +14,7 @@ import java.util.Date;
 @Accessors(chain = true)
 public class LocationDto implements Serializable {
     /**
-     * 
+     *
      */
     private Integer id;
 
@@ -78,11 +78,5 @@ public class LocationDto implements Serializable {
      */
     private Date createTime;
 
-    /**
-     * 
-     * @return id 
-     */
-    public Integer getId() {
-        return id;
-    }
+
 }

@@ -1,6 +1,7 @@
 package com.jaagro.tms.biz.service.impl;
 
 import com.jaagro.tms.api.dto.waybill.LocationDto;
+import com.jaagro.tms.api.dto.waybill.ShowLocationDto;
 import com.jaagro.tms.api.service.LocationService;
 import com.jaagro.tms.biz.mapper.LocationMapperExt;
 import lombok.extern.log4j.Log4j;
@@ -24,10 +25,25 @@ public class LocationServiceImpl implements LocationService {
      */
     @Override
     public int insertBatch(List<LocationDto> locationList) {
-        long start = System.currentTimeMillis();
+
         int count = locationMapper.insertBatch(locationList);
-        long end = System.currentTimeMillis();
-        log.info("-----耗时----------" + (start - end) + "---------------");
+
         return count;
     }
+
+    /**
+     * 根据运单Id查询轨迹
+     *
+     * @param waybillId
+     * @return
+     */
+    @Override
+    public List<ShowLocationDto> locationsByWaybillId(Integer waybillId) {
+
+
+        return locationMapper.listLocationsByWaybillId(waybillId);
+
+    }
+
+
 }

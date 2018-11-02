@@ -81,6 +81,7 @@ public class WaybillServiceImpl implements WaybillService {
     private SmsClientService smsClientService;
     @Autowired
     private UserClientService userClientService;
+
     /**
      * @param waybillDtoList
      * @return
@@ -1088,7 +1089,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-            ) {
+                    ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1119,23 +1120,22 @@ public class WaybillServiceImpl implements WaybillService {
 
     /**
      * 撤回待接单的运单
-     * @Author gavin
+     *
      * @param waybillId
      * @return
+     * @Author gavin
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean withdrawWaybill(Integer waybillId) {
-        if(null==waybillId)
-        {
+        if (null == waybillId) {
             throw new NullPointerException("运单Id不能为空");
         }
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
-        if(null==waybill)
-        {
+        if (null == waybill) {
             throw new NullPointerException("运单不存在");
         }
-        if(!WaybillStatus.RECEIVE.equals(waybill.getWaybillStatus())){
+        if (!WaybillStatus.RECEIVE.equals(waybill.getWaybillStatus())) {
             throw new RuntimeException("只有待接单的运单才可以撤回以便重新派单");
         }
         try {
@@ -1155,13 +1155,14 @@ public class WaybillServiceImpl implements WaybillService {
             }
             List<Integer> driverIds = new ArrayList<Integer>(driverIdSet);
             messageMapper.deleteMessage(waybillId, driverIds);
-        }catch(Exception ex ){
-            log.error("删除司机短信失败,运单id:{},原因{}",waybillId,ex.getMessage());
+        } catch (Exception ex) {
+            log.error("删除司机短信失败,运单id:{},原因{}", waybillId, ex.getMessage());
             throw ex;
         }
 
         return true;
     }
+
     private Integer getUserId() {
         UserInfo userInfo = null;
         try {
