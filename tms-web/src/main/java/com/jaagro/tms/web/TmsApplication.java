@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EnableScheduling
 @EnableAsync
+@EnableCaching
 public class TmsApplication {
     public static void main(String[] args) {
         SpringApplication.run(TmsApplication.class, args);
