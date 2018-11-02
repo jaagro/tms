@@ -22,6 +22,36 @@ public class SiteVo implements Serializable {
     private String siteName;
 
     /**
+     * 联系人姓名
+     */
+    private String contact;
+
+    /**
+     * 联系电话
+     */
+    private String phone;
+
+    /**
+     * 省份
+     */
+    private String province;
+
+    /**
+     * 城市
+     */
+    private String city;
+
+    /**
+     * 区
+     */
+    private String county;
+
+    /**
+     * 详细地址
+     */
+    private String address;
+
+    /**
      * 装货信息 提货要求时间
      */
     private Date loadTime;
