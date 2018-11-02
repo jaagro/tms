@@ -10,6 +10,8 @@ import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
+import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
+import com.jaagro.tms.api.dto.receipt.UpdateWaybillgoodsDto;
 import com.jaagro.tms.api.dto.truck.DriverReturnDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
@@ -1162,6 +1164,119 @@ public class WaybillServiceImpl implements WaybillService {
 
         return true;
     }
+
+    /**
+     * 回单修改运单货物信息新增运单轨迹(回单补录)
+     *
+     * @param updateWaybillGoodsReceiptDto
+     * @return
+     * @author yj
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateWaybillGoodsReceipt(UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto) {
+        // 更新运单货物
+        // 更新运单卸货地
+        List<UpdateWaybillgoodsDto> updateWaybillgoodsDtoList = updateWaybillGoodsReceiptDto.getUpdateWaybillgoodsDtoList();
+        Integer waybillId = null;
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        Integer currentUserId = currentUser == null ? null : currentUser.getId();
+        if (!CollectionUtils.isEmpty(updateWaybillgoodsDtoList)){
+            List<WaybillGoods> waybillGoodsList = new ArrayList<WaybillGoods>();
+            List<WaybillItems> waybillItemsList = new ArrayList<WaybillItems>();
+            for (UpdateWaybillgoodsDto waybillgoodsDto : updateWaybillgoodsDtoList){
+                waybillId = waybillgoodsDto.getWaybillId();
+                WaybillGoods waybillGoods = new WaybillGoods();
+                BeanUtils.copyProperties(waybillgoodsDto,waybillGoods);
+                waybillGoods
+                        .setModifyTime(new Date())
+                        .setModifyUserId(currentUserId);
+                waybillGoodsList.add(waybillGoods);
+                WaybillItems waybillItems = new WaybillItems();
+                waybillItems
+                        .setId(waybillgoodsDto.getId())
+                        .setUnloadSiteId(waybillgoodsDto.getUnloadSiteId())
+                        .setModifyTime(new Date())
+                        .setModifyUserId(currentUserId);
+                waybillItemsList.add(waybillItems);
+            }
+            Integer updateWaybillGoodsNum =  waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
+            if (waybillGoodsList.size() != updateWaybillGoodsNum){
+                throw new RuntimeException("更新回单运单货物失败");
+            }
+            Integer updateWaybillItemsNum =  waybillItemsMapper.batchUpdateByPrimaryKeySelective(waybillItemsList);
+            if (waybillItemsList.size() != updateWaybillItemsNum){
+                throw new RuntimeException("更新回单运单卸货地失败");
+            }
+        }
+        // 插入运单轨迹
+        WaybillTracking waybillTracking = new WaybillTracking();
+        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybillId);
+        if (!CollectionUtils.isEmpty(showTrackingDtos)){
+            ShowTrackingDto showTrackingDto = showTrackingDtos.get(0);
+            waybillTracking
+                    .setOldStatus(showTrackingDto.getOldStatus())
+                    .setNewStatus(showTrackingDto.getNewStatus());
+        }
+        waybillTracking
+                .setCreateTime(new Date())
+                .setWaybillId(waybillId)
+                .setTrackingInfo(updateWaybillGoodsReceiptDto.getReason())
+                .setReferUserId(currentUserId)
+                .setTrackingType(TrackingType.RECEIPT);
+        int waybillTrackingId = waybillTrackingMapper.insertSelective(waybillTracking);
+        if (waybillTrackingId <= 0){
+            throw new RuntimeException("插入运单轨迹(回单补录)失败");
+        }
+        return true;
+    }
+
+    /**
+     * 上传回单图片
+     *
+     * @param waybillId
+     * @param imageUrl
+     * @return
+     * @author yj
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean uploadReceiptImage(Integer waybillId, String imageUrl) {
+        WaybillTracking waybillTracking = new WaybillTracking();
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        Integer currentUserId = currentUser == null ? null : currentUser.getId();
+        List<ShowTrackingDto> waybillTrackingList = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybillId);
+        if (!CollectionUtils.isEmpty(waybillTrackingList)){
+            ShowTrackingDto showTrackingDto = waybillTrackingList.get(0);
+            waybillTracking
+                    .setOldStatus(showTrackingDto.getOldStatus())
+                    .setNewStatus(showTrackingDto.getNewStatus());
+        }
+        waybillTracking
+                .setTrackingType(TrackingType.RECEIPT)
+                .setReferUserId(currentUserId)
+                .setTrackingInfo("回单补传单据")
+                .setWaybillId(waybillId)
+                .setCreateTime(new Date());
+        int waybillTrackingId = waybillTrackingMapper.insertSelective(waybillTracking);
+        if (waybillId < 1){
+            throw new RuntimeException("插入运单轨迹(回单补传单据)失败");
+        }
+        WaybillTrackingImages trackingImages = new WaybillTrackingImages();
+        trackingImages
+                .setWaybillTrackingId(waybillTrackingId)
+                .setImageUrl(imageUrl)
+                .setImageType(ImagesTypeConstant.RECEIPT_BILL)
+                .setCreateUserId(currentUserId)
+                .setCreateTime(new Date())
+                .setWaybillId(waybillId);
+        int trackingImagesId = waybillTrackingImagesMapper.insertSelective(trackingImages);
+        if (trackingImagesId < 1){
+            throw new RuntimeException("插入运单轨迹图片(回单补传单据)失败");
+        }
+        return true;
+    }
+
     private Integer getUserId() {
         UserInfo userInfo = null;
         try {
@@ -1177,4 +1292,5 @@ public class WaybillServiceImpl implements WaybillService {
             return userInfo.getId();
         }
     }
+
 }

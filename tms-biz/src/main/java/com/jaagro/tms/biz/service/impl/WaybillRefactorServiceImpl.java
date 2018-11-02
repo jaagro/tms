@@ -3,12 +3,16 @@ package com.jaagro.tms.biz.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.constant.TrackingType;
+import com.jaagro.tms.api.constant.UserType;
 import com.jaagro.tms.api.constant.WaybillConstant;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.driverapp.*;
+import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
+import com.jaagro.tms.api.dto.receipt.UpdateWaybillgoodsDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
@@ -20,10 +24,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,6 +67,8 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     private DriverClientService driverClientService;
     @Autowired
     private TruckClientService truckClientService;
+    @Autowired
+    private UserClientService userClientService;
 
     /**
      * 根据状态查询我的运单信息
@@ -226,7 +236,8 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             BeanUtils.copyProperties(showTrackingDto, getTrackingDto);
             getTrackingDtos.add(getTrackingDto);
         }
-
+        //设置轨迹上传人信息
+        putTrackingUserInfo(getTrackingDtos);
         //根据waybillId获取所有的轨迹上传上来的图片WaybillTrackingImages
         WaybillTrackingImages record = new WaybillTrackingImages();
         record.setWaybillId(waybill.getId());
@@ -238,7 +249,8 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             BeanUtils.copyProperties(getWaybillTrackingImagesDto, getTrackingImagesDto);
             getTrackingImagesDtos.add(getTrackingImagesDto);
         }
-
+        //设置轨迹图片上传人信息
+        putTrackingImagesUserInfo(getTrackingImagesDtos);
         //把图片塞进对应的轨迹中
         for (GetTrackingDto getTrackingDto : getTrackingDtos) {
             List<GetTrackingImagesDto> imageList = getTrackingImagesDtos.stream().filter(c -> c.getWaybillTrackingId().equals(getTrackingDto.getId())).collect(Collectors.toList());
@@ -257,6 +269,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 .setGoodType(ordersData.getGoodsType());
         return getWaybillDto;
     }
+
 
     /**
      *
@@ -285,8 +298,85 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             getWaybillItemsDto.setGoods(getWaybillGoodsDtoList);
             getWaybillItemsDtoList.add(getWaybillItemsDto);
         }
-
         return getWaybillItemsDtoList;
     }
 
+    private void putTrackingUserInfo(List<GetTrackingDto> getTrackingDtos) {
+        //将轨迹分为司机上传和调度上传两组
+        if (!CollectionUtils.isEmpty(getTrackingDtos)){
+            List<Integer> driverIdList = new ArrayList<Integer>();
+            List<Integer> employeeIdList = new ArrayList<Integer>();
+            for (GetTrackingDto getTrackingDto : getTrackingDtos){
+                if (getTrackingDto.getTrackingType() == 1){
+                    driverIdList.add(getTrackingDto.getDriverId());
+                }else{
+                    employeeIdList.add(getTrackingDto.getReferUserId());
+                }
+            }
+            if (!CollectionUtils.isEmpty(driverIdList)){
+                List<UserInfo> driverList = userClientService.listUserInfo(driverIdList, UserType.DRIVER);
+                if (!CollectionUtils.isEmpty(driverList)){
+                    for (GetTrackingDto getTrackingDto : getTrackingDtos){
+                        for (UserInfo userInfo : driverList){
+                            if (getTrackingDto.getTrackingType() == 1 && userInfo.getId().equals(getTrackingDto.getDriverId())){
+                                getTrackingDto.setUserInfo(userInfo);
+                            }
+                        }
+                    }
+                }
+            }
+            if (!CollectionUtils.isEmpty(employeeIdList)){
+                List<UserInfo> employeeList = userClientService.listUserInfo(employeeIdList, UserType.EMPLOYEE);
+                if (!CollectionUtils.isEmpty(employeeList)){
+                    for (GetTrackingDto getTrackingDto : getTrackingDtos){
+                        for (UserInfo userInfo : employeeList){
+                            if (getTrackingDto.getTrackingType() == 2 && userInfo.getId().equals(getTrackingDto.getReferUserId())){
+                                getTrackingDto.setUserInfo(userInfo);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    private void putTrackingImagesUserInfo(List<GetTrackingImagesDto> getTrackingImagesDtos) {
+        //将轨迹图片分为司机上传和调度上传两组
+        if (!CollectionUtils.isEmpty(getTrackingImagesDtos)){
+            List<Integer> driverIdList = new ArrayList<Integer>();
+            List<Integer> employeeIdList = new ArrayList<Integer>();
+            for (GetTrackingImagesDto imagesDto : getTrackingImagesDtos){
+                if (imagesDto.getImageType() != 3){
+                    driverIdList.add(imagesDto.getCreateUserId());
+                }else{
+                    employeeIdList.add(imagesDto.getCreateUserId());
+                }
+            }
+            if (!CollectionUtils.isEmpty(driverIdList)){
+                List<UserInfo> driverList = userClientService.listUserInfo(driverIdList, UserType.DRIVER);
+                if (!CollectionUtils.isEmpty(driverList)){
+                    for (GetTrackingImagesDto imagesDto : getTrackingImagesDtos){
+                        for (UserInfo userInfo : driverList){
+                            if (imagesDto.getImageType() != 3 && userInfo.getId().equals(imagesDto.getCreateUserId())){
+                                imagesDto.setUserInfo(userInfo);
+                            }
+                        }
+                    }
+                }
+            }
+            if (!CollectionUtils.isEmpty(employeeIdList)){
+                List<UserInfo> employeeList = userClientService.listUserInfo(employeeIdList, UserType.EMPLOYEE);
+                if (!CollectionUtils.isEmpty(employeeList)){
+                    for (GetTrackingImagesDto imagesDto : getTrackingImagesDtos){
+                        for (UserInfo userInfo : employeeList){
+                            if (imagesDto.getImageType() == 3 && userInfo.getId().equals(imagesDto.getCreateUserId())){
+                                imagesDto.setUserInfo(userInfo);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

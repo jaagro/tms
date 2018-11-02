@@ -22,12 +22,13 @@
         where waybill_item_id = #{itemId,jdbcType=INTEGER} and enabled=1
     </select>
 
-    <select id="listGoodsByWaybillId" resultType="com.jaagro.tms.api.dto.waybill.GetWaybillGoodsDto" parameterType="java.lang.Integer">
-    select
-    <include refid="Base_Column_List"/>
-    from waybill_goods
-    where waybill_id = #{waybillId} and enabled=1
-  </select>
+    <select id="listGoodsByWaybillId" resultType="com.jaagro.tms.api.dto.waybill.GetWaybillGoodsDto"
+            parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill_goods
+        where waybill_id = #{waybillId} and enabled=1
+    </select>
 
     <select id="listWaybillGoodsByWaybillItemId" resultMap="DetailInfo" parameterType="java.lang.Integer">
     select id,goods_name,goods_unit,goods_quantity,goods_weight,load_quantity,load_weight,unload_quantity,unload_weight,join_drug
@@ -35,4 +36,118 @@
     where waybill_item_id = #{id,jdbcType=INTEGER} and enabled=1
   </select>
 
+    <update id="batchUpdateByPrimaryKeySelective" parameterType="list">
+        update waybill_goods
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="waybill_id =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.waybillId!=null">
+                        when id=#{i.waybill_id} then #{i.waybillId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix=" waybill_item_id =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.waybillItemId!=null">
+                        when id=#{i.waybill_item_id} then #{i.waybillItemId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="goods_name =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.goodsName!=null">
+                        when id=#{i.goods_name} then #{i.goodsName}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="goods_unit =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.goodsUnit!=null">
+                        when id=#{i.goods_unit} then #{i.goodsUnit}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="goods_quantity =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.goodsQuantity!=null">
+                        when id=#{i.goods_quantity} then #{i.goodsQuantity}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="goods_weight =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.goodsWeight!=null">
+                        when id=#{i.goods_weight} then #{i.goodsWeight}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="load_quantity =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.loadQuantity!=null">
+                        when id=#{i.load_quantity} then #{i.loadQuantity}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="load_weight =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.loadWeight!=null">
+                        when id=#{i.load_weight} then #{i.loadWeight}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="unload_quantity =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.unloadQuantity!=null">
+                        when id=#{i.unload_quantity} then #{i.unloadQuantity}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="unload_weight =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.unloadWeight!=null">
+                        when id=#{i.unload_weight} then #{i.unloadWeight}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="join_drug =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.joinDrug!=null">
+                        when id=#{i.join_drug} then #{i.joinDrug}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="enabled =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.enabled!=null">
+                        when id=#{i.enabled} then #{i.enabled}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="modify_time =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.modifyTime!=null">
+                        when id=#{i.modify_time} then #{i.modifyTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="modify_user_id =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.modifyUserId!=null">
+                        when id=#{i.modify_user_id} then #{i.modifyUserId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="order_goods_id =case" suffix="end,">
+                <foreach collection="waybillGoodsList" item="i" index="index">
+                    <if test="i.orderGoodsId!=null">
+                        when id=#{i.order_goods_id} then #{i.orderGoodsId}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="waybillGoodsList" separator="," item="i" index="index" close=")" open="(">
+            #{i.id}
+        </foreach>
+    </update>
 </mapper>

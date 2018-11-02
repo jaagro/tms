@@ -1,4 +1,4 @@
-package com.jaagro.user.api.constant;
+package com.jaagro.tms.api.constant;
 
 /**
  * @author tony
