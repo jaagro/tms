@@ -53,6 +53,6 @@ public class ListOrderItemsVo implements Serializable {
     /**
      * 货物列表
      */
-    private List<OrderGoodsVo> goods;
+    private List<GetOrderGoodsVo> goods;
 
 }

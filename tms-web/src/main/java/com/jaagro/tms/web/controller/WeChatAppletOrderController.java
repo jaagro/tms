@@ -158,10 +158,10 @@ public class WeChatAppletOrderController {
                          * 替换订单需求明细Dto为Vo
                          */
                         List<GetOrderGoodsDto> goodsDtoList = itemsDto.getOrderGoodsDtoList();
-                        List<OrderGoodsVo> goodsVoList = new ArrayList<>();
+                        List<GetOrderGoodsVo> goodsVoList = new ArrayList<>();
                         if (goodsDtoList.size() > 0) {
                             for (GetOrderGoodsDto goodsDto : goodsDtoList) {
-                                OrderGoodsVo goodsVo = new OrderGoodsVo();
+                                GetOrderGoodsVo goodsVo = new GetOrderGoodsVo();
                                 BeanUtils.copyProperties(goodsDto, goodsVo);
                                 goodsVoList.add(goodsVo);
                             }
