@@ -337,23 +337,20 @@ public class OrderController {
             for (ListOrderDto orderDto : orderDtoList) {
                 ListOrderVo orderVo = new ListOrderVo();
                 BeanUtils.copyProperties(orderDto, orderVo);
-                //循环拷贝Orders下的各个对象
-                /*Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
-                BeanUtils.copyProperties(order, orderDto);
-                orderDto
-                        .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
-                        .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
-                        .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
+                orderVo
+                        .setCustomerId(this.customerService.getShowCustomerById(orderDto.getCustomerId()))
+                        .setCustomerContract(this.customerService.getShowCustomerContractById(orderDto.getCustomerContractId()))
+                        .setLoadSite(this.customerService.getShowSiteById(orderDto.getLoadSiteId()));
                 //归属网点名称
-                ShowSiteDto showSiteDto = this.customerService.getShowSiteById(order.getLoadSiteId());
-                orderDto.setDepartmentName(this.userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                ShowSiteDto showSiteDto = this.customerService.getShowSiteById(orderDto.getLoadSiteId());
+                orderVo.setDepartmentName(this.userClientService.getDeptNameById(showSiteDto.getDeptId()));
                 //创单人
-                UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
+                UserInfo userInfo = this.authClientService.getUserInfoById(orderDto.getCreatedUserId(), "employee");
                 if (userInfo != null) {
                     ShowUserDto userDto = new ShowUserDto();
                     userDto.setUserName(userInfo.getName());
-                    orderDto.setCreatedUserId(userDto);
-                }*/
+                    orderVo.setCreatedUserId(userDto);
+                }
                 /**
                  * 替换订单需求Dto为Vo
                  */
