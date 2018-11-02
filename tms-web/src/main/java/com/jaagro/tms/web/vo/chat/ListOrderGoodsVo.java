@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class GetOrderGoodsVo implements Serializable {
+public class ListOrderGoodsVo implements Serializable {
 
     /**
      *
