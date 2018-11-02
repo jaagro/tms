@@ -1184,8 +1184,14 @@ public class WaybillServiceImpl implements WaybillService {
         if (!CollectionUtils.isEmpty(updateWaybillgoodsDtoList)){
             List<WaybillGoods> waybillGoodsList = new ArrayList<WaybillGoods>();
             List<WaybillItems> waybillItemsList = new ArrayList<WaybillItems>();
+            Set<Integer> waybillItemsIdSet = new HashSet<Integer>();
             for (UpdateWaybillgoodsDto waybillgoodsDto : updateWaybillgoodsDtoList){
+                waybillItemsIdSet.add(waybillgoodsDto.getWaybillItemId());
                 waybillId = waybillgoodsDto.getWaybillId();
+                Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+                if(waybill == null || !WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())){
+                    throw new RuntimeException("运单id="+waybillId+"不存在");
+                }
                 WaybillGoods waybillGoods = new WaybillGoods();
                 BeanUtils.copyProperties(waybillgoodsDto,waybillGoods);
                 waybillGoods
@@ -1194,7 +1200,7 @@ public class WaybillServiceImpl implements WaybillService {
                 waybillGoodsList.add(waybillGoods);
                 WaybillItems waybillItems = new WaybillItems();
                 waybillItems
-                        .setId(waybillgoodsDto.getId())
+                        .setId(waybillgoodsDto.getWaybillItemId())
                         .setUnloadSiteId(waybillgoodsDto.getUnloadSiteId())
                         .setModifyTime(new Date())
                         .setModifyUserId(currentUserId);
@@ -1205,13 +1211,13 @@ public class WaybillServiceImpl implements WaybillService {
                 throw new RuntimeException("更新回单运单货物失败");
             }
             Integer updateWaybillItemsNum =  waybillItemsMapper.batchUpdateByPrimaryKeySelective(waybillItemsList);
-            if (waybillItemsList.size() != updateWaybillItemsNum){
+            if (waybillItemsIdSet.size() != updateWaybillItemsNum){
                 throw new RuntimeException("更新回单运单卸货地失败");
             }
         }
         // 插入运单轨迹
         WaybillTracking waybillTracking = new WaybillTracking();
-        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybillId);
+        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybillId);
         if (!CollectionUtils.isEmpty(showTrackingDtos)){
             ShowTrackingDto showTrackingDto = showTrackingDtos.get(0);
             waybillTracking
@@ -1258,20 +1264,20 @@ public class WaybillServiceImpl implements WaybillService {
                 .setTrackingInfo("回单补传单据")
                 .setWaybillId(waybillId)
                 .setCreateTime(new Date());
-        int waybillTrackingId = waybillTrackingMapper.insertSelective(waybillTracking);
-        if (waybillId < 1){
+        int count = waybillTrackingMapper.insertSelective(waybillTracking);
+        if (count < 1){
             throw new RuntimeException("插入运单轨迹(回单补传单据)失败");
         }
         WaybillTrackingImages trackingImages = new WaybillTrackingImages();
         trackingImages
-                .setWaybillTrackingId(waybillTrackingId)
+                .setWaybillTrackingId(waybillTracking.getId())
                 .setImageUrl(imageUrl)
                 .setImageType(ImagesTypeConstant.RECEIPT_BILL)
                 .setCreateUserId(currentUserId)
                 .setCreateTime(new Date())
                 .setWaybillId(waybillId);
-        int trackingImagesId = waybillTrackingImagesMapper.insertSelective(trackingImages);
-        if (trackingImagesId < 1){
+        count = waybillTrackingImagesMapper.insertSelective(trackingImages);
+        if (count < 1){
             throw new RuntimeException("插入运单轨迹图片(回单补传单据)失败");
         }
         return true;

@@ -1,16 +1,20 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
+import com.jaagro.tms.biz.entity.Waybill;
+import com.jaagro.tms.biz.mapper.WaybillMapperExt;
 import com.jaagro.tms.web.vo.receipt.WayBillReceiptsVo;
 import com.jaagro.tms.web.vo.receipt.WayBillTrackingVo;
 import com.jaagro.tms.web.vo.receipt.WaybillGoodsVo;
 import com.jaagro.tms.web.vo.receipt.WaybillTrackingImagesVo;
 import com.jaagro.utils.BaseResponse;
+import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +22,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -36,9 +41,19 @@ public class ReceiptController {
     private WaybillRefactorService waybillRefactorService;
     @Autowired
     private WaybillService waybillService;
+    @Autowired
+    private WaybillMapperExt waybillMapperExt;
+    private static final String RECEIPT_TRACKING_IMAGE_INFO = "回单补传单据";
     @GetMapping("/getReceiptWaybillDetailById/{id}")
     @ApiOperation("获取回单运单详情")
     public BaseResponse getReceiptWaybillDetailById(@PathVariable("id") Integer id){
+        Waybill waybill = waybillMapperExt.selectByPrimaryKey(id);
+        if (waybill == null){
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(),"运单id="+id+"不存在");
+        }
+        if (!WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())){
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(),"运单未完成");
+        }
         GetWaybillDetailDto waybillDetailDto = waybillRefactorService.getWaybillDetailById(id);
         if (waybillDetailDto == null){
             return BaseResponse.errorInstance("回单运单详情为空");
@@ -49,7 +64,7 @@ public class ReceiptController {
 
     @PutMapping("/updateWaybillGoodsReceipt")
     @ApiOperation("回单修改运单货物信息")
-    public BaseResponse updateWaybillGoodsReceipt(@RequestBody UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto){
+    public BaseResponse updateWaybillGoodsReceipt(@RequestBody @Validated UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto){
         log.debug("updateWaybillGoodsReceipt,{}",updateWaybillGoodsReceiptDto);
         boolean success = waybillService.updateWaybillGoodsReceipt(updateWaybillGoodsReceiptDto);
         if (success){
@@ -60,7 +75,7 @@ public class ReceiptController {
 
     @PostMapping("/uploadReceiptImage")
     @ApiOperation("补传单据")
-    public BaseResponse uploadReceiptImage(@Param("waybillId") Integer waybillId,@Param("imageUrl") String imageUrl){
+    public BaseResponse uploadReceiptImage(@RequestParam ("waybillId") Integer waybillId,@RequestParam ("imageUrl") String imageUrl){
         boolean success = waybillService.uploadReceiptImage(waybillId,imageUrl);
         if (success){
             return BaseResponse.successInstance("补传单据成功");
@@ -110,7 +125,7 @@ public class ReceiptController {
         if (!CollectionUtils.isEmpty(trackingDtoList)){
             List<WayBillTrackingVo> wayBillTrackingVoList = new ArrayList<WayBillTrackingVo>();
             for (GetTrackingDto trackingDto : trackingDtoList){
-                if (trackingDto.getTrackingType() == 2){
+                if (trackingDto.getTrackingType() == 2 && !RECEIPT_TRACKING_IMAGE_INFO.equals(trackingDto.getTrackingInfo())){
                     WayBillTrackingVo trackingVo = new WayBillTrackingVo();
                     UserInfo userInfo = trackingDto.getUserInfo();
                     trackingVo

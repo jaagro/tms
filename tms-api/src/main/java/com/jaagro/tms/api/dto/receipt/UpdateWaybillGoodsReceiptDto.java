@@ -19,7 +19,7 @@ public class UpdateWaybillGoodsReceiptDto implements Serializable{
     /**
      * 运单货物列表
      */
-    @NotEmpty(message = "updateWaybillgoodsDtoList.NotEmpty")
+    @NotEmpty(message = "{updateWaybillgoodsDtoList.NotEmpty}")
     private List<UpdateWaybillgoodsDto> updateWaybillgoodsDtoList;
     /**
      * 补录原因

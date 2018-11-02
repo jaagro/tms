@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -69,7 +70,8 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     private TruckClientService truckClientService;
     @Autowired
     private UserClientService userClientService;
-
+    @Autowired
+    private OssSignUrlClientService ossSignUrlClientService;
     /**
      * 根据状态查询我的运单信息
      * @Author @Gao.
@@ -247,6 +249,9 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         for (GetWaybillTrackingImagesDto getWaybillTrackingImagesDto : getWaybillTrackingImagesDtos) {
             GetTrackingImagesDto getTrackingImagesDto = new GetTrackingImagesDto();
             BeanUtils.copyProperties(getWaybillTrackingImagesDto, getTrackingImagesDto);
+            String[] strArray = {getTrackingImagesDto.getImageUrl()};
+            List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
+            getTrackingImagesDto.setImageUrl(urls.get(0).toString());
             getTrackingImagesDtos.add(getTrackingImagesDto);
         }
         //设置轨迹图片上传人信息
