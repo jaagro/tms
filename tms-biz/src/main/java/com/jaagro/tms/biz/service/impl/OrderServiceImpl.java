@@ -21,6 +21,9 @@ import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -30,6 +33,7 @@ import java.util.*;
 /**
  * @author tony
  */
+@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "order")
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -60,6 +64,7 @@ public class OrderServiceImpl implements OrderService {
      * @param orderDto 入参json
      * @return
      */
+    @CacheEvict(cacheNames = "order", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createOrder(CreateOrderDto orderDto) {
@@ -88,6 +93,7 @@ public class OrderServiceImpl implements OrderService {
      * @param orderDto 入参json
      * @return 修改后的order对象
      */
+    @CacheEvict(cacheNames = "order", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public GetOrderDto updateOrder(UpdateOrderDto orderDto) {
@@ -134,6 +140,7 @@ public class OrderServiceImpl implements OrderService {
      * @param id 订单id
      * @return order对象
      */
+    @Cacheable
     @Override
     public GetOrderDto getOrderById(Integer id) {
         Orders order = this.ordersMapper.selectByPrimaryKey(id);
@@ -164,47 +171,17 @@ public class OrderServiceImpl implements OrderService {
      * @return 订单列表
      */
     @Override
-    public Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
+    public PageInfo listOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
-        List<Integer> departIds = userClientService.getDownDepartment();
-        List<Integer> dids = new ArrayList<>(departIds);
-        if (dids.size() != 0) {
-            criteriaDto.setDepartIds(dids);
-        }
         List<ListOrderDto> orderDtos = this.ordersMapper.listOrdersByCriteria(criteriaDto);
-        if (orderDtos != null && orderDtos.size() > 0) {
+        if (orderDtos.size() > 0) {
+            //填充订单详情
             for (ListOrderDto orderDto : orderDtos) {
-                Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
-                BeanUtils.copyProperties(order, orderDto);
-                orderDto
-                        .setCustomerId(this.customerService.getShowCustomerById(order.getCustomerId()))
-                        .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
-                        .setLoadSite(this.customerService.getShowSiteById(order.getLoadSiteId()));
-                //归属网点名称
-                ShowSiteDto showSiteDto = this.customerService.getShowSiteById(order.getLoadSiteId());
-                orderDto.setDepartmentName(this.userClientService.getDeptNameById(showSiteDto.getDeptId()));
-                //创单人
-                UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
-                if (userInfo != null) {
-                    ShowUserDto userDto = new ShowUserDto();
-                    userDto.setUserName(userInfo.getName());
-                    orderDto.setCreatedUserId(userDto);
-                }
-                //派单进度
-                List<Waybill> waybills = waybillMapper.listWaybillByOrderId(orderDto.getId());
-                if (waybills.size() > 0) {
-                    orderDto.setWaybillCount(waybills.size());
-                    //已派单
-                    List<Waybill> waitWaybills = waybillMapper.listWaybillWaitByOrderId(orderDto.getId());
-                    if (waitWaybills.size() > 0) {
-                        orderDto.setWaybillAlready(waitWaybills.size());
-                        orderDto.setWaybillWait(orderDto.getWaybillCount() - orderDto.getWaybillAlready());
-                    }
-                }
-
+                List<ListOrderItemsDto> itemsDtoList = orderItemsService.listItemsByOrderId(orderDto.getId());
+                orderDto.setOrderItemsDtoList(itemsDtoList);
             }
         }
-        return ServiceResult.toResult(new PageInfo<>(orderDtos));
+        return new PageInfo(orderDtos);
     }
 
     /**
@@ -213,6 +190,7 @@ public class OrderServiceImpl implements OrderService {
      * @param id 订单id
      * @return
      */
+    @CacheEvict(cacheNames = "order", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> deleteOrderById(Integer id) {
@@ -229,6 +207,7 @@ public class OrderServiceImpl implements OrderService {
         return ServiceResult.toResult("删除成功");
     }
 
+    @CacheEvict(cacheNames = "order", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> cancelOrders(Integer orderId, String detailInfo) {
@@ -263,6 +242,7 @@ public class OrderServiceImpl implements OrderService {
      * @param customerId
      * @return
      */
+    @Cacheable
     @Override
     public List<Integer> getOrderIdsByCustomerId(Integer customerId) {
         return this.ordersMapper.getOrderIdsByCustomerId(customerId);

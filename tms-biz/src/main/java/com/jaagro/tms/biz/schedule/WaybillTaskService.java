@@ -26,7 +26,7 @@ public class WaybillTaskService {
     /**
      * 超过30分钟未接的运单修改为被司机拒绝以便重新派单,10分钟跑一次
      */
-    @Scheduled(cron="0 0/10 * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     public void waybillDefaultRejectBySystem() {
 
         try {

@@ -1,6 +1,10 @@
 package com.jaagro.tms.api.service;
 
-import com.jaagro.tms.api.dto.order.*;
+import com.github.pagehelper.PageInfo;
+import com.jaagro.tms.api.dto.order.CreateOrderDto;
+import com.jaagro.tms.api.dto.order.GetOrderDto;
+import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
+import com.jaagro.tms.api.dto.order.UpdateOrderDto;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +44,7 @@ public interface OrderService {
      * @param criteriaDto 查询条件 json
      * @return 订单列表
      */
-    Map<String, Object> listOrderByCriteria(ListOrderCriteriaDto criteriaDto);
+    PageInfo listOrderByCriteria(ListOrderCriteriaDto criteriaDto);
 
     /**
      * 【逻辑】删除订单

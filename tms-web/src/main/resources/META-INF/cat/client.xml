@@ -1,0 +1,6 @@
+<config mode="client">
+    <domain id="tms" />
+    <servers>
+        <server ip="172.16.31.153" port="2280" http-port="8080"></server>
+    </servers>
+</config>

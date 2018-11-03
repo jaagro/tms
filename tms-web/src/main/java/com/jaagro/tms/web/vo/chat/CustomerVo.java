@@ -1,4 +1,4 @@
-package com.jaagro.tms.web.vo.order;
+package com.jaagro.tms.web.vo.chat;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

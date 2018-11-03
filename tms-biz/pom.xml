@@ -69,6 +69,13 @@
             <!--<artifactId>spring-boot-starter-amqp</artifactId>-->
         <!--</dependency>-->
 
+        <!-- cat监控 -->
+        <dependency>
+            <groupId>com.dianping.cat</groupId>
+            <artifactId>cat-client</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
         <!-- =======================================jdbc======================================= -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -92,6 +99,12 @@
             <groupId>org.mybatis.generator</groupId>
             <artifactId>mybatis-generator-core</artifactId>
             <version>1.3.2</version>
+        </dependency>
+
+        <!-- redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
         <!-- ==================================druid数据源======================================= -->
