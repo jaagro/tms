@@ -518,7 +518,7 @@ public class WaybillServiceImpl implements WaybillService {
                     .setNewStatus(WaybillStatus.ARRIVE_LOAD_SITE)
                     .setOldStatus(waybill.getWaybillStatus())
                     .setTrackingInfo("司机【" + currentUser.getName() + "】已出发");
-            waybillTrackingMapper.insert(waybillTracking);
+            waybillTrackingMapper.insertSelective(waybillTracking);
             waybill.setWaybillStatus(WaybillStatus.ARRIVE_LOAD_SITE);
             waybillMapper.updateByPrimaryKey(waybill);
             return ServiceResult.toResult("操作成功");
@@ -529,7 +529,7 @@ public class WaybillServiceImpl implements WaybillService {
                     .setNewStatus(WaybillStatus.LOAD_PRODUCT)
                     .setOldStatus(waybill.getWaybillStatus())
                     .setTrackingInfo("已到达提货地【" + loadSite.getSiteName() + "】");
-            waybillTrackingMapper.insert(waybillTracking);
+            waybillTrackingMapper.insertSelective(waybillTracking);
             waybill.setWaybillStatus(WaybillStatus.LOAD_PRODUCT);
             waybillMapper.updateByPrimaryKey(waybill);
             return ServiceResult.toResult("操作成功");
@@ -541,7 +541,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybillTracking
                     .setNewStatus(WaybillStatus.DELIVERY)
                     .setOldStatus(waybill.getWaybillStatus()).setTrackingInfo("在【" + loadSite.getSiteName() + "】已提货");
-            waybillTrackingMapper.insert(waybillTracking);
+            waybillTrackingMapper.insertSelective(waybillTracking);
             //更新货物信息
             for (ConfirmProductDto confirmProductDto : confirmProductDtosList) {
                 WaybillGoods waybillGoods = new WaybillGoods();
@@ -575,7 +575,7 @@ public class WaybillServiceImpl implements WaybillService {
                         //磅单
                         waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
                     }
-                    waybillTrackingImagesMapper.insert(waybillTrackingImages);
+                    waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
                 }
             }
             waybill.setWaybillStatus(WaybillStatus.DELIVERY);
@@ -588,7 +588,7 @@ public class WaybillServiceImpl implements WaybillService {
                     .setNewStatus(WaybillStatus.SIGN)
                     .setOldStatus(WaybillStatus.DELIVERY)
                     .setTrackingInfo("司机已到达卸货地");
-            waybillTrackingMapper.insert(waybillTracking);
+            waybillTrackingMapper.insertSelective(waybillTracking);
             waybill.setWaybillStatus(WaybillStatus.SIGN);
             waybillMapper.updateByPrimaryKey(waybill);
         }
@@ -613,7 +613,7 @@ public class WaybillServiceImpl implements WaybillService {
                             .setNewStatus(WaybillStatus.DELIVERY)
                             .setTrackingInfo("已签收，签收地为【" + showSiteById.getSiteName() + "】");
                 }
-                waybillTrackingMapper.insert(waybillTracking);
+                waybillTrackingMapper.insertSelective(waybillTracking);
                 //更新卸货物信息
                 for (ConfirmProductDto unLoadSiteconfirmProductDto : unLoadSiteConfirmProductDtos) {
                     WaybillGoods waybillGoods = new WaybillGoods();
@@ -645,7 +645,7 @@ public class WaybillServiceImpl implements WaybillService {
                             //磅单
                             waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
                         }
-                        waybillTrackingImagesMapper.insert(waybillTrackingImages);
+                        waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
                     }
                 }
                 //更新该运单签收
