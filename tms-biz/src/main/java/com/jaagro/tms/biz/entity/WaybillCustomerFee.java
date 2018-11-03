@@ -14,19 +14,24 @@ import java.util.Date;
 @Accessors(chain = true)
 public class WaybillCustomerFee implements Serializable {
     /**
-     * 
+     *
      */
     private Integer id;
 
     /**
-     * 
+     *
      */
     private Integer waybillId;
 
     /**
-     * 
+     *
      */
     private Integer waybillItemId;
+
+    /**
+     *
+     */
+    private Integer anomalyId;
 
     /**
      * 费用类型：1-运费 2-附加费
