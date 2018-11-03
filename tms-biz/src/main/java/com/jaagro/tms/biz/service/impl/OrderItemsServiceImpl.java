@@ -1,9 +1,6 @@
 package com.jaagro.tms.biz.service.impl;
 
-import com.jaagro.tms.api.dto.order.CreateOrderGoodsDto;
-import com.jaagro.tms.api.dto.order.CreateOrderItemsDto;
-import com.jaagro.tms.api.dto.order.GetOrderGoodsDto;
-import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
+import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.biz.entity.OrderGoodsMargin;
@@ -137,5 +134,35 @@ public class OrderItemsServiceImpl implements OrderItemsService {
             }
         }
         return getOrderItemsDtoList;
+    }
+
+    /**
+     * 根据订单id获得订单需求列表
+     *
+     * @param orderId
+     * @return
+     */
+    @Override
+    public List<ListOrderItemsDto> listItemsByOrderId(Integer orderId) {
+        List<ListOrderItemsDto> orderItemsDtoList = this.orderItemsMapper.listItemsDtoByOrderId(orderId);
+        if (orderItemsDtoList.size() > 0) {
+            for (ListOrderItemsDto items : orderItemsDtoList) {
+//                OrderItems orderItems = this.orderItemsMapper.selectByPrimaryKey(items.getId());
+                /*items
+                        .setModifyUserId(this.currentUserService.getShowUser())
+                        .setUnload(this.customerService.getShowSiteById(orderItems.getUnloadId()));*/
+                List<GetOrderGoodsDto> goodsDtoList = goodsService.listGoodsDtoByItemId(items.getId());
+                items.setOrderGoodsDtoList(goodsDtoList);
+                /*for (GetOrderGoodsDto goodsDto : items.getGoods()) {
+                    OrderGoodsMargin orderGoodsMarginData = orderGoodsMarginMapper.getMarginByGoodsId(goodsDto.getId());
+                    if (null == orderGoodsMarginData) {
+                        goodsDto.setMargin(new BigDecimal(0));
+                    } else {
+                        goodsDto.setMargin(orderGoodsMarginData.getMargin());
+                    }
+                }*/
+            }
+        }
+        return orderItemsDtoList;
     }
 }
