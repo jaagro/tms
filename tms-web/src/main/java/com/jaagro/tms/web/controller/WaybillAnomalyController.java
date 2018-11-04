@@ -87,4 +87,10 @@ public class WaybillAnomalyController {
         return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
     }
 
+    @ApiOperation("异常管理列表")
+    @PostMapping("anomalManagementList")
+    public BaseResponse anomalManagementList(@RequestBody WaybillAnomalyCondtion dto) {
+        return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
+    }
+
 }

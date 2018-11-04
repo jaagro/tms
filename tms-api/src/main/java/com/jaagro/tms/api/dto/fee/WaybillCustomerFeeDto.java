@@ -12,7 +12,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class WaybillTruckFeeDto implements Serializable {
+public class WaybillCustomerFeeDto implements Serializable {
 
     /**
      *
@@ -32,13 +32,12 @@ public class WaybillTruckFeeDto implements Serializable {
     /**
      *
      */
-
     private Integer anomalyId;
 
     /**
      * 费用类型：1-运费 2-附加费
      */
-    private Integer costType;
+    private Integer earningType;
 
     /**
      * 金额
@@ -80,5 +79,6 @@ public class WaybillTruckFeeDto implements Serializable {
      * 备注信息
      */
     private String notes;
+
 
 }

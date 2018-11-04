@@ -51,4 +51,12 @@ public interface WaybillAnomalyService {
      * @param dto
      */
     void anormalInformationProcess(AnomalInformationProcessDto dto);
+
+    /**
+     * 异常管理列表
+     * Author @Gao.
+     * @return
+     * @param dto
+     */
+    List<AnomalManagementListDto> anomalManagementList(WaybillAnomalyCondtion dto);
 }

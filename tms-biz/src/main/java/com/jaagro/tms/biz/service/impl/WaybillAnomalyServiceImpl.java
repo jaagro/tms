@@ -6,6 +6,9 @@ import com.jaagro.tms.api.constant.CostType;
 import com.jaagro.tms.api.constant.DeductCompensationRoleType;
 import com.jaagro.tms.api.dto.anomaly.*;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
+import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
+import com.jaagro.tms.api.dto.fee.WaybillFeeCondtion;
+import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
 import com.jaagro.tms.api.service.WaybillAnomalyService;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
@@ -126,8 +129,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      */
     @Override
     public List<WaybillAnomalyDto> listWaybillAnomalyByCondition(WaybillAnomalyCondtion dto) {
-        List<WaybillAnomalyDto> waybillAnomaly = waybillAnomalyMapper.listWaybillAnomalyByCondition(dto);
-        return waybillAnomaly;
+        return waybillAnomalyMapper.listWaybillAnomalyByCondition(dto);
     }
 
     /**
@@ -191,11 +193,11 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 AnomalDeductCompensationDto anomalDeductCompensationDto = feeAdjust.get(i);
                 //扣款对象
                 if (0 == i) {
-                   feeAdjust(dto,currentUser.getId(),anomalDeductCompensationDto,CostType.DEDUCTION);
+                    feeAdjust(dto, currentUser.getId(), anomalDeductCompensationDto, CostType.DEDUCTION);
                 }
                 //赔偿对象
                 if (1 == i) {
-                   feeAdjust(dto,currentUser.getId(),anomalDeductCompensationDto,CostType.COMPENSATE);
+                    feeAdjust(dto, currentUser.getId(), anomalDeductCompensationDto, CostType.COMPENSATE);
                 }
             }
         }
@@ -203,8 +205,56 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     }
 
     /**
+     * 异常管理列表
+     * Author @Gao.
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public List<AnomalManagementListDto> anomalManagementList(WaybillAnomalyCondtion dto) {
+        List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(dto);
+        AnomalManagementListDto anomalManagementListDto = new AnomalManagementListDto();
+        List<AnomalManagementListDto> anomalManagementListDtos = new ArrayList<>();
+        for (WaybillAnomalyDto waybillAnomalyDto : waybillAnomalyDtos) {
+            BeanUtils.copyProperties(waybillAnomalyDto, anomalManagementListDto);
+            anomalManagementListDtos.add(anomalManagementListDto);
+            WaybillFeeCondtion waybillFeeCondtion = new WaybillFeeCondtion();
+            waybillFeeCondtion
+                    .setAnomalyId(waybillAnomalyDto.getId());
+            //客户侧费用
+            List<WaybillCustomerFeeDto> waybillCustomerFeeDtos = waybillCustomerFeeMapper.listWaybillCustomerFeeByCondtion(waybillFeeCondtion);
+            WaybillCustomerFeeDto waybillCustomerFeeDto = waybillCustomerFeeDtos.get(0);
+            //运力侧费用
+            List<WaybillTruckFeeDto> waybillTruckFeeDtos = waybillTruckFeeMapper.listWaybillTruckFeeByCondtion(waybillFeeCondtion);
+            WaybillTruckFeeDto waybillTruckFeeDto = waybillTruckFeeDtos.get(0);
+            //------扣款金额------
+            //客户侧赔偿
+            if (CostType.COMPENSATE == waybillCustomerFeeDto.getAdjustType()) {
+                anomalManagementListDto.setCompensateMoney("[客户]" + waybillCustomerFeeDto.getMoney());
+            }
+            //运力侧赔偿
+            if (CostType.COMPENSATE == waybillTruckFeeDto.getAdjustType()) {
+                anomalManagementListDto.setCompensateMoney("[司机]" + waybillTruckFeeDto.getMoney());
+            }
+            //------扣款金额------
+            //客户侧扣款
+            if (CostType.DEDUCTION == waybillCustomerFeeDto.getAdjustType()) {
+                anomalManagementListDto.setDeductMoney("[客户]" + waybillCustomerFeeDto.getMoney());
+            }
+            //运力侧扣款
+            if (CostType.DEDUCTION == waybillTruckFeeDto.getAdjustType()) {
+                anomalManagementListDto.setDeductMoney("[司机]" + waybillTruckFeeDto.getMoney());
+            }
+
+        }
+        return anomalManagementListDtos;
+    }
+
+    /**
      * 费用是否调整公共方法
      * Author @Gao.
+     *
      * @param dto
      * @param currentUserId
      * @param anomalDeductCompensationDto
@@ -212,7 +262,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      */
     private void feeAdjust(AnomalInformationProcessDto dto, Integer currentUserId,
                            AnomalDeductCompensationDto anomalDeductCompensationDto, Integer costType) {
-
         WaybillFeeAdjustment waybillFeeAdjustment = new WaybillFeeAdjustment();
         waybillFeeAdjustment
                 .setCreatedUserId(currentUserId)

@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author @Gao.
@@ -24,4 +25,24 @@ public class WaybillAnomalyCondtion implements Serializable {
      * 运单号Id
      */
     private Integer waybillId;
+
+    /**
+     * 异常Id
+     */
+    private Integer anomalyId;
+
+    /**
+     * 处理状态
+     */
+    private String processingStatus;
+
+    /**
+     * 登记开始时间
+     */
+    private Date beginDate;
+
+    /**
+     * 登记结束时间
+     */
+    private Date endDate;
 }
