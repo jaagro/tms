@@ -50,4 +50,9 @@ public class WeChatOrderVo implements Serializable {
      */
     private List<WeChatOrderItemsVo> orderItems;
 
+    /**
+     * 运单列表
+     */
+    private List<ListWaybillVo> waybillVoList;
+
 }

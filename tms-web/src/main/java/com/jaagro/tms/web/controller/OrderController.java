@@ -350,6 +350,17 @@ public class OrderController {
                     userDto.setUserName(userInfo.getName());
                     orderVo.setCreatedUserId(userDto);
                 }
+                //派单进度
+                List<ListWaybillDto> waybills = waybillService.listWaybillByOrderId(orderVo.getId());
+                if (waybills.size() > 0) {
+                    orderVo.setWaybillCount(waybills.size());
+                    //已派单
+                    List<ListWaybillDto> waitWaybills = waybillService.listWaybillWaitByOrderId(orderVo.getId());
+                    if (waitWaybills.size() > 0) {
+                        orderVo.setWaybillAlready(waitWaybills.size());
+                        orderVo.setWaybillWait(orderVo.getWaybillCount() - orderVo.getWaybillAlready());
+                    }
+                }
                 /**
                  * 替换订单需求Dto为Vo
                  */
