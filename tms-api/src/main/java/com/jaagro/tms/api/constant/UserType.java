@@ -18,5 +18,5 @@ public final class UserType {
     /**
      * 司机
      */
-    public static final String DRIVER = "driver"; 
+    public static final String DRIVER = "driver";
 }
