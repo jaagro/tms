@@ -6,10 +6,12 @@ import com.jaagro.tms.api.service.LocationService;
 import com.jaagro.tms.biz.mapper.LocationMapperExt;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "location")
 @Service
 @Log4j
 public class LocationServiceImpl implements LocationService {
