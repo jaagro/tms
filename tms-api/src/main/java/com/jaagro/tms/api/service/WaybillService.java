@@ -18,6 +18,7 @@ public interface WaybillService {
 
     /**
      * 根据状态查询我的运单信息
+     *
      * @param dto
      * @return
      */
@@ -25,6 +26,7 @@ public interface WaybillService {
 
     /**
      * 查询订单详情页
+     *
      * @param waybillId
      * @return
      */
@@ -32,6 +34,7 @@ public interface WaybillService {
 
     /**
      * 运单轨迹展示
+     *
      * @param waybillId
      * @returne
      */
@@ -39,6 +42,7 @@ public interface WaybillService {
 
     /**
      * 更新运单轨迹
+     *
      * @param dto
      * @return
      */
@@ -48,6 +52,7 @@ public interface WaybillService {
     /**
      * 创建运单
      * Author gavin
+     *
      * @param waybillDto
      * @return
      */
@@ -55,6 +60,7 @@ public interface WaybillService {
 
     /**
      * 根据id获取waybill对象
+     *
      * @param id
      * @return
      */
@@ -70,6 +76,7 @@ public interface WaybillService {
 
     /**
      * 接单详情列表
+     *
      * @param dto
      * @return
      */
@@ -77,6 +84,7 @@ public interface WaybillService {
 
     /**
      * 接单消息列表显示
+     *
      * @param dto
      * @return
      */
@@ -84,6 +92,7 @@ public interface WaybillService {
 
     /**
      * 根据orderId获取order和waybill信息
+     *
      * @param orderId
      * @return
      */
@@ -91,17 +100,18 @@ public interface WaybillService {
 
     /**
      * Author gavin
+     *
      * @param waybillId
      * @param truckId
      * @return
      */
-    Map<String, Object> assignWaybillToTruck(Integer waybillId,Integer truckId);
+    Map<String, Object> assignWaybillToTruck(Integer waybillId, Integer truckId);
 
     /**
-     *显示运单卸货
+     * 显示运单卸货
+     *
      * @param waybillId
-     * @return
-     * Author @Gao.
+     * @return Author @Gao.
      */
     Map<String, Object> showUnloadSite(Integer waybillId);
 
@@ -115,6 +125,7 @@ public interface WaybillService {
 
     /**
      * 根据waybillId 卸货地Id 查询货物信息
+     *
      * @param
      * @return
      */
@@ -125,18 +136,35 @@ public interface WaybillService {
 
     /**
      * 个人中心
+     *
      * @return
      */
     Map<String, Object> personalCenter();
 
     /**
      * 撤回待接单的运单
-     * @Author gavin
+     *
      * @param waybillId
      * @return
+     * @Author gavin
      */
     boolean withdrawWaybill(Integer waybillId);
 
+    /**
+     * 根据订单id获取运单
+     *
+     * @param orderId
+     * @return
+     */
+    List<ListWaybillDto> listWaybillByOrderId(Integer orderId);
+
+    /**
+     * 根据订单id查询 待派单的运单
+     *
+     * @param id
+     * @return
+     */
+    List<ListWaybillDto> listWaybillWaitByOrderId(Integer id);
     /**
      * 回单修改运单货物信息新增运单轨迹(回单补录)
      * @author yj

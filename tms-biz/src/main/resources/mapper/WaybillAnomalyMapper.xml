@@ -7,8 +7,8 @@
     <result column="anomaly_type_id" property="anomalyTypeId" jdbcType="INTEGER" />
     <result column="anomaly_desc" property="anomalyDesc" jdbcType="VARCHAR" />
     <result column="processing_status" property="processingStatus" jdbcType="VARCHAR" />
-    <result column="processing _desc" property="processingDesc" jdbcType="VARCHAR" />
-    <result column="audit _status" property="auditStatus" jdbcType="VARCHAR" />
+    <result column="processing_desc" property="processingDesc" jdbcType="VARCHAR" />
+    <result column="audit_status" property="auditStatus" jdbcType="VARCHAR" />
     <result column="audit_desc" property="auditDesc" jdbcType="VARCHAR" />
     <result column="verified_status" property="verifiedStatus" jdbcType="BIT" />
     <result column="adjust_status" property="adjustStatus" jdbcType="BIT" />
@@ -21,9 +21,9 @@
     <result column="enabled" property="enabled" jdbcType="BIT" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, waybill_id, anomaly_type_id, anomaly_desc, processing_status, "processing _desc", 
-    "audit _status", audit_desc, verified_status, adjust_status, create_user_id, create_time, 
-    "processor_user _id", processor_time, audit_user_id, audit_time, enabled
+    id, waybill_id, anomaly_type_id, anomaly_desc, processing_status, processing_desc,
+    audit_status, audit_desc, verified_status, adjust_status, create_user_id, create_time,
+    processor_user_id, processor_time, audit_user_id, audit_time, enabled
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -38,10 +38,10 @@
   <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillAnomaly" useGeneratedKeys="true"
           keyProperty="id" keyColumn="id">
     insert into waybill_anomaly (id, waybill_id, anomaly_type_id, 
-      anomaly_desc, processing_status, "processing _desc", 
-      "audit _status", audit_desc, verified_status, 
+      anomaly_desc, processing_status, processing_desc,
+      audit_status, audit_desc, verified_status,
       adjust_status, create_user_id, create_time, 
-      "processor_user _id", processor_time, audit_user_id, 
+      processor_user_id, processor_time, audit_user_id,
       audit_time, enabled)
     values (#{id,jdbcType=INTEGER}, #{waybillId,jdbcType=INTEGER}, #{anomalyTypeId,jdbcType=INTEGER}, 
       #{anomalyDesc,jdbcType=VARCHAR}, #{processingStatus,jdbcType=VARCHAR}, #{processingDesc,jdbcType=VARCHAR}, 
@@ -70,10 +70,10 @@
         processing_status,
       </if>
       <if test="processingDesc != null" >
-        "processing _desc",
+        processing_desc,
       </if>
       <if test="auditStatus != null" >
-        "audit _status",
+        audit_status,
       </if>
       <if test="auditDesc != null" >
         audit_desc,
@@ -91,7 +91,7 @@
         create_time,
       </if>
       <if test="processorUserId != null" >
-        "processor_user _id",
+        processor_user_id,
       </if>
       <if test="processorTime != null" >
         processor_time,
@@ -176,10 +176,10 @@
         processing_status = #{processingStatus,jdbcType=VARCHAR},
       </if>
       <if test="processingDesc != null" >
-        "processing _desc" = #{processingDesc,jdbcType=VARCHAR},
+        processing_desc = #{processingDesc,jdbcType=VARCHAR},
       </if>
       <if test="auditStatus != null" >
-        "audit _status" = #{auditStatus,jdbcType=VARCHAR},
+        audit_status = #{auditStatus,jdbcType=VARCHAR},
       </if>
       <if test="auditDesc != null" >
         audit_desc = #{auditDesc,jdbcType=VARCHAR},
@@ -197,7 +197,7 @@
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="processorUserId != null" >
-        "processor_user _id" = #{processorUserId,jdbcType=INTEGER},
+        processor_user_id = #{processorUserId,jdbcType=INTEGER},
       </if>
       <if test="processorTime != null" >
         processor_time = #{processorTime,jdbcType=TIMESTAMP},
@@ -220,14 +220,14 @@
       anomaly_type_id = #{anomalyTypeId,jdbcType=INTEGER},
       anomaly_desc = #{anomalyDesc,jdbcType=VARCHAR},
       processing_status = #{processingStatus,jdbcType=VARCHAR},
-      "processing _desc" = #{processingDesc,jdbcType=VARCHAR},
-      "audit _status" = #{auditStatus,jdbcType=VARCHAR},
+      processing_desc = #{processingDesc,jdbcType=VARCHAR},
+      audit_status = #{auditStatus,jdbcType=VARCHAR},
       audit_desc = #{auditDesc,jdbcType=VARCHAR},
       verified_status = #{verifiedStatus,jdbcType=BIT},
       adjust_status = #{adjustStatus,jdbcType=BIT},
       create_user_id = #{createUserId,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      "processor_user _id" = #{processorUserId,jdbcType=INTEGER},
+      processor_user_id = #{processorUserId,jdbcType=INTEGER},
       processor_time = #{processorTime,jdbcType=TIMESTAMP},
       audit_user_id = #{auditUserId,jdbcType=INTEGER},
       audit_time = #{auditTime,jdbcType=TIMESTAMP},

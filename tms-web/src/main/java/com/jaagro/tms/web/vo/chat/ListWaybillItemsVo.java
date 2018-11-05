@@ -9,35 +9,27 @@ import java.util.List;
 
 /**
  * @author baiyiran
- * @Date 2018/10/30
+ * @Date 2018/11/5
  */
 @Data
 @Accessors(chain = true)
-public class WeChatOrderItemsVo implements Serializable {
+public class ListWaybillItemsVo implements Serializable {
+    /**
+     * 卸货地对象
+     */
+    private ShowSiteVo uploadSiteVo;
 
     /**
-     *
+     * 要求送达时间
      */
-    private Integer id;
+    private Date requiredTime;
 
     /**
-     * 订单id
+     * 签收状态
      */
-    private Integer orderId;
-
-    /**
-     * 卸货地id
-     */
-    private SiteVo unload;
-
-    /**
-     * 要求卸货时间
-     */
-    private Date unloadTime;
-
+    private Boolean signStatus;
     /**
      * 货物列表
      */
-    private List<WeChatOrderGoodsVo> goods;
-
+    private List<ListWaybillGoodsVo> goods;
 }

@@ -1,17 +1,14 @@
 package com.jaagro.tms.web.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.base.GetCustomerUserDto;
-import com.jaagro.tms.api.dto.order.GetOrderDto;
-import com.jaagro.tms.api.dto.order.GetOrderItemsDto;
-import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
-import com.jaagro.tms.web.vo.chat.WeChatOrderItemsVo;
-import com.jaagro.tms.web.vo.chat.WeChatOrderVo;
-import com.jaagro.tms.web.vo.order.CustomerVo;
-import com.jaagro.tms.web.vo.order.SiteVo;
+import com.jaagro.tms.web.vo.chat.*;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -41,6 +38,7 @@ public class WeChatAppletOrderController {
     @Autowired
     private CustomerClientService customerClientService;
 
+
     /**
      * 查询单条订单
      *
@@ -63,20 +61,35 @@ public class WeChatAppletOrderController {
                 SiteVo siteVo = new SiteVo();
                 BeanUtils.copyProperties(getOrderDto.getLoadSiteId(), siteVo);
                 chatOrderVo.setLoadSiteId(siteVo);
-                //订单详情
-                List<GetOrderItemsDto> orderItemsDtos = getOrderDto.getOrderItems();
-                List<WeChatOrderItemsVo> weChatOrderItemsVos = new ArrayList<>();
-                if (orderItemsDtos.size() > 0) {
-                    for (GetOrderItemsDto orderItemsDto : orderItemsDtos) {
+                /**
+                 * 订单详情Dto转换为Vo
+                 */
+                List<GetOrderItemsDto> orderItemsDtoList = getOrderDto.getOrderItems();
+                List<WeChatOrderItemsVo> orderItemsVoList = new ArrayList<>();
+                if (orderItemsDtoList.size() > 0) {
+                    for (GetOrderItemsDto orderItemsDto : orderItemsDtoList) {
                         WeChatOrderItemsVo itemsVo = new WeChatOrderItemsVo();
                         BeanUtils.copyProperties(orderItemsDto, itemsVo);
                         //卸货地转换
                         SiteVo vo = new SiteVo();
                         BeanUtils.copyProperties(orderItemsDto.getUnload(), vo);
                         itemsVo.setUnload(vo);
-                        weChatOrderItemsVos.add(itemsVo);
+                        orderItemsVoList.add(itemsVo);
+                        /**
+                         * 订单需求明细Dto转换为Vo
+                         */
+                        List<GetOrderGoodsDto> goodsDtoList = orderItemsDto.getGoods();
+                        List<WeChatOrderGoodsVo> goodsVoList = new ArrayList<>();
+                        if (goodsDtoList.size() > 0) {
+                            for (GetOrderGoodsDto goodsDto : goodsDtoList) {
+                                WeChatOrderGoodsVo goodsVo = new WeChatOrderGoodsVo();
+                                BeanUtils.copyProperties(goodsDto, goodsVo);
+                                goodsVoList.add(goodsVo);
+                            }
+                            itemsVo.setGoods(goodsVoList);
+                        }
                     }
-                    chatOrderVo.setOrderItems(weChatOrderItemsVos);
+                    chatOrderVo.setOrderItems(orderItemsVoList);
                 }
             }
         } catch (Exception ex) {
@@ -102,11 +115,59 @@ public class WeChatAppletOrderController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
         //获得customer_user中的关联用户id
-        GetCustomerUserDto customerUserDto = this.userService.getCustomerUserById();
+        GetCustomerUserDto customerUserDto = userService.getCustomerUserById();
         if (customerUserDto != null) {
             criteriaDto.setCustomerId(customerUserDto.getRelevanceId());
             criteriaDto.setCustomerType(customerUserDto.getCustomerType());
         }
-        return BaseResponse.service(orderRefactorService.listWeChatOrderByCriteria(criteriaDto));
+        //得到订单分页
+        PageInfo pageInfo = orderService.listOrderByCriteria(criteriaDto);
+        List<ListOrderDto> orderDtoList = pageInfo.getList();
+        List<ListOrderVo> orderVoList = new ArrayList<>();
+        //替换为vo
+        if (orderDtoList.size() > 0) {
+            for (ListOrderDto orderDto : orderDtoList) {
+                ListOrderVo orderVo = new ListOrderVo();
+                BeanUtils.copyProperties(orderDto, orderVo);
+                //装货地
+                ShowSiteDto showSiteDto = customerClientService.getShowSiteById(orderDto.getLoadSiteId());
+                SiteVo siteVo = new SiteVo();
+                BeanUtils.copyProperties(showSiteDto, siteVo);
+                orderVo.setLoadSiteId(siteVo);
+                /**
+                 * 替换订单需求Dto为Vo
+                 */
+                List<ListOrderItemsDto> itemsDtoList = orderDto.getOrderItemsDtoList();
+                List<ListOrderItemsVo> itemsVoList = new ArrayList<>();
+                if (itemsDtoList.size() > 0) {
+                    for (ListOrderItemsDto itemsDto : itemsDtoList) {
+                        ListOrderItemsVo itemsVo = new ListOrderItemsVo();
+                        BeanUtils.copyProperties(itemsDto, itemsVo);
+                        ShowSiteDto siteDto = customerClientService.getShowSiteById(orderDto.getLoadSiteId());
+                        SiteVo vo = new SiteVo();
+                        BeanUtils.copyProperties(siteDto, vo);
+                        itemsVo.setUnload(vo);
+                        itemsVoList.add(itemsVo);
+                        /**
+                         * 替换订单需求明细Dto为Vo
+                         */
+                        List<GetOrderGoodsDto> goodsDtoList = itemsDto.getOrderGoodsDtoList();
+                        List<ListOrderGoodsVo> goodsVoList = new ArrayList<>();
+                        if (goodsDtoList.size() > 0) {
+                            for (GetOrderGoodsDto goodsDto : goodsDtoList) {
+                                ListOrderGoodsVo goodsVo = new ListOrderGoodsVo();
+                                BeanUtils.copyProperties(goodsDto, goodsVo);
+                                goodsVoList.add(goodsVo);
+                            }
+                            itemsVo.setGoods(goodsVoList);
+                        }
+                    }
+                    orderVo.setItemsVoList(itemsVoList);
+                }
+                orderVoList.add(orderVo);
+            }
+        }
+        pageInfo.setList(orderVoList);
+        return BaseResponse.successInstance(pageInfo);
     }
 }

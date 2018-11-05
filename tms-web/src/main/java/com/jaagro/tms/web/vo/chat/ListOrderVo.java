@@ -9,11 +9,11 @@ import java.util.List;
 
 /**
  * @author baiyiran
- * @Date 2018/10/30
+ * @Date 2018/10/22
  */
 @Data
 @Accessors(chain = true)
-public class WeChatOrderVo implements Serializable {
+public class ListOrderVo implements Serializable {
 
     /**
      *
@@ -31,14 +31,14 @@ public class WeChatOrderVo implements Serializable {
     private String orderStatus;
 
     /**
-     * 客户id
-     */
-    private CustomerVo customer;
-
-    /**
      * 装货地id
      */
     private SiteVo loadSiteId;
+
+    /**
+     * 要求装货时间
+     */
+    private Date loadTime;
 
     /**
      * 创建时间
@@ -48,11 +48,7 @@ public class WeChatOrderVo implements Serializable {
     /**
      * 订单列表
      */
-    private List<WeChatOrderItemsVo> orderItems;
+    private List<ListOrderItemsVo> itemsVoList;
 
-    /**
-     * 运单列表
-     */
-    private List<ListWaybillVo> waybillVoList;
 
 }

@@ -29,9 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -47,7 +44,7 @@ import java.util.stream.Collectors;
  * @author tony
  */
 @Service
-@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "waybill")
+//@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "waybill")
 public class WaybillServiceImpl implements WaybillService {
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
 
@@ -94,7 +91,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @Author gavin
      */
     @Override
-    @CacheEvict(cacheNames = "waybill", allEntries = true)
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
         String departmentId = currentUserService.getCurrentUser().getDepartmentId().toString();
@@ -208,7 +205,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author tony
      */
-    @Cacheable
+//    @Cacheable
     @Override
     public GetWaybillDto getWaybillById(Integer id) {
         //拿到waybill对象
@@ -324,7 +321,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @param orderId
      * @return
      */
-    @Cacheable
+//    @Cacheable
     @Override
     public GetWaybillPlanDto getOrderAndWaybill(Integer orderId) {
         GetOrderDto getOrderDto = orderService.getOrderById(orderId);
@@ -354,7 +351,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
-    @Cacheable
+//    @Cacheable
     @Override
     public Map<String, Object> listWaybillByStatus(GetWaybillParamDto dto) {
 
@@ -397,7 +394,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @Author @Gao.
      */
     @Override
-    @Cacheable
+//    @Cacheable
     public Map<String, Object> listWayBillDetails(Integer waybillId) {
         GetWaybillDetailsAppDto waybillDetailsAppDto = new GetWaybillDetailsAppDto();
         WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
@@ -492,7 +489,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @author @Gao.
      */
     @Override
-    @Cacheable
+//    @Cacheable
     public ShowWaybillTrackingDto showWaybillTrucking(Integer waybillId) {
         ShowWaybillTrackingDto showWaybillTrackingDto = new ShowWaybillTrackingDto();
         List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybillId);
@@ -507,7 +504,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
-    @CacheEvict(cacheNames = "waybill", allEntries = true)
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> upDateWaybillTrucking(GetWaybillTruckingParamDto dto) {
@@ -532,7 +529,7 @@ public class WaybillServiceImpl implements WaybillService {
                     .setNewStatus(WaybillStatus.ARRIVE_LOAD_SITE)
                     .setOldStatus(waybill.getWaybillStatus())
                     .setTrackingInfo("司机【" + currentUser.getName() + "】已出发");
-            waybillTrackingMapper.insert(waybillTracking);
+            waybillTrackingMapper.insertSelective(waybillTracking);
             waybill.setWaybillStatus(WaybillStatus.ARRIVE_LOAD_SITE);
             waybillMapper.updateByPrimaryKey(waybill);
             return ServiceResult.toResult("操作成功");
@@ -543,7 +540,7 @@ public class WaybillServiceImpl implements WaybillService {
                     .setNewStatus(WaybillStatus.LOAD_PRODUCT)
                     .setOldStatus(waybill.getWaybillStatus())
                     .setTrackingInfo("已到达提货地【" + loadSite.getSiteName() + "】");
-            waybillTrackingMapper.insert(waybillTracking);
+            waybillTrackingMapper.insertSelective(waybillTracking);
             waybill.setWaybillStatus(WaybillStatus.LOAD_PRODUCT);
             waybillMapper.updateByPrimaryKey(waybill);
             return ServiceResult.toResult("操作成功");
@@ -555,7 +552,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybillTracking
                     .setNewStatus(WaybillStatus.DELIVERY)
                     .setOldStatus(waybill.getWaybillStatus()).setTrackingInfo("在【" + loadSite.getSiteName() + "】已提货");
-            waybillTrackingMapper.insert(waybillTracking);
+            waybillTrackingMapper.insertSelective(waybillTracking);
             //更新货物信息
             for (ConfirmProductDto confirmProductDto : confirmProductDtosList) {
                 WaybillGoods waybillGoods = new WaybillGoods();
@@ -589,7 +586,7 @@ public class WaybillServiceImpl implements WaybillService {
                         //磅单
                         waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
                     }
-                    waybillTrackingImagesMapper.insert(waybillTrackingImages);
+                    waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
                 }
             }
             waybill.setWaybillStatus(WaybillStatus.DELIVERY);
@@ -602,7 +599,7 @@ public class WaybillServiceImpl implements WaybillService {
                     .setNewStatus(WaybillStatus.SIGN)
                     .setOldStatus(WaybillStatus.DELIVERY)
                     .setTrackingInfo("司机已到达卸货地");
-            waybillTrackingMapper.insert(waybillTracking);
+            waybillTrackingMapper.insertSelective(waybillTracking);
             waybill.setWaybillStatus(WaybillStatus.SIGN);
             waybillMapper.updateByPrimaryKey(waybill);
         }
@@ -627,7 +624,7 @@ public class WaybillServiceImpl implements WaybillService {
                             .setNewStatus(WaybillStatus.DELIVERY)
                             .setTrackingInfo("已签收，签收地为【" + showSiteById.getSiteName() + "】");
                 }
-                waybillTrackingMapper.insert(waybillTracking);
+                waybillTrackingMapper.insertSelective(waybillTracking);
                 //更新卸货物信息
                 for (ConfirmProductDto unLoadSiteconfirmProductDto : unLoadSiteConfirmProductDtos) {
                     WaybillGoods waybillGoods = new WaybillGoods();
@@ -659,7 +656,7 @@ public class WaybillServiceImpl implements WaybillService {
                             //磅单
                             waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
                         }
-                        waybillTrackingImagesMapper.insert(waybillTrackingImages);
+                        waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
                     }
                 }
                 //更新该运单签收
@@ -708,7 +705,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
-    @Cacheable
+//    @Cacheable
     @Override
     public Map<String, Object> showGoodsByWaybillItemId(Integer waybillItemId) {
         ShowWaybillGoodDto showWaybillGoodDto = new ShowWaybillGoodDto();
@@ -724,7 +721,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
-    @Cacheable
+//    @Cacheable
     @Override
     public Map<String, Object> showGoodsByWaybillId(Integer waybillId) {
         ShowLoadSiteGoodsDto showLoadSiteGoodsDto = new ShowLoadSiteGoodsDto();
@@ -754,7 +751,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
-    @Cacheable
+//    @Cacheable
     @Override
     public Map<String, Object> showUnloadSite(Integer waybillId) {
         ShowUnLoadSite showUnLoadSiteDto = new ShowUnLoadSite();
@@ -785,7 +782,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
-    @CacheEvict(cacheNames = "waybill", allEntries = true)
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     public Map<String, Object> receiptList(GetReceiptParamDto dto) {
 
@@ -850,7 +847,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
-    @CacheEvict(cacheNames = "waybill", allEntries = true)
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> upDateReceiptStatus(GetReceiptParamDto dto) {
@@ -901,7 +898,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
-    @Cacheable
+//    @Cacheable
     @Override
     public Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
@@ -981,7 +978,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @param truckId
      * @return
      */
-    @CacheEvict(cacheNames = "waybill", allEntries = true)
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> assignWaybillToTruck(Integer waybillId, Integer truckId) {
@@ -1082,7 +1079,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @param criteriaDto
      * @return
      */
-    @Cacheable
+//    @Cacheable
     @Override
     public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
@@ -1110,7 +1107,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-                    ) {
+            ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1146,7 +1143,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author gavin
      */
-    @CacheEvict(cacheNames = "waybill", allEntries = true)
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean withdrawWaybill(Integer waybillId) {
@@ -1304,6 +1301,28 @@ public class WaybillServiceImpl implements WaybillService {
             throw new RuntimeException("插入运单轨迹图片(回单补传单据)失败");
         }
         return true;
+    }
+
+    /**
+     * 根据订单id获取运单
+     *
+     * @param orderId
+     * @return
+     */
+    @Override
+    public List<ListWaybillDto> listWaybillByOrderId(Integer orderId) {
+        return waybillMapper.listWaybillDtoByOrderId(orderId);
+    }
+
+    /**
+     * 根据订单id查询 待派单的运单
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public List<ListWaybillDto> listWaybillWaitByOrderId(Integer id) {
+        return waybillMapper.listWaybillDtoWaitByOrderId(id);
     }
 
     private Integer getUserId() {

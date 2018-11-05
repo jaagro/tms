@@ -1,5 +1,6 @@
-package com.jaagro.tms.web.vo.order;
+package com.jaagro.tms.web.vo.pc;
 
+import com.jaagro.tms.api.dto.base.ShowUserDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -9,11 +10,10 @@ import java.util.Date;
 
 /**
  * @author baiyiran
- * @Date 2018/10/22
  */
 @Data
 @Accessors(chain = true)
-public class OrderGoodsVo implements Serializable {
+public class GetOrderGoodsVo implements Serializable {
 
     /**
      *
@@ -73,6 +73,5 @@ public class OrderGoodsVo implements Serializable {
     /**
      * 修改人id
      */
-    private UserVo modifyUser;
-
+    private ShowUserDto modifyUser;
 }
