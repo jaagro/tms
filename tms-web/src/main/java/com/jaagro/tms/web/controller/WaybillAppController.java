@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
 import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
 import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
+import com.jaagro.tms.api.dto.driverapp.ShowWaybillTrackingDto;
 import com.jaagro.tms.api.dto.waybill.GetReceiptMessageParamDto;
 import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
@@ -56,7 +57,11 @@ public class WaybillAppController {
         if (waybillId == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单单参数不能为空");
         }
-        return BaseResponse.service(waybillService.showWaybillTrucking(waybillId));
+        ShowWaybillTrackingDto showWaybillTrackingDto = waybillService.showWaybillTrucking(waybillId);
+        if (showWaybillTrackingDto != null){
+            return BaseResponse.successInstance(showWaybillTrackingDto);
+        }
+        return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(),"查询不到有效的运单");
     }
 
     @ApiOperation("运单轨迹更新")

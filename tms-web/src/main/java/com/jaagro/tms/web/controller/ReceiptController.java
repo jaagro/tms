@@ -92,30 +92,32 @@ public class ReceiptController {
         //货物信息
         List<GetWaybillItemDto> waybillItems = waybillDetailDto.getWaybillItems();
         if (!CollectionUtils.isEmpty(waybillItems)){
-            List<WaybillGoodsVo> waybillGoodsVoList = new ArrayList<WaybillGoodsVo>();
+            List<WaybillGoodsVo> waybillGoodsVoList = new ArrayList<>();
             for (GetWaybillItemDto getWaybillItemDto : waybillItems){
                 ShowSiteDto showSiteDto = getWaybillItemDto.getShowSiteDto();
                 List<GetWaybillGoodsDto> goods = getWaybillItemDto.getGoods();
-                for (GetWaybillGoodsDto goodsDto : goods){
-                    WaybillGoodsVo waybillGoodsVo = new WaybillGoodsVo();
-                    waybillGoodsVo.setUnloadSiteName(showSiteDto == null ? null : showSiteDto.getSiteName());
-                    waybillGoodsVo
-                            .setId(goodsDto.getId())
-                            .setWaybillId(goodsDto.getWaybillId())
-                            .setWaybillItemId(goodsDto.getWaybillItemId())
-                            .setUnloadSiteId(getWaybillItemDto.getUnloadSiteId())
-                            .setGoodsName(goodsDto.getGoodsName())
-                            .setUnloadSiteName(showSiteDto.getSiteName())
-                            .setGoodsQuantity(goodsDto.getGoodsQuantity())
-                            .setGoodsUnit(goodsDto.getGoodsUnit())
-                            .setGoodsWeight(goodsDto.getGoodsWeight())
-                            .setJoinDrug(goodsDto.getJoinDrug())
-                            .setLoadQuantity(goodsDto.getLoadQuantity())
-                            .setLoadWeight(goodsDto.getLoadWeight())
-                            .setRequiredTime(getWaybillItemDto.getRequiredTime())
-                            .setUnloadQuantity(goodsDto.getUnloadQuantity())
-                            .setUnloadWeight(goodsDto.getUnloadWeight());
-                    waybillGoodsVoList.add(waybillGoodsVo);
+                if (!CollectionUtils.isEmpty(goods)){
+                    for (GetWaybillGoodsDto goodsDto : goods){
+                        WaybillGoodsVo waybillGoodsVo = new WaybillGoodsVo();
+                        waybillGoodsVo
+                                .setUnloadSiteName(showSiteDto == null ? null : showSiteDto.getSiteName())
+                                .setId(goodsDto.getId())
+                                .setWaybillId(goodsDto.getWaybillId())
+                                .setWaybillItemId(goodsDto.getWaybillItemId())
+                                .setUnloadSiteId(getWaybillItemDto.getUnloadSiteId())
+                                .setGoodsName(goodsDto.getGoodsName())
+                                .setUnloadSiteName(showSiteDto.getSiteName())
+                                .setGoodsQuantity(goodsDto.getGoodsQuantity())
+                                .setGoodsUnit(goodsDto.getGoodsUnit())
+                                .setGoodsWeight(goodsDto.getGoodsWeight())
+                                .setJoinDrug(goodsDto.getJoinDrug())
+                                .setLoadQuantity(goodsDto.getLoadQuantity())
+                                .setLoadWeight(goodsDto.getLoadWeight())
+                                .setRequiredTime(getWaybillItemDto.getRequiredTime())
+                                .setUnloadQuantity(goodsDto.getUnloadQuantity())
+                                .setUnloadWeight(goodsDto.getUnloadWeight());
+                        waybillGoodsVoList.add(waybillGoodsVo);
+                    }
                 }
             }
             wayBillReceiptsVo.setWaybillGoodsVoList(waybillGoodsVoList);

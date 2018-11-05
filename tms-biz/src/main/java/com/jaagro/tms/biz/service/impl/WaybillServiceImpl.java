@@ -493,11 +493,11 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     @Cacheable
-    public Map<String, Object> showWaybillTrucking(Integer waybillId) {
+    public ShowWaybillTrackingDto showWaybillTrucking(Integer waybillId) {
         ShowWaybillTrackingDto showWaybillTrackingDto = new ShowWaybillTrackingDto();
         List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybillId);
         showWaybillTrackingDto.setShowTrackingDtos(showTrackingDtos);
-        return ServiceResult.toResult(showWaybillTrackingDto);
+        return showWaybillTrackingDto;
     }
 
     /**
@@ -1194,6 +1194,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @author yj
      */
     @Override
+    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public boolean updateWaybillGoodsReceipt(UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto) {
         // 更新运单货物
@@ -1203,9 +1204,9 @@ public class WaybillServiceImpl implements WaybillService {
         UserInfo currentUser = currentUserService.getCurrentUser();
         Integer currentUserId = currentUser == null ? null : currentUser.getId();
         if (!CollectionUtils.isEmpty(updateWaybillgoodsDtoList)){
-            List<WaybillGoods> waybillGoodsList = new ArrayList<WaybillGoods>();
-            List<WaybillItems> waybillItemsList = new ArrayList<WaybillItems>();
-            Set<Integer> waybillItemsIdSet = new HashSet<Integer>();
+            List<WaybillGoods> waybillGoodsList = new ArrayList<>();
+            List<WaybillItems> waybillItemsList = new ArrayList<>();
+            Set<Integer> waybillItemsIdSet = new HashSet<>();
             for (UpdateWaybillgoodsDto waybillgoodsDto : updateWaybillgoodsDtoList){
                 waybillItemsIdSet.add(waybillgoodsDto.getWaybillItemId());
                 waybillId = waybillgoodsDto.getWaybillId();
@@ -1267,6 +1268,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @author yj
      */
     @Override
+    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public boolean uploadReceiptImage(Integer waybillId, String imageUrl) {
         WaybillTracking waybillTracking = new WaybillTracking();

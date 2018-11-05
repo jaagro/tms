@@ -1,6 +1,7 @@
 package com.jaagro.tms.api.service;
 
 import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
+import com.jaagro.tms.api.dto.driverapp.ShowWaybillTrackingDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
@@ -34,7 +35,7 @@ public interface WaybillService {
      * @param waybillId
      * @returne
      */
-    Map<String, Object> showWaybillTrucking(Integer waybillId);
+    ShowWaybillTrackingDto showWaybillTrucking(Integer waybillId);
 
     /**
      * 更新运单轨迹
