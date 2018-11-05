@@ -222,17 +222,8 @@ public class OrderController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
         List<Integer> departIds = userClientService.getDownDepartment();
-        List<Integer> dids = new ArrayList<>();
         if (!CollectionUtils.isEmpty(departIds)) {
-            for (Integer did : departIds
-            ) {
-                if (did != null) {
-                    dids.add(did);
-                }
-            }
-            if (dids.size() > 0) {
-                criteriaDto.setDepartIds(dids);
-            }
+            criteriaDto.setDepartIds(departIds);
         }
         //得到订单分页
         PageInfo pageInfo = orderService.listOrderByCriteria(criteriaDto);
@@ -333,17 +324,8 @@ public class OrderController {
         criteriaDto.setWaitOrders(OrderStatus.PLACE_ORDER);
         //部门隔离
         List<Integer> departIds = userClientService.getDownDepartment();
-        List<Integer> dids = new ArrayList<>();
         if (!CollectionUtils.isEmpty(departIds)) {
-            for (Integer did : departIds
-            ) {
-                if (did != null) {
-                    dids.add(did);
-                }
-            }
-            if (dids.size() > 0) {
-                criteriaDto.setDepartIds(dids);
-            }
+            criteriaDto.setDepartIds(departIds);
         }
         //得到订单分页
         PageInfo pageInfo = orderService.listOrderByCriteria(criteriaDto);
