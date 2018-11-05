@@ -1191,7 +1191,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @author yj
      */
     @Override
-    @CacheEvict(cacheNames = "waybill", allEntries = true)
+    //@CacheEvict(cacheNames = "waybill", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public boolean updateWaybillGoodsReceipt(UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto) {
         // 更新运单货物
@@ -1265,7 +1265,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @author yj
      */
     @Override
-    @CacheEvict(cacheNames = "waybill", allEntries = true)
+    //@CacheEvict(cacheNames = "waybill", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public boolean uploadReceiptImage(Integer waybillId, String imageUrl) {
         WaybillTracking waybillTracking = new WaybillTracking();
