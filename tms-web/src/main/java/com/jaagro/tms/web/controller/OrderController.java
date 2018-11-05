@@ -221,8 +221,9 @@ public class OrderController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
         List<Integer> departIds = userClientService.getDownDepartment();
-        List<Integer> dids = new ArrayList<>(departIds);
-        if (dids.size() != 0) {
+        List<Integer> dids = new ArrayList<>();
+        if (departIds.size() != 0) {
+            dids = departIds;
             criteriaDto.setDepartIds(dids);
         }
         //得到订单分页
@@ -324,8 +325,9 @@ public class OrderController {
         criteriaDto.setWaitOrders(OrderStatus.PLACE_ORDER);
         //部门隔离
         List<Integer> departIds = userClientService.getDownDepartment();
-        List<Integer> dids = new ArrayList<>(departIds);
-        if (dids.size() != 0) {
+        List<Integer> dids = new ArrayList<>();
+        if (departIds.size() != 0) {
+            dids = departIds;
             criteriaDto.setDepartIds(dids);
         }
         //得到订单分页

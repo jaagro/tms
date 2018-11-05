@@ -43,7 +43,7 @@
         <if test="loadEndTime != null">
             <![CDATA[and o.load_time <= #{loadEndTime}]]>
         </if>
-        <if test="departIds!=null and departIds.size()>0">
+        <if test="departIds != null and departIds.size() > 0">
             and o.department_id in
             <foreach collection="departIds" open="(" separator="," close=")" item="did">
                 ${did}
