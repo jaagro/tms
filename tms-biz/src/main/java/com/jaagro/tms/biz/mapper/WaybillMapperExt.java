@@ -4,7 +4,6 @@ import com.jaagro.tms.api.dto.driverapp.GetWaybillAppDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillCriteriaDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillDto;
 import com.jaagro.tms.biz.entity.Waybill;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -28,6 +27,14 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @return
      */
     List<Waybill> listWaybillByOrderId(Integer orderId);
+
+    /**
+     * 根据订单id获取运单
+     *
+     * @param orderId
+     * @return
+     */
+    List<ListWaybillDto> listWaybillDtoByOrderId(Integer orderId);
 
     /**
      * 查询未完成的运单
@@ -70,7 +77,16 @@ public interface WaybillMapperExt extends WaybillMapper {
     List<Waybill> listWaybillWaitByOrderId(Integer orderId);
 
     /**
+     * 根据订单id查询 待派单的运单
+     *
+     * @param orderId
+     * @return
+     */
+    List<ListWaybillDto> listWaybillDtoWaitByOrderId(Integer orderId);
+
+    /**
      * 选择派单超过30分钟的运单 gavin
+     *
      * @return
      */
     List<Waybill> listOverTimeWaybills();
@@ -80,6 +96,6 @@ public interface WaybillMapperExt extends WaybillMapper {
      * 批量更新运单状态为拒绝
      */
 
-   void  batchUpdateWaybillStatus(List<Waybill> waybills);
+    void batchUpdateWaybillStatus(List<Waybill> waybills);
 
 }

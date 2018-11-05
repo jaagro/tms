@@ -10,14 +10,15 @@ import java.io.Serializable;
  */
 @Data
 @Accessors(chain = true)
-public class WaybillAbnomalTypeDto implements Serializable {
-    /**
-     * 主键id
-     */
-    private Integer id;
+public class WaybillAnomalyImageCondtion implements Serializable {
 
     /**
-     * 异常类型
+     * 异常id
      */
-    private String typeName;
+    private Integer anomalyId;
+
+    /**
+     * 创建人的Id
+     */
+    private Integer createUserId;
 }
