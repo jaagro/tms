@@ -1,3 +1,4 @@
+/*
 package com.jaagro.tms.biz.config;
 
 import com.jaagro.tms.biz.cat.CatMybatisPlugin;
@@ -10,9 +11,11 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import javax.sql.DataSource;
 import java.io.IOException;
 
+*/
 /**
  * @author tony
- */
+ *//*
+
 @Configuration
 public class SqlSessionFactoryConfig {
 
@@ -29,4 +32,4 @@ public class SqlSessionFactoryConfig {
         sqlSessionFactoryBean.setConfigLocation(resolver.getResources("classpath*:/mybatis/mybatis_config.xml")[0]);
         return sqlSessionFactoryBean;
     }
-}
+}*/

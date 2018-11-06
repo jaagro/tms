@@ -5,6 +5,7 @@
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="waybill_id" property="waybillId" jdbcType="INTEGER" />
     <result column="waybill_item_id" property="waybillItemId" jdbcType="INTEGER" />
+    <result column="anomaly_id" property="anomalyId" jdbcType="INTEGER" />
     <result column="cost_type" property="costType" jdbcType="INTEGER" />
     <result column="money" property="money" jdbcType="DECIMAL" />
     <result column="enabled" property="enabled" jdbcType="BIT" />
@@ -14,7 +15,7 @@
     <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, waybill_id, waybill_item_id, cost_type, money, enabled, create_time, created_user_id, 
+    id, waybill_id, waybill_item_id,anomaly_id, cost_type, money, enabled, create_time, created_user_id,
     modify_time, modify_user_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -28,16 +29,16 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillTruckFee" >
-    insert into waybill_truck_fee (id, waybill_id, waybill_item_id, 
+    insert into waybill_truck_fee (id, waybill_id, waybill_item_id,anomaly_id
       cost_type, money, enabled, 
       create_time, created_user_id, modify_time, 
       modify_user_id)
-    values (#{id,jdbcType=INTEGER}, #{waybillId,jdbcType=INTEGER}, #{waybillItemId,jdbcType=INTEGER}, 
+    values (#{id,jdbcType=INTEGER}, #{waybillId,jdbcType=INTEGER}, #{waybillItemId,jdbcType=INTEGER}, #{anomalyId,jdbcType=INTEGER},
       #{costType,jdbcType=INTEGER}, #{money,jdbcType=DECIMAL}, #{enabled,jdbcType=BIT}, 
       #{createTime,jdbcType=TIMESTAMP}, #{createdUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, 
       #{modifyUserId,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillTruckFee" >
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillTruckFee" keyProperty="id" keyColumn="id" useGeneratedKeys="true" >
     insert into waybill_truck_fee
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -48,6 +49,9 @@
       </if>
       <if test="waybillItemId != null" >
         waybill_item_id,
+      </if>
+      <if test="anomalyId != null" >
+        anomaly_id,
       </if>
       <if test="costType != null" >
         cost_type,
@@ -81,6 +85,9 @@
       <if test="waybillItemId != null" >
         #{waybillItemId,jdbcType=INTEGER},
       </if>
+      <if test="anomalyId != null" >
+        #{anomalyId,jdbcType=INTEGER},
+      </if>
       <if test="costType != null" >
         #{costType,jdbcType=INTEGER},
       </if>
@@ -113,6 +120,9 @@
       <if test="waybillItemId != null" >
         waybill_item_id = #{waybillItemId,jdbcType=INTEGER},
       </if>
+      <if test="anomalyId != null" >
+        anomaly_id= #{anomalyId,jdbcType=INTEGER},
+      </if>
       <if test="costType != null" >
         cost_type = #{costType,jdbcType=INTEGER},
       </if>
@@ -141,6 +151,7 @@
     update waybill_truck_fee
     set waybill_id = #{waybillId,jdbcType=INTEGER},
       waybill_item_id = #{waybillItemId,jdbcType=INTEGER},
+      anomaly_id = #{anomalyId,jdbcType=INTEGER},
       cost_type = #{costType,jdbcType=INTEGER},
       money = #{money,jdbcType=DECIMAL},
       enabled = #{enabled,jdbcType=BIT},

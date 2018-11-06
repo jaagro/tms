@@ -4,6 +4,7 @@
     <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.ShowTrackingDto">
         <id column="id" jdbcType="INTEGER" property="id" />
         <result column="waybill_id" jdbcType="INTEGER" property="waybillId" />
+        <result column="tracking_type" jdbcType="INTEGER" property="trackingType" />
         <result column="old_status" jdbcType="VARCHAR" property="oldStatus" />
         <result column="new_status" jdbcType="VARCHAR" property="newStatus" />
         <result column="driver_id" jdbcType="INTEGER" property="driverId" />

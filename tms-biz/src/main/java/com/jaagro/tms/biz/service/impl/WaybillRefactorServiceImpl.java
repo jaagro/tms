@@ -3,6 +3,7 @@ package com.jaagro.tms.biz.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.constant.UserType;
 import com.jaagro.tms.api.constant.WaybillConstant;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
@@ -23,11 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.net.URL;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -61,10 +62,13 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     private DriverClientService driverClientService;
     @Autowired
     private TruckClientService truckClientService;
-
+    @Autowired
+    private UserClientService userClientService;
+    @Autowired
+    private OssSignUrlClientService ossSignUrlClientService;
     /**
      * 根据状态查询我的运单信息
-     *
+     * @Author @Gao.
      * @param dto
      * @return
      * @Author @Gao.
@@ -82,7 +86,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
             List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByCarrierStatus(waybill);
             listWaybillAppDtos = listWaybill(waybillDtos, currentUserId);
-            return new PageInfo<>(listWaybillAppDtos);
+            return  new PageInfo<>(listWaybillAppDtos);
         }
         //已完成运单
         if (WaybillConstant.ACCOMPLISH.equals(dto.getWaybillStatus())) {
@@ -180,7 +184,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         }
         List<GetWaybillDetailDto> getWaybills = new ArrayList<>();
         for (Waybill waybill : waybillList) {
-            GetWaybillDetailDto waybillDetailDto = getWaybillDetailById(waybill.getId());
+            GetWaybillDetailDto waybillDetailDto =getWaybillDetailById(waybill.getId());
 
             getWaybills.add(waybillDetailDto);
         }
@@ -189,7 +193,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
 
     /**
      * 根据id获取waybill相关的所有对象
-     *
+     * @Author Gavin
      * @param id
      * @return
      * @Author Gavin
@@ -230,7 +234,8 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             BeanUtils.copyProperties(showTrackingDto, getTrackingDto);
             getTrackingDtos.add(getTrackingDto);
         }
-
+        //设置轨迹上传人信息
+        putTrackingUserInfo(getTrackingDtos);
         //根据waybillId获取所有的轨迹上传上来的图片WaybillTrackingImages
         WaybillTrackingImages record = new WaybillTrackingImages();
         record.setWaybillId(waybill.getId());
@@ -240,9 +245,13 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         for (GetWaybillTrackingImagesDto getWaybillTrackingImagesDto : getWaybillTrackingImagesDtos) {
             GetTrackingImagesDto getTrackingImagesDto = new GetTrackingImagesDto();
             BeanUtils.copyProperties(getWaybillTrackingImagesDto, getTrackingImagesDto);
+            String[] strArray = {getTrackingImagesDto.getImageUrl()};
+            List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
+            getTrackingImagesDto.setImageUrl(urls.get(0).toString());
             getTrackingImagesDtos.add(getTrackingImagesDto);
         }
-
+        //设置轨迹图片上传人信息
+        putTrackingImagesUserInfo(getTrackingImagesDtos);
         //把图片塞进对应的轨迹中
         for (GetTrackingDto getTrackingDto : getTrackingDtos) {
             List<GetTrackingImagesDto> imageList = getTrackingImagesDtos.stream().filter(c -> c.getWaybillTrackingId().equals(getTrackingDto.getId())).collect(Collectors.toList());
@@ -261,6 +270,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 .setGoodType(ordersData.getGoodsType());
         return getWaybillDto;
     }
+
 
     /**
      * 根据waybillId获取Items和goods
@@ -289,8 +299,85 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             getWaybillItemsDto.setGoods(getWaybillGoodsDtoList);
             getWaybillItemsDtoList.add(getWaybillItemsDto);
         }
-
         return getWaybillItemsDtoList;
     }
 
+    private void putTrackingUserInfo(List<GetTrackingDto> getTrackingDtos) {
+        //将轨迹分为司机上传和调度上传两组
+        if (!CollectionUtils.isEmpty(getTrackingDtos)){
+            List<Integer> driverIdList = new ArrayList<>();
+            List<Integer> employeeIdList = new ArrayList<>();
+            for (GetTrackingDto getTrackingDto : getTrackingDtos){
+                if (getTrackingDto.getTrackingType() == 1){
+                    driverIdList.add(getTrackingDto.getDriverId());
+                }else{
+                    employeeIdList.add(getTrackingDto.getReferUserId());
+                }
+            }
+            if (!CollectionUtils.isEmpty(driverIdList)){
+                List<UserInfo> driverList = userClientService.listUserInfo(driverIdList, UserType.DRIVER);
+                Map<Integer,UserInfo> driverMap = new HashMap<>();
+                driverList.forEach(userInfo -> driverMap.put(userInfo.getId(),userInfo));
+                if (!driverMap.isEmpty()){
+                    for (GetTrackingDto getTrackingDto : getTrackingDtos){
+                        if (getTrackingDto.getTrackingType() == 1){
+                            getTrackingDto.setUserInfo(driverMap.get(getTrackingDto.getDriverId()));
+                        }
+                    }
+                }
+            }
+            if (!CollectionUtils.isEmpty(employeeIdList)){
+                List<UserInfo> employeeList = userClientService.listUserInfo(employeeIdList, UserType.EMPLOYEE);
+                Map<Integer,UserInfo> employeeMap = new HashMap<>();
+                employeeList.forEach(userInfo -> employeeMap.put(userInfo.getId(),userInfo));
+                if (!employeeMap.isEmpty()){
+                    for (GetTrackingDto getTrackingDto : getTrackingDtos){
+                        if (getTrackingDto.getTrackingType() == 2){
+                            getTrackingDto.setUserInfo(employeeMap.get(getTrackingDto.getReferUserId()));
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    private void putTrackingImagesUserInfo(List<GetTrackingImagesDto> getTrackingImagesDtos) {
+        //将轨迹图片分为司机上传和调度上传两组
+        if (!CollectionUtils.isEmpty(getTrackingImagesDtos)){
+            List<Integer> driverIdList = new ArrayList<>();
+            List<Integer> employeeIdList = new ArrayList<>();
+            for (GetTrackingImagesDto imagesDto : getTrackingImagesDtos){
+                if (imagesDto.getImageType() != 3){
+                    driverIdList.add(imagesDto.getCreateUserId());
+                }else{
+                    employeeIdList.add(imagesDto.getCreateUserId());
+                }
+            }
+            if (!CollectionUtils.isEmpty(driverIdList)){
+                List<UserInfo> driverList = userClientService.listUserInfo(driverIdList, UserType.DRIVER);
+                Map<Integer,UserInfo> driverMap = new HashMap<>();
+                driverList.forEach(userInfo -> driverMap.put(userInfo.getId(),userInfo));
+                if (!driverMap.isEmpty()){
+                    for (GetTrackingImagesDto imagesDto : getTrackingImagesDtos){
+                        if (imagesDto.getImageType() != 3){
+                            imagesDto.setUserInfo(driverMap.get(imagesDto.getCreateUserId()));
+                        }
+                    }
+                }
+            }
+            if (!CollectionUtils.isEmpty(employeeIdList)){
+                List<UserInfo> employeeList = userClientService.listUserInfo(employeeIdList, UserType.EMPLOYEE);
+                Map<Integer,UserInfo> employeeMap = new HashMap<>();
+                employeeList.forEach(userInfo -> employeeMap.put(userInfo.getId(),userInfo));
+                if (!CollectionUtils.isEmpty(employeeMap)){
+                    for (GetTrackingImagesDto imagesDto : getTrackingImagesDtos){
+                        if (imagesDto.getImageType() == 3){
+                            imagesDto.setUserInfo(employeeMap.get(imagesDto.getCreateUserId()));
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.dto.waybill;
 
+import com.jaagro.constant.UserInfo;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -42,4 +43,19 @@ public class GetTrackingImagesDto implements Serializable {
      * 图片地址
      */
     private String imageUrl;
+
+    /**
+     * 创建人
+     */
+    private Integer createUserId;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 创建人用户信息
+     */
+    private UserInfo userInfo;
 }

@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,10 +39,20 @@ public class WebChatAppWaybillController {
         WaybillDetailVo detailVo = new WaybillDetailVo();
         GetWaybillDetailDto detailDto = waybillService.getWaybillDetailById(id);
         BeanUtils.copyProperties(detailDto, detailVo);
-
         detailVo.setTruckNumber(detailDto.getAssginedTruckDto() == null ? "--" : detailDto.getAssginedTruckDto().getTruckNumber());
-        detailVo.setDriverName(detailDto.getAssginedTruckDto() == null ? "--" : detailDto.getAssginedTruckDto().getDrivers().get(0).getName());
-        detailVo.setDriverPhoneNumber(detailDto.getAssginedTruckDto() == null ? "--" : detailDto.getAssginedTruckDto().getDrivers().get(0).getPhoneNumber());
+        if(null == detailDto.getAssginedTruckDto()){
+            detailVo.setDriverName("--");
+            detailVo.setDriverPhoneNumber("--");
+
+        }else {
+            if (CollectionUtils.isEmpty(detailDto.getAssginedTruckDto().getDrivers())) {
+                detailVo.setDriverName("--");
+                detailVo.setDriverPhoneNumber("--");
+            } else if (null != detailDto.getAssginedTruckDto().getDrivers().get(0)) {
+                detailVo.setDriverName(detailDto.getAssginedTruckDto().getDrivers().get(0).getName() == null ? "--" : detailDto.getAssginedTruckDto().getDrivers().get(0).getName());
+                detailVo.setDriverPhoneNumber(detailDto.getAssginedTruckDto().getDrivers().get(0).getPhoneNumber() == null ? "--" : detailDto.getAssginedTruckDto().getDrivers().get(0).getPhoneNumber());
+            }
+        }
         //装货地
         ShowSiteVo loadSiteVo = new ShowSiteVo();
         BeanUtils.copyProperties(detailDto.getLoadSiteDto(), loadSiteVo);
