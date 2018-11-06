@@ -35,5 +35,5 @@ public class WaybillAnomalyReportDto implements Serializable {
     /**
      * 异常上传图片路径
      */
-    private List<String> imageUrl;
+    private List<String> imagesUrl;
 }

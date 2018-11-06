@@ -46,7 +46,7 @@ public class AnomalInformationProcessDto implements Serializable {
     /**
      * 异常处理图片上传路径
      */
-    private List<String> imageUrl;
+    private List<String> imagesUrl;
 
     /**
      * 是否涉及费用调整

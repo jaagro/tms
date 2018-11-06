@@ -81,7 +81,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         waybillAnomaly.setCreateUserId(currentUser.getId());
         waybillAnomalyMapper.insertSelective(waybillAnomaly);
         //插入异常图片表
-        List<String> imageUrl = dto.getImageUrl();
+        List<String> imageUrl = dto.getImagesUrl();
         for (String url : imageUrl) {
             WaybillAnomalyImage waybillAnomalyImage = new WaybillAnomalyImage();
             waybillAnomalyImage
@@ -184,7 +184,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 .setAdjustStatus(dto.getAdjustStatus());
         waybillAnomalyMapper.updateByPrimaryKeySelective(waybillAnomaly);
         //批量插入图片
-        List<String> imageUrl = dto.getImageUrl();
+        List<String> imageUrl = dto.getImagesUrl();
         for (String url : imageUrl) {
             WaybillAnomalyImage waybillAnomalyImage = new WaybillAnomalyImage();
             waybillAnomalyImage
