@@ -24,4 +24,14 @@ public final class CostType {
      * 扣款
      */
     public final static Integer DEDUCTION = 4;
+
+    /**
+     * 卸货费
+     */
+    public final static Integer UNLOAD_FEE = 5;
+
+    /**
+     *货损费
+     */
+    public final static Integer DAMAGE_FEE = 6;
 }
