@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URL;
@@ -41,11 +42,13 @@ public class WaybillAnomalyController {
     @GetMapping("displayAnomalType")
     public BaseResponse displayAnormalType() {
         List<WaybillAnomalTypeDto> waybillAnomalTypeDtos = waybillAnomalyService.displayAnormalType();
-        AnomalTypeVo anomalTypeVo = new AnomalTypeVo();
+        List<AnomalTypeVo> anomalTypeVos = new ArrayList<>();
         for (WaybillAnomalTypeDto waybillAnomalTypeDto : waybillAnomalTypeDtos) {
+            AnomalTypeVo anomalTypeVo = new AnomalTypeVo();
             BeanUtils.copyProperties(waybillAnomalTypeDto, anomalTypeVo);
+            anomalTypeVos.add(anomalTypeVo);
         }
-        return BaseResponse.successInstance(waybillAnomalyService.displayAnormalType());
+        return BaseResponse.successInstance(anomalTypeVos);
     }
 
     @ApiOperation("根据运单Id显示客户信息")
@@ -59,24 +62,28 @@ public class WaybillAnomalyController {
     public BaseResponse anomalInformationDisplay(@RequestBody WaybillAnomalyCondtion dto) {
         List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyService.listWaybillAnomalyByCondition(dto);
         AnomalInformationVo anomalInformationVo = new AnomalInformationVo();
-        BeanUtils.copyProperties(waybillAnomalyDtos.get(0), anomalInformationVo);
-        //客户名称
-        ShowCustomerDto customer = waybillAnomalyService.getCustomerByWaybillId(waybillAnomalyDtos.get(0).getWaybillId());
-        anomalInformationVo.setCustomerName(customer.getCustomerName());
-        //异常图片
-        WaybillAnomalyImageCondtion waybillAnomalyImageCondtion = new WaybillAnomalyImageCondtion();
-        waybillAnomalyImageCondtion
-                .setAnomalyId(waybillAnomalyDtos.get(0).getId())
-                .setCreateUserId(waybillAnomalyDtos.get(0).getCreateUserId());
-        List<String> imageUrls = new ArrayList<>();
-        List<WaybillAnomalyImageDto> waybillAnomalyImageDtos = waybillAnomalyService.listWaybillAnormalyImageByCondtion(waybillAnomalyImageCondtion);
-        for (WaybillAnomalyImageDto waybillAnomalyImageDto : waybillAnomalyImageDtos) {
-            //异常图片替换url地址
-            String[] strArray1 = {waybillAnomalyImageDto.getImageUrl()};
-            List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray1);
-            imageUrls.add(urls.get(0).toString());
+        if (!CollectionUtils.isEmpty(waybillAnomalyDtos)) {
+            BeanUtils.copyProperties(waybillAnomalyDtos.get(0), anomalInformationVo);
+            //客户名称
+            ShowCustomerDto customer = waybillAnomalyService.getCustomerByWaybillId(waybillAnomalyDtos.get(0).getWaybillId());
+            anomalInformationVo.setCustomerName(customer.getCustomerName());
+            //异常图片
+            WaybillAnomalyImageCondtion waybillAnomalyImageCondtion = new WaybillAnomalyImageCondtion();
+            waybillAnomalyImageCondtion
+                    .setAnomalyId(waybillAnomalyDtos.get(0).getId())
+                    .setCreateUserId(waybillAnomalyDtos.get(0).getCreateUserId());
+            List<String> imageUrls = new ArrayList<>();
+            List<WaybillAnomalyImageDto> waybillAnomalyImageDtos = waybillAnomalyService.listWaybillAnormalyImageByCondtion(waybillAnomalyImageCondtion);
+            if (!CollectionUtils.isEmpty(waybillAnomalyImageDtos)) {
+                for (WaybillAnomalyImageDto waybillAnomalyImageDto : waybillAnomalyImageDtos) {
+                    //异常图片替换url地址
+                    String[] strArray1 = {waybillAnomalyImageDto.getImageUrl()};
+                    List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray1);
+                    imageUrls.add(urls.get(0).toString());
+                }
+                anomalInformationVo.setImageUrl(imageUrls);
+            }
         }
-        anomalInformationVo.setImageUrl(imageUrls);
         return BaseResponse.successInstance(anomalInformationVo);
     }
 
@@ -87,4 +94,9 @@ public class WaybillAnomalyController {
         return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
     }
 
+    @ApiOperation("异常管理列表")
+    @PostMapping("anomalManagementList")
+    public BaseResponse anomalManagementList(@RequestBody WaybillAnomalyCondtion dto) {
+        return BaseResponse.successInstance(waybillAnomalyService.anomalManagementList(dto));
+    }
 }

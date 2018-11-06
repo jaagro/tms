@@ -28,6 +28,10 @@ public class WaybillAnomalyReportDto implements Serializable {
     private String anomalyDesc;
 
     /**
+     * 创建人用户类型
+     */
+    private String createUserType;
+    /**
      * 异常上传图片路径
      */
     private String imageUrl;

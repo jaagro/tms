@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.jaagro.tms.biz.mapper.WaybillCustomerFeeMapperExt" >
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillCustomerFeeMapperExt">
 
+    <select id="listWaybillCustomerFeeByCondtion" parameterType="com.jaagro.tms.api.dto.fee.WaybillFeeCondtion" resultType="com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto">
+        select
+        wcf.id, wcf.waybill_id, wcf.waybill_item_id, wcf.anomaly_id, wcf.earning_type,
+        wcf.money, wcf.create_time,wcf.created_user_id,
+        wfa.adjust_reason,wfa. adjust_type,wfa.customer_effect, wfa.truck_effect, wfa.notes
+        from waybill_customer_fee wcf ,waybill_fee_adjustment wfa
+        where wcf.id=wfa.relevance_id and wfa.relevance_type=1 and wcf.enabled=1 and wfa.enabled=1
+        <if test="anomalyId!=null">
+            and anomaly_id=#{anomalyId}
+        </if>
+    </select>
 </mapper>

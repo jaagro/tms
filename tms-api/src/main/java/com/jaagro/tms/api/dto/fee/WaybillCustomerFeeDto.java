@@ -1,4 +1,4 @@
-package com.jaagro.tms.biz.entity;
+package com.jaagro.tms.api.dto.fee;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -8,11 +8,12 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * @author tony
+ * @author @Gao.
  */
 @Data
 @Accessors(chain = true)
-public class WaybillCustomerFee implements Serializable {
+public class WaybillCustomerFeeDto implements Serializable {
+
     /**
      *
      */
@@ -44,11 +45,6 @@ public class WaybillCustomerFee implements Serializable {
     private BigDecimal money;
 
     /**
-     * 是否有效
-     */
-    private Boolean enabled;
-
-    /**
      * 创建时间
      */
     private Date createTime;
@@ -58,13 +54,31 @@ public class WaybillCustomerFee implements Serializable {
      */
     private Integer createdUserId;
 
+    //-----WaybillFeeAdjustment字段-------
     /**
-     * 修改时间
+     * 调整原因类型：1-卸货费  2-货损费。。。
      */
-    private Date modifyTime;
+    private Integer adjustReason;
 
     /**
-     * 修改人id
+     * 调整类型：1-货主向司机付费，2-司机向货主付费
      */
-    private Integer modifyUserId;
+    private Integer adjustType;
+
+    /**
+     * 是否对客户有效
+     */
+    private Boolean customerEffect;
+
+    /**
+     * 是否对司机有效
+     */
+    private Boolean truckEffect;
+
+    /**
+     * 备注信息
+     */
+    private String notes;
+
+
 }
