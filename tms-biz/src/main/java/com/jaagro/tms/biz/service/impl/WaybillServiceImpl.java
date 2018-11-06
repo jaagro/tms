@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
  * @author tony
  */
 @Service
-//@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "waybill")
+@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "waybill")
 public class WaybillServiceImpl implements WaybillService {
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
 
@@ -92,7 +92,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @Author gavin
      */
     @Override
-//    @CacheEvict(cacheNames = "waybill", allEntries = true)
+    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
         String departmentId = currentUserService.getCurrentUser().getDepartmentId().toString();
@@ -979,7 +979,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @param truckId
      * @return
      */
-//    @CacheEvict(cacheNames = "waybill", allEntries = true)
+    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> assignWaybillToTruck(Integer waybillId, Integer truckId) {
