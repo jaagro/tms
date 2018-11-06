@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -221,9 +222,8 @@ public class OrderController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
         List<Integer> departIds = userClientService.getDownDepartment();
-        List<Integer> dids = new ArrayList<>(departIds);
-        if (dids.size() != 0) {
-            criteriaDto.setDepartIds(dids);
+        if (!CollectionUtils.isEmpty(departIds)) {
+            criteriaDto.setDepartIds(departIds);
         }
         //得到订单分页
         PageInfo pageInfo = orderService.listOrderByCriteria(criteriaDto);
@@ -324,9 +324,8 @@ public class OrderController {
         criteriaDto.setWaitOrders(OrderStatus.PLACE_ORDER);
         //部门隔离
         List<Integer> departIds = userClientService.getDownDepartment();
-        List<Integer> dids = new ArrayList<>(departIds);
-        if (dids.size() != 0) {
-            criteriaDto.setDepartIds(dids);
+        if (!CollectionUtils.isEmpty(departIds)) {
+            criteriaDto.setDepartIds(departIds);
         }
         //得到订单分页
         PageInfo pageInfo = orderService.listOrderByCriteria(criteriaDto);
@@ -350,6 +349,17 @@ public class OrderController {
                     ShowUserDto userDto = new ShowUserDto();
                     userDto.setUserName(userInfo.getName());
                     orderVo.setCreatedUserId(userDto);
+                }
+                //派单进度
+                List<ListWaybillDto> waybills = waybillService.listWaybillByOrderId(orderVo.getId());
+                if (waybills.size() > 0) {
+                    orderVo.setWaybillCount(waybills.size());
+                    //已派单
+                    List<ListWaybillDto> waitWaybills = waybillService.listWaybillWaitByOrderId(orderVo.getId());
+                    if (waitWaybills.size() > 0) {
+                        orderVo.setWaybillAlready(waitWaybills.size());
+                        orderVo.setWaybillWait(orderVo.getWaybillCount() - orderVo.getWaybillAlready());
+                    }
                 }
                 /**
                  * 替换订单需求Dto为Vo
