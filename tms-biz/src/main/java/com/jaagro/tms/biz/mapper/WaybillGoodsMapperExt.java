@@ -3,6 +3,7 @@ package com.jaagro.tms.biz.mapper;
 import com.jaagro.tms.api.dto.driverapp.ShowGoodsDto;
 import com.jaagro.tms.api.dto.waybill.GetWaybillGoodsDto;
 import com.jaagro.tms.biz.entity.WaybillGoods;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -35,4 +36,11 @@ public interface WaybillGoodsMapperExt extends WaybillGoodsMapper {
      */
     List<ShowGoodsDto> listWaybillGoodsByWaybillItemId(Integer id);
 
+    /**
+     * 批量更新运单货物
+     * @author yj
+     * @param waybillGoodsList
+     * @return
+     */
+    Integer batchUpdateByPrimaryKeySelective(@Param("waybillGoodsList") List<WaybillGoods> waybillGoodsList);
 }

@@ -1,3 +1,4 @@
+/*
 package com.jaagro.tms.biz.cat;
 
 import com.alibaba.druid.pool.DruidDataSource;
@@ -26,12 +27,14 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 
 
+*/
 /**
  * 1.Cat-Mybatis plugin:  Rewrite on the version of Steven;
  * 2.Support DruidDataSource,PooledDataSource(mybatis Self-contained data source);
  *
  * @author zhanzehui(west_20 @ 163.com)
- */
+ *//*
+
 
 @Intercepts({
         @Signature(method = "query", type = Executor.class, args = {
@@ -194,3 +197,4 @@ public class CatMybatisPlugin implements Interceptor {
     }
 
 }
+*/

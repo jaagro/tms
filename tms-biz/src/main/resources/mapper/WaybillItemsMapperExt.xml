@@ -52,4 +52,63 @@
         </if>
     </select>
 
+    <update id="batchUpdateByPrimaryKeySelective" parameterType="list">
+        update waybill_items
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="waybill_id =case" suffix="end,">
+                <foreach collection="waybillItemsList" item="i" index="index">
+                    <if test="i.waybillId!=null">
+                        when id=#{i.id} then #{i.waybillId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix=" unload_site_id =case" suffix="end,">
+                <foreach collection="waybillItemsList" item="i" index="index">
+                    <if test="i.unloadSiteId!=null">
+                        when id=#{i.id} then #{i.unloadSiteId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="required_time =case" suffix="end," >
+                <foreach collection="waybillItemsList" item="i" index="index">
+                    <if test="i.requiredTime!=null">
+                        when id=#{i.id} then #{i.requiredTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="enabled =case" suffix="end," >
+                <foreach collection="waybillItemsList" item="i" index="index">
+                    <if test="i.enabled!=null">
+                        when id=#{i.id} then #{i.enabled}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="modify_time =case" suffix="end," >
+                <foreach collection="waybillItemsList" item="i" index="index">
+                    <if test="i.modifyTime!=null">
+                        when id=#{i.id} then #{i.modifyTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="modify_user_id =case" suffix="end," >
+                <foreach collection="waybillItemsList" item="i" index="index">
+                    <if test="i.modifyUserId!=null">
+                        when id=#{i.id} then #{i.modifyUserId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="sign_status =case" suffix="end," >
+                <foreach collection="waybillItemsList" item="i" index="index">
+                    <if test="i.signStatus!=null">
+                        when id=#{i.id} then #{i.signStatus}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="waybillItemsList" separator="," item="i" index="index" close=")" open="(" >
+            #{i.id}
+        </foreach>
+    </update>
+
 </mapper>

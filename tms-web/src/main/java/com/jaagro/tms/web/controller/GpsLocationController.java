@@ -79,7 +79,7 @@ public class GpsLocationController {
         long start = System.currentTimeMillis();
         List<ShowLocationDto> result = locationService.locationsByWaybillId(waybillId);
         long end = System.currentTimeMillis();
-        log.info("----异步耗时----------" + (start - end) + "---------------");
+        log.info("----耗时----------" + (start - end) + "---------------");
         return BaseResponse.successInstance(result);
     }
 }

@@ -1,6 +1,7 @@
 package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.biz.entity.WaybillItems;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -23,4 +24,12 @@ public interface WaybillItemsMapperExt extends WaybillItemsMapper {
      * @return
      */
     List<Map<String,Long>> listWaybillIdIdAndSignStatus(WaybillItems waybillItems);
+
+    /**
+     * 批量更新运单卸货地
+     * @author yj
+     * @param waybillItemsList
+     * @return
+     */
+    Integer batchUpdateByPrimaryKeySelective(@Param("waybillItemsList") List<WaybillItems> waybillItemsList);
 }

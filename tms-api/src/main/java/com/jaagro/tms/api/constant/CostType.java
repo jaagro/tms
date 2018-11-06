@@ -8,20 +8,30 @@ public final class CostType {
     /**
      * 运费
      */
-    private final static Integer FREIGHT = 1;
+    public final static Integer FREIGHT = 1;
 
     /**
      * 附加费
      */
-    private final static Integer ADDITIONAL = 2;
+    public final static Integer ADDITIONAL = 2;
 
     /**
      * 赔款
      */
-    private final static Integer COMPENSATE = 3;
+    public final static Integer COMPENSATE = 3;
 
     /**
      * 扣款
      */
-    private final static Integer DEDUCTION = 4;
+    public final static Integer DEDUCTION = 4;
+
+    /**
+     * 卸货费
+     */
+    public final static Integer UNLOAD_FEE = 5;
+
+    /**
+     *货损费
+     */
+    public final static Integer DAMAGE_FEE = 6;
 }

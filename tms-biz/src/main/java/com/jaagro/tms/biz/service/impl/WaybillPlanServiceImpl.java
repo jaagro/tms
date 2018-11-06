@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 /**
  * @author tony
  */
+//@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "waybill")
 @Service
 public class WaybillPlanServiceImpl implements WaybillPlanService {
 
@@ -107,6 +110,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
      * @return 结果集
      * @author tony
      */
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> removeWaybillFromPlan(Integer waybillId) {
