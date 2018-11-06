@@ -71,7 +71,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         //插入异常表
         WaybillAnomaly waybillAnomaly = new WaybillAnomaly();
         BeanUtils.copyProperties(dto, waybillAnomaly);
-        waybillAnomaly.setProcessingStatus("待处理");
+        waybillAnomaly
+                .setProcessingStatus("待处理")
+                .setAuditStatus("待审核");
         UserInfo currentUser = currentUserService.getCurrentUser();
         waybillAnomaly.setCreateUserId(currentUser.getId());
         waybillAnomalyMapper.insertSelective(waybillAnomaly);
@@ -94,8 +96,8 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     public List<WaybillAnomalTypeDto> displayAnormalType() {
         List<WaybillAnomalyType> waybillAnomalyTypes = waybillAnomalyTypeMapper.listAnomalyType();
         List<WaybillAnomalTypeDto> waybillAnomalTypeDtos = new ArrayList<>();
-        WaybillAnomalTypeDto dto = new WaybillAnomalTypeDto();
         for (WaybillAnomalyType waybillAnomalyType : waybillAnomalyTypes) {
+            WaybillAnomalTypeDto dto = new WaybillAnomalTypeDto();
             BeanUtils.copyProperties(waybillAnomalyType, dto);
             waybillAnomalTypeDtos.add(dto);
         }
@@ -190,15 +192,17 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         if (true == dto.getAdjustStatus()) {
             //是否涉及费用调整
             List<AnomalDeductCompensationDto> feeAdjust = dto.getFeeAdjust();
-            for (int i = 0; i < feeAdjust.size(); i++) {
-                AnomalDeductCompensationDto anomalDeductCompensationDto = feeAdjust.get(i);
-                //扣款对象
-                if (0 == i) {
-                    feeAdjust(dto, currentUser.getId(), anomalDeductCompensationDto, CostType.DEDUCTION);
-                }
-                //赔偿对象
-                if (1 == i) {
-                    feeAdjust(dto, currentUser.getId(), anomalDeductCompensationDto, CostType.COMPENSATE);
+            if (!CollectionUtils.isEmpty(feeAdjust)) {
+                for (int i = 0; i < feeAdjust.size(); i++) {
+                    AnomalDeductCompensationDto anomalDeductCompensationDto = feeAdjust.get(i);
+                    //扣款对象
+                    if (0 == i) {
+                        feeAdjust(dto, currentUser.getId(), anomalDeductCompensationDto, CostType.DEDUCTION);
+                    }
+                    //赔偿对象
+                    if (1 == i) {
+                        feeAdjust(dto, currentUser.getId(), anomalDeductCompensationDto, CostType.COMPENSATE);
+                    }
                 }
             }
         }
@@ -225,13 +229,13 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 driverList.add(waybillAnomalyDto.getCreateUserId());
             }
         }
-        List<UserInfo> driverLists=new ArrayList<>();
+        List<UserInfo> driverLists = new ArrayList<>();
         if (!CollectionUtils.isEmpty(employeeList)) {
-            driverLists = customerClientService.listUserInfo(driverList);
+            //driverLists = customerClientService.listUserInfo(driverList);
         }
-        List<UserInfo> employeeLists=new ArrayList<>();
+        List<UserInfo> employeeLists = new ArrayList<>();
         if (CollectionUtils.isEmpty(employeeList)) {
-            employeeLists = customerClientService.listUserInfo(employeeList);
+            // employeeLists = customerClientService.listUserInfo(employeeList);
         }
         for (WaybillAnomalyDto waybillAnomalyDto : waybillAnomalyDtos) {
             AnomalManagementListDto anomalManagementListDto = new AnomalManagementListDto();
@@ -267,15 +271,15 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             }
             //登记人
             if (UserType.EMPLOYEE.equals(waybillAnomalyDto.getCreateUserType())) {
-                UserInfo  creatorName = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList()).get(0);
+                UserInfo creatorName = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList()).get(0);
                 anomalManagementListDto.setCreatorName(creatorName.getName());
             }
             if (UserType.DRIVER.equals(waybillAnomalyDto.getCreateUserId())) {
-                UserInfo driverName=driverLists.stream().filter(c->c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList()).get(0);
+                UserInfo driverName = driverLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList()).get(0);
                 anomalManagementListDto.setCreatorName(driverName.getName());
             }
             //处理人
-            UserInfo  processUser = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList()).get(0);
+            UserInfo processUser = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList()).get(0);
             anomalManagementListDto.setProcessorName(processUser.getName());
             anomalManagementListDtos.add(anomalManagementListDto);
         }

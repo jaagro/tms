@@ -13,10 +13,6 @@ import java.util.Date;
 @Accessors(chain = true)
 public class WaybillAnomalyCondtion implements Serializable {
     /**
-     * 异常Id
-     */
-    private Integer id;
-    /**
      * 异常创建人Id
      */
     private Integer createUserId;
@@ -29,6 +25,11 @@ public class WaybillAnomalyCondtion implements Serializable {
      * 异常Id
      */
     private Integer anomalyId;
+
+    /**
+     * 异常类型id
+     */
+    private Integer anomalyTypeId;
 
     /**
      * 处理状态
