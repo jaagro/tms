@@ -1,5 +1,6 @@
 package com.jaagro.tms.biz.service;
 
+import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
@@ -61,4 +62,6 @@ public interface CustomerClientService {
      */
     @PostMapping("/getTruckIdsByTruckNum/{truckNumber}")
     List<Integer> getTruckIdsByTruckNum(@PathVariable("truckNumber") String truckNumber);
+
+    List<UserInfo> listUserInfo(List<Integer> aa);
 }

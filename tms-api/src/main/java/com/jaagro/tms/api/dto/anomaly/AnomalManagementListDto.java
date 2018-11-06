@@ -46,10 +46,10 @@ public class AnomalManagementListDto implements Serializable {
     /**
      * 登记人
      */
-    private Integer creatorName;
+    private String creatorName;
     /**
      * 处理人
      */
-    private  Integer processorName;
+    private  String processorName;
 
 }

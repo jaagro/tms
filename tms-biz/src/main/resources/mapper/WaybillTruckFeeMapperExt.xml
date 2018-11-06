@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jaagro.tms.biz.mapper.WaybillTruckFeeMapperExt">
 
-    <select id="listWaybillTruckFeeByCondtion" parameterType="java.lang.Integer" resultType="com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto">
+    <select id="listWaybillTruckFeeByCondtion" parameterType="com.jaagro.tms.api.dto.fee.WaybillFeeCondtion" resultType="com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto">
         select
         wtf.id, wtf.waybill_id, wtf.waybill_item_id,wtf.anomaly_id, wtf.cost_type, wtf.money,wtf.create_time, wtf.created_user_id,
         wfa.adjust_reason,wfa. adjust_type,wfa.customer_effect, wfa.truck_effect, wfa.notes

@@ -20,7 +20,6 @@ public class WaybillAnomalyCondtion implements Serializable {
      * 异常创建人Id
      */
     private Integer createUserId;
-
     /**
      * 运单号Id
      */
@@ -45,4 +44,9 @@ public class WaybillAnomalyCondtion implements Serializable {
      * 登记结束时间
      */
     private Date endDate;
+
+    /**
+     * 异常创建人 类型
+     */
+    private String createUserType;
 }
