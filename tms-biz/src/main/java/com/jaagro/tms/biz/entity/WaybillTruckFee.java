@@ -29,6 +29,12 @@ public class WaybillTruckFee implements Serializable {
     private Integer waybillItemId;
 
     /**
+     *
+     */
+
+    private Integer anomalyId;
+
+    /**
      * 费用类型：1-运费 2-附加费
      */
     private Integer costType;

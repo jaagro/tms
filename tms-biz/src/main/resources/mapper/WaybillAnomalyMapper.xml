@@ -13,6 +13,7 @@
     <result column="verified_status" property="verifiedStatus" jdbcType="BIT" />
     <result column="adjust_status" property="adjustStatus" jdbcType="BIT" />
     <result column="create_user_id" property="createUserId" jdbcType="INTEGER" />
+    <result column="create_user_type" property="createUserType" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="processor_user _id" property="processorUserId" jdbcType="INTEGER" />
     <result column="processor_time" property="processorTime" jdbcType="TIMESTAMP" />
@@ -22,7 +23,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, waybill_id, anomaly_type_id, anomaly_desc, processing_status, processing_desc,
-    audit_status, audit_desc, verified_status, adjust_status, create_user_id, create_time,
+    audit_status, audit_desc, verified_status, adjust_status, create_user_id, create_user_type,create_time,
     processor_user_id, processor_time, audit_user_id, audit_time, enabled
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -40,13 +41,13 @@
     insert into waybill_anomaly (id, waybill_id, anomaly_type_id, 
       anomaly_desc, processing_status, processing_desc,
       audit_status, audit_desc, verified_status,
-      adjust_status, create_user_id, create_time, 
+      adjust_status, create_user_id,create_user_type, create_time,
       processor_user_id, processor_time, audit_user_id,
       audit_time, enabled)
     values (#{id,jdbcType=INTEGER}, #{waybillId,jdbcType=INTEGER}, #{anomalyTypeId,jdbcType=INTEGER}, 
       #{anomalyDesc,jdbcType=VARCHAR}, #{processingStatus,jdbcType=VARCHAR}, #{processingDesc,jdbcType=VARCHAR}, 
       #{auditStatus,jdbcType=VARCHAR}, #{auditDesc,jdbcType=VARCHAR}, #{verifiedStatus,jdbcType=BIT}, 
-      #{adjustStatus,jdbcType=BIT}, #{createUserId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{adjustStatus,jdbcType=BIT}, #{createUserId,jdbcType=INTEGER},#{createUserType,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
       #{processorUserId,jdbcType=INTEGER}, #{processorTime,jdbcType=TIMESTAMP}, #{auditUserId,jdbcType=INTEGER}, 
       #{auditTime,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT})
   </insert>
@@ -86,6 +87,9 @@
       </if>
       <if test="createUserId != null" >
         create_user_id,
+      </if>
+      <if test="createUserType != null" >
+        create_user_type,
       </if>
       <if test="createTime != null" >
         create_time,
@@ -140,6 +144,9 @@
       <if test="createUserId != null" >
         #{createUserId,jdbcType=INTEGER},
       </if>
+      <if test="createUserType != null" >
+        #{createUserType},
+      </if>
       <if test="createTime != null" >
         #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -193,6 +200,9 @@
       <if test="createUserId != null" >
         create_user_id = #{createUserId,jdbcType=INTEGER},
       </if>
+      <if test="createUserType != null" >
+        create_user_type = #{createUserType},
+      </if>
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -226,6 +236,7 @@
       verified_status = #{verifiedStatus,jdbcType=BIT},
       adjust_status = #{adjustStatus,jdbcType=BIT},
       create_user_id = #{createUserId,jdbcType=INTEGER},
+      create_user_type = #{createUserType},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       processor_user_id = #{processorUserId,jdbcType=INTEGER},
       processor_time = #{processorTime,jdbcType=TIMESTAMP},

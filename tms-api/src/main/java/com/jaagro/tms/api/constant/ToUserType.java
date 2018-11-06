@@ -21,4 +21,5 @@ public final class ToUserType {
      * 员工
      */
     public static final Integer EMPLOYEE = 3;
+
 }
