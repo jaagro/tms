@@ -29,7 +29,6 @@ import java.util.List;
  */
 @Service
 @Log4j
-//@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "message")
 public class MessageServiceImpl implements MessageService {
     @Autowired
     private MessageMapperExt messageMapperExt;
@@ -41,7 +40,6 @@ public class MessageServiceImpl implements MessageService {
      * @param criteriaDto
      * @return
      */
-//    @CacheEvict(cacheNames = "message", allEntries = true)
     @Override
     public PageInfo<MessageReturnDto> listMessageByCriteriaDto(ListMessageCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(),criteriaDto.getPageSize());
