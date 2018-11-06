@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @Author @Gao.
@@ -21,7 +22,7 @@ public class AnomalManagementListDto implements Serializable {
     /**
      * 处理状态
      */
-    private String processStatus;
+    private String processingStatus;
 
     /**
      * 扣款金额
@@ -41,7 +42,7 @@ public class AnomalManagementListDto implements Serializable {
     /**
      * 登记时间
      */
-    private Integer createTime;
+    private Date createTime;
 
     /**
      * 登记人
