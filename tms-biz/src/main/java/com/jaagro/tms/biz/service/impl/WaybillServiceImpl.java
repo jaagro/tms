@@ -1108,7 +1108,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-            ) {
+                    ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1162,11 +1162,11 @@ public class WaybillServiceImpl implements WaybillService {
             Integer userId = getUserId();
             Integer truckId = waybill.getTruckId();
             //1。把所派车辆置空、状态改为带派单
-            waybill.setTruckId(0);
+            waybill.setTruckId(null);
             waybill.setWaybillStatus(WaybillStatus.SEND_TRUCK);
             waybill.setModifyTime(new Date());
             waybill.setModifyUserId(userId);
-            waybillMapper.updateByPrimaryKeySelective(waybill);
+            waybillMapper.updateByPrimaryKey(waybill);
             //2.删除司机的短信
             List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
             Set<Integer> driverIdSet = new HashSet<>();
@@ -1174,7 +1174,9 @@ public class WaybillServiceImpl implements WaybillService {
                 driverIdSet.add(drivers.get(i).getId());
             }
             List<Integer> driverIds = new ArrayList<Integer>(driverIdSet);
-            messageMapper.deleteMessage(waybillId, driverIds);
+            if (!CollectionUtils.isEmpty(driverIds)) {
+                messageMapper.deleteMessage(waybillId, driverIds);
+            }
         } catch (Exception ex) {
             log.error("删除司机短信失败,运单id:{},原因{}", waybillId, ex.getMessage());
             throw ex;
