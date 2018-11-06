@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "location")
+//@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "location")
 @Service
 @Log4j
 public class LocationServiceImpl implements LocationService {

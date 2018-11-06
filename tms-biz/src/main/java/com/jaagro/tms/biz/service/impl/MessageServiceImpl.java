@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Service
 @Log4j
-@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "message")
+//@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "message")
 public class MessageServiceImpl implements MessageService {
     @Autowired
     private MessageMapperExt messageMapperExt;
@@ -41,7 +41,7 @@ public class MessageServiceImpl implements MessageService {
      * @param criteriaDto
      * @return
      */
-    @CacheEvict(cacheNames = "message", allEntries = true)
+//    @CacheEvict(cacheNames = "message", allEntries = true)
     @Override
     public PageInfo<MessageReturnDto> listMessageByCriteriaDto(ListMessageCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(),criteriaDto.getPageSize());
@@ -63,7 +63,6 @@ public class MessageServiceImpl implements MessageService {
      * @param messageIdList
      * @return
      */
-    @Cacheable
     @Override
     public boolean readMessages(List<Integer> messageIdList) {
         Integer currentUserId = currentUserService.getCurrentUser() == null ? null : currentUserService.getCurrentUser().getId();
@@ -80,7 +79,6 @@ public class MessageServiceImpl implements MessageService {
      * @param criteriaDto
      * @return
      */
-    @Cacheable
     @Override
     public List<MessageReturnDto> listUnreadMessages(ListUnReadMsgCriteriaDto criteriaDto) {
         if (criteriaDto.getMsgStatus() == null){
@@ -109,7 +107,6 @@ public class MessageServiceImpl implements MessageService {
      * @param createMessageDto
      * @return
      */
-    @CacheEvict(cacheNames = "message", allEntries = true)
     @Override
     public boolean createMessage(CreateMessageDto createMessageDto) {
         Message message = new Message();

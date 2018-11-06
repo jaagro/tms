@@ -38,9 +38,10 @@ public class WebChatAppWaybillController {
         WaybillDetailVo detailVo = new WaybillDetailVo();
         GetWaybillDetailDto detailDto = waybillService.getWaybillDetailById(id);
         BeanUtils.copyProperties(detailDto, detailVo);
-        detailVo.setTruckNumber(detailDto.getAssginedTruckDto().getTruckNumber() == null ? "--" : detailDto.getAssginedTruckDto().getTruckNumber());
-        detailVo.setDriverName(detailDto.getAssginedTruckDto().getDrivers().get(0).getName() == null ? "--" : detailDto.getAssginedTruckDto().getDrivers().get(0).getName());
-        detailVo.setDriverPhoneNumber(detailDto.getAssginedTruckDto().getDrivers().get(0).getPhoneNumber() == null ? "--" : detailDto.getAssginedTruckDto().getDrivers().get(0).getPhoneNumber());
+
+        detailVo.setTruckNumber(detailDto.getAssginedTruckDto() == null ? "--" : detailDto.getAssginedTruckDto().getTruckNumber());
+        detailVo.setDriverName(detailDto.getAssginedTruckDto() == null ? "--" : detailDto.getAssginedTruckDto().getDrivers().get(0).getName());
+        detailVo.setDriverPhoneNumber(detailDto.getAssginedTruckDto() == null ? "--" : detailDto.getAssginedTruckDto().getDrivers().get(0).getPhoneNumber());
         //装货地
         ShowSiteVo loadSiteVo = new ShowSiteVo();
         BeanUtils.copyProperties(detailDto.getLoadSiteDto(), loadSiteVo);

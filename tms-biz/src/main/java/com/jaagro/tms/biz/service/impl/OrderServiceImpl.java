@@ -33,7 +33,6 @@ import java.util.*;
 /**
  * @author tony
  */
-@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "order")
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -64,7 +63,6 @@ public class OrderServiceImpl implements OrderService {
      * @param orderDto 入参json
      * @return
      */
-    @CacheEvict(cacheNames = "order", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createOrder(CreateOrderDto orderDto) {
@@ -93,7 +91,6 @@ public class OrderServiceImpl implements OrderService {
      * @param orderDto 入参json
      * @return 修改后的order对象
      */
-    @CacheEvict(cacheNames = "order", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public GetOrderDto updateOrder(UpdateOrderDto orderDto) {
@@ -140,7 +137,6 @@ public class OrderServiceImpl implements OrderService {
      * @param id 订单id
      * @return order对象
      */
-    @Cacheable
     @Override
     public GetOrderDto getOrderById(Integer id) {
         Orders order = this.ordersMapper.selectByPrimaryKey(id);
@@ -190,7 +186,6 @@ public class OrderServiceImpl implements OrderService {
      * @param id 订单id
      * @return
      */
-    @CacheEvict(cacheNames = "order", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> deleteOrderById(Integer id) {
@@ -207,7 +202,6 @@ public class OrderServiceImpl implements OrderService {
         return ServiceResult.toResult("删除成功");
     }
 
-    @CacheEvict(cacheNames = "order", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> cancelOrders(Integer orderId, String detailInfo) {
@@ -242,7 +236,6 @@ public class OrderServiceImpl implements OrderService {
      * @param customerId
      * @return
      */
-    @Cacheable
     @Override
     public List<Integer> getOrderIdsByCustomerId(Integer customerId) {
         return this.ordersMapper.getOrderIdsByCustomerId(customerId);
