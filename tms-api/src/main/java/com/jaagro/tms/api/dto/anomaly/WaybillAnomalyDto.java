@@ -68,6 +68,11 @@ public class WaybillAnomalyDto implements Serializable {
     private Integer createUserId;
 
     /**
+     * 创建人类型
+     */
+    private String createUserType;
+
+    /**
      * 登记时间
      */
     private Date createTime;

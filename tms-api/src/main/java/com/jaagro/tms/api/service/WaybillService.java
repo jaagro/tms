@@ -1,6 +1,8 @@
 package com.jaagro.tms.api.service;
 
 import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
+import com.jaagro.tms.api.dto.driverapp.ShowWaybillTrackingDto;
+import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
 import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
@@ -36,7 +38,7 @@ public interface WaybillService {
      * @param waybillId
      * @returne
      */
-    Map<String, Object> showWaybillTrucking(Integer waybillId);
+    ShowWaybillTrackingDto showWaybillTrucking(Integer waybillId);
 
     /**
      * 更新运单轨迹
@@ -163,4 +165,20 @@ public interface WaybillService {
      * @return
      */
     List<ListWaybillDto> listWaybillWaitByOrderId(Integer id);
+    /**
+     * 回单修改运单货物信息新增运单轨迹(回单补录)
+     * @author yj
+     * @param updateWaybillGoodsReceiptDto
+     * @return
+     */
+    boolean updateWaybillGoodsReceipt(UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto);
+
+    /**
+     * 上传回单图片
+     * @author yj
+     * @param waybillId
+     * @param imageUrl
+     * @return
+     */
+    boolean uploadReceiptImage(Integer waybillId, String imageUrl);
 }

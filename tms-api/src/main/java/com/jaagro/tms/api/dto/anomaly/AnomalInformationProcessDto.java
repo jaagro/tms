@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,6 +46,11 @@ public class AnomalInformationProcessDto implements Serializable {
     /**
      * 异常处理图片上传路径
      */
-    private List<String> imageUrl;
+    private List<String> imagesUrl;
+
+    /**
+     * 是否涉及费用调整
+     */
+    private List<AnomalDeductCompensationDto> feeAdjust;
 
 }
