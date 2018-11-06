@@ -10,6 +10,8 @@ import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
+import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
+import com.jaagro.tms.api.dto.receipt.UpdateWaybillgoodsDto;
 import com.jaagro.tms.api.dto.truck.DriverReturnDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
@@ -27,9 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -45,6 +44,7 @@ import java.util.stream.Collectors;
  * @author tony
  */
 @Service
+//@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "waybill")
 public class WaybillServiceImpl implements WaybillService {
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
 
@@ -91,6 +91,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @Author gavin
      */
     @Override
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
         String departmentId = currentUserService.getCurrentUser().getDepartmentId().toString();
@@ -204,6 +205,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author tony
      */
+//    @Cacheable
     @Override
     public GetWaybillDto getWaybillById(Integer id) {
         //拿到waybill对象
@@ -319,6 +321,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @param orderId
      * @return
      */
+//    @Cacheable
     @Override
     public GetWaybillPlanDto getOrderAndWaybill(Integer orderId) {
         GetOrderDto getOrderDto = orderService.getOrderById(orderId);
@@ -348,6 +351,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
+//    @Cacheable
     @Override
     public Map<String, Object> listWaybillByStatus(GetWaybillParamDto dto) {
 
@@ -390,6 +394,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @Author @Gao.
      */
     @Override
+//    @Cacheable
     public Map<String, Object> listWayBillDetails(Integer waybillId) {
         GetWaybillDetailsAppDto waybillDetailsAppDto = new GetWaybillDetailsAppDto();
         WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
@@ -484,11 +489,12 @@ public class WaybillServiceImpl implements WaybillService {
      * @author @Gao.
      */
     @Override
-    public Map<String, Object> showWaybillTrucking(Integer waybillId) {
+//    @Cacheable
+    public ShowWaybillTrackingDto showWaybillTrucking(Integer waybillId) {
         ShowWaybillTrackingDto showWaybillTrackingDto = new ShowWaybillTrackingDto();
         List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybillId);
         showWaybillTrackingDto.setShowTrackingDtos(showTrackingDtos);
-        return ServiceResult.toResult(showWaybillTrackingDto);
+        return showWaybillTrackingDto;
     }
 
     /**
@@ -498,6 +504,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> upDateWaybillTrucking(GetWaybillTruckingParamDto dto) {
@@ -698,6 +705,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
+//    @Cacheable
     @Override
     public Map<String, Object> showGoodsByWaybillItemId(Integer waybillItemId) {
         ShowWaybillGoodDto showWaybillGoodDto = new ShowWaybillGoodDto();
@@ -713,6 +721,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
+//    @Cacheable
     @Override
     public Map<String, Object> showGoodsByWaybillId(Integer waybillId) {
         ShowLoadSiteGoodsDto showLoadSiteGoodsDto = new ShowLoadSiteGoodsDto();
@@ -742,6 +751,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
+//    @Cacheable
     @Override
     public Map<String, Object> showUnloadSite(Integer waybillId) {
         ShowUnLoadSite showUnLoadSiteDto = new ShowUnLoadSite();
@@ -772,6 +782,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     public Map<String, Object> receiptList(GetReceiptParamDto dto) {
 
@@ -836,6 +847,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> upDateReceiptStatus(GetReceiptParamDto dto) {
@@ -886,6 +898,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
+//    @Cacheable
     @Override
     public Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
@@ -965,6 +978,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @param truckId
      * @return
      */
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> assignWaybillToTruck(Integer waybillId, Integer truckId) {
@@ -1065,6 +1079,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @param criteriaDto
      * @return
      */
+//    @Cacheable
     @Override
     public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
@@ -1092,7 +1107,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-            ) {
+                    ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1128,6 +1143,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author gavin
      */
+//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean withdrawWaybill(Integer waybillId) {
@@ -1149,7 +1165,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setWaybillStatus(WaybillStatus.SEND_TRUCK);
             waybill.setModifyTime(new Date());
             waybill.setModifyUserId(userId);
-            waybillMapper.updateByPrimaryKeySelective(waybill);
+            waybillMapper.updateByPrimaryKey(waybill);
             //2.删除司机的短信
             List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
             Set<Integer> driverIdSet = new HashSet<>();
@@ -1157,12 +1173,134 @@ public class WaybillServiceImpl implements WaybillService {
                 driverIdSet.add(drivers.get(i).getId());
             }
             List<Integer> driverIds = new ArrayList<Integer>(driverIdSet);
-            messageMapper.deleteMessage(waybillId, driverIds);
+            if (!CollectionUtils.isEmpty(driverIds)) {
+                messageMapper.deleteMessage(waybillId, driverIds);
+            }
         } catch (Exception ex) {
             log.error("删除司机短信失败,运单id:{},原因{}", waybillId, ex.getMessage());
             throw ex;
         }
 
+        return true;
+    }
+
+
+    /**
+     * 回单修改运单货物信息新增运单轨迹(回单补录)
+     *
+     * @param updateWaybillGoodsReceiptDto
+     * @return
+     * @author yj
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateWaybillGoodsReceipt(UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto) {
+        // 更新运单货物
+        // 更新运单卸货地
+        List<UpdateWaybillgoodsDto> updateWaybillgoodsDtoList = updateWaybillGoodsReceiptDto.getUpdateWaybillgoodsDtoList();
+        Integer waybillId = null;
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        Integer currentUserId = currentUser == null ? null : currentUser.getId();
+        if (!CollectionUtils.isEmpty(updateWaybillgoodsDtoList)){
+            List<WaybillGoods> waybillGoodsList = new ArrayList<>();
+            List<WaybillItems> waybillItemsList = new ArrayList<>();
+            Set<Integer> waybillItemsIdSet = new HashSet<>();
+            for (UpdateWaybillgoodsDto waybillgoodsDto : updateWaybillgoodsDtoList){
+                waybillItemsIdSet.add(waybillgoodsDto.getWaybillItemId());
+                waybillId = waybillgoodsDto.getWaybillId();
+                Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+                if(waybill == null || !WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())){
+                    throw new RuntimeException("运单id="+waybillId+"不存在");
+                }
+                WaybillGoods waybillGoods = new WaybillGoods();
+                BeanUtils.copyProperties(waybillgoodsDto,waybillGoods);
+                waybillGoods
+                        .setModifyTime(new Date())
+                        .setModifyUserId(currentUserId);
+                waybillGoodsList.add(waybillGoods);
+                WaybillItems waybillItems = new WaybillItems();
+                waybillItems
+                        .setId(waybillgoodsDto.getWaybillItemId())
+                        .setUnloadSiteId(waybillgoodsDto.getUnloadSiteId())
+                        .setModifyTime(new Date())
+                        .setModifyUserId(currentUserId);
+                waybillItemsList.add(waybillItems);
+            }
+            Integer updateWaybillGoodsNum =  waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
+            if (waybillGoodsList.size() != updateWaybillGoodsNum){
+                throw new RuntimeException("更新回单运单货物失败");
+            }
+            Integer updateWaybillItemsNum =  waybillItemsMapper.batchUpdateByPrimaryKeySelective(waybillItemsList);
+            if (waybillItemsIdSet.size() != updateWaybillItemsNum){
+                throw new RuntimeException("更新回单运单卸货地失败");
+            }
+        }
+        // 插入运单轨迹
+        WaybillTracking waybillTracking = new WaybillTracking();
+        List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybillId);
+        if (!CollectionUtils.isEmpty(showTrackingDtos)){
+            ShowTrackingDto showTrackingDto = showTrackingDtos.get(0);
+            waybillTracking
+                    .setOldStatus(showTrackingDto.getOldStatus())
+                    .setNewStatus(showTrackingDto.getNewStatus());
+        }
+        waybillTracking
+                .setCreateTime(new Date())
+                .setWaybillId(waybillId)
+                .setTrackingInfo(updateWaybillGoodsReceiptDto.getReason())
+                .setReferUserId(currentUserId)
+                .setTrackingType(TrackingType.RECEIPT);
+        int waybillTrackingId = waybillTrackingMapper.insertSelective(waybillTracking);
+        if (waybillTrackingId <= 0){
+            throw new RuntimeException("插入运单轨迹(回单补录)失败");
+        }
+        return true;
+    }
+
+    /**
+     * 上传回单图片
+     *
+     * @param waybillId
+     * @param imageUrl
+     * @return
+     * @author yj
+     */
+    @Override
+    //@CacheEvict(cacheNames = "waybill", allEntries = true)
+    @Transactional(rollbackFor = Exception.class)
+    public boolean uploadReceiptImage(Integer waybillId, String imageUrl) {
+        WaybillTracking waybillTracking = new WaybillTracking();
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        Integer currentUserId = currentUser == null ? null : currentUser.getId();
+        List<ShowTrackingDto> waybillTrackingList = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybillId);
+        if (!CollectionUtils.isEmpty(waybillTrackingList)){
+            ShowTrackingDto showTrackingDto = waybillTrackingList.get(0);
+            waybillTracking
+                    .setOldStatus(showTrackingDto.getOldStatus())
+                    .setNewStatus(showTrackingDto.getNewStatus());
+        }
+        waybillTracking
+                .setTrackingType(TrackingType.RECEIPT)
+                .setReferUserId(currentUserId)
+                .setTrackingInfo("回单补传单据")
+                .setWaybillId(waybillId)
+                .setCreateTime(new Date());
+        int count = waybillTrackingMapper.insertSelective(waybillTracking);
+        if (count < 1){
+            throw new RuntimeException("插入运单轨迹(回单补传单据)失败");
+        }
+        WaybillTrackingImages trackingImages = new WaybillTrackingImages();
+        trackingImages
+                .setWaybillTrackingId(waybillTracking.getId())
+                .setImageUrl(imageUrl)
+                .setImageType(ImagesTypeConstant.RECEIPT_BILL)
+                .setCreateUserId(currentUserId)
+                .setCreateTime(new Date())
+                .setWaybillId(waybillId);
+        count = waybillTrackingImagesMapper.insertSelective(trackingImages);
+        if (count < 1){
+            throw new RuntimeException("插入运单轨迹图片(回单补传单据)失败");
+        }
         return true;
     }
 
@@ -1203,4 +1341,5 @@ public class WaybillServiceImpl implements WaybillService {
             return userInfo.getId();
         }
     }
+
 }
