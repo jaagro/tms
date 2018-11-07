@@ -24,7 +24,6 @@ import java.util.Map;
 /**
  * @author baiyiran
  */
-//@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "orderGoods")
 @Service
 public class OrderGoodsServiceImpl implements OrderGoodsService {
 

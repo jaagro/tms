@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 /**
  * @author tony
  */
-//@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "waybill")
 @Service
 public class WaybillPlanServiceImpl implements WaybillPlanService {
 
@@ -110,7 +109,6 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
      * @return 结果集
      * @author tony
      */
-//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> removeWaybillFromPlan(Integer waybillId) {
