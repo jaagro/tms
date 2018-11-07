@@ -1,7 +1,9 @@
 package com.jaagro.tms.web.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.jaagro.tms.api.constant.CustomerType;
 import com.jaagro.tms.api.dto.base.GetCustomerUserDto;
+import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
@@ -216,5 +218,34 @@ public class WeChatAppletOrderController {
         }
         pageInfo.setList(orderVoList);
         return BaseResponse.successInstance(pageInfo);
+    }
+
+    /**
+     * 我的—获取当前登录用户的信息
+     *
+     * @param criteriaDto
+     * @return
+     */
+    @ApiOperation("小程序-我的")
+    @PostMapping("/getCurrentUserPhone")
+    public BaseResponse getCurrentUserPhone() {
+        //获得customer_user中的关联用户id
+        GetCustomerUserDto customerUserDto = userService.getCustomerUserById();
+        if (customerUserDto != null) {
+            MyInfoVo myInfoVo = new MyInfoVo();
+            if (customerUserDto.getCustomerType().equals(CustomerType.CUSTOER)) {
+                ShowCustomerDto customerDto = customerClientService.getShowCustomerById(customerUserDto.getRelevanceId());
+                myInfoVo
+                        .setName(customerDto.getCustomerName())
+                        .setPhone(customerUserDto.getPhoneNumber());
+            } else {
+                ShowSiteDto showSiteDto = customerClientService.getShowSiteById(customerUserDto.getRelevanceId());
+                myInfoVo
+                        .setName(showSiteDto.getSiteName())
+                        .setPhone(customerUserDto.getPhoneNumber());
+            }
+            return BaseResponse.successInstance(myInfoVo);
+        }
+        return BaseResponse.successInstance(null);
     }
 }
