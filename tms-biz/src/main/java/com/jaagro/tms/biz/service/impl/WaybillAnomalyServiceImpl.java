@@ -305,13 +305,13 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 e.printStackTrace();
             }
             //登记人
-            if (null != employeeLists && employeeLists.size() != 0) {
+            if (null != employeeLists && employeeLists.size() != 0 && null != waybillAnomalyDto.getCreateUserId()) {
                 if (UserType.EMPLOYEE.equals(waybillAnomalyDto.getCreateUserType())) {
                     UserInfo creatorName = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList()).get(0);
                     anomalManagementListDto.setCreatorName(creatorName.getName());
                 }
             }
-            if (null != driverLists && driverLists.size() != 0) {
+            if (null != driverLists && driverLists.size() != 0 && null != waybillAnomalyDto.getCreateUserId()) {
                 if (UserType.DRIVER.equals(waybillAnomalyDto.getCreateUserType())) {
                     UserInfo driverName = driverLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList()).get(0);
                     anomalManagementListDto.setCreatorName(driverName.getName());
