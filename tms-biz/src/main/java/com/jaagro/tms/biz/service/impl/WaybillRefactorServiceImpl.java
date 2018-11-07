@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 /**
  * @author tony
  */
-//@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "waybill")
 @Service
 public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     private static final Logger log = LoggerFactory.getLogger(WaybillRefactorServiceImpl.class);
@@ -74,7 +73,6 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
      * @return
      * @Author @Gao.
      */
-//    @Cacheable
     @Override
     public PageInfo listWaybillByStatus(GetWaybillParamDto dto) {
 
@@ -178,7 +176,6 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
      * @return
      * @Author Gavin
      */
-//    @Cacheable
     @Override
     public List<GetWaybillDetailDto> listWaybillDetailByOrderId(Integer orderId) {
         List<Waybill> waybillList = waybillMapper.listWaybillByOrderId(orderId);
@@ -202,7 +199,6 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
      * @Author Gavin
      */
 
-//    @Cacheable
     @Override
     public GetWaybillDetailDto getWaybillDetailById(Integer id) {
         //拿到waybill对象

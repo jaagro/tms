@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
  * @author tony
  */
 @Service
-//@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "waybill")
 public class WaybillServiceImpl implements WaybillService {
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
 
@@ -92,7 +91,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @Author gavin
      */
     @Override
-//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
         String departmentId = currentUserService.getCurrentUser().getDepartmentId().toString();
@@ -206,7 +204,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author tony
      */
-//    @Cacheable
     @Override
     public GetWaybillDto getWaybillById(Integer id) {
         //拿到waybill对象
@@ -322,7 +319,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @param orderId
      * @return
      */
-//    @Cacheable
     @Override
     public GetWaybillPlanDto getOrderAndWaybill(Integer orderId) {
         GetOrderDto getOrderDto = orderService.getOrderById(orderId);
@@ -352,7 +348,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
-//    @Cacheable
     @Override
     public Map<String, Object> listWaybillByStatus(GetWaybillParamDto dto) {
 
@@ -395,7 +390,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @Author @Gao.
      */
     @Override
-//    @Cacheable
     public Map<String, Object> listWayBillDetails(Integer waybillId) {
         GetWaybillDetailsAppDto waybillDetailsAppDto = new GetWaybillDetailsAppDto();
         WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
@@ -490,7 +484,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @author @Gao.
      */
     @Override
-//    @Cacheable
     public ShowWaybillTrackingDto showWaybillTrucking(Integer waybillId) {
         ShowWaybillTrackingDto showWaybillTrackingDto = new ShowWaybillTrackingDto();
         List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.listWaybillTrackingByWaybillId(waybillId);
@@ -505,7 +498,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
-//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> upDateWaybillTrucking(GetWaybillTruckingParamDto dto) {
@@ -706,7 +698,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
-//    @Cacheable
     @Override
     public Map<String, Object> showGoodsByWaybillItemId(Integer waybillItemId) {
         ShowWaybillGoodDto showWaybillGoodDto = new ShowWaybillGoodDto();
@@ -722,7 +713,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
-//    @Cacheable
     @Override
     public Map<String, Object> showGoodsByWaybillId(Integer waybillId) {
         ShowLoadSiteGoodsDto showLoadSiteGoodsDto = new ShowLoadSiteGoodsDto();
@@ -752,7 +742,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
-//    @Cacheable
     @Override
     public Map<String, Object> showUnloadSite(Integer waybillId) {
         ShowUnLoadSite showUnLoadSiteDto = new ShowUnLoadSite();
@@ -783,7 +772,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
-//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     public Map<String, Object> receiptList(GetReceiptParamDto dto) {
 
@@ -848,7 +836,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
-//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> upDateReceiptStatus(GetReceiptParamDto dto) {
@@ -899,7 +886,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @author @Gao.
      */
-//    @Cacheable
     @Override
     public Map<String, Object> receiptMessage(GetReceiptMessageParamDto dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
@@ -979,7 +965,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @param truckId
      * @return
      */
-//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> assignWaybillToTruck(Integer waybillId, Integer truckId) {
@@ -1080,7 +1065,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @param criteriaDto
      * @return
      */
-//    @Cacheable
     @Override
     public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
@@ -1144,7 +1128,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author gavin
      */
-//    @CacheEvict(cacheNames = "waybill", allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean withdrawWaybill(Integer waybillId) {
@@ -1194,7 +1177,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @author yj
      */
     @Override
-    //@CacheEvict(cacheNames = "waybill", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public boolean updateWaybillGoodsReceipt(UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto) {
         // 更新运单货物
@@ -1268,7 +1250,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @author yj
      */
     @Override
-    //@CacheEvict(cacheNames = "waybill", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public boolean uploadReceiptImage(Integer waybillId, String imageUrl) {
         WaybillTracking waybillTracking = new WaybillTracking();

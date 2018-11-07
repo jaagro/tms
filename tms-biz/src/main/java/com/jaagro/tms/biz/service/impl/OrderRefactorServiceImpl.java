@@ -31,7 +31,6 @@ import java.util.Map;
 /**
  * @author baiyiran
  */
-@CacheConfig(keyGenerator = "wiselyKeyGenerator", cacheNames = "order")
 @Service
 public class OrderRefactorServiceImpl implements OrderRefactorService {
 
@@ -56,7 +55,6 @@ public class OrderRefactorServiceImpl implements OrderRefactorService {
      * @param id 订单id
      * @return order对象
      */
-    @Cacheable
     @Override
     public GetOrderDto getOrderById(Integer id) {
         Orders order = this.ordersMapper.selectByPrimaryKey(id);
@@ -86,7 +84,6 @@ public class OrderRefactorServiceImpl implements OrderRefactorService {
      * @param criteriaDto 查询条件 json
      * @return 订单列表
      */
-    @Cacheable
     @Override
     public Map<String, Object> listWeChatOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
@@ -123,7 +120,5 @@ public class OrderRefactorServiceImpl implements OrderRefactorService {
             }
         }
         return ServiceResult.toResult(new PageInfo<>(orderDtos));
-
-
     }
 }
