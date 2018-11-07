@@ -269,40 +269,30 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             waybillFeeCondtion
                     .setAnomalyId(waybillAnomalyDto.getId());
             //客户侧费用
-            try {
-                List<WaybillCustomerFeeDto> waybillCustomerFeeDtos = waybillCustomerFeeMapper.listWaybillCustomerFeeByCondtion(waybillFeeCondtion);
-                if (null != waybillCustomerFeeDtos.get(0)) {
-                    WaybillCustomerFeeDto waybillCustomerFeeDto = waybillCustomerFeeDtos.get(0);
-                    //客户侧赔偿
-                    if (CostType.COMPENSATE == waybillCustomerFeeDto.getAdjustType()) {
-                        anomalManagementListDto.setCompensateMoney("[客户] " + waybillCustomerFeeDto.getMoney());
-                    }
-                    //客户侧扣款
-                    if (CostType.DEDUCTION == waybillCustomerFeeDto.getAdjustType()) {
-                        anomalManagementListDto.setDeductMoney("[客户] " + "-" + waybillCustomerFeeDto.getMoney());
-                    }
+            List<WaybillCustomerFeeDto> waybillCustomerFeeDtos = waybillCustomerFeeMapper.listWaybillCustomerFeeByCondtion(waybillFeeCondtion);
+            if (!CollectionUtils.isEmpty(waybillCustomerFeeDtos)) {
+                WaybillCustomerFeeDto waybillCustomerFeeDto = waybillCustomerFeeDtos.get(0);
+                //客户侧赔偿
+                if (CostType.COMPENSATE == waybillCustomerFeeDto.getAdjustType()) {
+                    anomalManagementListDto.setCompensateMoney("[客户] " + waybillCustomerFeeDto.getMoney());
                 }
-            } catch (Exception e) {
-                log.error("当前行获取客户侧费用失败={}", e);
-                e.printStackTrace();
+                //客户侧扣款
+                if (CostType.DEDUCTION == waybillCustomerFeeDto.getAdjustType()) {
+                    anomalManagementListDto.setDeductMoney("[客户] " + "-" + waybillCustomerFeeDto.getMoney());
+                }
             }
             //运力侧费用
-            try {
-                List<WaybillTruckFeeDto> waybillTruckFeeDtos = waybillTruckFeeMapper.listWaybillTruckFeeByCondtion(waybillFeeCondtion);
-                if (null != waybillAnomalyDtos.get(0)) {
-                    WaybillTruckFeeDto waybillTruckFeeDto = waybillTruckFeeDtos.get(0);
-                    //运力侧赔偿
-                    if (CostType.COMPENSATE == waybillTruckFeeDto.getAdjustType()) {
-                        anomalManagementListDto.setCompensateMoney("[司机] " + waybillTruckFeeDto.getMoney());
-                    }
-                    //运力侧扣款
-                    if (CostType.DEDUCTION == waybillTruckFeeDto.getAdjustType()) {
-                        anomalManagementListDto.setDeductMoney("[司机] " + "-" + waybillTruckFeeDto.getMoney());
-                    }
+            List<WaybillTruckFeeDto> waybillTruckFeeDtos = waybillTruckFeeMapper.listWaybillTruckFeeByCondtion(waybillFeeCondtion);
+            if (!CollectionUtils.isEmpty(waybillTruckFeeDtos)) {
+                WaybillTruckFeeDto waybillTruckFeeDto = waybillTruckFeeDtos.get(0);
+                //运力侧赔偿
+                if (CostType.COMPENSATE == waybillTruckFeeDto.getAdjustType()) {
+                    anomalManagementListDto.setCompensateMoney("[司机] " + waybillTruckFeeDto.getMoney());
                 }
-            } catch (Exception e) {
-                log.error("当前行获取运力侧费用失败={}", e);
-                e.printStackTrace();
+                //运力侧扣款
+                if (CostType.DEDUCTION == waybillTruckFeeDto.getAdjustType()) {
+                    anomalManagementListDto.setDeductMoney("[司机] " + "-" + waybillTruckFeeDto.getMoney());
+                }
             }
             //登记人
             if (null != employeeLists && employeeLists.size() != 0 && null != waybillAnomalyDto.getCreateUserId()) {
