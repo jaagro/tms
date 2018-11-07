@@ -84,7 +84,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         waybillAnomalyMapper.insertSelective(waybillAnomaly);
         //插入异常图片表
         List<String> imageUrl = dto.getImagesUrl() == null ? null : dto.getImagesUrl();
-        if (null != imageUrl) {
+        if (null != imageUrl && imageUrl.size() != 0) {
             for (String url : imageUrl) {
                 WaybillAnomalyImage waybillAnomalyImage = new WaybillAnomalyImage();
                 waybillAnomalyImage
@@ -189,7 +189,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         waybillAnomalyMapper.updateByPrimaryKeySelective(waybillAnomaly);
         //批量插入图片
         List<String> imageUrl = dto.getImagesUrl() == null ? null : dto.getImagesUrl();
-        if (null != imageUrl) {
+        if (null != imageUrl && imageUrl.size() != 0) {
             for (String url : imageUrl) {
                 WaybillAnomalyImage waybillAnomalyImage = new WaybillAnomalyImage();
                 waybillAnomalyImage
@@ -283,7 +283,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     }
                 }
             } catch (Exception e) {
-                log.error("当前行取客户侧费用失败={}", e);
+                log.error("当前行获取客户侧费用失败={}", e);
                 e.printStackTrace();
             }
             //运力侧费用
