@@ -18,7 +18,6 @@ import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
@@ -125,7 +124,7 @@ public class ReceiptController {
         //回单补录信息
         List<GetTrackingDto> trackingDtoList = waybillDetailDto.getTracking();
         if (!CollectionUtils.isEmpty(trackingDtoList)){
-            List<WayBillTrackingVo> wayBillTrackingVoList = new ArrayList<WayBillTrackingVo>();
+            List<WayBillTrackingVo> wayBillTrackingVoList = new ArrayList<>();
             for (GetTrackingDto trackingDto : trackingDtoList){
                 if (trackingDto.getTrackingType() == 2 && !RECEIPT_TRACKING_IMAGE_INFO.equals(trackingDto.getTrackingInfo())){
                     WayBillTrackingVo trackingVo = new WayBillTrackingVo();
@@ -142,7 +141,7 @@ public class ReceiptController {
         }
         // 轨迹图片
         if (!CollectionUtils.isEmpty(trackingDtoList)){
-            List<WaybillTrackingImagesVo> waybillTrackingImagesVoList = new ArrayList<WaybillTrackingImagesVo>();
+            List<WaybillTrackingImagesVo> waybillTrackingImagesVoList = new ArrayList<>();
             for (GetTrackingDto trackingDto : trackingDtoList){
                 List<GetTrackingImagesDto> imageList = trackingDto.getImageList();
                 if (!CollectionUtils.isEmpty(imageList)){

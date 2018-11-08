@@ -1179,8 +1179,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateWaybillGoodsReceipt(UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto) {
-        // 更新运单货物
-        // 更新运单卸货地
+        // 更新运单货物 更新运单卸货地
         List<UpdateWaybillgoodsDto> updateWaybillgoodsDtoList = updateWaybillGoodsReceiptDto.getUpdateWaybillgoodsDtoList();
         Integer waybillId = null;
         UserInfo currentUser = currentUserService.getCurrentUser();
