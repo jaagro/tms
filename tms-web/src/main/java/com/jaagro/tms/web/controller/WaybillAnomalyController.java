@@ -134,7 +134,6 @@ public class WaybillAnomalyController {
                 }
             }
         }
-
         return BaseResponse.successInstance(anomalInformationVo);
     }
 
