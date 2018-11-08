@@ -38,18 +38,21 @@ public class WaybillTaskService {
             Date nowTime = new SimpleDateFormat(format).parse(strNowTime);
             Date startTime = new SimpleDateFormat(format).parse("06:00:00");
             Date endTime = new SimpleDateFormat(format).parse("09:00:00");
+
             if (!isEffectiveDate(nowTime, startTime, endTime)) {
+
                 List<Waybill> waybillList = waybillMapperExt.listOverTimeWaybills();
 
                 if (!CollectionUtils.isEmpty(waybillList)) {
                     waybillMapperExt.batchUpdateWaybillStatus(waybillList);
                 }
+
+                log.info("定时钟执行结束");
             }
         } catch (ParseException ex) {
             ex.printStackTrace();
             log.error("定时钟waybillDefaultRejectBySystem执行异常:", ex);
         }
-        log.info("定时钟执行结束");
     }
 
     public static void main(String[] args) {
@@ -131,4 +134,3 @@ public class WaybillTaskService {
         return 0;
     }
 }
-
