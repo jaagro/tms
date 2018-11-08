@@ -6,10 +6,7 @@ import com.jaagro.tms.api.dto.base.GetCustomerUserDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.order.*;
-import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
-import com.jaagro.tms.api.dto.waybill.GetWaybillItemDto;
-import com.jaagro.tms.api.dto.waybill.GetWaybillPlanDto;
-import com.jaagro.tms.api.dto.waybill.ListWaybillDto;
+import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
@@ -70,46 +67,6 @@ public class WeChatAppletOrderController {
                 SiteVo siteVo = new SiteVo();
                 BeanUtils.copyProperties(getOrderDto.getLoadSiteId(), siteVo);
                 chatOrderVo.setLoadSiteId(siteVo);
-                //运单列表
-                List<ListWaybillDto> waybills = waybillService.listWaybillByOrderId(getOrderDto.getId());
-                if (waybills.size() > 0) {
-                    GetWaybillPlanDto waybillPlanDto = waybillService.getOrderAndWaybill(getOrderDto.getId());
-                    if (waybillPlanDto != null) {
-                        List<GetWaybillDto> getWaybillDtos = waybillPlanDto.getWaybillDtoList();
-                        if (getWaybillDtos.size() > 0) {
-                            List<ListWaybillVo> waybillVoList = new ArrayList<>();
-                            //运单
-                            for (GetWaybillDto waybillDto : getWaybillDtos) {
-                                ListWaybillVo waybillVo = new ListWaybillVo();
-                                BeanUtils.copyProperties(waybillDto, waybillVo);
-                                //运单装货地
-                                if (waybillDto.getLoadSite() != null) {
-                                    ShowSiteVo showSiteVo = new ShowSiteVo();
-                                    BeanUtils.copyProperties(waybillDto.getLoadSite(), showSiteVo);
-                                    waybillVo.setLoadSiteVo(showSiteVo);
-                                }
-                                List<ListWaybillItemsVo> listWaybillItemsVoList = new ArrayList<>();
-                                //运单详细
-                                if (waybillDto.getWaybillItems().size() > 0) {
-                                    for (GetWaybillItemDto itemDto : waybillDto.getWaybillItems()) {
-                                        ListWaybillItemsVo itemsVo = new ListWaybillItemsVo();
-                                        BeanUtils.copyProperties(itemDto, itemsVo);
-                                        //运单详情的卸货地址
-                                        if (itemDto.getShowSiteDto() != null) {
-                                            ShowSiteVo showSiteVo = new ShowSiteVo();
-                                            BeanUtils.copyProperties(itemDto.getShowSiteDto(), showSiteVo);
-                                            itemsVo.setUploadSiteVo(showSiteVo);
-                                        }
-                                        listWaybillItemsVoList.add(itemsVo);
-                                    }
-                                }
-                                waybillVo.setWaybillItemsVoList(listWaybillItemsVoList);
-                                waybillVoList.add(waybillVo);
-                            }
-                            chatOrderVo.setWaybillVoList(waybillVoList);
-                        }
-                    }
-                }
                 /**
                  * 订单详情Dto转换为Vo
                  */
@@ -146,6 +103,63 @@ public class WeChatAppletOrderController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), ex.getMessage());
         }
         return BaseResponse.successInstance(chatOrderVo);
+    }
+
+    /**
+     * 根据订单id查询运单分页
+     *
+     * @param criteriaDto
+     * @return
+     */
+    @ApiOperation("根据订单id查询运单分页")
+    @PostMapping("/listWaybillByCriteriaForWechat")
+    public BaseResponse listWaybillByCriteriaForWechat(@RequestBody ListWaybillCriteriaDto criteriaDto) {
+        if (StringUtils.isEmpty(criteriaDto.getPageNum())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空");
+        }
+        if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
+        }
+        if (StringUtils.isEmpty(criteriaDto.getOrderId())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单id不能为空");
+        }
+        //运单列表
+        PageInfo pageInfo = waybillService.listWaybillByCriteriaForWechat(criteriaDto);
+        List<GetWaybillDto> getWaybillDtos = pageInfo.getList();
+            if (getWaybillDtos.size() > 0) {
+                List<ListWaybillVo> waybillVoList = new ArrayList<>();
+                //运单
+                for (GetWaybillDto waybillDto : getWaybillDtos) {
+                    ListWaybillVo waybillVo = new ListWaybillVo();
+                    BeanUtils.copyProperties(waybillDto, waybillVo);
+                    //运单装货地
+                    if (waybillDto.getLoadSite() != null) {
+                        ShowSiteVo showSiteVo = new ShowSiteVo();
+                        BeanUtils.copyProperties(waybillDto.getLoadSite(), showSiteVo);
+                        waybillVo.setLoadSiteVo(showSiteVo);
+                    }
+                    List<ListWaybillItemsVo> listWaybillItemsVoList = new ArrayList<>();
+                    //运单详细
+                    if (waybillDto.getWaybillItems().size() > 0) {
+                        for (GetWaybillItemDto itemDto : waybillDto.getWaybillItems()) {
+                            ListWaybillItemsVo itemsVo = new ListWaybillItemsVo();
+                            BeanUtils.copyProperties(itemDto, itemsVo);
+                            //运单详情的卸货地址
+                            if (itemDto.getShowSiteDto() != null) {
+                                ShowSiteVo showSiteVo = new ShowSiteVo();
+                                BeanUtils.copyProperties(itemDto.getShowSiteDto(), showSiteVo);
+                                itemsVo.setUploadSiteVo(showSiteVo);
+                            }
+                            listWaybillItemsVoList.add(itemsVo);
+                        }
+                    }
+                    waybillVo.setWaybillItemsVoList(listWaybillItemsVoList);
+                    waybillVoList.add(waybillVo);
+                }
+                pageInfo.setList(waybillVoList);
+            }
+        return BaseResponse.successInstance(pageInfo);
+
     }
 
     /**

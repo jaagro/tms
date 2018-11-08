@@ -1,12 +1,12 @@
 package com.jaagro.tms.api.service;
 
+import com.github.pagehelper.PageInfo;
+import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
+import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
 import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
 import com.jaagro.tms.api.dto.driverapp.ShowWaybillTrackingDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
 import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
-import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
-import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
 
 import java.util.List;
 import java.util.Map;
@@ -159,26 +159,37 @@ public interface WaybillService {
     List<ListWaybillDto> listWaybillByOrderId(Integer orderId);
 
     /**
+     * 根据订单id获取运单分页
+     *
+     * @param criteriaDto
+     * @return
+     */
+    PageInfo listWaybillByCriteriaForWechat(ListWaybillCriteriaDto criteriaDto);
+
+    /**
      * 根据订单id查询 待派单的运单
      *
      * @param id
      * @return
      */
     List<ListWaybillDto> listWaybillWaitByOrderId(Integer id);
+
     /**
      * 回单修改运单货物信息新增运单轨迹(回单补录)
-     * @author yj
+     *
      * @param updateWaybillGoodsReceiptDto
      * @return
+     * @author yj
      */
     boolean updateWaybillGoodsReceipt(UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto);
 
     /**
      * 上传回单图片
-     * @author yj
+     *
      * @param waybillId
      * @param imageUrl
      * @return
+     * @author yj
      */
     boolean uploadReceiptImage(Integer waybillId, String imageUrl);
 }
