@@ -1091,7 +1091,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-                    ) {
+            ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1184,19 +1184,19 @@ public class WaybillServiceImpl implements WaybillService {
         Integer waybillId = null;
         UserInfo currentUser = currentUserService.getCurrentUser();
         Integer currentUserId = currentUser == null ? null : currentUser.getId();
-        if (!CollectionUtils.isEmpty(updateWaybillgoodsDtoList)){
+        if (!CollectionUtils.isEmpty(updateWaybillgoodsDtoList)) {
             List<WaybillGoods> waybillGoodsList = new ArrayList<>();
             List<WaybillItems> waybillItemsList = new ArrayList<>();
             Set<Integer> waybillItemsIdSet = new HashSet<>();
-            for (UpdateWaybillgoodsDto waybillgoodsDto : updateWaybillgoodsDtoList){
+            for (UpdateWaybillgoodsDto waybillgoodsDto : updateWaybillgoodsDtoList) {
                 waybillItemsIdSet.add(waybillgoodsDto.getWaybillItemId());
                 waybillId = waybillgoodsDto.getWaybillId();
                 Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
-                if(waybill == null || !WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())){
-                    throw new RuntimeException("运单id="+waybillId+"不存在");
+                if (waybill == null || !WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
+                    throw new RuntimeException("运单id=" + waybillId + "不存在");
                 }
                 WaybillGoods waybillGoods = new WaybillGoods();
-                BeanUtils.copyProperties(waybillgoodsDto,waybillGoods);
+                BeanUtils.copyProperties(waybillgoodsDto, waybillGoods);
                 waybillGoods
                         .setModifyTime(new Date())
                         .setModifyUserId(currentUserId);
@@ -1209,19 +1209,19 @@ public class WaybillServiceImpl implements WaybillService {
                         .setModifyUserId(currentUserId);
                 waybillItemsList.add(waybillItems);
             }
-            Integer updateWaybillGoodsNum =  waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
-            if (waybillGoodsList.size() != updateWaybillGoodsNum){
+            Integer updateWaybillGoodsNum = waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
+            if (waybillGoodsList.size() != updateWaybillGoodsNum) {
                 throw new RuntimeException("更新回单运单货物失败");
             }
-            Integer updateWaybillItemsNum =  waybillItemsMapper.batchUpdateByPrimaryKeySelective(waybillItemsList);
-            if (waybillItemsIdSet.size() != updateWaybillItemsNum){
+            Integer updateWaybillItemsNum = waybillItemsMapper.batchUpdateByPrimaryKeySelective(waybillItemsList);
+            if (waybillItemsIdSet.size() != updateWaybillItemsNum) {
                 throw new RuntimeException("更新回单运单卸货地失败");
             }
         }
         // 插入运单轨迹
         WaybillTracking waybillTracking = new WaybillTracking();
         List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybillId);
-        if (!CollectionUtils.isEmpty(showTrackingDtos)){
+        if (!CollectionUtils.isEmpty(showTrackingDtos)) {
             ShowTrackingDto showTrackingDto = showTrackingDtos.get(0);
             waybillTracking
                     .setOldStatus(showTrackingDto.getOldStatus())
@@ -1234,7 +1234,7 @@ public class WaybillServiceImpl implements WaybillService {
                 .setReferUserId(currentUserId)
                 .setTrackingType(TrackingType.RECEIPT);
         int waybillTrackingId = waybillTrackingMapper.insertSelective(waybillTracking);
-        if (waybillTrackingId <= 0){
+        if (waybillTrackingId <= 0) {
             throw new RuntimeException("插入运单轨迹(回单补录)失败");
         }
         return true;
@@ -1255,7 +1255,7 @@ public class WaybillServiceImpl implements WaybillService {
         UserInfo currentUser = currentUserService.getCurrentUser();
         Integer currentUserId = currentUser == null ? null : currentUser.getId();
         List<ShowTrackingDto> waybillTrackingList = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybillId);
-        if (!CollectionUtils.isEmpty(waybillTrackingList)){
+        if (!CollectionUtils.isEmpty(waybillTrackingList)) {
             ShowTrackingDto showTrackingDto = waybillTrackingList.get(0);
             waybillTracking
                     .setOldStatus(showTrackingDto.getOldStatus())
@@ -1268,7 +1268,7 @@ public class WaybillServiceImpl implements WaybillService {
                 .setWaybillId(waybillId)
                 .setCreateTime(new Date());
         int count = waybillTrackingMapper.insertSelective(waybillTracking);
-        if (count < 1){
+        if (count < 1) {
             throw new RuntimeException("插入运单轨迹(回单补传单据)失败");
         }
         WaybillTrackingImages trackingImages = new WaybillTrackingImages();
@@ -1280,7 +1280,7 @@ public class WaybillServiceImpl implements WaybillService {
                 .setCreateTime(new Date())
                 .setWaybillId(waybillId);
         count = waybillTrackingImagesMapper.insertSelective(trackingImages);
-        if (count < 1){
+        if (count < 1) {
             throw new RuntimeException("插入运单轨迹图片(回单补传单据)失败");
         }
         return true;
@@ -1295,6 +1295,27 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public List<ListWaybillDto> listWaybillByOrderId(Integer orderId) {
         return waybillMapper.listWaybillDtoByOrderId(orderId);
+    }
+
+    /**
+     * 根据订单id获取运单分页
+     *
+     * @param criteriaDto
+     * @return
+     */
+    @Override
+    public PageInfo listWaybillByCriteriaForWechat(ListWaybillCriteriaDto criteriaDto) {
+        PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        List<Integer> waybillIds = waybillMapper.listWaybillIdByOrderId(criteriaDto.getOrderId());
+        if (null == waybillIds) {
+            throw new NullPointerException(criteriaDto.getOrderId() + " :当前订单无有效运单");
+        }
+        List<GetWaybillDto> getWaybillDtoList = new ArrayList<>(12);
+        for (Integer waybillId : waybillIds) {
+            GetWaybillDto getWaybillDto = this.getWaybillById(waybillId);
+            getWaybillDtoList.add(getWaybillDto);
+        }
+        return new PageInfo<>(getWaybillDtoList);
     }
 
     /**

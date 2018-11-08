@@ -36,7 +36,7 @@ public class ListWaybillVo {
     private String waybillStatus;
 
     /**
-     * 运单明细list
+     * 运单明细list\
      */
     private List<ListWaybillItemsVo> waybillItemsVoList;
 }
