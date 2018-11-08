@@ -318,6 +318,26 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     }
 
     /**
+     * 客户侧费用
+     *
+     * @param dto
+     */
+    @Override
+    public List<WaybillCustomerFeeDto> listWaybillCustomerFeeByCondtion(WaybillFeeCondtion dto) {
+        return waybillCustomerFeeMapper.listWaybillCustomerFeeByCondtion(dto);
+    }
+
+    /**
+     * 运力侧费用
+     *
+     * @param dto
+     */
+    @Override
+    public List<WaybillTruckFeeDto> listWaybillTruckFeeByCondtion(WaybillFeeCondtion dto) {
+        return waybillTruckFeeMapper.listWaybillTruckFeeByCondtion(dto);
+    }
+
+    /**
      * 费用是否调整公共方法
      * Author @Gao.
      *

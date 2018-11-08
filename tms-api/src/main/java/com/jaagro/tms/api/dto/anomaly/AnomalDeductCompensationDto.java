@@ -21,4 +21,8 @@ public class AnomalDeductCompensationDto implements Serializable {
      * 金额
      */
     private BigDecimal money;
+    /**
+     * 扣款 赔偿类型
+     */
+    private Integer adjustType;
 }
