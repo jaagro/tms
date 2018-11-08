@@ -11,7 +11,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class WaybillAnomalyCondtion implements Serializable {
+public class WaybillAnomalyCondition implements Serializable {
     /**
      * 异常创建人Id
      */

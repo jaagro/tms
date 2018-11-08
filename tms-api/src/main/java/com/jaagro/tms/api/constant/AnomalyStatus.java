@@ -3,7 +3,7 @@ package com.jaagro.tms.api.constant;
 /**
  * 异常状态
  */
-public final class AnormalyStatus {
+public final class AnomalyStatus {
 
     public final static String TO_DO = "待处理";
 

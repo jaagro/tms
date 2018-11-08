@@ -1,7 +1,7 @@
 package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.api.dto.anomaly.WaybillAnomalyDto;
-import com.jaagro.tms.api.dto.anomaly.WaybillAnomalyCondtion;
+import com.jaagro.tms.api.dto.anomaly.WaybillAnomalyCondition;
 
 import java.util.List;
 
@@ -14,6 +14,6 @@ public interface WaybillAnomalyMapperExt extends WaybillAnomalyMapper {
      * @param
      * @return
      */
-   List<WaybillAnomalyDto> listWaybillAnomalyByCondition(WaybillAnomalyCondtion dto);
+   List<WaybillAnomalyDto> listWaybillAnomalyByCondition(WaybillAnomalyCondition dto);
 
 }

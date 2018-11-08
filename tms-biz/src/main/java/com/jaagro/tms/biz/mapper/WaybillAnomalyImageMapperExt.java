@@ -1,6 +1,6 @@
 package com.jaagro.tms.biz.mapper;
 
-import com.jaagro.tms.api.dto.anomaly.WaybillAnomalyImageCondtion;
+import com.jaagro.tms.api.dto.anomaly.WaybillAnomalyImageCondition;
 import com.jaagro.tms.biz.entity.WaybillAnomalyImage;
 
 import java.util.List;
@@ -10,6 +10,6 @@ import java.util.List;
  */
 public interface WaybillAnomalyImageMapperExt extends WaybillAnomalyImageMapper {
 
-   List<WaybillAnomalyImage> listWaybillAnormalyImageByCondtion(WaybillAnomalyImageCondtion waybillAnomalyImageCondtion);
+   List<WaybillAnomalyImage> listWaybillAnormalyImageByCondition(WaybillAnomalyImageCondition waybillAnomalyImageCondition);
 
 }

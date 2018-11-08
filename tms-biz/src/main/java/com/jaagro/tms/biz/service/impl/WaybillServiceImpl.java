@@ -578,7 +578,9 @@ public class WaybillServiceImpl implements WaybillService {
                         //磅单
                         waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
                     }
-                    waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
+                    if (!"invalidPicUrl".equalsIgnoreCase(imagesUrls.get(i))) {
+                        waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
+                    }
                 }
             }
             waybill.setWaybillStatus(WaybillStatus.DELIVERY);
@@ -648,7 +650,9 @@ public class WaybillServiceImpl implements WaybillService {
                             //磅单
                             waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
                         }
-                        waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
+                        if (!"invalidPicUrl".equalsIgnoreCase(imagesUrls.get(i))) {
+                            waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
+                        }
                     }
                 }
                 //更新该运单签收
