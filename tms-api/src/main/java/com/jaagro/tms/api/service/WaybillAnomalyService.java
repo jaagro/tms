@@ -3,6 +3,9 @@ package com.jaagro.tms.api.service;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.anomaly.*;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
+import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
+import com.jaagro.tms.api.dto.fee.WaybillFeeCondtion;
+import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
 
 import java.util.List;
 
@@ -65,4 +68,15 @@ public interface WaybillAnomalyService {
      * @return
      */
     PageInfo anomalManagementList(WaybillAnomalyCondtion dto);
+
+    /**
+     * 客户侧费用
+     */
+
+    List<WaybillCustomerFeeDto> listWaybillCustomerFeeByCondtion(WaybillFeeCondtion dto);
+
+    /**
+     * 运力侧费用
+     */
+    List<WaybillTruckFeeDto> listWaybillTruckFeeByCondtion(WaybillFeeCondtion dto);
 }

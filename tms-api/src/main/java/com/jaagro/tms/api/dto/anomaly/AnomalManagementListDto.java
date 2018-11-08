@@ -15,6 +15,11 @@ import java.util.Date;
 public class AnomalManagementListDto implements Serializable {
 
     /**
+     * 异常id
+     */
+    private Integer id;
+
+    /**
      * 异常类型
      */
     private String typeName;
@@ -32,7 +37,7 @@ public class AnomalManagementListDto implements Serializable {
     /**
      * 赔款金额
      */
-    private String  compensateMoney;
+    private String compensateMoney;
 
     /**
      * 运单编号
@@ -51,6 +56,6 @@ public class AnomalManagementListDto implements Serializable {
     /**
      * 处理人
      */
-    private  String processorName;
+    private String processorName;
 
 }

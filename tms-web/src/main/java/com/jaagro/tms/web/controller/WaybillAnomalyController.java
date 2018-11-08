@@ -2,6 +2,9 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.anomaly.*;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
+import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
+import com.jaagro.tms.api.dto.fee.WaybillFeeCondtion;
+import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
 import com.jaagro.tms.api.service.WaybillAnomalyService;
 import com.jaagro.tms.biz.service.OssSignUrlClientService;
 import com.jaagro.tms.web.vo.anomaly.AnomalInformationVo;
@@ -63,15 +66,16 @@ public class WaybillAnomalyController {
         List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyService.listWaybillAnomalyByCondition(dto);
         AnomalInformationVo anomalInformationVo = new AnomalInformationVo();
         if (!CollectionUtils.isEmpty(waybillAnomalyDtos)) {
-            BeanUtils.copyProperties(waybillAnomalyDtos.get(0), anomalInformationVo);
+            WaybillAnomalyDto waybillAnomalyDto = waybillAnomalyDtos.get(0);
+            BeanUtils.copyProperties(waybillAnomalyDto, anomalInformationVo);
             //客户名称
             ShowCustomerDto customer = waybillAnomalyService.getCustomerByWaybillId(waybillAnomalyDtos.get(0).getWaybillId());
             anomalInformationVo.setCustomerName(customer.getCustomerName());
             //异常图片
             WaybillAnomalyImageCondtion waybillAnomalyImageCondtion = new WaybillAnomalyImageCondtion();
             waybillAnomalyImageCondtion
-                    .setAnomalyId(waybillAnomalyDtos.get(0).getId())
-                    .setCreateUserId(waybillAnomalyDtos.get(0).getCreateUserId());
+                    .setAnomalyId(waybillAnomalyDto.getId())
+                    .setCreateUserId(waybillAnomalyDto.getCreateUserId());
             List<String> imageUrls = new ArrayList<>();
             List<WaybillAnomalyImageDto> waybillAnomalyImageDtos = waybillAnomalyService.listWaybillAnormalyImageByCondtion(waybillAnomalyImageCondtion);
             if (!CollectionUtils.isEmpty(waybillAnomalyImageDtos)) {
@@ -82,6 +86,52 @@ public class WaybillAnomalyController {
                     imageUrls.add(urls.get(0).toString());
                 }
                 anomalInformationVo.setImageUrl(imageUrls);
+            }
+            //如果异常已处理 显示异常处理结果信息
+            if ("已处理".equals(waybillAnomalyDto.getProcessingStatus())) {
+                //是否涉及费用调整
+                List<AnomalDeductCompensationDto> anomalDeductCompensationDtos = new ArrayList<>();
+                //客户侧费用
+                WaybillFeeCondtion waybillFeeCondtion = new WaybillFeeCondtion();
+                waybillFeeCondtion.
+                        setAnomalyId(waybillAnomalyDto.getId());
+                List<WaybillCustomerFeeDto> waybillCustomerFeeDtos = waybillAnomalyService.listWaybillCustomerFeeByCondtion(waybillFeeCondtion);
+                if (!CollectionUtils.isEmpty(waybillCustomerFeeDtos)) {
+                    AnomalDeductCompensationDto customerFeeDto = new AnomalDeductCompensationDto();
+                    customerFeeDto
+                            .setUserType(1)
+                            .setMoney(waybillCustomerFeeDtos.get(0).getMoney())
+                            .setAdjustType(waybillCustomerFeeDtos.get(0).getAdjustType());
+                    anomalDeductCompensationDtos.add(customerFeeDto);
+                }
+                //运力侧费用
+                List<WaybillTruckFeeDto> waybillTruckFeeDtos = waybillAnomalyService.listWaybillTruckFeeByCondtion(waybillFeeCondtion);
+                if (!CollectionUtils.isEmpty(waybillTruckFeeDtos)) {
+                    AnomalDeductCompensationDto truckFeeDto = new AnomalDeductCompensationDto();
+                    truckFeeDto
+                            .setUserType(2)
+                            .setMoney(waybillTruckFeeDtos.get(0).getMoney())
+                            .setAdjustType(waybillTruckFeeDtos.get(0).getAdjustType());
+                    anomalDeductCompensationDtos.add(truckFeeDto);
+                }
+                anomalInformationVo.setAnomalDeductCompensationDto(anomalDeductCompensationDtos);
+                //处理上传异常图片显示
+                WaybillAnomalyImageCondtion anomalyImageCondtion = new WaybillAnomalyImageCondtion();
+                anomalyImageCondtion
+                        .setAnomalyId(waybillAnomalyDto.getId())
+                        .setCreateUserId(waybillAnomalyDto.getProcessorUserId());
+                List<String> processImageUrl = new ArrayList<>();
+                List<WaybillAnomalyImageDto> waybillAnomalyImages = waybillAnomalyService.listWaybillAnormalyImageByCondtion(anomalyImageCondtion);
+                if (!CollectionUtils.isEmpty(waybillAnomalyImageDtos)) {
+                    for (WaybillAnomalyImageDto waybillAnomalyImage : waybillAnomalyImages) {
+                        //异常图片替换
+                        String[] strArray1 = {waybillAnomalyImage.getImageUrl()};
+                        List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray1);
+                        processImageUrl.add(urls.get(0).toString());
+
+                    }
+                    anomalInformationVo.setProcessImageUrl(processImageUrl);
+                }
             }
         }
         return BaseResponse.successInstance(anomalInformationVo);
