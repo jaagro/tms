@@ -24,7 +24,7 @@ public class CreateMessageDto implements Serializable {
     private Integer fromUserId;
 
     /**
-     * 消息发送者类型：0-系统
+     * 消息发送者类型：0-系统 1-客户 2-司机 3-员工
      */
     @NotNull(message = "{fromUserType.NotNull}")
     private Integer fromUserType;
@@ -36,7 +36,7 @@ public class CreateMessageDto implements Serializable {
     private Integer toUserId;
 
     /**
-     * 消息接受者类型：0-系统
+     * 消息接受者类型：0-系统 1-客户 2-司机 3-员工
      */
     @NotNull(message = "{toUserType.NotNull}")
     private Integer toUserType;

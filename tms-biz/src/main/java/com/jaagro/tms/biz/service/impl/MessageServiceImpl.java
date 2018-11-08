@@ -52,7 +52,7 @@ public class MessageServiceImpl implements MessageService {
                 messageReturnDto.setMsgCategory(1);
             }
         }
-        return new PageInfo<MessageReturnDto>(messageList);
+        return new PageInfo<>(messageList);
     }
 
     /**
