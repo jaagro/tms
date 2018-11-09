@@ -1,6 +1,5 @@
 package com.jaagro.tms.biz.entity;
 
-import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -16,6 +15,8 @@ public class WaybillAnomalyLog implements Serializable{
      * 
      */
     private Integer id;
+
+    private Integer waybillAnomalyId;
 
     /**
      * 
@@ -56,6 +57,14 @@ public class WaybillAnomalyLog implements Serializable{
      */
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getWaybillAnomalyId() {
+        return waybillAnomalyId;
+    }
+
+    public void setWaybillAnomalyId(Integer waybillAnomalyId) {
+        this.waybillAnomalyId = waybillAnomalyId;
     }
 
     /**

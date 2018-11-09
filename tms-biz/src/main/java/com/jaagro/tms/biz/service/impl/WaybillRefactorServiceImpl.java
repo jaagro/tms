@@ -49,7 +49,6 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     private OrdersMapperExt ordersMapper;
     @Autowired
     private WaybillTrackingMapperExt waybillTrackingMapper;
-
     @Autowired
     private TruckTypeClientService truckTypeClientService;
     @Autowired

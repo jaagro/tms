@@ -2,10 +2,7 @@ package com.jaagro.tms.biz.service.impl;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
-import com.jaagro.tms.api.constant.AnomalyImageTypeConstant;
-import com.jaagro.tms.api.constant.CostType;
-import com.jaagro.tms.api.constant.DeductCompensationRoleType;
-import com.jaagro.tms.api.constant.UserType;
+import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.anomaly.*;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
@@ -23,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.security.cert.CertSelector;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,6 +53,8 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     private WaybillFeeAdjustmentMapperExt waybillFeeAdjustmentMapper;
     @Autowired
     private UserClientService userClientService;
+    @Autowired
+    private WaybillAnomalyLogMapperExt waybillAnomalyLogMapperExt;
 
 
     /**
@@ -335,6 +335,74 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     @Override
     public List<WaybillTruckFeeDto> listWaybillTruckFeeByCondtion(WaybillFeeCondtion dto) {
         return waybillTruckFeeMapper.listWaybillTruckFeeByCondtion(dto);
+    }
+
+    /**
+     * 改变异常状态:入参为已处理则将状态改为待审核，入参为待审核则将状态改为已处理
+     *
+     * @param nowStatus 当前状态
+     * @return
+     * @author tony
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean changeAnomalyStatus(int[] ids, String nowStatus) {
+
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        List<WaybillAnomaly> waybillAnomalyList = new LinkedList<>();
+        List<WaybillAnomalyLog> waybillAnomalyLogList = new LinkedList<>();
+
+        for(int id : ids){
+            WaybillAnomaly waybillAnomaly = waybillAnomalyMapper.selectByPrimaryKey(id);
+            if (null == waybillAnomaly) {
+                throw new NullPointerException(id + ":记录不存在");
+            }
+            if (!nowStatus.equals(waybillAnomaly.getProcessingStatus())) {
+                throw new NullPointerException("状态不满足条件");
+            }
+            WaybillAnomaly record = new WaybillAnomaly();
+            record.setId(id);
+            switch (nowStatus) {
+                case AnomalyStatus.DONE:
+                    //判断是否需要审核
+                    if (!waybillAnomaly.getAdjustStatus()) {
+                        //更新状态为已结束
+                        record.setProcessingStatus(AnomalyStatus.FINISH);
+                    } else {
+                        //更新状态为待审核
+                        record.setAuditStatus(AnomalyStatus.TO_AUDIT);
+                        record.setProcessingStatus(AnomalyStatus.TO_AUDIT);
+                    }
+                    break;
+                case AnomalyStatus.TO_AUDIT:
+                    record.setProcessingStatus(AnomalyStatus.DONE);
+                    break;
+                default:
+                    //插入日志
+                    WaybillAnomalyLog waybillAnomalyLog = new WaybillAnomalyLog();
+                    waybillAnomalyLog.setCreateUserId(currentUser.getId());
+                    waybillAnomalyLog.setOldStatus(nowStatus);
+                    waybillAnomalyLog.setWaybillAnomalyId(record.getId());
+                    if (AnomalyStatus.DONE.equals(nowStatus)) {
+                        waybillAnomalyLog.setNewStatus(AnomalyStatus.TO_AUDIT);
+                        waybillAnomalyLog.setLogInfo("异常单被【" + currentUser.getName() + "】发送至【待审核】");
+                    }
+                    if (AnomalyStatus.TO_AUDIT.equals(nowStatus)) {
+                        waybillAnomalyLog.setNewStatus(AnomalyStatus.DONE);
+                        waybillAnomalyLog.setLogInfo("异常单被【" + currentUser.getName() + "】退回至【已处理】");
+                    }
+                    if (!waybillAnomaly.getAdjustStatus()) {
+                        waybillAnomalyLog.setNewStatus(AnomalyStatus.FINISH);
+                        waybillAnomalyLog.setLogInfo("异常单被【" + currentUser.getName() + "】发送至【已结束】");
+                    }
+                    waybillAnomalyList.add(record);
+                    waybillAnomalyLogList.add(waybillAnomalyLog);
+                    break;
+            }
+        }
+        waybillAnomalyMapper.batchUpdateByPrimaryKeySelective(waybillAnomalyList);
+        waybillAnomalyLogMapperExt.batchInsert(waybillAnomalyLogList);
+        return true;
     }
 
     /**

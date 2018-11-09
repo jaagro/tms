@@ -9,6 +9,7 @@ import com.jaagro.tms.api.service.WaybillAnomalyService;
 import com.jaagro.tms.biz.service.OssSignUrlClientService;
 import com.jaagro.tms.web.vo.anomaly.AnomalInformationVo;
 import com.jaagro.tms.web.vo.anomaly.AnomalTypeVo;
+import com.jaagro.tms.web.vo.anomaly.ChangeAnomalyParamVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -104,6 +105,12 @@ public class WaybillAnomalyController {
     @PostMapping("anomalManagementList")
     public BaseResponse anomalManagementList(@RequestBody WaybillAnomalyCondtion dto) {
         return BaseResponse.successInstance(waybillAnomalyService.anomalManagementList(dto));
+    }
+
+    @ApiOperation(("异常发送/审核退回"))
+    @PostMapping("/changeAnomalyStatus")
+    public BaseResponse changeAnomalyStatus(@RequestBody ChangeAnomalyParamVo param){
+        return BaseResponse.successInstance(waybillAnomalyService.changeAnomalyStatus(param.getIds(), param.getNowStatus()));
     }
 
     /**

@@ -71,12 +71,20 @@ public interface WaybillAnomalyService {
 
     /**
      * 客户侧费用
+     * @param dto
+     * @return
      */
-
     List<WaybillCustomerFeeDto> listWaybillCustomerFeeByCondtion(WaybillFeeCondtion dto);
 
     /**
      * 运力侧费用
      */
     List<WaybillTruckFeeDto> listWaybillTruckFeeByCondtion(WaybillFeeCondtion dto);
+
+    /**
+     * 改变异常状态:入参为已处理则将状态改为待审核，入参为待审核则将状态改为已处理
+     * @param nowStatus 当前状态
+     * @return
+     */
+    boolean changeAnomalyStatus(int[] id, String nowStatus);
 }
