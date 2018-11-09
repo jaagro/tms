@@ -2,6 +2,7 @@ package com.jaagro.tms.api.constant;
 
 /**
  * 消息来源
+ *
  * @author yj
  * @date 2018/11/9
  */

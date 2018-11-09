@@ -2,6 +2,7 @@ package com.jaagro.tms.api.constant;
 
 /**
  * 异常状态
+ *
  * @author tony
  */
 public final class AnomalyStatus {
