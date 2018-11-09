@@ -3,6 +3,9 @@ package com.jaagro.tms.biz.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.constant.MsgCategory;
+import com.jaagro.tms.api.constant.MsgStatusConstant;
+import com.jaagro.tms.api.constant.MsgType;
 import com.jaagro.tms.api.dto.Message.CreateMessageDto;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.ListUnReadMsgCriteriaDto;
@@ -46,10 +49,10 @@ public class MessageServiceImpl implements MessageService {
         criteriaDto.setToUserId(currentUserService.getCurrentUser() == null ? null : currentUserService.getCurrentUser().getId());
         List<MessageReturnDto> messageList = messageMapperExt.listMessageByCriteriaDto(criteriaDto);
         for(MessageReturnDto messageReturnDto : messageList){
-            if (messageReturnDto.getMsgType() == 1){
-                messageReturnDto.setMsgCategory(2);
+            if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)){
+                messageReturnDto.setMsgCategory(MsgCategory.PUBLIC);
             }else{
-                messageReturnDto.setMsgCategory(1);
+                messageReturnDto.setMsgCategory(MsgCategory.INFORM);
             }
         }
         return new PageInfo<>(messageList);
@@ -81,7 +84,7 @@ public class MessageServiceImpl implements MessageService {
     public List<MessageReturnDto> listUnreadMessages(ListUnReadMsgCriteriaDto criteriaDto) {
         if (criteriaDto.getMsgStatus() == null){
             // 消息状态: 0-未读,1-已读
-            criteriaDto.setMsgStatus(0);
+            criteriaDto.setMsgStatus(MsgStatusConstant.UNREAD);
         }
         UserInfo currentUser = currentUserService.getCurrentUser();
         Integer currentUserId = currentUser == null ? null : currentUser.getId();
@@ -90,10 +93,10 @@ public class MessageServiceImpl implements MessageService {
         BeanUtils.copyProperties(criteriaDto,dto);
         List<MessageReturnDto> messageReturnDtos = messageMapperExt.listMessageByCriteriaDto(dto);
         for(MessageReturnDto messageReturnDto : messageReturnDtos){
-            if (messageReturnDto.getMsgType() == 1){
-                messageReturnDto.setMsgCategory(2);
+            if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)){
+                messageReturnDto.setMsgCategory(MsgCategory.PUBLIC);
             }else{
-                messageReturnDto.setMsgCategory(1);
+                messageReturnDto.setMsgCategory(MsgCategory.INFORM);
             }
         }
         return messageReturnDtos;

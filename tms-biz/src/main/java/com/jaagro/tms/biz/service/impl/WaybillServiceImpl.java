@@ -1043,10 +1043,10 @@ public class WaybillServiceImpl implements WaybillService {
             Message appMessage = new Message();
             appMessage.setReferId(waybillId);
             // 消息类型：1-系统通知 2-运单相关 3-账务相关
-            appMessage.setMsgType(2);
+            appMessage.setMsgType(MsgType.WAYBILL);
             //消息来源:1-APP,2-小程序,3-站内
-            appMessage.setMsgSource(1);
-            appMessage.setMsgStatus(0);
+            appMessage.setMsgSource(MsgSource.APP);
+            appMessage.setMsgStatus(MsgStatusConstant.UNREAD);
             appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
             appMessage.setBody("您有新的运单信息待接单,从" + loadSiteName + "到" + unloadSiteName + "的运单。");
             appMessage.setCreateTime(new Date());
