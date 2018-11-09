@@ -112,8 +112,8 @@ public class WeChatAppletOrderController {
      * @return
      */
     @ApiOperation("根据订单id查询运单分页")
-    @PostMapping("/listWaybillByCriteriaForWechat")
-    public BaseResponse listWaybillByCriteriaForWechat(@RequestBody ListWaybillCriteriaDto criteriaDto) {
+    @PostMapping("/listWaybillByCriteriaForWeChat")
+    public BaseResponse listWaybillByCriteriaForWeChat(@RequestBody ListWaybillCriteriaDto criteriaDto) {
         if (StringUtils.isEmpty(criteriaDto.getPageNum())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空");
         }
@@ -184,10 +184,11 @@ public class WeChatAppletOrderController {
             criteriaDto.setCustomerType(customerUserDto.getCustomerType());
         }
         //得到订单分页
+        criteriaDto.setDifferentiateStatus("WeChat");
         PageInfo pageInfo = orderService.listOrderByCriteria(criteriaDto);
         List<ListOrderDto> orderDtoList = pageInfo.getList();
         List<ListOrderVo> orderVoList = new ArrayList<>();
-        //替换为vo
+        //替换为vol
         if (orderDtoList.size() > 0) {
             for (ListOrderDto orderDto : orderDtoList) {
                 ListOrderVo orderVo = new ListOrderVo();
@@ -198,7 +199,7 @@ public class WeChatAppletOrderController {
                 BeanUtils.copyProperties(showSiteDto, siteVo);
                 orderVo.setLoadSiteId(siteVo);
                 /**
-                 * 替换订单需求Dto为Vo
+                 * 替换订单需求Dto为Vos
                  */
                 List<ListOrderItemsDto> itemsDtoList = orderDto.getOrderItemsDtoList();
                 List<ListOrderItemsVo> itemsVoList = new ArrayList<>();

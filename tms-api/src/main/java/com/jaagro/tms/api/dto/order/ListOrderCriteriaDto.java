@@ -79,4 +79,9 @@ public class ListOrderCriteriaDto implements Serializable {
      */
     private String waitOrders;
 
+    /**
+     * 区分小程序列表和pc端订单列表
+     */
+    private String differentiateStatus;
+
 }
