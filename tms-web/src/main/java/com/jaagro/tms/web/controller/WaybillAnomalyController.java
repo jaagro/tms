@@ -4,7 +4,7 @@ import com.jaagro.tms.api.constant.AnomalyStatus;
 import com.jaagro.tms.api.dto.anomaly.*;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
-import com.jaagro.tms.api.dto.fee.WaybillFeeCondtion;
+import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
 import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
 import com.jaagro.tms.api.service.WaybillAnomalyService;
 import com.jaagro.tms.biz.service.OssSignUrlClientService;
@@ -119,10 +119,10 @@ public class WaybillAnomalyController {
             //是否涉及费用调整
             List<AnomalyDeductCompensationDto> anomalyDeductCompensationDtos = new ArrayList<>();
             //客户侧费用
-            WaybillFeeCondtion waybillFeeCondtion = new WaybillFeeCondtion();
-            waybillFeeCondtion.
+            WaybillFeeCondition waybillFeeCondition = new WaybillFeeCondition();
+            waybillFeeCondition.
                     setAnomalyId(waybillAnomalyDto.getId());
-            List<WaybillCustomerFeeDto> waybillCustomerFeeDtos = waybillAnomalyService.listWaybillCustomerFeeByCondition(waybillFeeCondtion);
+            List<WaybillCustomerFeeDto> waybillCustomerFeeDtos = waybillAnomalyService.listWaybillCustomerFeeByCondition(waybillFeeCondition);
             if (!CollectionUtils.isEmpty(waybillCustomerFeeDtos)) {
                 AnomalyDeductCompensationDto customerFeeDto = new AnomalyDeductCompensationDto();
                 customerFeeDto
@@ -132,7 +132,7 @@ public class WaybillAnomalyController {
                 anomalyDeductCompensationDtos.add(customerFeeDto);
             }
             //运力侧费用
-            List<WaybillTruckFeeDto> waybillTruckFeeDtos = waybillAnomalyService.listWaybillTruckFeeByCondition(waybillFeeCondtion);
+            List<WaybillTruckFeeDto> waybillTruckFeeDtos = waybillAnomalyService.listWaybillTruckFeeByCondition(waybillFeeCondition);
             if (!CollectionUtils.isEmpty(waybillTruckFeeDtos)) {
                 AnomalyDeductCompensationDto truckFeeDto = new AnomalyDeductCompensationDto();
                 truckFeeDto

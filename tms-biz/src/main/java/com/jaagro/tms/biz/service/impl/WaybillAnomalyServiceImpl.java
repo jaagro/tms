@@ -6,7 +6,7 @@ import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.anomaly.*;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
-import com.jaagro.tms.api.dto.fee.WaybillFeeCondtion;
+import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
 import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
 import com.jaagro.tms.api.service.WaybillAnomalyService;
 import com.jaagro.tms.biz.entity.*;
@@ -232,7 +232,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     /**
      * 异常管理列表
      * Author @Gao.
-     *
      * @param dto
      * @return
      */
@@ -274,11 +273,11 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         for (WaybillAnomalyDto waybillAnomalyDto : waybillAnomalyDtos) {
             AnomalyManagementListDto anomalyManagementListDto = new AnomalyManagementListDto();
             BeanUtils.copyProperties(waybillAnomalyDto, anomalyManagementListDto);
-            WaybillFeeCondtion waybillFeeCondtion = new WaybillFeeCondtion();
-            waybillFeeCondtion
+            WaybillFeeCondition waybillFeeCondition = new WaybillFeeCondition();
+            waybillFeeCondition
                     .setAnomalyId(waybillAnomalyDto.getId());
             //客户侧费用
-            List<WaybillCustomerFeeDto> waybillCustomerFeeDtos = waybillCustomerFeeMapper.listWaybillCustomerFeeByCondition(waybillFeeCondtion);
+            List<WaybillCustomerFeeDto> waybillCustomerFeeDtos = waybillCustomerFeeMapper.listWaybillCustomerFeeByCondition(waybillFeeCondition);
             if (!CollectionUtils.isEmpty(waybillCustomerFeeDtos)) {
                 WaybillCustomerFeeDto waybillCustomerFeeDto = waybillCustomerFeeDtos.get(0);
                 //客户侧赔偿
@@ -291,7 +290,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 }
             }
             //运力侧费用
-            List<WaybillTruckFeeDto> waybillTruckFeeDtos = waybillTruckFeeMapper.listWaybillTruckFeeByCondtion(waybillFeeCondtion);
+            List<WaybillTruckFeeDto> waybillTruckFeeDtos = waybillTruckFeeMapper.listWaybillTruckFeeByCondition(waybillFeeCondition);
             if (!CollectionUtils.isEmpty(waybillTruckFeeDtos)) {
                 WaybillTruckFeeDto waybillTruckFeeDto = waybillTruckFeeDtos.get(0);
                 //运力侧赔偿
@@ -332,7 +331,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      * @param dto
      */
     @Override
-    public List<WaybillCustomerFeeDto> listWaybillCustomerFeeByCondition(WaybillFeeCondtion dto) {
+    public List<WaybillCustomerFeeDto> listWaybillCustomerFeeByCondition(WaybillFeeCondition dto) {
         return waybillCustomerFeeMapper.listWaybillCustomerFeeByCondition(dto);
     }
 
@@ -342,14 +341,13 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      * @param dto
      */
     @Override
-    public List<WaybillTruckFeeDto> listWaybillTruckFeeByCondition(WaybillFeeCondtion dto) {
-        return waybillTruckFeeMapper.listWaybillTruckFeeByCondtion(dto);
+    public List<WaybillTruckFeeDto> listWaybillTruckFeeByCondition(WaybillFeeCondition dto) {
+        return waybillTruckFeeMapper.listWaybillTruckFeeByCondition(dto);
     }
 
     /**
      * 费用是否调整公共方法
      * Author @Gao.
-     *
      * @param dto
      * @param currentUserId
      * @param anomalyDeductCompensationDto
