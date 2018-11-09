@@ -10,6 +10,11 @@ import java.util.List;
  */
 public interface WaybillAnomalyImageMapperExt extends WaybillAnomalyImageMapper {
 
-   List<WaybillAnomalyImage> listWaybillAnormalyImageByCondition(WaybillAnomalyImageCondition waybillAnomalyImageCondition);
+    /**
+     * 根据条件查询图片信息
+     * @param waybillAnomalyImageCondition
+     * @return
+     */
+   List<WaybillAnomalyImage> listWaybillAnomalyImageByCondition(WaybillAnomalyImageCondition waybillAnomalyImageCondition);
 
 }

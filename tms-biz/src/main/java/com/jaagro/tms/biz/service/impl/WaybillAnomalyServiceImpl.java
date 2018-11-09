@@ -74,8 +74,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         WaybillAnomaly waybillAnomaly = new WaybillAnomaly();
         BeanUtils.copyProperties(dto, waybillAnomaly);
         waybillAnomaly
-                .setProcessingStatus(AnomalyStatus.TO_DO)
-                .setAuditStatus(AnomalyStatus.TO_AUDIT);
+                .setProcessingStatus(AnomalyStatus.TO_DO);
         UserInfo currentUser = currentUserService.getCurrentUser();
         waybillAnomaly.setCreateUserId(currentUser.getId());
         waybillAnomalyMapper.insertSelective(waybillAnomaly);
@@ -100,7 +99,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      * Author @Gao.
      */
     @Override
-    public List<WaybillAnomalyTypeDto> displayAnormalType() {
+    public List<WaybillAnomalyTypeDto> displayAnomalyType() {
         List<WaybillAnomalyType> waybillAnomalyTypes = waybillAnomalyTypeMapper.listAnomalyType();
         List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = new ArrayList<>();
         for (WaybillAnomalyType waybillAnomalyType : waybillAnomalyTypes) {
@@ -151,7 +150,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      */
     @Override
     public List<WaybillAnomalyImageDto> listWaybillAnomalyImageByCondition(WaybillAnomalyImageCondition dto) {
-        List<WaybillAnomalyImage> waybillAnomalyImages = waybillAnomalyImageMapper.listWaybillAnormalyImageByCondition(dto);
+        List<WaybillAnomalyImage> waybillAnomalyImages = waybillAnomalyImageMapper.listWaybillAnomalyImageByCondition(dto);
         List<WaybillAnomalyImageDto> waybillAnomalyImageDtos = new ArrayList<>();
         WaybillAnomalyImageDto waybillAnomalyImageDto = new WaybillAnomalyImageDto();
         for (WaybillAnomalyImage waybillAnomalyImage : waybillAnomalyImages) {
@@ -170,7 +169,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void anormalInformationProcess(AnomalyInformationProcessDto dto) {
+    public void anomalyInformationProcess(AnomalyInformationProcessDto dto) {
 
         UserInfo currentUser = currentUserService.getCurrentUser();
         //插入异常审核信息
@@ -184,6 +183,12 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 .setProcessingStatus(dto.getProcessingStatus())
                 .setVerifiedStatus(dto.getVerifiedStatus())
                 .setAdjustStatus(dto.getAdjustStatus());
+        //是否属实 是否涉及费用调整 为空 设置默认值
+        if (null == dto.getVerifiedStatus() || null == dto.getAdjustStatus()) {
+            waybillAnomaly
+                    .setVerifiedStatus(false)
+                    .setAdjustStatus(false);
+        }
         waybillAnomalyMapper.updateByPrimaryKeySelective(waybillAnomaly);
         //批量插入图片
         List<String> imageUrl = dto.getImagesUrl() == null ? null : dto.getImagesUrl();
@@ -212,11 +217,11 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 for (int i = 0; i < feeAdjust.size(); i++) {
                     AnomalyDeductCompensationDto anomalyDeductCompensationDto = feeAdjust.get(i);
                     //扣款对象
-                    if (0 == i) {
+                    if (CostType.DEDUCTION.equals(anomalyDeductCompensationDto.getAdjustType())) {
                         feeAdjust(dto, currentUser.getId(), anomalyDeductCompensationDto, CostType.DEDUCTION);
                     }
                     //赔偿对象
-                    if (1 == i) {
+                    if (CostType.COMPENSATE.equals(anomalyDeductCompensationDto.getAdjustType())) {
                         feeAdjust(dto, currentUser.getId(), anomalyDeductCompensationDto, CostType.COMPENSATE);
                     }
                 }
@@ -232,7 +237,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      * @return
      */
     @Override
-    public PageInfo anomalManagementList(WaybillAnomalyCondition dto) {
+    public PageInfo anomalyManagementList(WaybillAnomalyCondition dto) {
         List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(dto);
         List<AnomalyManagementListDto> anomalyManagementListDtos = new ArrayList<>();
         List<Integer> driverList = new ArrayList<>();

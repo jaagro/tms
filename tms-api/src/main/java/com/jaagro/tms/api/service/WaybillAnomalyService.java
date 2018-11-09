@@ -24,7 +24,7 @@ public interface WaybillAnomalyService {
      * 运单异常类型显示
      * Author @Gao.
      */
-    List<WaybillAnomalyTypeDto> displayAnormalType();
+    List<WaybillAnomalyTypeDto> displayAnomalyType();
 
     /**
      * 根据运单Id查询客户信息
@@ -58,7 +58,7 @@ public interface WaybillAnomalyService {
      * @param dto
      * @return
      */
-    void anormalInformationProcess(AnomalyInformationProcessDto dto);
+    void anomalyInformationProcess(AnomalyInformationProcessDto dto);
 
     /**
      * 异常管理列表
@@ -67,7 +67,7 @@ public interface WaybillAnomalyService {
      * @param dto
      * @return
      */
-    PageInfo anomalManagementList(WaybillAnomalyCondition dto);
+    PageInfo anomalyManagementList(WaybillAnomalyCondition dto);
 
     /**
      * 客户侧费用
