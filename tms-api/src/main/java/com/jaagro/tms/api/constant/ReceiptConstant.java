@@ -1,12 +1,13 @@
 package com.jaagro.tms.api.constant;
+
 /**
  * @author @Gao.
  */
-public class ReceiptConstant {
+public final class ReceiptConstant {
 
     public static final String OPERATION_SUCCESS = "OPERATION_SUCCESS";
     /**
-     *操作失败
+     * 操作失败
      */
     public static final String OPERATION_FAILED = "OPERATION_FAILED";
     /**

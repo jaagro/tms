@@ -7,6 +7,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * @author tony
+ */
 @Data
 @Accessors(chain = true)
 public class Waybill implements Serializable {

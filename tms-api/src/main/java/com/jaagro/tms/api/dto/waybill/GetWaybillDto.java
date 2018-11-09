@@ -89,6 +89,10 @@ public class GetWaybillDto implements Serializable {
      */
     private List<GetTrackingDto> tracking;
 
+    private Integer totalQuantity;
+
+    private BigDecimal totalWeight;
+
     /**
      * 装货时间
      */

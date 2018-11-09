@@ -1,120 +1,130 @@
 package com.jaagro.tms.web.controller;
 
-import com.jaagro.constant.UserInfo;
-import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
-import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
-import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
-import com.jaagro.tms.api.dto.truck.ShowTruckDto;
-import com.jaagro.tms.api.dto.waybill.CreateWaybillPlanDto;
-import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
-import com.jaagro.tms.api.dto.waybill.ListWaybillPlanDto;
-import com.jaagro.tms.api.service.WaybillPlanService;
-import com.jaagro.tms.api.service.WaybillService;
-import com.jaagro.tms.biz.service.CustomerClientService;
-import com.jaagro.tms.biz.service.SmsClientService;
-import com.jaagro.tms.biz.service.TruckClientService;
-import com.jaagro.tms.biz.service.TruckTypeClientService;
+import com.jaagro.tms.api.dto.base.GetCustomerUserDto;
+import com.jaagro.tms.api.dto.waybill.LocationDto;
+import com.jaagro.tms.biz.mapper.LocationMapperExt;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
-import com.jaagro.utils.BaseResponse;
-import com.jaagro.utils.BeanDifferentUtils;
-import com.jaagro.utils.DifferentResult;
+import com.jaagro.tms.biz.service.impl.GpsLocationAsync;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * @author tony
  */
 @RestController
 public class TestController {
+    @Autowired
+    CurrentUserService currentUserService;
 
     @Autowired
-    private CustomerClientService customerClientService;
-    @Autowired
-    private CurrentUserService currentUserService;
-    @Autowired
-    private TruckTypeClientService truckTypeClientService;
-    @Autowired
-    private WaybillService waybillService;
-    @Autowired
-    private WaybillPlanService waybillPlanService;
-    @Autowired
-    private SmsClientService smsClientService;
+    LocationMapperExt locationMapper;
 
-    @GetMapping("/test1/{id}")
-    public ShowCustomerDto test1(@PathVariable("id") Integer id){
-        return customerClientService.getShowCustomerById(id);
+
+    @Autowired
+    private GpsLocationAsync asyncTask;
+
+    @GetMapping("/test")
+    public GetCustomerUserDto test1() {
+        return currentUserService.getCustomerUserById();
     }
 
-    @GetMapping("/test2/{id}")
-    public ShowCustomerContractDto test2(@PathVariable("id") Integer id){
-        return customerClientService.getShowCustomerContractById(id);
+
+    @GetMapping("/insertBatch")
+    public void insertBatch() {
+        long start = System.currentTimeMillis();
+        List<LocationDto> list = new ArrayList<>();
+        LocationDto loc;
+        for (int i = 0; i < 500; i++) {
+            loc = new LocationDto();
+            loc.setLatitude(new BigDecimal(i));
+            loc.setLongitude(new BigDecimal(i));
+            loc.setLocationTime(new Date());
+            list.add(loc);
+        }
+
+        int count= locationMapper.insertBatch(list);
+        long end = System.currentTimeMillis();
+        System.out.println("-----同步耗时----------" + (start - end) + "---------------");
+        System.out.println("插入的条数："+count);
     }
 
-    @GetMapping("/test3")
-    public UserInfo test3(){
-        return currentUserService.getCurrentUser();
+    @GetMapping("/asyncBatchInsert")
+    public void asyncBatchInsert() {
+        long start = System.currentTimeMillis();
+        List<LocationDto> list = new ArrayList<>();
+        LocationDto loc;
+        for (int i = 0; i < 500; i++) {
+            loc = new LocationDto();
+            loc.setLatitude(new BigDecimal(i));
+            loc.setLongitude(new BigDecimal(i));
+            loc.setLocationTime(new Date());
+            list.add(loc);
+        }
+
+        List<LocationDto> listA = list.subList(0,165);
+        List<LocationDto> listB = list.subList(165,330);
+        List<LocationDto> listC = list.subList(330,list.size());
+        Future<Boolean> taskA =  asyncTask.batchInsertOne(listA);
+        Future<Boolean> taskB =  asyncTask.batchInsertTwo(listB);
+        Future<Boolean> taskC =  asyncTask.batchInsertThree(listC);
+
+        while(!taskA.isDone() || !taskB.isDone() || !taskC.isDone()){
+            if(taskA.isDone() && taskB.isDone() && taskC.isDone()){
+                break;
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("-----异步耗时----------" + (start - end) + "---------------");
     }
 
-    @GetMapping("/test4")
-    public DifferentResult test4(){
-        UserInfo userInfo = new UserInfo();
-        userInfo.setLoginName("hello");
-        UserInfo userInfo1 = new UserInfo();
-        userInfo1.setName("world");
-        DifferentResult result = BeanDifferentUtils.compare(userInfo, userInfo1);
+    public static  <T> List<List<T>> averageAssign(List<T> source, int n) {
+        List<List<T>> result = new ArrayList<List<T>>();
+        int remainder = source.size() % n;  //(先计算出余数)
+        int number = source.size() / n;  //然后是商
+        int offset = 0;//偏移量
+        for (int i = 0; i < n; i++) {
+            List<T> value = null;
+            if (remainder > 0) {
+                value = source.subList(i * number + offset, (i + 1) * number + offset + 1);
+                remainder--;
+
+            } else {
+                value = source.subList(i * number + offset, (i + 1) * number + offset);
+            }
+            result.add(value);
+            }
         return result;
     }
 
-    @GetMapping("/test5")
-    public List<ListTruckTypeDto> test5(){
-        return truckTypeClientService.listTruckTypeReturnDto();
-    }
-    @GetMapping("/test6/{id}")
-    public ListTruckTypeDto test56(@PathVariable("id") Integer id){
-        return truckTypeClientService.getTruckTypeById(id);
-    }
-    @PostMapping("/createWaybillPlan")
-    public List<ListWaybillPlanDto> createWaybill(@RequestBody CreateWaybillPlanDto waybillPlanDto){
-        return waybillPlanService.createWaybillPlan(waybillPlanDto);
-    }
 
-//    @GetMapping("/test7/{orderId}")
-//    public List<GetWaybillDto> test7(@PathVariable("orderId") Integer orderId){
-//        return waybillService.listWaybillByOrderId(orderId);
-//    }
-    @Autowired
-    private TruckClientService truckClientService;
-
-    @GetMapping("/test8/{truckId}")
-    public ShowTruckDto test8(@PathVariable("truckId") Integer truckId){
-        return truckClientService.getTruckByIdReturnObject(truckId);
-    }
-
-    @GetMapping("/test9/{id}")
-    public GetWaybillDto test9(@PathVariable("id") Integer id){
-        return waybillService.getWaybillById(id);
-    }
-
-    @GetMapping("/test10/{id}/{userType}")
-    public UserInfo test10(@PathVariable("id") Integer id, @PathVariable("userType") String userType){
-        return currentUserService.getUserInfoById(id, userType);
-    }
-
-    @GetMapping("/test11")
-    public BaseResponse test11(){
-        try{
-        Map<String, Object> templateMap = new HashMap<>();
-        templateMap.put("drvierName","driver.getName()");
-            BaseResponse response=smsClientService.sendSMS("13600517630","smsTemplate_assignWaybill", templateMap);
-            System.out.println("TestHello=============================++++++++++++++");
-            return response;
-        }catch (Exception e){
-            e.printStackTrace();
+    public static void main(String[] args) {
+        long start = System.currentTimeMillis();
+        List<LocationDto> list = new ArrayList<>();
+        LocationDto loc;
+        for (int i = 0; i < 10210; i++) {
+            loc = new LocationDto();
+            loc.setLatitude(new BigDecimal(i));
+            loc.setLongitude(new BigDecimal(i));
+            loc.setLocationTime(new Date());
+            list.add(loc);
         }
-        return null;
+        List<List<LocationDto>> lll =  averageAssign(list,3);
+        for(int i=0;i<lll.size();i++){
+            System.out.println(lll.get(i).size());
+        }
+        System.out.println("======================");
+        System.out.println(lll.get(0).size());
+        System.out.println(lll.get(1).size());
+        System.out.println(lll.get(2).size());
+        System.out.println(lll.get(4).size());
+        long end = System.currentTimeMillis();
+        System.out.println("-----耗时----------" + (start - end) + "---------------");
     }
 }

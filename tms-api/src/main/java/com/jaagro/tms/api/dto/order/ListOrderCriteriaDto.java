@@ -40,6 +40,11 @@ public class ListOrderCriteriaDto implements Serializable {
     private Integer customerId;
 
     /**
+     * 客户类型
+     */
+    private Integer customerType;
+
+    /**
      * 订单状态
      */
     private String orderStatus;
@@ -73,5 +78,10 @@ public class ListOrderCriteriaDto implements Serializable {
      * 区分待派单列表和订单列表
      */
     private String waitOrders;
+
+    /**
+     * 区分小程序列表和pc端订单列表
+     */
+    private String differentiateStatus;
 
 }

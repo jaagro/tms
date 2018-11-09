@@ -2,7 +2,7 @@ package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
 import com.jaagro.tms.api.dto.order.ListOrderDto;
-import com.jaagro.tms.biz.entity.Orders;
+import com.jaagro.tms.api.dto.order.WeChatListOrderDto;
 
 import java.util.List;
 
@@ -26,4 +26,12 @@ public interface OrdersMapperExt extends OrdersMapper {
      * @return
      */
     List<Integer> getOrderIdsByCustomerId(Integer customerId);
+
+    /**
+     * 微信小程序 订单列表
+     *
+     * @param criteriaDto
+     * @return
+     */
+    List<WeChatListOrderDto> listWeChatOrdersByCriteria(ListOrderCriteriaDto criteriaDto);
 }

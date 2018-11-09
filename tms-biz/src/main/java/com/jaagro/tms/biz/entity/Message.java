@@ -3,13 +3,14 @@ package com.jaagro.tms.biz.entity;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.Date;
 /**
  * @author tony
  */
 @Data
 @Accessors(chain = true)
-public class Message {
+public class Message implements Serializable {
     /**
      * 
      */
@@ -46,9 +47,14 @@ public class Message {
     private String body;
 
     /**
-     * 消息类型：1-系统通知 2-运单相关 3-账务相关
+     * 消息类型：1-系统通知(公告) 2-运单相关 3-账务相关
      */
     private Integer msgType;
+
+    /**
+     * 消息来源:1-APP,2-小程序,3-站内
+     */
+    private Integer msgSource;
 
     /**
      * 关联id

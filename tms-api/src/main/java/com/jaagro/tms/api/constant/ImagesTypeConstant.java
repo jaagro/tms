@@ -1,8 +1,9 @@
 package com.jaagro.tms.api.constant;
+
 /**
  * @author @Gao.
  */
-public class ImagesTypeConstant {
+public final class ImagesTypeConstant {
     /**
      * 出库单
      */
@@ -15,4 +16,8 @@ public class ImagesTypeConstant {
      * 签收单
      */
     public static final Integer SIGN_BILL = 2;
+    /**
+     * 回单补录
+     */
+    public static final Integer RECEIPT_BILL =3;
 }

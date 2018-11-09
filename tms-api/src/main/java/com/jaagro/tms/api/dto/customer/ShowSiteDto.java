@@ -22,6 +22,11 @@ public class ShowSiteDto implements Serializable {
     private Integer deptId;
 
     /**
+     * 归属网点名称
+     */
+    private String deptName;
+
+    /**
      * 地址类型：1-装货点，2-卸货点
      */
     private Integer siteType;
@@ -104,4 +109,9 @@ public class ShowSiteDto implements Serializable {
      * 货物类型:毛鸡、饲料、母猪、公猪、仔猪、生猪
      */
     private int productType;
+
+    /**
+     * 客户Id
+     */
+    private Integer customerId;
 }

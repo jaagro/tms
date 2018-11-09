@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.dto.driverapp;
 
+import com.jaagro.constant.UserInfo;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -67,4 +68,10 @@ public class ShowTrackingDto implements Serializable {
      * 运单状态修改记录时间
      */
     private Date createTime;
+
+    /**
+     * 跟踪类型：1-运输轨迹 2-补录轨迹
+     */
+    private Integer trackingType;
+
 }

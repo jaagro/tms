@@ -33,7 +33,14 @@
         select
         <include refid="Base_Column_List"/>
         from order_items
+        where order_id = #{id,jdbcType=INTEGER} and enabled = 1
+    </select>
+    <select id="listItemsDtoByOrderId" resultType="com.jaagro.tms.api.dto.order.ListOrderItemsDto" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from order_items
         where order_id = #{id,jdbcType=INTEGER}
+        and enabled = 1
     </select>
     <update id="disableByOrderId">
         update order_items

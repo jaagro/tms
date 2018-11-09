@@ -1,15 +1,11 @@
 package com.jaagro.tms.api.dto.order;
 
-import com.jaagro.tms.api.dto.base.ShowUserDto;
-import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
-import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
-import com.jaagro.tms.api.dto.customer.ShowSiteDto;
-import com.jaagro.tms.api.dto.driverapp.ShowSiteAppDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tony
@@ -26,7 +22,7 @@ public class ListOrderDto implements Serializable {
     /**
      * 客户合同id
      */
-    private ShowCustomerContractDto customerContract;
+    private Integer customerContractId;
 
     /**
      * 货物类型
@@ -41,22 +37,12 @@ public class ListOrderDto implements Serializable {
     /**
      * 客户id
      */
-    private ShowCustomerDto customerId;
+    private Integer customerId;
 
     /**
      * 装货地id
      */
-    private ShowSiteDto loadSite;
-
-    /**
-     * 部门id
-     */
-    private Integer departmentId;
-
-    /**
-     * 部门名称
-     */
-    private String departmentName;
+    private Integer loadSiteId;
 
     /**
      * 要求装货时间
@@ -81,21 +67,27 @@ public class ListOrderDto implements Serializable {
     /**
      * 创建人
      */
-    private ShowUserDto createdUserId;
+    private Integer createdUserId;
 
     /**
-     * 计划派单
+     * 修改时间
      */
-    private Integer waybillCount;
+    private Date modifyTime;
 
     /**
-     * 已派单
+     * 修改人id
      */
-    private Integer waybillAlready;
+    private Integer modifyUserId;
 
     /**
-     * 待派单
+     * 部门id
      */
-    private Integer waybillWait;
+    private Integer departmentId;
+
+    /**
+     * 订单需求列表
+     */
+    private List<ListOrderItemsDto> orderItemsDtoList;
+
 
 }

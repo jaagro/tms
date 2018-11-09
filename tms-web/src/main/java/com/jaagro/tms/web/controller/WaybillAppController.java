@@ -1,9 +1,12 @@
 package com.jaagro.tms.web.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
 import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
 import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
+import com.jaagro.tms.api.dto.driverapp.ShowWaybillTrackingDto;
 import com.jaagro.tms.api.dto.waybill.GetReceiptMessageParamDto;
+import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
@@ -25,6 +28,8 @@ public class WaybillAppController {
 
     @Autowired
     private WaybillService waybillService;
+    @Autowired
+    private WaybillRefactorService waybillRefactorService;
 
     @ApiOperation("我的运单")
     @PostMapping("/listWaybillApp")
@@ -32,9 +37,10 @@ public class WaybillAppController {
         if (StringUtils.isEmpty(dto.getWaybillStatus())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单状态参数为空");
         }
-        Map<String, Object> waybill = waybillService.listWaybillByStatus(dto);
-        return BaseResponse.service(waybill);
+        PageInfo  waybill= waybillRefactorService.listWaybillByStatus(dto);
+        return BaseResponse.successInstance(waybill);
     }
+
 
     @ApiOperation("运单详情")
     @GetMapping("/ListWayBillDetailsApp/{waybillId}")
@@ -42,8 +48,7 @@ public class WaybillAppController {
         if (waybillId == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单参数不能为空");
         }
-        final Map<String, Object> waybillDetails = waybillService.listWayBillDetails(waybillId);
-        return BaseResponse.service(waybillDetails);
+        return BaseResponse.service(waybillService.listWayBillDetails(waybillId));
     }
 
     @ApiOperation("运单轨迹")
@@ -52,7 +57,11 @@ public class WaybillAppController {
         if (waybillId == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单单参数不能为空");
         }
-        return BaseResponse.service(waybillService.showWaybillTrucking(waybillId));
+        ShowWaybillTrackingDto showWaybillTrackingDto = waybillService.showWaybillTrucking(waybillId);
+        if (showWaybillTrackingDto != null){
+            return BaseResponse.successInstance(showWaybillTrackingDto);
+        }
+        return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(),"查询不到有效的运单");
     }
 
     @ApiOperation("运单轨迹更新")
