@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -1182,8 +1183,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateWaybillGoodsReceipt(UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto) {
-        // 更新运单货物
-        // 更新运单卸货地
+        // 更新运单货物 更新运单卸货地
         List<UpdateWaybillgoodsDto> updateWaybillgoodsDtoList = updateWaybillGoodsReceiptDto.getUpdateWaybillgoodsDtoList();
         Integer waybillId = null;
         UserInfo currentUser = currentUserService.getCurrentUser();
