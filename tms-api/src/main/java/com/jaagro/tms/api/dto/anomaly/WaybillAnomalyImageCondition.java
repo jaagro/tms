@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @Data
 @Accessors(chain = true)
-public class WaybillAnomalyImageCondtion implements Serializable {
+public class WaybillAnomalyImageCondition implements Serializable {
 
     /**
      * 异常id

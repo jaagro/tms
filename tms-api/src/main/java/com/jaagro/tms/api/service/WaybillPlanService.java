@@ -18,9 +18,6 @@ public interface WaybillPlanService {
      */
     List<ListWaybillPlanDto> createWaybillPlan(CreateWaybillPlanDto waybillDto);
 
-
-
-
     /**
      * 从配载计划中移除运单【逻辑删除】
      *

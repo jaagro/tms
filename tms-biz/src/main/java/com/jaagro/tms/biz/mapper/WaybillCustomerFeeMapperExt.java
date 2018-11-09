@@ -15,6 +15,6 @@ public interface WaybillCustomerFeeMapperExt extends WaybillCustomerFeeMapper{
      * 根据条件查询客户费用相关信息
      * @return
      */
-    List<WaybillCustomerFeeDto > listWaybillCustomerFeeByCondtion(WaybillFeeCondtion condtion);
+    List<WaybillCustomerFeeDto > listWaybillCustomerFeeByCondition(WaybillFeeCondtion condtion);
 
 }

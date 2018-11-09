@@ -11,7 +11,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class WaybillAnomalTypeDto implements Serializable {
+public class WaybillAnomalyTypeDto implements Serializable {
     /**
      * 主键id
      */

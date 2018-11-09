@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class AnomalInformationProcessDto implements Serializable {
+public class AnomalyInformationProcessDto implements Serializable {
 
     /**
      * 异常Id
@@ -51,6 +51,6 @@ public class AnomalInformationProcessDto implements Serializable {
     /**
      * 是否涉及费用调整
      */
-    private List<AnomalDeductCompensationDto> feeAdjust;
+    private List<AnomalyDeductCompensationDto> feeAdjust;
 
 }
