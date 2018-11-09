@@ -24,7 +24,7 @@ public interface WaybillAnomalyService {
      * 运单异常类型显示
      * Author @Gao.
      */
-    List<WaybillAnomalTypeDto> displayAnormalType();
+    List<WaybillAnomalyTypeDto> displayAnomalyType();
 
     /**
      * 根据运单Id查询客户信息
@@ -40,7 +40,7 @@ public interface WaybillAnomalyService {
      * @param
      * @return
      */
-    List<WaybillAnomalyDto> listWaybillAnomalyByCondition(WaybillAnomalyCondtion dto);
+    List<WaybillAnomalyDto> listWaybillAnomalyByCondition(WaybillAnomalyCondition dto);
 
     /**
      * 根据条件查询图片信息
@@ -49,7 +49,7 @@ public interface WaybillAnomalyService {
      * @param
      * @return
      */
-    List<WaybillAnomalyImageDto> listWaybillAnormalyImageByCondtion(WaybillAnomalyImageCondtion dto);
+    List<WaybillAnomalyImageDto> listWaybillAnomalyImageByCondition(WaybillAnomalyImageCondition dto);
 
     /**
      * 异常信息处理
@@ -58,7 +58,7 @@ public interface WaybillAnomalyService {
      * @param dto
      * @return
      */
-    void anormalInformationProcess(AnomalInformationProcessDto dto);
+    void anomalyInformationProcess(AnomalyInformationProcessDto dto);
 
     /**
      * 异常管理列表
@@ -67,19 +67,22 @@ public interface WaybillAnomalyService {
      * @param dto
      * @return
      */
-    PageInfo anomalManagementList(WaybillAnomalyCondtion dto);
+    PageInfo anomalyManagementList(WaybillAnomalyCondition dto);
 
     /**
      * 客户侧费用
      * @param dto
      * @return
      */
-    List<WaybillCustomerFeeDto> listWaybillCustomerFeeByCondtion(WaybillFeeCondtion dto);
+
+    List<WaybillCustomerFeeDto> listWaybillCustomerFeeByCondition(WaybillFeeCondtion dto);
 
     /**
      * 运力侧费用
+     * @param dto
+     * @return
      */
-    List<WaybillTruckFeeDto> listWaybillTruckFeeByCondtion(WaybillFeeCondtion dto);
+    List<WaybillTruckFeeDto> listWaybillTruckFeeByCondition(WaybillFeeCondtion dto);
 
     /**
      * 改变异常状态:入参为已处理则将状态改为待审核，入参为待审核则将状态改为已处理

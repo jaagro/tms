@@ -12,7 +12,7 @@ import java.math.BigDecimal;
  */
 @Data
 @Accessors(chain = true)
-public class AnomalDeductCompensationDto implements Serializable {
+public class AnomalyDeductCompensationDto implements Serializable {
     /**
      * 扣款 补款对象类型
      */

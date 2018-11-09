@@ -12,7 +12,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class AnomalManagementListDto implements Serializable {
+public class AnomalyManagementListDto implements Serializable {
 
     /**
      * 异常id

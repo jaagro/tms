@@ -3,7 +3,7 @@
 <mapper namespace="com.jaagro.tms.biz.mapper.WaybillAnomalyMapperExt">
 
     <select id="listWaybillAnomalyByCondition" resultType="com.jaagro.tms.api.dto.anomaly.WaybillAnomalyDto"
-            parameterType="com.jaagro.tms.api.dto.anomaly.WaybillAnomalyCondtion">
+            parameterType="com.jaagro.tms.api.dto.anomaly.WaybillAnomalyCondition">
         select
         wa.id, wa.waybill_id, wa.anomaly_type_id, wa.anomaly_desc, wa.processing_status, wa.processing_desc,
         wa.audit_status, wa.audit_desc, wa.verified_status, wa.adjust_status, wa.create_user_id,wa.create_user_type, wa.create_time,
