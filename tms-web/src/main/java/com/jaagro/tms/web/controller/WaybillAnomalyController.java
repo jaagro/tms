@@ -46,13 +46,13 @@ public class WaybillAnomalyController {
     @GetMapping("displayAnomalyType")
     public BaseResponse displayAnomalyType() {
         List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = waybillAnomalyService.displayAnomalyType();
-        List<AnomalTypeVo> anomalTypeVos = new ArrayList<>();
+        List<AnomalTypeVo> anomalyTypeVos = new ArrayList<>();
         for (WaybillAnomalyTypeDto waybillAnomalyTypeDto : waybillAnomalyTypeDtos) {
             AnomalTypeVo anomalTypeVo = new AnomalTypeVo();
             BeanUtils.copyProperties(waybillAnomalyTypeDto, anomalTypeVo);
-            anomalTypeVos.add(anomalTypeVo);
+            anomalyTypeVos.add(anomalTypeVo);
         }
-        return BaseResponse.successInstance(anomalTypeVos);
+        return BaseResponse.successInstance(anomalyTypeVos);
     }
 
     @ApiOperation("根据运单Id显示客户信息")
