@@ -18,7 +18,15 @@
         orders o
         left JOIN order_items t ON o.id = t.order_id
         where 1=1
-        <if test="orderStatus != null and orderStatus != ''">
+        <if test="differentiateStatus != null and differentiateStatus == 'WeChat'">
+            <if test="orderStatus != null and orderStatus != '' and orderStatus == '运输中'">
+                and o.order_status in ('已下单','已配载','运输中')
+            </if>
+        </if>
+        <if test="orderStatus != null and orderStatus != '' and differentiateStatus != 'WeChat'">
+            and o.order_status = #{orderStatus}
+        </if>
+        <if test="orderStatus != null and orderStatus != '' and differentiateStatus == 'WeChat' and orderStatus != '运输中'">
             and o.order_status = #{orderStatus}
         </if>
         <!--pc端的查询条件-->

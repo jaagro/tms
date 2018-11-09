@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @Data
 @Accessors(chain = true)
-public class WaybillFeeCondtion implements Serializable {
+public class WaybillFeeCondition implements Serializable {
     /**
      * 异常Id
      */

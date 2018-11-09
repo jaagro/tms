@@ -1,6 +1,6 @@
 package com.jaagro.tms.web.vo.anomaly;
 
-import com.jaagro.tms.api.dto.anomaly.AnomalDeductCompensationDto;
+import com.jaagro.tms.api.dto.anomaly.AnomalyDeductCompensationDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class AnomalInformationVo implements Serializable {
+public class AnomalyInformationVo implements Serializable {
 
     /**
      * 运单id
@@ -54,7 +54,7 @@ public class AnomalInformationVo implements Serializable {
     /**
      * 是否涉及费用调整 扣款对象 补偿对象
      */
-    private List<AnomalDeductCompensationDto> anomalDeductCompensationDto;
+    private List<AnomalyDeductCompensationDto> anomalyDeductCompensationDto;
 
     /**
      * 处理描述

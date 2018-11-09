@@ -1,6 +1,6 @@
 package com.jaagro.tms.biz.mapper;
 
-import com.jaagro.tms.api.dto.fee.WaybillFeeCondtion;
+import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
 import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
 
 import java.util.List;
@@ -11,11 +11,12 @@ import java.util.List;
 public interface WaybillTruckFeeMapperExt extends WaybillTruckFeeMapper {
 
     /**
+     * 根据条件查询运力侧费用
      * @Gao.
      * 根据条件查询运力侧费用
-     * @param condtion
+     * @param condition
      * @return
      */
-    List<WaybillTruckFeeDto> listWaybillTruckFeeByCondtion(WaybillFeeCondtion condtion);
+    List<WaybillTruckFeeDto> listWaybillTruckFeeByCondition(WaybillFeeCondition condition);
 
 }
