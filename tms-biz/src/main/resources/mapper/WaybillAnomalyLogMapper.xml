@@ -3,6 +3,7 @@
 <mapper namespace="com.jaagro.tms.biz.mapper.WaybillAnomalyLogMapperExt" >
   <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.WaybillAnomalyLog" >
     <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="waybill_anomaly_id" property="waybillAnomalyId" jdbcType="VARCHAR" />
     <result column="old_status" property="oldStatus" jdbcType="VARCHAR" />
     <result column="new_status" property="newStatus" jdbcType="VARCHAR" />
     <result column="log_info" property="logInfo" jdbcType="VARCHAR" />
@@ -10,10 +11,10 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, old_status, new_status, log_info, create_user_id, create_time
+    id, waybill_anomaly_id, old_status, new_status, log_info, create_user_id, create_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from waybill_anomaly_log
     where id = #{id,jdbcType=INTEGER}
@@ -22,19 +23,15 @@
     delete from waybill_anomaly_log
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillAnomalyLog" >
-    insert into waybill_anomaly_log (id, old_status, new_status, 
-      log_info, create_user_id, create_time
-      )
-    values (#{id,jdbcType=INTEGER}, #{oldStatus,jdbcType=VARCHAR}, #{newStatus,jdbcType=VARCHAR}, 
-      #{logInfo,jdbcType=VARCHAR}, #{createUserId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
-      )
-  </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillAnomalyLog" >
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillAnomalyLog" useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
     insert into waybill_anomaly_log
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
+      </if>
+      <if test="waybillAnomalyId != null" >
+        waybill_anomaly_id,
       </if>
       <if test="oldStatus != null" >
         old_status,
@@ -56,6 +53,9 @@
       <if test="id != null" >
         #{id,jdbcType=INTEGER},
       </if>
+      <if test="waybillAnomalyId != null" >
+        #{waybillAnomalyId,jdbcType=INTEGER},
+      </if>
       <if test="oldStatus != null" >
         #{oldStatus,jdbcType=VARCHAR},
       </if>
@@ -76,6 +76,9 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.WaybillAnomalyLog" >
     update waybill_anomaly_log
     <set >
+      <if test="waybillAnomalyId != null" >
+        waybill_anomaly_id = #{waybillAnomalyId,jdbcType=INTEGER},
+      </if>
       <if test="oldStatus != null" >
         old_status = #{oldStatus,jdbcType=VARCHAR},
       </if>
@@ -97,6 +100,7 @@
   <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.WaybillAnomalyLog" >
     update waybill_anomaly_log
     set old_status = #{oldStatus,jdbcType=VARCHAR},
+      waybill_anomaly_id = #{waybillAnomalyId,jdbcType=INTEGER},
       new_status = #{newStatus,jdbcType=VARCHAR},
       log_info = #{logInfo,jdbcType=VARCHAR},
       create_user_id = #{createUserId,jdbcType=INTEGER},

@@ -83,4 +83,12 @@ public interface WaybillAnomalyService {
      * @return
      */
     List<WaybillTruckFeeDto> listWaybillTruckFeeByCondition(WaybillFeeCondition dto);
+
+    /**
+     * 改变异常状态:入参为已处理则将状态改为待审核，入参为待审核则将状态改为已处理
+     * @param nowStatus 当前状态
+     * @param id
+     * @return
+     */
+    boolean changeAnomalyStatus(int[] id, String nowStatus);
 }

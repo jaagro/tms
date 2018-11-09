@@ -34,4 +34,132 @@
         order by wa.waybill_id ,wa.create_time desc
     </select>
 
+    <update id="batchUpdateByPrimaryKeySelective" parameterType="list">
+        update waybill_anomaly
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="waybill_id =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.waybillId!=null">
+                        when id=#{i.id} then #{i.waybillId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="anomaly_type_id =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.anomalyTypeId!=null">
+                        when id=#{i.id} then #{i.anomalyTypeId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="anomaly_desc =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.anomalyDesc!=null">
+                        when id=#{i.id} then #{i.anomalyDesc}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="processing_status =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.processingStatus!=null">
+                        when id=#{i.id} then #{i.processingStatus}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="processing_desc =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.processingDesc!=null">
+                        when id=#{i.id} then #{i.processingDesc}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="audit_status =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.auditStatus!=null">
+                        when id=#{i.id} then #{i.auditStatus}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="audit_desc =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.auditDesc!=null">
+                        when id=#{i.id} then #{i.auditDesc}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="verified_status =case" suffix="end,">
+            <foreach collection="records" item="i" index="index">
+                <if test="i.verifiedStatus!=null">
+                    when id=#{i.id} then #{i.verifiedStatus}
+                </if>
+            </foreach>
+            </trim>
+            <trim prefix="adjust_status =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.adjustStatus!=null">
+                        when id=#{i.id} then #{i.adjustStatus}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="create_user_id =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.createUserId!=null">
+                        when id=#{i.id} then #{i.createUserId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="create_user_type =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.createUserType!=null">
+                        when id=#{i.id} then #{i.createUserType}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="create_time =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.createTime!=null">
+                        when id=#{i.id} then #{i.createTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="processor_user_id =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.processorUserId!=null">
+                        when id=#{i.id} then #{i.processorUserId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="processor_time =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.processorTime!=null">
+                        when id=#{i.id} then #{i.processorTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="auditUser_id =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.auditUserId!=null">
+                        when id=#{i.id} then #{i.auditUserId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="audit_time =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.auditTime!=null">
+                        when id=#{i.id} then #{i.auditTime}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="enabled =case" suffix="end,">
+                <foreach collection="records" item="i" index="index">
+                    <if test="i.enabled!=null">
+                        when id=#{i.id} then #{i.enabled}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="records" separator="," item="i" index="index" close=")" open="(">
+            #{i.id}
+        </foreach>
+    </update>
 </mapper>

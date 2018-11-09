@@ -2,6 +2,7 @@ package com.jaagro.tms.api.constant;
 
 /**
  * 异常状态
+ * @author tony
  */
 public final class AnomalyStatus {
 
@@ -14,4 +15,6 @@ public final class AnomalyStatus {
     public final static String FINISH = "已结束";
 
     public final static String INVALID = "已作废";
+
+    public final static String REFUSE = "审核不通过";
 }
