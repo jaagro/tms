@@ -3,6 +3,7 @@ package com.jaagro.tms.biz.mapper;
 import com.jaagro.tms.api.dto.anomaly.WaybillAnomalyDto;
 import com.jaagro.tms.biz.entity.WaybillAnomaly;
 import com.jaagro.tms.api.dto.anomaly.WaybillAnomalyCondition;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -23,5 +24,5 @@ public interface WaybillAnomalyMapperExt extends WaybillAnomalyMapper {
      * @param records
      * @return
      */
-    Integer batchUpdateByPrimaryKeySelective(List<WaybillAnomaly> records);
+    Integer batchUpdateByPrimaryKeySelective(@Param("records") List<WaybillAnomaly> records);
 }

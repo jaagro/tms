@@ -363,7 +363,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         UserInfo currentUser = currentUserService.getCurrentUser();
         List<WaybillAnomaly> waybillAnomalyList = new LinkedList<>();
         List<WaybillAnomalyLog> waybillAnomalyLogList = new LinkedList<>();
-
         for(int id : ids){
             WaybillAnomaly waybillAnomaly = waybillAnomalyMapper.selectByPrimaryKey(id);
             if (null == waybillAnomaly) {
@@ -387,30 +386,31 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     }
                     break;
                 case AnomalyStatus.TO_AUDIT:
+                    record.setAuditStatus(AnomalyStatus.REFUSE);
                     record.setProcessingStatus(AnomalyStatus.DONE);
                     break;
                 default:
-                    //插入日志
-                    WaybillAnomalyLog waybillAnomalyLog = new WaybillAnomalyLog();
-                    waybillAnomalyLog.setCreateUserId(currentUser.getId());
-                    waybillAnomalyLog.setOldStatus(nowStatus);
-                    waybillAnomalyLog.setWaybillAnomalyId(record.getId());
-                    if (AnomalyStatus.DONE.equals(nowStatus)) {
-                        waybillAnomalyLog.setNewStatus(AnomalyStatus.TO_AUDIT);
-                        waybillAnomalyLog.setLogInfo("异常单被【" + currentUser.getName() + "】发送至【待审核】");
-                    }
-                    if (AnomalyStatus.TO_AUDIT.equals(nowStatus)) {
-                        waybillAnomalyLog.setNewStatus(AnomalyStatus.DONE);
-                        waybillAnomalyLog.setLogInfo("异常单被【" + currentUser.getName() + "】退回至【已处理】");
-                    }
-                    if (!waybillAnomaly.getAdjustStatus()) {
-                        waybillAnomalyLog.setNewStatus(AnomalyStatus.FINISH);
-                        waybillAnomalyLog.setLogInfo("异常单被【" + currentUser.getName() + "】发送至【已结束】");
-                    }
-                    waybillAnomalyList.add(record);
-                    waybillAnomalyLogList.add(waybillAnomalyLog);
-                    break;
+                    throw new NullPointerException("不满足操作条件");
             }
+            //插入日志
+            WaybillAnomalyLog waybillAnomalyLog = new WaybillAnomalyLog();
+            waybillAnomalyLog.setCreateUserId(currentUser.getId());
+            waybillAnomalyLog.setOldStatus(nowStatus);
+            waybillAnomalyLog.setWaybillAnomalyId(record.getId());
+            if (AnomalyStatus.DONE.equals(nowStatus)) {
+                waybillAnomalyLog.setNewStatus(AnomalyStatus.TO_AUDIT);
+                waybillAnomalyLog.setLogInfo("异常单被【" + currentUser.getName() + "】发送至【待审核】");
+            }
+            if (AnomalyStatus.TO_AUDIT.equals(nowStatus)) {
+                waybillAnomalyLog.setNewStatus(AnomalyStatus.DONE);
+                waybillAnomalyLog.setLogInfo("异常单被【" + currentUser.getName() + "】退回至【已处理】");
+            }
+            if (!waybillAnomaly.getAdjustStatus()) {
+                waybillAnomalyLog.setNewStatus(AnomalyStatus.FINISH);
+                waybillAnomalyLog.setLogInfo("异常单被【" + currentUser.getName() + "】发送至【已结束】");
+            }
+            waybillAnomalyList.add(record);
+            waybillAnomalyLogList.add(waybillAnomalyLog);
         }
         waybillAnomalyMapper.batchUpdateByPrimaryKeySelective(waybillAnomalyList);
         waybillAnomalyLogMapperExt.batchInsert(waybillAnomalyLogList);
