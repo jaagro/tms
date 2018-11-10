@@ -61,7 +61,6 @@ public class OrderController {
      */
     @ApiOperation("新增订单")
     @PostMapping("/order")
-
     public BaseResponse createOrder(@RequestBody CreateOrderDto orderDto) {
         if (StringUtils.isEmpty(orderDto.getCustomerId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");

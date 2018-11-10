@@ -1071,7 +1071,6 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
-        PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
         List<Integer> departIds = userClientService.getDownDepartment();
         if (departIds.size() != 0) {
             criteriaDto.setDepartIds(departIds);
@@ -1093,6 +1092,7 @@ public class WaybillServiceImpl implements WaybillService {
                 return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
             }
         }
+        PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
