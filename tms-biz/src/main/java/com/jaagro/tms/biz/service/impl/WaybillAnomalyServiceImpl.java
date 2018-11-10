@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.security.cert.CertSelector;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -88,9 +87,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 WaybillAnomalyImage waybillAnomalyImage = new WaybillAnomalyImage();
                 waybillAnomalyImage
                         .setCreateUserId(currentUser.getId())
-                        .setImageType(AnomalyImageTypeConstant.APPLY)
                         .setAnomalyId(waybillAnomaly.getId())
                         .setWaybillId(dto.getWaybillId())
+                        .setImageType(AnomalyImageTypeConstant.ADD)
                         .setImageUrl(url);
                 waybillAnomalyImageMapper.insertSelective(waybillAnomalyImage);
             }
@@ -196,6 +195,11 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         //批量插入图片
         List<String> imageUrl = dto.getImagesUrl() == null ? null : dto.getImagesUrl();
         if (null != imageUrl && imageUrl.size() != 0) {
+            WaybillAnomalyImageCondition waybillAnomalyImageCondition = new WaybillAnomalyImageCondition();
+            waybillAnomalyImageCondition
+                    .setAnomalyId(dto.getAnomalId())
+                    .setAnomalyImageType(AnomalyImageTypeConstant.PROCESS);
+            waybillAnomalyImageMapper.deleteAnomalyImageByCondition(waybillAnomalyImageCondition);
             for (String url : imageUrl) {
                 WaybillAnomalyImage waybillAnomalyImage = new WaybillAnomalyImage();
                 waybillAnomalyImage
@@ -235,6 +239,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     /**
      * 异常管理列表
      * Author @Gao.
+     *
      * @param dto
      * @return
      */
@@ -362,7 +367,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         UserInfo currentUser = currentUserService.getCurrentUser();
         List<WaybillAnomaly> waybillAnomalyList = new LinkedList<>();
         List<WaybillAnomalyLog> waybillAnomalyLogList = new LinkedList<>();
-        for(int id : ids){
+        for (int id : ids) {
             WaybillAnomaly waybillAnomaly = waybillAnomalyMapper.selectByPrimaryKey(id);
             if (null == waybillAnomaly) {
                 throw new NullPointerException(id + ":记录不存在");
@@ -419,6 +424,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     /**
      * 费用是否调整公共方法
      * Author @Gao.
+     *
      * @param dto
      * @param currentUserId
      * @param anomalyDeductCompensationDto
