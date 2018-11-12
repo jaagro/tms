@@ -130,6 +130,6 @@ public class WaybillAppController {
     @ApiOperation("个人中心")
     @GetMapping ("personalCenterApp")
     public BaseResponse personalCenterApp() {
-        return BaseResponse.service(waybillService.personalCenter());
+        return BaseResponse.successInstance(waybillService.personalCenter());
     }
 }

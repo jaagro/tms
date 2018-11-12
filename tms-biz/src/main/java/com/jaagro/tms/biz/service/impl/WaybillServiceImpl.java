@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
+import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
@@ -12,10 +13,12 @@ import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillgoodsDto;
+import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.DriverReturnDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.service.AccountService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.*;
@@ -84,7 +87,8 @@ public class WaybillServiceImpl implements WaybillService {
     private SmsClientService smsClientService;
     @Autowired
     private UserClientService userClientService;
-
+    @Autowired
+    private AccountService accountService;
     /**
      * @param waybillDtoList
      * @return
@@ -732,11 +736,18 @@ public class WaybillServiceImpl implements WaybillService {
      * @Author @Gao.
      */
     @Override
-    public Map<String, Object> personalCenter() {
+    public ShowPersonalCenter personalCenter() {
         ShowPersonalCenter showPersonalCenter = new ShowPersonalCenter();
         UserInfo currentUser = currentUserService.getCurrentUser();
         showPersonalCenter.setUserInfo(currentUser);
-        return ServiceResult.toResult(showPersonalCenter);
+        // 设置账户信息 add by yj 20181112
+        QueryAccountDto queryAccountDto = new QueryAccountDto();
+        queryAccountDto
+                .setAccountType(AccountType.CASH)
+                .setUserId(currentUser == null ? null : currentUser.getId())
+                .setUserType(AccountUserType.DRIVER);
+        showPersonalCenter.setAccountInfo(accountService.getByQueryAccountDto(queryAccountDto));
+        return showPersonalCenter;
     }
 
     /**
@@ -1247,45 +1258,59 @@ public class WaybillServiceImpl implements WaybillService {
     /**
      * 上传回单图片
      *
-     * @param waybillId
-     * @param imageUrl
+     * @param uploadReceiptImageDto
      * @return
      * @author yj
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean uploadReceiptImage(Integer waybillId, String imageUrl) {
-        WaybillTracking waybillTracking = new WaybillTracking();
+    public boolean uploadReceiptImage(UploadReceiptImageDto uploadReceiptImageDto) {
+        // 获取公共参数
         UserInfo currentUser = currentUserService.getCurrentUser();
         Integer currentUserId = currentUser == null ? null : currentUser.getId();
+        Integer waybillId = uploadReceiptImageDto.getWaybillId();
         List<ShowTrackingDto> waybillTrackingList = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybillId);
+        ShowTrackingDto showTrackingDto = null;
         if (!CollectionUtils.isEmpty(waybillTrackingList)) {
-            ShowTrackingDto showTrackingDto = waybillTrackingList.get(0);
-            waybillTracking
-                    .setOldStatus(showTrackingDto.getOldStatus())
-                    .setNewStatus(showTrackingDto.getNewStatus());
+            showTrackingDto = waybillTrackingList.get(0);
         }
-        waybillTracking
-                .setTrackingType(TrackingType.RECEIPT)
-                .setReferUserId(currentUserId)
-                .setTrackingInfo("回单补传单据")
-                .setWaybillId(waybillId)
-                .setCreateTime(new Date());
-        int count = waybillTrackingMapper.insertSelective(waybillTracking);
-        if (count < 1) {
-            throw new RuntimeException("插入运单轨迹(回单补传单据)失败");
-        }
-        WaybillTrackingImages trackingImages = new WaybillTrackingImages();
-        trackingImages
-                .setWaybillTrackingId(waybillTracking.getId())
-                .setImageUrl(imageUrl)
-                .setImageType(ImagesTypeConstant.RECEIPT_BILL)
-                .setCreateUserId(currentUserId)
-                .setCreateTime(new Date())
-                .setWaybillId(waybillId);
-        count = waybillTrackingImagesMapper.insertSelective(trackingImages);
-        if (count < 1) {
-            throw new RuntimeException("插入运单轨迹图片(回单补传单据)失败");
+
+        // 物理删除补录单据，补录单据轨迹
+        List<GetTrackingImagesDto> uploadImages = uploadReceiptImageDto.getUploadImages();
+        if (!CollectionUtils.isEmpty(uploadImages)){
+            List<WaybillTracking> waybillTrackings = new LinkedList<>();
+            List<WaybillTrackingImages> waybillTrackingImagesList = new LinkedList<>();
+            waybillTrackingImagesMapper.deleteByWaybillIdAndImageType(waybillId,ImagesTypeConstant.RECEIPT_BILL);
+            waybillTrackingMapper.deleteByWaybillIdAndTrackingType(waybillId,TrackingType.RECEIPT_BILL);
+            for (GetTrackingImagesDto imagesDto : uploadImages){
+                WaybillTracking waybillTracking = new WaybillTracking();
+                waybillTracking
+                        .setOldStatus(showTrackingDto.getOldStatus())
+                        .setNewStatus(showTrackingDto.getNewStatus())
+                        .setTrackingType(TrackingType.RECEIPT_BILL)
+                        .setReferUserId(currentUserId)
+                        .setTrackingInfo("回单补传单据")
+                        .setWaybillId(waybillId)
+                        .setCreateTime(new Date());
+                waybillTrackings.add(waybillTracking);
+                WaybillTrackingImages trackingImages = new WaybillTrackingImages();
+                trackingImages
+                        .setWaybillTrackingId(waybillTracking.getId())
+                        .setImageUrl(imagesDto.getImageUrl())
+                        .setImageType(ImagesTypeConstant.RECEIPT_BILL)
+                        .setCreateUserId(currentUserId)
+                        .setCreateTime(new Date())
+                        .setWaybillId(waybillId);
+                waybillTrackingImagesList.add(trackingImages);
+            }
+            Integer insertNum = waybillTrackingImagesMapper.batchInsert(waybillTrackingImagesList);
+            if (waybillTrackingImagesList.size() != insertNum){
+                throw new RuntimeException("插入补录单据失败");
+            }
+            insertNum = waybillTrackingMapper.batchInsert(waybillTrackings);
+            if (waybillTrackingList.size() != insertNum){
+                throw new RuntimeException("插入补录单据轨迹失败");
+            }
         }
         return true;
     }

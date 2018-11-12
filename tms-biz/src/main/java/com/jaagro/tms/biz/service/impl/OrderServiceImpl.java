@@ -5,30 +5,28 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
-import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.biz.entity.OrderItems;
 import com.jaagro.tms.biz.entity.OrderModifyLog;
 import com.jaagro.tms.biz.entity.Orders;
-import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.AuthClientService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.UserClientService;
+import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author tony
@@ -54,8 +52,6 @@ public class OrderServiceImpl implements OrderService {
     private OrderModifyLogMapper modifyLogMapper;
     @Autowired
     private WaybillMapperExt waybillMapper;
-    @Autowired
-    private UserClientService userClientService;
 
     /**
      * 创建订单
@@ -66,15 +62,22 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createOrder(CreateOrderDto orderDto) {
+        if (customerService.getShowCustomerById(orderDto.getCustomerId()) == null) {
+            throw new RuntimeException("客户不存在");
+        }
+        if (customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
+            throw new RuntimeException("客户合同不存在");
+        }
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
         order.setCreatedUserId(currentUserService.getShowUser().getId());
-        order.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
+        //暂时将departmentId定为1，仅限小程序客户下单
+        order.setDepartmentId(1);
         this.ordersMapper.insertSelective(order);
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
             for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
                 if (StringUtils.isEmpty(itemsDto.getUnloadId())) {
-                    return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "卸货地不能为空");
+                    throw new RuntimeException("卸货地不能为空");
                 }
                 itemsDto.setOrderId(order.getId());
                 this.orderItemsService.createOrderItem(itemsDto);
