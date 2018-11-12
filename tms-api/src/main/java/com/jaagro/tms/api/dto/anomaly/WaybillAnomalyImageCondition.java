@@ -21,4 +21,9 @@ public class WaybillAnomalyImageCondition implements Serializable {
      * 创建人的Id
      */
     private Integer createUserId;
+
+    /**
+     * 异常图片类型
+     */
+    private Integer anomalyImageType;
 }
