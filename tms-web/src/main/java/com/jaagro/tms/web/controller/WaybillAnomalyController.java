@@ -131,6 +131,7 @@ public class WaybillAnomalyController {
         return BaseResponse.successInstance(waybillAnomalyService.changeAnomalyStatus(param.getIds(), param.getNowStatus()));
     }
 
+
     /**
      * @param waybillAnomalyDto
      * @param anomalyInformationVo
