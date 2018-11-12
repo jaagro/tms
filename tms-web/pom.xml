@@ -97,6 +97,14 @@
                 <profileActive>prod</profileActive>
             </properties>
         </profile>
+
+        <!--内部开发环境-->
+        <profile>
+            <id>dev-zheng</id>
+            <properties>
+                <profileActive>dev-zheng</profileActive>
+            </properties>
+        </profile>
     </profiles>
     <!--jar包工具-->
     <build>

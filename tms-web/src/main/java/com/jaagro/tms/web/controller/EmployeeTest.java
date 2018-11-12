@@ -37,7 +37,7 @@ public class EmployeeTest {
     public static void main(String[] args) {
         List<Employee> employeeList = generateData();
         //返回姓名列表
-        List<String> names = employeeList.stream().map(c->c.getName()).collect(Collectors.toList());
+        List<String> names = employeeList.stream().map(Employee::getName).collect(Collectors.toList());
         System.out.println(names);
     }
 }

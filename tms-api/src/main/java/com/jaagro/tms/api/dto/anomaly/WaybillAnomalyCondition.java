@@ -60,4 +60,9 @@ public class WaybillAnomalyCondition implements Serializable {
      * 异常创建人 类型
      */
     private String createUserType;
+
+    /**
+     * 审核状态
+     */
+    private String auditStatus;
 }

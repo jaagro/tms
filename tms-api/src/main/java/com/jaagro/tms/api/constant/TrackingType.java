@@ -14,4 +14,8 @@ public final class TrackingType {
      * 补录轨迹
      */
     public static final Integer RECEIPT = 2;
+    /**
+     * 补录单据轨迹
+     */
+    public static final Integer RECEIPT_BILL = 3;
 }

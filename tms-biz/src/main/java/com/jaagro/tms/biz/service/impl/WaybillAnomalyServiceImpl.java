@@ -1,7 +1,6 @@
 package com.jaagro.tms.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.anomaly.*;
@@ -173,7 +172,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void anomalyInformationProcess(AnomalyInformationProcessDto dto) {
-
         UserInfo currentUser = currentUserService.getCurrentUser();
         //插入异常审核信息
         WaybillAnomaly waybillAnomaly = new WaybillAnomaly();
@@ -245,7 +243,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      * @return
      */
     @Override
-    public PageInfo anomalyManagementList(WaybillAnomalyCondition dto) {
+    public List<AnomalyManagementListDto> anomalyManagementList(WaybillAnomalyCondition dto) {
         if (null != dto.getPageNum() && null != dto.getPageSize()) {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         }
@@ -340,7 +338,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             }
             anomalyManagementListDtos.add(anomalyManagementListDto);
         }
-        return new PageInfo(anomalyManagementListDtos);
+        return anomalyManagementListDtos;
     }
 
     /**
@@ -429,6 +427,34 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         waybillAnomalyMapper.batchUpdateByPrimaryKeySelective(waybillAnomalyList);
         waybillAnomalyLogMapperExt.batchInsert(waybillAnomalyLogList);
         return true;
+    }
+
+    /**
+     * 异常审核
+     * Author @Gao.
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public void anomalyInformationAudit(AnomalyInformationAuditDto dto) {
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        WaybillAnomaly waybillAnomaly = new WaybillAnomaly();
+        waybillAnomaly
+                .setAuditUserId(currentUser.getId())
+                .setAuditTime(new Date());
+        //审核通过
+        if (AnomalyStatus.OK.equals(dto.getAuditStatus())) {
+            waybillAnomaly.setAuditStatus(AnomalyStatus.AUDIT_APPROVAL);
+            waybillAnomaly.setProcessingStatus(AnomalyStatus.FINISH);
+        }
+        //审核拒绝
+        if (AnomalyStatus.NO.equals(dto.getAuditStatus())) {
+            waybillAnomaly.setAuditStatus(AnomalyStatus.AUDIT_REFUSEL);
+            waybillAnomaly.setProcessingStatus(AnomalyStatus.DONE);
+        }
+
+        waybillAnomalyMapper.updateByPrimaryKeySelective(waybillAnomaly);
     }
 
     /**

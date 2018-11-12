@@ -1,27 +1,25 @@
 package com.jaagro.tms.web.vo.anomaly;
 
-import io.swagger.models.auth.In;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 /**
  * @Author @Gao.
- * 异常管理列表
  */
 @Data
 @Accessors(chain = true)
-public class AnomalManagementListVo implements Serializable {
+public class AnomalyAuditManagementListVo implements Serializable {
+    /**
+     * 异常id
+     */
+    private Integer id;
 
     /**
      * 异常类型
      */
     private String typeName;
-
-    /**
-     * 处理状态
-     */
-    private String processStatus;
 
     /**
      * 扣款金额
@@ -31,7 +29,7 @@ public class AnomalManagementListVo implements Serializable {
     /**
      * 赔款金额
      */
-    private String  compensateMoney;
+    private String compensateMoney;
 
     /**
      * 运单编号
@@ -39,17 +37,25 @@ public class AnomalManagementListVo implements Serializable {
     private Integer waybillId;
 
     /**
-     * 登记时间
+     * 审核时间
      */
-    private Integer createTime;
+    private Date auditTime;
 
     /**
-     * 登记人
+     * 审核人
      */
-    private Integer creatorName;
+    private String auditName;
+
     /**
-     * 处理人
+     * 审核人处理描述
      */
-    private  Integer processorName;
+    private String auditDesc;
+
+    /**
+     * 处理结果
+     */
+    private String auditStatus;
+
+
 
 }
