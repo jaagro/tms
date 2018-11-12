@@ -1,3 +1,7 @@
 spring:
   application:
     name: tms
+
+feignclinet:
+  application:
+    crm: crm
