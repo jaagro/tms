@@ -6,6 +6,7 @@ import com.jaagro.tms.biz.mapper.LocationMapperExt;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import com.jaagro.tms.biz.service.impl.GpsLocationAsync;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,11 +30,6 @@ public class TestController {
 
     @Autowired
     private GpsLocationAsync asyncTask;
-
-    @GetMapping("/test")
-    public GetCustomerUserDto test1() {
-        return currentUserService.getCustomerUserById();
-    }
 
 
     @GetMapping("/insertBatch")

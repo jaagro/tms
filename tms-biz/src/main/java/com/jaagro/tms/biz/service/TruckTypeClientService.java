@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author tony
  */
-@FeignClient("crm")
+@FeignClient(value = "${feignClient.application.crm}")
 public interface TruckTypeClientService {
 
     /**
