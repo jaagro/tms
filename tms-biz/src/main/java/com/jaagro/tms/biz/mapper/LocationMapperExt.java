@@ -24,5 +24,5 @@ public interface LocationMapperExt extends LocationMapper {
      * @param waybillId
      * @return
      */
-    List<ShowLocationDto> listLocationsByWaybillId(Integer waybillId);
+    List<ShowLocationDto> listLocationsByWaybillId(Integer waybillId,Integer interval);
 }

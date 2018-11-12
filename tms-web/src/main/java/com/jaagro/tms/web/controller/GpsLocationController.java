@@ -75,9 +75,9 @@ public class GpsLocationController {
 
     @ApiOperation("运单轨迹定位数据")
     @PostMapping("/listLocationsByWaybillId/{waybillId}")
-    public BaseResponse listLocationsByWaybillId(@PathVariable Integer waybillId) {
+    public BaseResponse listLocationsByWaybillId(@PathVariable Integer waybillId,@PathVariable Integer interval) {
         long start = System.currentTimeMillis();
-        List<ShowLocationDto> result = locationService.locationsByWaybillId(waybillId);
+        List<ShowLocationDto> result = locationService.locationsByWaybillId(waybillId,interval);
         long end = System.currentTimeMillis();
         log.info("----耗时----------" + (start - end) + "---------------");
         return BaseResponse.successInstance(result);

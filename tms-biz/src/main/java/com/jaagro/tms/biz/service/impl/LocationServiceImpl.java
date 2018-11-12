@@ -13,6 +13,7 @@ import com.jaagro.tms.biz.mapper.OrdersMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -30,6 +31,7 @@ private OrdersMapperExt ordersMapperExt;
 
     @Autowired
     private RedisOperator redis;
+
 
     /**
      * 批量新增司机定位数据
@@ -52,7 +54,7 @@ private OrdersMapperExt ordersMapperExt;
      * @return
      */
     @Override
-    public List<ShowLocationDto> locationsByWaybillId(Integer waybillId) {
+    public List<ShowLocationDto> locationsByWaybillId(Integer waybillId,Integer interval) {
         List<ShowLocationDto> locationDtos;
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         Orders order = ordersMapperExt.selectByPrimaryKey(waybill.getOrderId());
@@ -63,14 +65,16 @@ private OrdersMapperExt ordersMapperExt;
             //订单的状态是运输中或者已完成
            String locationListJson = redis.get(key);
            if(StringUtils.isEmpty(locationListJson)){
-               locationDtos = locationMapper.listLocationsByWaybillId(waybillId);
+               locationDtos = locationMapper.listLocationsByWaybillId(waybillId,interval);
                redis.set(key, JsonUtils.objectToJson(locationDtos), 2000);
            }else {
                locationDtos = JsonUtils.jsonToList(locationListJson, ShowLocationDto.class);
            }
        }else {
-           locationDtos = locationMapper.listLocationsByWaybillId(waybillId);
+           locationDtos = locationMapper.listLocationsByWaybillId(waybillId,interval);
        }
+
+
         return locationDtos;
 
     }
