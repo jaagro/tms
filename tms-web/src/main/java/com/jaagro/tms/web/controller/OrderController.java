@@ -89,6 +89,9 @@ public class OrderController {
     @ApiOperation("修改订单")
     @PutMapping("/order")
     public BaseResponse updateOrder(@RequestBody UpdateOrderDto orderDto) {
+        if (StringUtils.isEmpty(orderDto.getId())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单id不能为空");
+        }
         if (StringUtils.isEmpty(orderDto.getCustomerId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
         }
