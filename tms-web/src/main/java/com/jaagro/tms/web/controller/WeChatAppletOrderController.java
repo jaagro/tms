@@ -84,7 +84,7 @@ public class WeChatAppletOrderController {
         }
         Map<String, Object> result;
         try {
-            result = orderService.createOrder(orderDto);
+            result = orderRefactorService.createOrder(orderDto);
         } catch (Exception ex) {
             log.error("微信小程序开单:" + ex.getMessage());
             return BaseResponse.errorInstance(ex.getMessage());
