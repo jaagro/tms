@@ -4,6 +4,7 @@ import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
+import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
@@ -74,8 +75,8 @@ public class ReceiptController {
 
     @PostMapping("/uploadReceiptImage")
     @ApiOperation("补传单据")
-    public BaseResponse uploadReceiptImage(@RequestParam ("waybillId") Integer waybillId,@RequestParam ("imageUrl") String imageUrl){
-        boolean success = waybillService.uploadReceiptImage(waybillId,imageUrl);
+    public BaseResponse uploadReceiptImage(@RequestBody @Validated UploadReceiptImageDto uploadReceiptImageDto){
+        boolean success = waybillService.uploadReceiptImage(uploadReceiptImageDto);
         if (success){
             return BaseResponse.successInstance("补传单据成功");
         }

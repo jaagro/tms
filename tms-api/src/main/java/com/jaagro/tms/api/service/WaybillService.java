@@ -1,11 +1,9 @@
 package com.jaagro.tms.api.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
-import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
-import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
-import com.jaagro.tms.api.dto.driverapp.ShowWaybillTrackingDto;
+import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
+import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.waybill.*;
 
 import java.util.List;
@@ -139,7 +137,7 @@ public interface WaybillService {
      *
      * @return
      */
-    Map<String, Object> personalCenter();
+    ShowPersonalCenter personalCenter();
 
     /**
      * 撤回待接单的运单
@@ -186,10 +184,9 @@ public interface WaybillService {
     /**
      * 上传回单图片
      *
-     * @param waybillId
-     * @param imageUrl
+     * @param uploadReceiptImageDto
      * @return
      * @author yj
      */
-    boolean uploadReceiptImage(Integer waybillId, String imageUrl);
+    boolean uploadReceiptImage(UploadReceiptImageDto uploadReceiptImageDto);
 }
