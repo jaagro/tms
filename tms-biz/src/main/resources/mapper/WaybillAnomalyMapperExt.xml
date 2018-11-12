@@ -22,6 +22,9 @@
         <if test="processingStatus != null and processingStatus!=''">
             and wa.processing_status = #{processingStatus}
         </if>
+        <if test="auditStatus != null and auditStatus!=''">
+            and wa.audit_status = #{auditStatus}
+        </if>
         <if test="beginDate!=null and beginDate!='' and endDate!=null and endDate!=''">
             and wa.create_time between #{beginDate} and #{endDate}
         </if>

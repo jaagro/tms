@@ -70,8 +70,16 @@ public class AnomalyManagementListDto implements Serializable {
     private String auditDesc;
 
     /**
-     * 处理结果
+     * 审核状态
      */
     private String auditStatus;
+    /**
+     * 审核时间
+     */
+    private Date auditTime;
+    /**
+     * 是否涉及费用调整  0-否 1-是
+     */
+    private Boolean adjustStatus;
 
 }

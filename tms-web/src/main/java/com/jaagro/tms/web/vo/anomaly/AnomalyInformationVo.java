@@ -53,9 +53,19 @@ public class AnomalyInformationVo implements Serializable {
     private Boolean adjustStatus;
 
     /**
+     *审核状态
+     */
+    private String auditStatus;
+
+    /**
+     * 审核描述
+     */
+    private String auditDesc;
+
+    /**
      * 是否涉及费用调整 扣款对象 补偿对象
      */
-    private  List<AnomalyDeductCompensationDto> anomalyDeductCompensationDto;
+    private List<AnomalyDeductCompensationDto> anomalyDeductCompensationDto;
 
     /**
      * 处理描述

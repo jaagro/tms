@@ -1,5 +1,7 @@
 package com.jaagro.tms.web.controller;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.constant.AnomalyImageTypeConstant;
 import com.jaagro.tms.api.dto.anomaly.*;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
@@ -8,8 +10,9 @@ import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
 import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
 import com.jaagro.tms.api.service.WaybillAnomalyService;
 import com.jaagro.tms.biz.service.OssSignUrlClientService;
+import com.jaagro.tms.web.vo.anomaly.AnomalyAuditManagementListVo;
 import com.jaagro.tms.web.vo.anomaly.AnomalyInformationVo;
-import com.jaagro.tms.web.vo.anomaly.AnomalTypeVo;
+import com.jaagro.tms.web.vo.anomaly.AnomalyTypeVo;
 import com.jaagro.tms.web.vo.anomaly.ChangeAnomalyParamVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
@@ -49,11 +52,11 @@ public class WaybillAnomalyController {
     @GetMapping("displayAnomalyType")
     public BaseResponse displayAnomalyType() {
         List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = waybillAnomalyService.displayAnomalyType();
-        List<AnomalTypeVo> anomalyTypeVos = new ArrayList<>();
+        List<AnomalyTypeVo> anomalyTypeVos = new ArrayList<>();
         for (WaybillAnomalyTypeDto waybillAnomalyTypeDto : waybillAnomalyTypeDtos) {
-            AnomalTypeVo anomalTypeVo = new AnomalTypeVo();
-            BeanUtils.copyProperties(waybillAnomalyTypeDto, anomalTypeVo);
-            anomalyTypeVos.add(anomalTypeVo);
+            AnomalyTypeVo anomalyTypeVo = new AnomalyTypeVo();
+            BeanUtils.copyProperties(waybillAnomalyTypeDto, anomalyTypeVo);
+            anomalyTypeVos.add(anomalyTypeVo);
         }
         return BaseResponse.successInstance(anomalyTypeVos);
     }
@@ -64,7 +67,7 @@ public class WaybillAnomalyController {
         return BaseResponse.successInstance(waybillAnomalyService.getCustomerByWaybillId(waybillId));
     }
 
-    @ApiOperation("异常消息显示")
+    @ApiOperation("异常信息显示")
     @PostMapping("anomalyInformationDisplay")
     public BaseResponse anomalyInformationDisplay(@RequestBody WaybillAnomalyCondition dto) {
         List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyService.listWaybillAnomalyByCondition(dto);
@@ -106,23 +109,49 @@ public class WaybillAnomalyController {
                 }
                 anomalyInformationVo.setCreateAnomalyImageUrlDtos(anomalyImageUrlDtos);
             }
-            //显示处理信息
+            //显示处理 审核信息
             processAuditInformation(waybillAnomalyDto, anomalyInformationVo);
         }
         return BaseResponse.successInstance(anomalyInformationVo);
     }
 
-    @ApiOperation("异常消息处理")
+    @ApiOperation("异常信息处理")
     @PostMapping("anomalyInformationProcess")
     public BaseResponse anomalyInformationProcess(@RequestBody AnomalyInformationProcessDto dto) {
         waybillAnomalyService.anomalyInformationProcess(dto);
         return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
     }
 
-    @ApiOperation("异常管理列表")
+    @ApiOperation("异常处理管理列表")
     @PostMapping("anomalyManagementList")
     public BaseResponse anomalyManagementList(@RequestBody WaybillAnomalyCondition dto) {
-        return BaseResponse.successInstance(waybillAnomalyService.anomalyManagementList(dto));
+        if (null != dto.getPageNum() && null != dto.getPageSize()) {
+            PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+        }
+        return BaseResponse.successInstance(new PageInfo<>(waybillAnomalyService.anomalyManagementList(dto)));
+    }
+
+    @ApiOperation("异常审核管理列表")
+    @PostMapping("anomalyAuditManagementList")
+    public BaseResponse anomalyAuditManagementList(@RequestBody WaybillAnomalyCondition dto) {
+        if (null != dto.getPageNum() && null != dto.getPageSize()) {
+            PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+        }
+        List<AnomalyManagementListDto> anomalyManagementListDtos = waybillAnomalyService.anomalyManagementList(dto);
+        AnomalyAuditManagementListVo anomalyAuditManagementListVo = new AnomalyAuditManagementListVo();
+        List<AnomalyAuditManagementListVo> anomalyAuditManagementListVos = new ArrayList<>();
+        for (AnomalyManagementListDto anomalyManagementListDto : anomalyManagementListDtos) {
+            BeanUtils.copyProperties(anomalyManagementListDto, anomalyAuditManagementListVo);
+            anomalyAuditManagementListVos.add(anomalyAuditManagementListVo);
+        }
+        return BaseResponse.successInstance(new PageInfo<>(anomalyAuditManagementListVos));
+    }
+
+    @ApiOperation("异常信息审核")
+    @PostMapping("anomalyInformationAudit")
+    public BaseResponse anomalyInformationAudit(@RequestBody AnomalyInformationAuditDto dto) {
+        waybillAnomalyService.anomalyInformationAudit(dto);
+        return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
     }
 
     @ApiOperation(("异常发送/审核退回"))
@@ -130,7 +159,6 @@ public class WaybillAnomalyController {
     public BaseResponse changeAnomalyStatus(@RequestBody ChangeAnomalyParamVo param) {
         return BaseResponse.successInstance(waybillAnomalyService.changeAnomalyStatus(param.getIds(), param.getNowStatus()));
     }
-
 
     /**
      * @param waybillAnomalyDto

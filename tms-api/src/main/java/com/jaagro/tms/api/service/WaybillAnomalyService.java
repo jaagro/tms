@@ -67,10 +67,11 @@ public interface WaybillAnomalyService {
      * @param dto
      * @return
      */
-    PageInfo anomalyManagementList(WaybillAnomalyCondition dto);
+    List<AnomalyManagementListDto> anomalyManagementList(WaybillAnomalyCondition dto);
 
     /**
      * 客户侧费用
+     * Author @Gao.
      *
      * @param dto
      * @return
@@ -80,6 +81,7 @@ public interface WaybillAnomalyService {
 
     /**
      * 运力侧费用
+     * Author @Gao.
      *
      * @param dto
      * @return
@@ -94,4 +96,13 @@ public interface WaybillAnomalyService {
      * @return
      */
     boolean changeAnomalyStatus(int[] id, String nowStatus);
+
+    /**
+     * 异常审核
+     * Author @Gao.
+     *
+     * @param dto
+     * @return
+     */
+    void anomalyInformationAudit(AnomalyInformationAuditDto dto);
 }
