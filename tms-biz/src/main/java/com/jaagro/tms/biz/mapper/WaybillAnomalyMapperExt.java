@@ -13,7 +13,7 @@ import java.util.List;
 public interface WaybillAnomalyMapperExt extends WaybillAnomalyMapper {
     /**
      * 根据运单号Id 创建人id 查询异常信息
-     * @param
+     * @param dto
      * @return
      */
    List<WaybillAnomalyDto> listWaybillAnomalyByCondition(WaybillAnomalyCondition dto);

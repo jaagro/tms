@@ -53,9 +53,33 @@ public class AnomalyManagementListDto implements Serializable {
      * 登记人
      */
     private String creatorName;
+
     /**
      * 处理人
      */
     private String processorName;
+
+    /**
+     * 审核人
+     */
+    private String auditName;
+
+    /**
+     * 审核人处理描述
+     */
+    private String auditDesc;
+
+    /**
+     * 审核状态
+     */
+    private String auditStatus;
+    /**
+     * 审核时间
+     */
+    private Date auditTime;
+    /**
+     * 是否涉及费用调整  0-否 1-是
+     */
+    private Boolean adjustStatus;
 
 }

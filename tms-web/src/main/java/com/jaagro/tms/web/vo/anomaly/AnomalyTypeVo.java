@@ -5,9 +5,13 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
+/**
+ * @author @Gao.
+ * @date
+ */
 @Data
 @Accessors(chain = true)
-public class AnomalTypeVo implements Serializable {
+public class AnomalyTypeVo implements Serializable {
     /**
      * 主键id
      */

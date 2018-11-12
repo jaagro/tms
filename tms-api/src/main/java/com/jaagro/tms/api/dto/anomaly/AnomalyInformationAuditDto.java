@@ -10,20 +10,17 @@ import java.io.Serializable;
  */
 @Data
 @Accessors(chain = true)
-public class WaybillAnomalyImageCondition implements Serializable {
-
+public class AnomalyInformationAuditDto implements Serializable {
     /**
      * 异常id
      */
-    private Integer anomalyId;
-
+    private Integer id;
     /**
-     * 创建人的Id
+     * 审核结果
      */
-    private Integer createUserId;
-
+    private String auditStatus;
     /**
-     * 异常图片类型
+     * 审核描述
      */
-    private Integer anomalyImageType;
+    private String auditDesc;
 }
