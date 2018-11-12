@@ -52,11 +52,6 @@ public class ShowSiteDto implements Serializable {
     private Integer operationTime;
 
     /**
-     * 屠宰链数(卸货地属性)
-     */
-    private Integer killChain;
-
-    /**
      * 开始屠宰时间（卸货地属性）
      */
     private Date killTime;
