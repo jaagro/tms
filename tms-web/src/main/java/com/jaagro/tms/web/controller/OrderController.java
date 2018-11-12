@@ -71,12 +71,6 @@ public class OrderController {
         if (StringUtils.isEmpty(orderDto.getCustomerContractId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同id不能为空");
         }
-        if (customerService.getShowCustomerById(orderDto.getCustomerId()) == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户不存在");
-        }
-        if (customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同不存在");
-        }
         Map<String, Object> result;
         try {
             result = orderService.createOrder(orderDto);
