@@ -20,9 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +48,43 @@ public class OrderRefactorServiceImpl implements OrderRefactorService {
     private OrderGoodsMapperExt orderGoodsMapper;
     @Autowired
     private AuthClientService authClientService;
+    @Autowired
+    private CurrentUserService currentUserService;
+
+    /**
+     * 创建订单
+     *
+     * @param orderDto 入参json
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Map<String, Object> createOrder(CreateOrderDto orderDto) {
+        if (customerService.getShowCustomerById(orderDto.getCustomerId()) == null) {
+            throw new RuntimeException("下单客户不存在");
+        }
+        if (customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
+            throw new RuntimeException("下单客户合同不存在");
+        }
+        Orders order = new Orders();
+        BeanUtils.copyProperties(orderDto, order);
+        order.setCreatedUserId(currentUserService.getShowUser().getId());
+        //暂时将departmentId定为1，仅限小程序客户下单
+        order.setDepartmentId(1);
+        this.ordersMapper.insertSelective(order);
+        if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
+            for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
+                if (StringUtils.isEmpty(itemsDto.getUnloadId())) {
+                    throw new RuntimeException("卸货地址不能为空");
+                }
+                itemsDto.setOrderId(order.getId());
+                this.orderItemsService.createOrderItem(itemsDto);
+            }
+        } else {
+            throw new RuntimeException("订单明细不能为空");
+        }
+        return ServiceResult.toResult("创建成功");
+    }
 
     /**
      * 获取单条订单

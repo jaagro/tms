@@ -19,5 +19,5 @@ public interface AccountClientService {
      * @return
      */
     @PostMapping("/getByQueryAccountDto")
-    public AccountReturnDto getByQueryAccountDto(@RequestBody QueryAccountDto queryAccountDto);
+    AccountReturnDto getByQueryAccountDto(@RequestBody QueryAccountDto queryAccountDto);
 }

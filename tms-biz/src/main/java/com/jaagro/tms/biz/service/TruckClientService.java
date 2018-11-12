@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 /**
  * @author tony
  */
-@FeignClient("crm")
+@FeignClient(value = "${feignClient.application.crm}")
 public interface TruckClientService {
 
     /**

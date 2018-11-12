@@ -1,6 +1,5 @@
 package com.jaagro.tms.biz.service;
 
-import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
@@ -15,7 +14,7 @@ import java.util.List;
 /**
  * @author tony
  */
-@FeignClient(value = "crm")
+@FeignClient(value = "${feignClient.application.crm}")
 public interface CustomerClientService {
 
     /**
