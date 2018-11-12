@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author tony
  */
-@FeignClient(value = "${feignclinet.application.crm}")
+@FeignClient(value = "${feignClient.application.crm}")
 public interface CustomerClientService {
 
     /**
