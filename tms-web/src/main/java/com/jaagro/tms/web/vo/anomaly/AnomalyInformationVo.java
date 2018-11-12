@@ -1,6 +1,7 @@
 package com.jaagro.tms.web.vo.anomaly;
 
 import com.jaagro.tms.api.dto.anomaly.AnomalyDeductCompensationDto;
+import com.jaagro.tms.api.dto.anomaly.AnomalyImageUrlDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -38,7 +39,7 @@ public class AnomalyInformationVo implements Serializable {
     /**
      * 异常图片
      */
-    List<String> imageUrl;
+    private List<AnomalyImageUrlDto> createAnomalyImageUrlDtos;
 
     // 处理结果字段
     /**
@@ -54,7 +55,7 @@ public class AnomalyInformationVo implements Serializable {
     /**
      * 是否涉及费用调整 扣款对象 补偿对象
      */
-    private List<AnomalyDeductCompensationDto> anomalyDeductCompensationDto;
+    private  List<AnomalyDeductCompensationDto> anomalyDeductCompensationDto;
 
     /**
      * 处理描述
@@ -64,8 +65,5 @@ public class AnomalyInformationVo implements Serializable {
     /**
      * 处理者 上传的图片路径
      */
-    private List<String> processImageUrl;
-
-
-
+    private List<AnomalyImageUrlDto> processAnomalyImageUrlDtos;
 }

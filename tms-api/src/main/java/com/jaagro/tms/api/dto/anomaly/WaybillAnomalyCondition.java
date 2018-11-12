@@ -12,6 +12,16 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 public class WaybillAnomalyCondition implements Serializable {
+
+    /**
+     * 起始页
+     */
+    private Integer pageNum;
+
+    /**
+     * 每页条数
+     */
+    private Integer pageSize;
     /**
      * 异常创建人Id
      */
