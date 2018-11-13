@@ -3,11 +3,14 @@ package com.jaagro.tms.web.controller;
 import com.jaagro.tms.api.dto.waybill.LocationDto;
 import com.jaagro.tms.api.dto.waybill.ShowLocationDto;
 import com.jaagro.tms.api.service.LocationService;
+import com.jaagro.tms.biz.config.RabbitMqConfig;
 import com.jaagro.tms.biz.service.impl.GpsLocationAsync;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,9 +31,10 @@ public class GpsLocationController {
 
     @Autowired
     private LocationService locationService;
-
     @Autowired
     private GpsLocationAsync asyncTask;
+    @Autowired
+    private AmqpTemplate amqpTemplate;
 
     /**
      * 批量新增司机定位数据
@@ -44,6 +48,10 @@ public class GpsLocationController {
         locationService.insertBatch(locationDtos);
     }
 
+    @PostMapping("/insertBatchMq")
+    public void insertBatchMq(@RequestBody List<LocationDto> locationDtos) {
+        amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "location.send", locationDtos);
+    }
 
     @ApiOperation("异步新增司机定位")
     @PostMapping("/asyncBatchInsert")
@@ -67,8 +75,8 @@ public class GpsLocationController {
 
     @ApiOperation("运单轨迹定位数据")
     @PostMapping("/listLocationsByWaybillId/{waybillId}/{interval}")
-    public BaseResponse listLocationsByWaybillId(@PathVariable(("waybillId")) Integer waybillId,@PathVariable("interval") Integer interval) {
-        List<ShowLocationDto> result = locationService.locationsByWaybillId(waybillId,interval);
+    public BaseResponse listLocationsByWaybillId(@PathVariable(("waybillId")) Integer waybillId, @PathVariable("interval") Integer interval) {
+        List<ShowLocationDto> result = locationService.locationsByWaybillId(waybillId, interval);
         return BaseResponse.successInstance(result);
     }
 }

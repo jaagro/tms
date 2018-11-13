@@ -11,16 +11,16 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMqConfig {
 
     /**
-     * APP实时位置队列
+     * APP插入实时位置队列
      */
-    public static final String LOCATION_QUEUE = "location.queue";
+    public static final String LOCATION_SEND_QUEUE = "location.send.queue";
 
     public static final String TOPIC_EXCHANGE = "topic.exchange";
     public static final String FANOUT_EXCHANGE = "fanout.exchange";
 
     @Bean
-    public Queue locationQueue() {
-        return new Queue(LOCATION_QUEUE);
+    public Queue locationSendQueue() {
+        return new Queue(LOCATION_SEND_QUEUE, true);
     }
 
     /**
@@ -45,7 +45,7 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public Binding locationBindingTopic() {
-        return BindingBuilder.bind(locationQueue()).to(topicExchange()).with("location.#");
+    public Binding locationSendBindingTopic() {
+        return BindingBuilder.bind(locationSendQueue()).to(topicExchange()).with("location.send");
     }
 }

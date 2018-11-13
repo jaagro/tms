@@ -130,17 +130,8 @@ public class TestController {
         System.out.println("-----耗时----------" + (start - end) + "---------------");
     }
 
-    @Autowired
-    private AmqpTemplate amqpTemplate;
-
-    @GetMapping("sendMessage")
-    public void sendMessage(){
-        String message = "topic";
-        amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "location.send", message);
-    }
-
-    @RabbitListener(queues = RabbitMqConfig.LOCATION_QUEUE)
-    private void receiveMessage(String msg){
+    @RabbitListener(queues = RabbitMqConfig.LOCATION_SEND_QUEUE)
+    private void receiveMessage(List<LocationDto> msg){
         log.info("消息已被监听" + msg);
     }
 }
