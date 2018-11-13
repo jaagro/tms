@@ -2,13 +2,18 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.base.GetCustomerUserDto;
 import com.jaagro.tms.api.dto.waybill.LocationDto;
+import com.jaagro.tms.biz.config.RabbitMqConfig;
 import com.jaagro.tms.biz.mapper.LocationMapperExt;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import com.jaagro.tms.biz.service.impl.GpsLocationAsync;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import sun.rmi.runtime.Log;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,6 +24,7 @@ import java.util.concurrent.Future;
 /**
  * @author tony
  */
+@Slf4j
 @RestController
 public class TestController {
     @Autowired
@@ -122,5 +128,19 @@ public class TestController {
         System.out.println(lll.get(4).size());
         long end = System.currentTimeMillis();
         System.out.println("-----耗时----------" + (start - end) + "---------------");
+    }
+
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+
+    @GetMapping("sendMessage")
+    public void sendMessage(){
+        String message = "topic";
+        amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "location.send", message);
+    }
+
+    @RabbitListener(queues = RabbitMqConfig.LOCATION_QUEUE)
+    private void receiveMessage(String msg){
+        log.info("消息已被监听" + msg);
     }
 }
