@@ -13,8 +13,8 @@ import com.jaagro.tms.biz.mapper.OrdersMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -66,7 +66,9 @@ private OrdersMapperExt ordersMapperExt;
            String locationListJson = redis.get(key);
            if(StringUtils.isEmpty(locationListJson)){
                locationDtos = locationMapper.listLocationsByWaybillId(waybillId,interval);
-               redis.set(key, JsonUtils.objectToJson(locationDtos), 2000);
+               if(!CollectionUtils.isEmpty(locationDtos)) {
+                   redis.set(key, JsonUtils.objectToJson(locationDtos), 2000);
+               }
            }else {
                locationDtos = JsonUtils.jsonToList(locationListJson, ShowLocationDto.class);
            }
