@@ -50,4 +50,12 @@ public interface OrderItemsService {
      * @return
      */
     List<ListOrderItemsDto> listItemsByOrderId(Integer orderId);
+
+    /**
+     * 根据订单id删除orderItems
+     *
+     * @param id
+     * @return
+     */
+    Boolean deleteByOrderId(Integer orderId);
 }

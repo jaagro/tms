@@ -154,8 +154,8 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     public List<WaybillAnomalyImageDto> listWaybillAnomalyImageByCondition(WaybillAnomalyImageCondition dto) {
         List<WaybillAnomalyImage> waybillAnomalyImages = waybillAnomalyImageMapper.listWaybillAnomalyImageByCondition(dto);
         List<WaybillAnomalyImageDto> waybillAnomalyImageDtos = new ArrayList<>();
-        WaybillAnomalyImageDto waybillAnomalyImageDto = new WaybillAnomalyImageDto();
         for (WaybillAnomalyImage waybillAnomalyImage : waybillAnomalyImages) {
+            WaybillAnomalyImageDto waybillAnomalyImageDto = new WaybillAnomalyImageDto();
             BeanUtils.copyProperties(waybillAnomalyImage, waybillAnomalyImageDto);
             waybillAnomalyImageDtos.add(waybillAnomalyImageDto);
         }

@@ -95,12 +95,22 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public GetOrderDto updateOrder(UpdateOrderDto orderDto) {
+    public Map<String, Object> updateOrder(UpdateOrderDto orderDto) {
         if (orderDto.getId() == null) {
             throw new NullPointerException("订单id不能为空");
         }
-        if (ordersMapper.selectByPrimaryKey(orderDto.getId()) == null) {
+        Orders o = ordersMapper.selectByPrimaryKey(orderDto.getId());
+        if (o == null) {
             throw new NullPointerException("订单查询无数据");
+        }
+        if (!o.getOrderStatus().equals(OrderStatus.PLACE_ORDER)) {
+            throw new RuntimeException("在" + o.getOrderStatus() + "的订单状态不允许修改");
+        }
+        if (customerService.getShowCustomerById(orderDto.getCustomerId()) == null) {
+            throw new RuntimeException("客户不存在");
+        }
+        if (customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
+            throw new RuntimeException("客户合同不存在");
         }
         //修改order
         Orders orders = new Orders();
@@ -110,27 +120,26 @@ public class OrderServiceImpl implements OrderService {
                 .setModifyUserId(this.currentUserService.getShowUser().getId());
         this.ordersMapper.updateByPrimaryKeySelective(orders);
 
+        //删除order的全部货物信息，重新添加
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
-            for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
-                this.orderItemsService.updateItems(itemsDto);
+            //删除
+            Boolean result = orderItemsService.deleteByOrderId(orders.getId());
+            //新增
+            if (result) {
+                for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
+                    itemsDto
+                            .setOrderId(orders.getId())
+                            .setId(null);
+                    try {
+                        this.orderItemsService.createOrderItem(itemsDto);
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex.getMessage());
+                    }
+
+                }
             }
         }
-
-        //返回
-        Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
-        GetOrderDto getOrderDto = new GetOrderDto();
-        BeanUtils.copyProperties(order, orderDto);
-        getOrderDto
-                .setCustomer(this.customerService.getShowCustomerById(order.getCustomerId()))
-                .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
-                .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()));
-        UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
-        if (userInfo != null) {
-            ShowUserDto userDto = new ShowUserDto();
-            userDto.setUserName(userInfo.getName());
-            getOrderDto.setCreatedUser(userDto);
-        }
-        return getOrderDto;
+        return ServiceResult.toResult("操作成功");
     }
 
     /**

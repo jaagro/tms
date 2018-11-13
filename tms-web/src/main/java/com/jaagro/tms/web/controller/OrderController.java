@@ -95,14 +95,14 @@ public class OrderController {
         if (StringUtils.isEmpty(orderDto.getCustomerId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
         }
-        GetOrderDto getOrderDto;
+        Map<String, Object> result;
         try {
-            getOrderDto = orderService.updateOrder(orderDto);
+            result = orderService.updateOrder(orderDto);
         } catch (Exception ex) {
             ex.printStackTrace();
             return BaseResponse.errorInstance(ex.getMessage());
         }
-        return BaseResponse.successInstance(getOrderDto);
+        return BaseResponse.service(result);
     }
 
     /**
@@ -143,9 +143,9 @@ public class OrderController {
                 BeanUtils.copyProperties(getOrderDto.getContactsDto(), contactsVo);
                 orderVo.setContactsDto(contactsVo);
                 //创建人
-                UserVo userVo = new UserVo();
+                /*UserVo userVo = new UserVo();
                 BeanUtils.copyProperties(getOrderDto.getCreatedUser(), userVo);
-                orderVo.setCreatedUser(userVo);
+                orderVo.setCreatedUser(userVo);*/
                 //客户
                 CustomerVo customerVo = new CustomerVo();
                 BeanUtils.copyProperties(getOrderDto.getCustomer(), customerVo);
