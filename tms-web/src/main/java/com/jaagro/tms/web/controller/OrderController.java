@@ -143,9 +143,9 @@ public class OrderController {
                 BeanUtils.copyProperties(getOrderDto.getContactsDto(), contactsVo);
                 orderVo.setContactsDto(contactsVo);
                 //创建人
-                /*UserVo userVo = new UserVo();
+                UserVo userVo = new UserVo();
                 BeanUtils.copyProperties(getOrderDto.getCreatedUser(), userVo);
-                orderVo.setCreatedUser(userVo);*/
+                orderVo.setCreatedUser(userVo);
                 //客户
                 CustomerVo customerVo = new CustomerVo();
                 BeanUtils.copyProperties(getOrderDto.getCustomer(), customerVo);
