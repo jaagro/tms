@@ -43,5 +43,11 @@ public interface OrderItemsMapperExt extends OrderItemsMapper {
      */
     int disableByOrderId(Integer orderId);
 
-
+    /**
+     * 根据订单删除
+     *
+     * @param orderId
+     * @return
+     */
+    int deleteByOrderId(Integer orderId);
 }
