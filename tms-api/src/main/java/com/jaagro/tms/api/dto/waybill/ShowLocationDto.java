@@ -5,7 +5,6 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * @Author gavin
@@ -13,10 +12,6 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 public class ShowLocationDto implements Serializable {
-    /**
-     *
-     */
-    private Integer id;
 
     /**
      * 纬度
@@ -27,12 +22,5 @@ public class ShowLocationDto implements Serializable {
      * 经度
      */
     private BigDecimal longitude;
-
-
-    /**
-     * 设备定位的时间
-     */
-    private Date locationTime;
-
 
 }

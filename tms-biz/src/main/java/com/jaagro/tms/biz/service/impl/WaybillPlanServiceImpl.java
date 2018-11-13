@@ -22,6 +22,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -90,6 +91,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             //更新运单货物是生鸡时的装货时间和卸货时间
             int goodType = waybillDtos.get(0).getGoodType();
             if (GoodsType.CHICKEN.equals(goodType)) {
+                Assert.notNull(waybillDto.getKillChain(), "毛鸡屠宰链不能为空");
                 waybillDtos = getloadTimeAndUnloadTime(waybillDtos, truckDtos,waybillDto.getKillChain());
             }
         } catch (Exception e) {
