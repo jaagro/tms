@@ -6,7 +6,7 @@
         select
         <include refid="Base_Column_List"/>
         from order_goods
-        where order_item_id = #{id,jdbcType=INTEGER} and enabled = 1
+        where order_item_id = #{id,jdbcType=INTEGER}
     </select>
     <select id="listGoodsDtoByItemsId" resultType="com.jaagro.tms.api.dto.order.GetOrderGoodsDto"
             parameterType="java.lang.Integer">
