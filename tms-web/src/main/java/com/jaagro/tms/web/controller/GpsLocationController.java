@@ -10,7 +10,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j;
 import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,6 +47,12 @@ public class GpsLocationController {
         locationService.insertBatch(locationDtos);
     }
 
+    /**
+     * 把采集到的司机定位信息发布到rabbitMQ
+     *
+     * @param locationDtos
+     */
+    @ApiOperation("司机定位数据采集")
     @PostMapping("/insertBatchMq")
     public void insertBatchMq(@RequestBody List<LocationDto> locationDtos) {
         amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "location.send", locationDtos);

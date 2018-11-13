@@ -1,19 +1,13 @@
 package com.jaagro.tms.web.controller;
 
-import com.jaagro.tms.api.dto.base.GetCustomerUserDto;
 import com.jaagro.tms.api.dto.waybill.LocationDto;
-import com.jaagro.tms.biz.config.RabbitMqConfig;
 import com.jaagro.tms.biz.mapper.LocationMapperExt;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import com.jaagro.tms.biz.service.impl.GpsLocationAsync;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sun.rmi.runtime.Log;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -51,10 +45,10 @@ public class TestController {
             list.add(loc);
         }
 
-        int count= locationMapper.insertBatch(list);
+        int count = locationMapper.insertBatch(list);
         long end = System.currentTimeMillis();
         System.out.println("-----同步耗时----------" + (start - end) + "---------------");
-        System.out.println("插入的条数："+count);
+        System.out.println("插入的条数：" + count);
     }
 
     @GetMapping("/asyncBatchInsert")
@@ -70,15 +64,15 @@ public class TestController {
             list.add(loc);
         }
 
-        List<LocationDto> listA = list.subList(0,165);
-        List<LocationDto> listB = list.subList(165,330);
-        List<LocationDto> listC = list.subList(330,list.size());
-        Future<Boolean> taskA =  asyncTask.batchInsertOne(listA);
-        Future<Boolean> taskB =  asyncTask.batchInsertTwo(listB);
-        Future<Boolean> taskC =  asyncTask.batchInsertThree(listC);
+        List<LocationDto> listA = list.subList(0, 165);
+        List<LocationDto> listB = list.subList(165, 330);
+        List<LocationDto> listC = list.subList(330, list.size());
+        Future<Boolean> taskA = asyncTask.batchInsertOne(listA);
+        Future<Boolean> taskB = asyncTask.batchInsertTwo(listB);
+        Future<Boolean> taskC = asyncTask.batchInsertThree(listC);
 
-        while(!taskA.isDone() || !taskB.isDone() || !taskC.isDone()){
-            if(taskA.isDone() && taskB.isDone() && taskC.isDone()){
+        while (!taskA.isDone() || !taskB.isDone() || !taskC.isDone()) {
+            if (taskA.isDone() && taskB.isDone() && taskC.isDone()) {
                 break;
             }
         }
@@ -86,7 +80,7 @@ public class TestController {
         System.out.println("-----异步耗时----------" + (start - end) + "---------------");
     }
 
-    public static  <T> List<List<T>> averageAssign(List<T> source, int n) {
+    public static <T> List<List<T>> averageAssign(List<T> source, int n) {
         List<List<T>> result = new ArrayList<List<T>>();
         int remainder = source.size() % n;  //(先计算出余数)
         int number = source.size() / n;  //然后是商
@@ -101,7 +95,7 @@ public class TestController {
                 value = source.subList(i * number + offset, (i + 1) * number + offset);
             }
             result.add(value);
-            }
+        }
         return result;
     }
 
@@ -117,8 +111,8 @@ public class TestController {
             loc.setLocationTime(new Date());
             list.add(loc);
         }
-        List<List<LocationDto>> lll =  averageAssign(list,3);
-        for(int i=0;i<lll.size();i++){
+        List<List<LocationDto>> lll = averageAssign(list, 3);
+        for (int i = 0; i < lll.size(); i++) {
             System.out.println(lll.get(i).size());
         }
         System.out.println("======================");
@@ -130,8 +124,4 @@ public class TestController {
         System.out.println("-----耗时----------" + (start - end) + "---------------");
     }
 
-    @RabbitListener(queues = RabbitMqConfig.LOCATION_SEND_QUEUE)
-    private void receiveMessage(List<LocationDto> msg){
-        log.info("消息已被监听" + msg);
-    }
 }
