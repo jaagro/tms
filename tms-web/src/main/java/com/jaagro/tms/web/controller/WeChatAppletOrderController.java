@@ -84,7 +84,7 @@ public class WeChatAppletOrderController {
         }
         Map<String, Object> result;
         try {
-            result = orderService.createOrder(orderDto);
+            result = orderRefactorService.createOrder(orderDto);
         } catch (Exception ex) {
             log.error("微信小程序开单:" + ex.getMessage());
             return BaseResponse.errorInstance(ex.getMessage());
@@ -235,7 +235,7 @@ public class WeChatAppletOrderController {
         PageInfo pageInfo = orderService.listOrderByCriteria(criteriaDto);
         List<ListOrderDto> orderDtoList = pageInfo.getList();
         List<ListOrderVo> orderVoList = new ArrayList<>();
-        //替换为vol
+        //替换为vo
         if (orderDtoList.size() > 0) {
             for (ListOrderDto orderDto : orderDtoList) {
                 ListOrderVo orderVo = new ListOrderVo();
@@ -254,7 +254,7 @@ public class WeChatAppletOrderController {
                     for (ListOrderItemsDto itemsDto : itemsDtoList) {
                         ListOrderItemsVo itemsVo = new ListOrderItemsVo();
                         BeanUtils.copyProperties(itemsDto, itemsVo);
-                        ShowSiteDto siteDto = customerClientService.getShowSiteById(orderDto.getLoadSiteId());
+                        ShowSiteDto siteDto = customerClientService.getShowSiteById(itemsDto.getUnloadId());
                         SiteVo vo = new SiteVo();
                         BeanUtils.copyProperties(siteDto, vo);
                         itemsVo.setUnload(vo);

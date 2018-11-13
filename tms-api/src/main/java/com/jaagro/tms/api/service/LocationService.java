@@ -26,5 +26,5 @@ public interface LocationService {
      * @param waybillId
      * @return
      */
-    List<ShowLocationDto> locationsByWaybillId(Integer waybillId);
+    List<ShowLocationDto> locationsByWaybillId(Integer waybillId,Integer interval);
 }
