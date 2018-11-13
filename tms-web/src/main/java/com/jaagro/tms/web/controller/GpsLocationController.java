@@ -44,6 +44,7 @@ public class GpsLocationController {
     @ApiOperation("新增司机定位")
     @PostMapping("/insertBatch")
     public void insertBatch(@RequestBody List<LocationDto> locationDtos) {
+
         locationService.insertBatch(locationDtos);
     }
 

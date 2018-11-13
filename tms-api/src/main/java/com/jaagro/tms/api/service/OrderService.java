@@ -28,7 +28,7 @@ public interface OrderService {
      * @param orderDto 入参json
      * @return 修改后的order对象
      */
-    GetOrderDto updateOrder(UpdateOrderDto orderDto);
+    Map<String, Object> updateOrder(UpdateOrderDto orderDto);
 
     /**
      * 获取单条订单
