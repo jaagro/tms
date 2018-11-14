@@ -118,7 +118,7 @@
         where waybill_id = #{waybillId}
     </delete>
 
-    <insert id="batchInsert" parameterType="list" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    <insert id="batchInsert" parameterType="list">
         insert into waybill_items (waybill_id, unload_site_id,
         required_time, enabled, modify_time,
         modify_user_id, sign_status)

@@ -1212,12 +1212,13 @@ public class WaybillServiceImpl implements WaybillService {
                 waybillItems
                         .setModifyTime(new Date())
                         .setModifyUserId(currentUserId)
-                        .setRequiredTime(waybillGoodsDto.getRequiredTime())
+                        .setRequiredTime(waybillGoodsDto.getRequiredTime() == null ? new Date() : waybillGoodsDto.getRequiredTime())
                         .setModifyUserId(currentUserId)
                         .setModifyTime(new Date())
                         .setUnloadSiteId(waybillGoodsDto.getUnloadSiteId())
                         .setWaybillId(waybillId)
-                        .setEnabled(true);
+                        .setEnabled(true)
+                        .setSignStatus(waybillGoodsDto.getSignStatus());
                 waybillItemsSet.add(waybillItems);
             }
             // 删除原有运单货物
@@ -1236,6 +1237,7 @@ public class WaybillServiceImpl implements WaybillService {
             if (!insertItemsNum.equals(waybillItemsSet.size())){
                 throw new RuntimeException("插入卸货地失败");
             }
+            waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
             // 设置运单货物运单卸货地id
             for (UpdateWaybillGoodsDto waybillGoodsDto : updateWaybillGoodsDtoList){
                     WaybillGoods waybillGoods = new WaybillGoods();
@@ -1247,6 +1249,16 @@ public class WaybillServiceImpl implements WaybillService {
                     if (waybillGoodsDto.getWaybillId().equals(waybillItems.getWaybillId()) && waybillGoodsDto.getUnloadSiteId().equals(waybillItems.getUnloadSiteId())){
                         waybillGoods.setWaybillItemId(waybillItems.getId());
                     }
+                }
+                // 设置是否加药,订单货物id,是否有效默认值
+                if (waybillGoods.getEnabled() == null){
+                    waybillGoods.setEnabled(true);
+                }
+                if (waybillGoods.getJoinDrug() == null){
+                    waybillGoods.setJoinDrug(false);
+                }
+                if (waybillGoods.getOrderGoodsId() == null){
+                    waybillGoods.setOrderGoodsId(0);
                 }
                 waybillGoodsList.add(waybillGoods);
             }
@@ -1285,6 +1297,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @author yj
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateUnLoadGoodsReceipt(List<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList) {
         if (!CollectionUtils.isEmpty(updateWaybillGoodsDtoList)){
             UserInfo currentUser = currentUserService.getCurrentUser();
@@ -1331,10 +1344,6 @@ public class WaybillServiceImpl implements WaybillService {
             List<WaybillTracking> waybillTrackings = new LinkedList<>();
             List<WaybillTrackingImages> waybillTrackingImagesList = new LinkedList<>();
             waybillTrackingImagesMapper.deleteByWaybillIdAndImageType(waybillId,ImagesTypeConstant.RECEIPT_BILL);
-            waybillTrackingMapper.deleteByWaybillIdAndTrackingType(waybillId,TrackingType.LOAD_BILLS_RECEIPT);
-            for (GetTrackingImagesDto imagesDto : uploadImages){
-            waybillTrackingImagesMapper.deleteByWaybillIdAndImageType(waybillId, ImagesTypeConstant.RECEIPT_BILL);
-            waybillTrackingMapper.deleteByWaybillIdAndTrackingType(waybillId, TrackingType.RECEIPT_BILL);
             for (GetTrackingImagesDto imagesDto : uploadImages) {
                 WaybillTracking waybillTracking = new WaybillTracking();
                 waybillTracking

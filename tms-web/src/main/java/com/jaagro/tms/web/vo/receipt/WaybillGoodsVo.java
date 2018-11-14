@@ -108,4 +108,9 @@ public class WaybillGoodsVo implements Serializable{
      * 要求送达时间
      */
     private Date requiredTime;
+
+    /**
+     * 签收状态
+     */
+    private Boolean signStatus;
 }

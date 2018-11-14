@@ -1,7 +1,9 @@
 package com.jaagro.tms.api.dto.receipt;
 
 import lombok.Data;
+import lombok.Value;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
@@ -21,7 +23,7 @@ public class UpdateWaybillGoodsDto implements Serializable{
     /**
      * 运单货物id
      */
-    @NotNull(message = "{waybillGoodsId.NotNull}")
+    @Min(value = 1,message = "{waybillGoodsId.Min}")
     private Integer id;
 
     /**
@@ -34,32 +36,8 @@ public class UpdateWaybillGoodsDto implements Serializable{
     /**
      * 运单卸货地id
      */
-    @NotNull(message = "{waybillItemId.NotNull}")
+    @Min(value = 1,message = "{waybillItemId.Min}")
     private Integer waybillItemId;
-
-    /**
-     * 装货数量
-     */
-    @Min(value = 1,message = "{loadQuantity.Min}")
-    private Integer loadQuantity;
-
-    /**
-     * 装货重量
-     */
-    @DecimalMin(value = "0.01",message = "{loadWeight.DecimalMin}")
-    private BigDecimal loadWeight;
-
-    /**
-     * 卸货数量
-     */
-    @Min(value = 1,message = "{unloadQuantity.Min}")
-    private Integer unloadQuantity;
-
-    /**
-     * 卸货重量
-     */
-    @DecimalMin(value = "0.01",message = "{unloadWeight.DecimalMin}")
-    private BigDecimal unloadWeight;
 
     /**
      * 卸货地id
@@ -67,6 +45,48 @@ public class UpdateWaybillGoodsDto implements Serializable{
     @NotNull(message = "{unloadSiteId.NotNull}")
     @Min(value = 1,message = "{unloadSiteId.Min}")
     private Integer unloadSiteId;
+
+    /**
+     * 货物名称
+     */
+    @NotBlank(message = "{goodsName.NotBlank}")
+    private String goodsName;
+
+    /**
+     * 货物单位：1-羽 2-头 3-吨
+     */
+    @NotNull(message = "{goodsUnit.NotNull}")
+    @Min(value = 1,message = "{goodsUnit.Min}")
+    private Integer goodsUnit;
+    /**
+     * 计划数量
+     */
+    private Integer goodsQuantity;
+
+    /**
+     * 计划重量
+     */
+    private BigDecimal goodsWeight;
+
+    /**
+     * 装货数量
+     */
+    private Integer loadQuantity;
+
+    /**
+     * 装货重量
+     */
+    private BigDecimal loadWeight;
+
+    /**
+     * 卸货数量
+     */
+    private Integer unloadQuantity;
+
+    /**
+     * 卸货重量
+     */
+    private BigDecimal unloadWeight;
 
     /**
      * 是否加药
@@ -94,7 +114,17 @@ public class UpdateWaybillGoodsDto implements Serializable{
     private Integer orderGoodsId;
 
     /**
+     * 卸货地名称
+     */
+    private String unloadSiteName;
+
+    /**
      * 要求送达时间
      */
     private Date requiredTime;
+
+    /**
+     * 签收状态
+     */
+    private Boolean signStatus;
 }

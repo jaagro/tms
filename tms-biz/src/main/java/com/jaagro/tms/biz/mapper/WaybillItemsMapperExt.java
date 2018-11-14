@@ -45,7 +45,7 @@ public interface WaybillItemsMapperExt extends WaybillItemsMapper {
      * 批量插入
      * @author yj
      * @param waybillItemsList
-     * @reutrn
+     * @return
      */
     Integer batchInsert(@Param("waybillItemsList") List<WaybillItems> waybillItemsList);
 }

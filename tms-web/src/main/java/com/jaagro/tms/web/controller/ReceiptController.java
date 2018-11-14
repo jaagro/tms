@@ -111,31 +111,29 @@ public class ReceiptController {
         wayBillReceiptsVo.setCustomerId(waybillDetailDto.getLoadSiteDto() == null ? null : waybillDetailDto.getLoadSiteDto().getCustomerId());
         //货物类型
         wayBillReceiptsVo.setGoodsType(waybillDetailDto.getGoodType());
-        //货物信息
+        //运单卸货地
         List<GetWaybillItemDto> waybillItems = waybillDetailDto.getWaybillItems();
-        //提货信息
-        List<WaybillGoodsVo> loadGoodsList = new ArrayList<>();
-        //卸货信息
-        List<WaybillGoodsVo> unloadGoodsList = new ArrayList<>();
+        //运单货物信息
+        List<WaybillGoodsVo> waybillGoodsList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(waybillItems)) {
             for (GetWaybillItemDto getWaybillItemDto : waybillItems) {
                 ShowSiteDto showSiteDto = getWaybillItemDto.getShowSiteDto();
                 List<GetWaybillGoodsDto> goods = getWaybillItemDto.getGoods();
                 if (!CollectionUtils.isEmpty(goods)) {
                     for (GetWaybillGoodsDto goodsDto : goods) {
-                        WaybillGoodsVo loadGoods = new WaybillGoodsVo();
-                        loadGoods.setUnloadSiteName(showSiteDto == null ? null : showSiteDto.getSiteName());
-                        BeanUtils.copyProperties(goodsDto, loadGoods);
-                        loadGoodsList.add(loadGoods);
-                        WaybillGoodsVo unLoadGoods = new WaybillGoodsVo();
-                        unLoadGoods.setUnloadSiteName(showSiteDto == null ? null : showSiteDto.getSiteName());
-                        BeanUtils.copyProperties(goodsDto, unLoadGoods);
-                        unloadGoodsList.add(unLoadGoods);
+                        WaybillGoodsVo waybillGoodsVo = new WaybillGoodsVo();
+                        waybillGoodsVo
+                                .setUnloadSiteName(showSiteDto == null ? null : showSiteDto.getSiteName())
+                                .setUnloadSiteId(getWaybillItemDto.getUnloadSiteId())
+                                .setWaybillItemId(getWaybillItemDto.getId())
+                                .setRequiredTime(getWaybillItemDto.getRequiredTime())
+                                .setSignStatus(getWaybillItemDto.getSignStatus());
+                        BeanUtils.copyProperties(goodsDto, waybillGoodsVo);
+                        waybillGoodsList.add(waybillGoodsVo);
                     }
                 }
             }
-            wayBillReceiptsVo.setLoadGoodsList(loadGoodsList);
-            wayBillReceiptsVo.setUnLoadGoodsList(unloadGoodsList);
+            wayBillReceiptsVo.setWaybillGoodsList(waybillGoodsList);
         }
         //补录记录
         List<GetTrackingDto> trackingDtoList = waybillDetailDto.getTracking();
