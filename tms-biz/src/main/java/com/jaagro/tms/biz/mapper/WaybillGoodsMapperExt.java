@@ -43,4 +43,20 @@ public interface WaybillGoodsMapperExt extends WaybillGoodsMapper {
      * @return
      */
     Integer batchUpdateByPrimaryKeySelective(@Param("waybillGoodsList") List<WaybillGoods> waybillGoodsList);
+
+    /**
+     * 根据运单id删除
+     * @author yj
+     * @param waybillId
+     * @return
+     */
+    Integer deleteByWaybillId(@Param("waybillId") Integer waybillId);
+
+    /**
+     * 批量插入
+     * @author yj
+     * @param waybillGoodsList
+     * @return
+     */
+    Integer batchInsert(@Param("waybillGoodsList") List<WaybillGoods> waybillGoodsList);
 }

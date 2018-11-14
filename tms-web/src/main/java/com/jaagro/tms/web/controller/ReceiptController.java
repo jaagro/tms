@@ -1,8 +1,10 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.constant.TrackingType;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.waybill.*;
@@ -19,17 +21,20 @@ import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 回单管理
+ *
  * @author yj
  * @date 2018/10/31
  */
@@ -43,47 +48,64 @@ public class ReceiptController {
     private WaybillService waybillService;
     @Autowired
     private WaybillMapperExt waybillMapperExt;
-    private static final String RECEIPT_TRACKING_IMAGE_INFO = "回单补传单据";
+
     @GetMapping("/getReceiptWaybillDetailById/{id}")
     @ApiOperation("获取回单运单详情")
-    public BaseResponse getReceiptWaybillDetailById(@PathVariable("id") Integer id){
+    public BaseResponse getReceiptWaybillDetailById(@PathVariable("id") Integer id) {
         Waybill waybill = waybillMapperExt.selectByPrimaryKey(id);
-        if (waybill == null){
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(),"运单id="+id+"不存在");
+        if (waybill == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "不存在");
         }
-        if (!WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())){
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(),"运单未完成");
+        if (!WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单未完成");
         }
         GetWaybillDetailDto waybillDetailDto = waybillRefactorService.getWaybillDetailById(id);
-        if (waybillDetailDto == null){
+        if (waybillDetailDto == null) {
             return BaseResponse.errorInstance("回单运单详情为空");
         }
         WayBillReceiptsVo wayBillReceiptsVo = generateWayBillReceiptsVo(waybillDetailDto);
         return BaseResponse.successInstance(wayBillReceiptsVo);
     }
 
-    @PutMapping("/updateWaybillGoodsReceipt")
-    @ApiOperation("回单修改运单货物信息")
-    public BaseResponse updateWaybillGoodsReceipt(@RequestBody @Validated UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto){
-        log.debug("updateWaybillGoodsReceipt,{}",updateWaybillGoodsReceiptDto);
-        boolean success = waybillService.updateWaybillGoodsReceipt(updateWaybillGoodsReceiptDto);
-        if (success){
-            return BaseResponse.successInstance("回单修改运单货物信息成功");
+    @PutMapping("/updateLoadGoodsReceipt")
+    @ApiOperation("回单修改提货信息")
+    public BaseResponse updateLoadGoodsReceipt(@RequestBody @Validated List<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList) {
+        log.info("updateLoadGoodsReceipt,{}", updateWaybillGoodsDtoList);
+        if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)){
+            return BaseResponse.errorInstance("提货信息不能为空");
         }
-        return BaseResponse.errorInstance("回单修改运单货物信息失败");
+        boolean success = waybillService.updateLoadGoodsReceipt(updateWaybillGoodsDtoList);
+        if (success) {
+            return BaseResponse.successInstance("回单修改提货信息成功");
+        }
+        return BaseResponse.errorInstance("回单修改提货信息失败");
     }
 
+    @PutMapping("/updateUnLoadGoodsReceipt")
+    @ApiOperation("回单修改卸货信息")
+    public BaseResponse updateUnLoadGoodsReceipt(@RequestBody @Validated List<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList) {
+        log.info("updateUnLoadGoodsReceipt,{}", updateWaybillGoodsDtoList);
+        if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)){
+            return BaseResponse.errorInstance("卸货信息不能为空");
+        }
+        boolean success = waybillService.updateUnLoadGoodsReceipt(updateWaybillGoodsDtoList);
+        if (success) {
+            return BaseResponse.successInstance("回单修改卸货信息成功");
+        }
+        return BaseResponse.errorInstance("回单修改卸货信息失败");
+    }
+
+    @Deprecated
     @PostMapping("/uploadReceiptImage")
-    @ApiOperation("补传单据")
-    public BaseResponse uploadReceiptImage(@RequestBody @Validated UploadReceiptImageDto uploadReceiptImageDto){
+    public BaseResponse uploadReceiptImage(@RequestBody @Validated UploadReceiptImageDto uploadReceiptImageDto) {
         boolean success = waybillService.uploadReceiptImage(uploadReceiptImageDto);
-        if (success){
+        if (success) {
             return BaseResponse.successInstance("补传单据成功");
         }
         return BaseResponse.errorInstance("补传单据失败");
     }
 
-    private WayBillReceiptsVo generateWayBillReceiptsVo(GetWaybillDetailDto waybillDetailDto){
+    private WayBillReceiptsVo generateWayBillReceiptsVo(GetWaybillDetailDto waybillDetailDto) {
         WayBillReceiptsVo wayBillReceiptsVo = new WayBillReceiptsVo();
         //客户id
         wayBillReceiptsVo.setCustomerId(waybillDetailDto.getLoadSiteDto() == null ? null : waybillDetailDto.getLoadSiteDto().getCustomerId());
@@ -91,62 +113,64 @@ public class ReceiptController {
         wayBillReceiptsVo.setGoodsType(waybillDetailDto.getGoodType());
         //货物信息
         List<GetWaybillItemDto> waybillItems = waybillDetailDto.getWaybillItems();
-        if (!CollectionUtils.isEmpty(waybillItems)){
-            List<WaybillGoodsVo> waybillGoodsVoList = new ArrayList<>();
-            for (GetWaybillItemDto getWaybillItemDto : waybillItems){
+        //提货信息
+        List<WaybillGoodsVo> loadGoodsList = new ArrayList<>();
+        //卸货信息
+        List<WaybillGoodsVo> unloadGoodsList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(waybillItems)) {
+            for (GetWaybillItemDto getWaybillItemDto : waybillItems) {
                 ShowSiteDto showSiteDto = getWaybillItemDto.getShowSiteDto();
                 List<GetWaybillGoodsDto> goods = getWaybillItemDto.getGoods();
-                if (!CollectionUtils.isEmpty(goods)){
-                    for (GetWaybillGoodsDto goodsDto : goods){
-                        WaybillGoodsVo waybillGoodsVo = new WaybillGoodsVo();
-                        waybillGoodsVo
-                                .setUnloadSiteName(showSiteDto == null ? null : showSiteDto.getSiteName())
-                                .setId(goodsDto.getId())
-                                .setWaybillId(goodsDto.getWaybillId())
-                                .setWaybillItemId(goodsDto.getWaybillItemId())
-                                .setUnloadSiteId(getWaybillItemDto.getUnloadSiteId())
-                                .setGoodsName(goodsDto.getGoodsName())
-                                .setUnloadSiteName(showSiteDto.getSiteName())
-                                .setGoodsQuantity(goodsDto.getGoodsQuantity())
-                                .setGoodsUnit(goodsDto.getGoodsUnit())
-                                .setGoodsWeight(goodsDto.getGoodsWeight())
-                                .setJoinDrug(goodsDto.getJoinDrug())
-                                .setLoadQuantity(goodsDto.getLoadQuantity())
-                                .setLoadWeight(goodsDto.getLoadWeight())
-                                .setRequiredTime(getWaybillItemDto.getRequiredTime())
-                                .setUnloadQuantity(goodsDto.getUnloadQuantity())
-                                .setUnloadWeight(goodsDto.getUnloadWeight());
-                        waybillGoodsVoList.add(waybillGoodsVo);
+                if (!CollectionUtils.isEmpty(goods)) {
+                    for (GetWaybillGoodsDto goodsDto : goods) {
+                        WaybillGoodsVo loadGoods = new WaybillGoodsVo();
+                        loadGoods.setUnloadSiteName(showSiteDto == null ? null : showSiteDto.getSiteName());
+                        BeanUtils.copyProperties(goodsDto, loadGoods);
+                        loadGoodsList.add(loadGoods);
+                        WaybillGoodsVo unLoadGoods = new WaybillGoodsVo();
+                        unLoadGoods.setUnloadSiteName(showSiteDto == null ? null : showSiteDto.getSiteName());
+                        BeanUtils.copyProperties(goodsDto, unLoadGoods);
+                        unloadGoodsList.add(unLoadGoods);
                     }
                 }
             }
-            wayBillReceiptsVo.setWaybillGoodsVoList(waybillGoodsVoList);
+            wayBillReceiptsVo.setLoadGoodsList(loadGoodsList);
+            wayBillReceiptsVo.setUnLoadGoodsList(unloadGoodsList);
         }
-        //回单补录信息
+        //补录记录
         List<GetTrackingDto> trackingDtoList = waybillDetailDto.getTracking();
-        if (!CollectionUtils.isEmpty(trackingDtoList)){
-            List<WayBillTrackingVo> wayBillTrackingVoList = new ArrayList<>();
-            for (GetTrackingDto trackingDto : trackingDtoList){
-                if (trackingDto.getTrackingType() == 2 && !RECEIPT_TRACKING_IMAGE_INFO.equals(trackingDto.getTrackingInfo())){
-                    WayBillTrackingVo trackingVo = new WayBillTrackingVo();
+        if (!CollectionUtils.isEmpty(trackingDtoList)) {
+            SimpleDateFormat sdf = new SimpleDateFormat();
+            for (GetTrackingDto trackingDto : trackingDtoList) {
+                if (trackingDto.getTrackingType().equals(TrackingType.LOAD_RECEIPT)) {
+                    WayBillTrackingVo loadTrackingVo = new WayBillTrackingVo();
                     UserInfo userInfo = trackingDto.getUserInfo();
-                    trackingVo
+                    loadTrackingVo
                             .setCreateTime(trackingDto.getCreateTime())
-                            .setOperator(userInfo == null ? null : userInfo.getName())
-                            .setOperatorPhoneNum(userInfo == null ? null : userInfo.getPhoneNumber())
-                            .setTrackingInfo(trackingDto.getTrackingInfo());
-                    wayBillTrackingVoList.add(trackingVo);
+                            .setOperator(userInfo == null ? null : userInfo.getName());
+                    wayBillReceiptsVo.setLoadTracking(loadTrackingVo);
+                }
+                if (trackingDto.getTrackingType().equals(TrackingType.UNLOAD_RECEIPT)) {
+                    WayBillTrackingVo unloadTrackingVo = new WayBillTrackingVo();
+                    UserInfo userInfo = trackingDto.getUserInfo();
+                    unloadTrackingVo
+                            .setCreateTime(trackingDto.getCreateTime())
+                            .setOperator(userInfo == null ? null : userInfo.getName());
+                    wayBillReceiptsVo.setUnLoadTracking(unloadTrackingVo);
                 }
             }
-            wayBillReceiptsVo.setWayBillTrackingVoList(wayBillTrackingVoList);
+
         }
         // 轨迹图片
-        if (!CollectionUtils.isEmpty(trackingDtoList)){
-            List<WaybillTrackingImagesVo> waybillTrackingImagesVoList = new ArrayList<>();
-            for (GetTrackingDto trackingDto : trackingDtoList){
+        if (!CollectionUtils.isEmpty(trackingDtoList)) {
+            // 提货图片
+            List<WaybillTrackingImagesVo> loadImagesList = new ArrayList<>();
+            // 卸货图片
+            List<WaybillTrackingImagesVo> unLoadImagesList = new ArrayList<>();
+            for (GetTrackingDto trackingDto : trackingDtoList) {
                 List<GetTrackingImagesDto> imageList = trackingDto.getImageList();
-                if (!CollectionUtils.isEmpty(imageList)){
-                    for (GetTrackingImagesDto imagesDto : imageList){
+                if (!CollectionUtils.isEmpty(imageList)) {
+                    for (GetTrackingImagesDto imagesDto : imageList) {
                         WaybillTrackingImagesVo imagesVo = new WaybillTrackingImagesVo();
                         UserInfo userInfo = imagesDto.getUserInfo();
                         imagesVo
@@ -154,11 +178,17 @@ public class ReceiptController {
                                 .setCreateUserName(userInfo == null ? null : userInfo.getName())
                                 .setImageType(imagesDto.getImageType())
                                 .setImageUrl(imagesDto.getImageUrl());
-                        waybillTrackingImagesVoList.add(imagesVo);
+                        if (WaybillStatus.LOAD_PRODUCT.equals(trackingDto.getOldStatus())) {
+                            loadImagesList.add(imagesVo);
+                        }
+                        if (WaybillStatus.SIGN.equals(trackingDto.getOldStatus())) {
+                            unLoadImagesList.add(imagesVo);
+                        }
                     }
                 }
             }
-            wayBillReceiptsVo.setWaybillTrackingImagesVoList(waybillTrackingImagesVoList);
+            wayBillReceiptsVo.setLoadImagesList(loadImagesList);
+            wayBillReceiptsVo.setUnLoadImagesList(unLoadImagesList);
         }
         return wayBillReceiptsVo;
     }

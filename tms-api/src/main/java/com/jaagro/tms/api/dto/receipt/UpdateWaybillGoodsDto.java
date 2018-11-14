@@ -8,6 +8,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 更新运单货物
@@ -16,12 +17,11 @@ import java.math.BigDecimal;
  */
 @Data
 @Accessors(chain = true)
-public class UpdateWaybillgoodsDto implements Serializable{
+public class UpdateWaybillGoodsDto implements Serializable{
     /**
      * 运单货物id
      */
     @NotNull(message = "{waybillGoodsId.NotNull}")
-    @Min(value = 1,message = "{waybillGoodsId.Min}")
     private Integer id;
 
     /**
@@ -35,7 +35,6 @@ public class UpdateWaybillgoodsDto implements Serializable{
      * 运单卸货地id
      */
     @NotNull(message = "{waybillItemId.NotNull}")
-    @Min(value = 1,message = "{waybillItemId.Min}")
     private Integer waybillItemId;
 
     /**
@@ -68,4 +67,34 @@ public class UpdateWaybillgoodsDto implements Serializable{
     @NotNull(message = "{unloadSiteId.NotNull}")
     @Min(value = 1,message = "{unloadSiteId.Min}")
     private Integer unloadSiteId;
+
+    /**
+     * 是否加药
+     */
+    private Boolean joinDrug;
+
+    /**
+     * 是否有效
+     */
+    private Boolean enabled;
+
+    /**
+     * 修改时间
+     */
+    private Date modifyTime;
+
+    /**
+     * 修改人id
+     */
+    private Integer modifyUserId;
+
+    /**
+     * 订单货物id
+     */
+    private Integer orderGoodsId;
+
+    /**
+     * 要求送达时间
+     */
+    private Date requiredTime;
 }

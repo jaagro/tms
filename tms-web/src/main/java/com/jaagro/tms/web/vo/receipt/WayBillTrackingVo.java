@@ -15,13 +15,9 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 public class WayBillTrackingVo implements Serializable{
-    /**
-     * 轨迹描述
-     */
-    private String trackingInfo;
 
     /**
-     * 运单状态修改记录时间
+     * 创建时间
      */
     private Date createTime;
 
@@ -30,8 +26,4 @@ public class WayBillTrackingVo implements Serializable{
      */
     private String operator;
 
-    /**
-     * 补录人手机号
-     */
-    private String operatorPhoneNum;
 }

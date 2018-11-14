@@ -16,17 +16,29 @@ import java.util.List;
 @Accessors(chain = true)
 public class WayBillReceiptsVo implements Serializable{
     /**
-     * 运单货物信息
+     * 提货信息
      */
-    private List<WaybillGoodsVo> waybillGoodsVoList;
+    private List<WaybillGoodsVo> loadGoodsList;
     /**
-     * 运单轨迹信息(补录)
+     * 卸货信息
      */
-    private List<WayBillTrackingVo> wayBillTrackingVoList;
+    private List<WaybillGoodsVo> unLoadGoodsList;
     /**
-     * 运单轨迹图片
+     * 提货轨迹图片
      */
-    private List<WaybillTrackingImagesVo> waybillTrackingImagesVoList;
+    private List<WaybillTrackingImagesVo> loadImagesList;
+    /**
+     * 卸货轨迹图片
+     */
+    private List<WaybillTrackingImagesVo> unLoadImagesList;
+    /**
+     * 提货补录记录
+     */
+    private WayBillTrackingVo loadTracking;
+    /**
+     * 卸货补录记录
+     */
+    private WayBillTrackingVo unLoadTracking;
     /**
      * 客户id
      */
