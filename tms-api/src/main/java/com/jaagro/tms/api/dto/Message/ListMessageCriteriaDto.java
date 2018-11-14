@@ -57,4 +57,9 @@ public class ListMessageCriteriaDto implements Serializable{
      * 消息状态：0-未读 1-已读
      */
     private Integer msgStatus;
+
+    /**
+     *关联id
+     */
+    private Integer referId;
 }

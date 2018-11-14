@@ -19,4 +19,8 @@ public class MsgType {
      * 3-账务相关
      */
     public static final Integer ACCOUNT = 3;
+    /**
+     * 4-运单磅差异常相关
+     */
+    public static final Integer POUNDS_DIFF = 4;
 }
