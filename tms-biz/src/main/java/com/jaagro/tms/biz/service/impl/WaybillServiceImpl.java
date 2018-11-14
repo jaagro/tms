@@ -4,6 +4,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
+import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
+import com.jaagro.tms.api.dto.Message.MessageReturnDto;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
@@ -19,6 +21,7 @@ import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.AccountService;
+import com.jaagro.tms.api.service.MessageService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.*;
@@ -32,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -673,7 +675,8 @@ public class WaybillServiceImpl implements WaybillService {
                 //更改运单状态
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
                 waybillMapper.updateByPrimaryKeySelective(waybill);
-
+                //磅单超过千分之二 进行于预警判断
+                pounderAlert(waybillId);
                 //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
                 List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
                 int count = 0;
@@ -1132,9 +1135,35 @@ public class WaybillServiceImpl implements WaybillService {
                     waybillDto.setDriver(this.driverClientService.getDriverReturnObject(waybill.getDriverId()));
 
                 }
+                //如果当前运单有预警提示消息 则在运单列表显示预警小图标
+                if (!CollectionUtils.isEmpty(listPoundAnomaly())) {
+                    if (listPoundAnomaly().contains(waybill.getId())) {
+                        waybillDto.setPoundAlert(true);
+                    }
+                }
             }
         }
         return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
+    }
+
+    /**
+     * 列出所有磅差异常消息所对应的运单id
+     *
+     * @return
+     * @Author @Gao.
+     */
+    private List<Integer> listPoundAnomaly() {
+        List<Integer> waybillIds = new ArrayList<>();
+        ListMessageCriteriaDto listMessageCriteriaDto = new ListMessageCriteriaDto();
+        listMessageCriteriaDto
+                .setMsgType(MsgType.POUNDS_DIFF);
+        List<MessageReturnDto> messageReturnDtos = messageMapper.listMessageByCriteriaDto(listMessageCriteriaDto);
+        if (!CollectionUtils.isEmpty(messageReturnDtos)) {
+            for (MessageReturnDto messageReturnDto : messageReturnDtos) {
+                waybillIds.add(messageReturnDto.getReferId());
+            }
+        }
+        return waybillIds;
     }
 
     /**
@@ -1375,7 +1404,6 @@ public class WaybillServiceImpl implements WaybillService {
         }
     }
 
-
     /**
      * 磅差超过千分之二，进行预警提醒
      *
@@ -1383,19 +1411,36 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
-    public boolean test(Integer waybillId) {
+    private void pounderAlert(Integer waybillId) {
         List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
         BigDecimal totalLoadWeight = BigDecimal.ZERO;
+        BigDecimal totalUnloadWeigth = BigDecimal.ZERO;
         for (GetWaybillGoodsDto waybillGoodsDto : waybillGoodsDtos) {
-            //单位 羽 吨 累计提货重量
-            boolean flag = (null != waybillGoodsDto.getLoadWeight() && (GoodsUnit.YU.equals(waybillGoodsDto.getGoodsUnit())
-                    || GoodsUnit.TON.equals(waybillGoodsDto.getGoodsUnit())));
+            boolean flag = ((null != waybillGoodsDto.getUnloadWeight() || null != waybillGoodsDto.getLoadWeight())
+                    && (GoodsUnit.YU.equals(waybillGoodsDto.getGoodsUnit()) || GoodsUnit.TON.equals(waybillGoodsDto.getGoodsUnit())));
             if (flag) {
+                //单位 羽 吨 累计提货重量
                 totalLoadWeight = totalLoadWeight.add(waybillGoodsDto.getLoadWeight());
+                //单位 羽 吨 累计卸货重量
+                totalUnloadWeigth = totalUnloadWeigth.add(waybillGoodsDto.getUnloadWeight());
             }
-
         }
-
-        return true;
+        BigDecimal weightDiff = totalLoadWeight.subtract(totalUnloadWeigth).abs();
+        BigDecimal weightDivide = weightDiff.divide(totalLoadWeight);
+        if (DataConstant.DIFFWEIGHT.compareTo(weightDivide) == -1) {
+            //插入预警提醒信息
+            Message message = new Message();
+            message
+                    .setToUserId(0)
+                    .setReferId(waybillId)
+                    .setCreateUserId(0)
+                    .setMsgSource(3)
+                    .setFromUserId(0)
+                    .setFromUserType(0)
+                    .setMsgType(MsgType.POUNDS_DIFF)
+                    .setBody("运单号为（" + waybillId + "）的运单，出现磅差异常，请及时处理。")
+                    .setHeader("你有一个运单异常消息待接收");
+            messageMapper.insertSelective(message);
+        }
     }
 }

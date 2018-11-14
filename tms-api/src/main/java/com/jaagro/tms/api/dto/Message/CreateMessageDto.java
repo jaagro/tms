@@ -72,4 +72,10 @@ public class CreateMessageDto implements Serializable {
      */
     @Min(value = 1,message = "{referId.Min}")
     private Integer referId;
+
+    /**
+     * 创建人
+     */
+    @Min(value = 1,message = "{createUserId.Min}")
+    private Integer createUserId;
 }

@@ -43,6 +43,9 @@
         <if test="msgCategory == 1">
             and msg_type!=1
         </if>
+        <if test="referId != null">
+            and refer_id=#{referId}
+        </if>
         <if test="msgStatus != null">
         and msg_status=#{msgStatus}
       </if>
