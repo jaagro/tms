@@ -1426,7 +1426,7 @@ public class WaybillServiceImpl implements WaybillService {
             }
         }
         BigDecimal weightDiff = totalLoadWeight.subtract(totalUnloadWeight).abs();
-        BigDecimal weightDivide = weightDiff.divide(totalLoadWeight);
+        BigDecimal weightDivide = weightDiff.divide(totalLoadWeight,6,BigDecimal.ROUND_HALF_UP);
         if (DataConstant.DIFFWEIGHT.compareTo(weightDivide) == -1) {
             //插入预警提醒信息
             Message message = new Message();
