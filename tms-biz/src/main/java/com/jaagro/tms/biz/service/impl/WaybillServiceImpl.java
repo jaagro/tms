@@ -1414,7 +1414,7 @@ public class WaybillServiceImpl implements WaybillService {
     private void pounderAlert(Integer waybillId) {
         List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
         BigDecimal totalLoadWeight = BigDecimal.ZERO;
-        BigDecimal totalUnloadWeigth = BigDecimal.ZERO;
+        BigDecimal totalUnloadWeight = BigDecimal.ZERO;
         for (GetWaybillGoodsDto waybillGoodsDto : waybillGoodsDtos) {
             boolean flag = ((null != waybillGoodsDto.getUnloadWeight() || null != waybillGoodsDto.getLoadWeight())
                     && (GoodsUnit.YU.equals(waybillGoodsDto.getGoodsUnit()) || GoodsUnit.TON.equals(waybillGoodsDto.getGoodsUnit())));
@@ -1422,10 +1422,10 @@ public class WaybillServiceImpl implements WaybillService {
                 //单位 羽 吨 累计提货重量
                 totalLoadWeight = totalLoadWeight.add(waybillGoodsDto.getLoadWeight());
                 //单位 羽 吨 累计卸货重量
-                totalUnloadWeigth = totalUnloadWeigth.add(waybillGoodsDto.getUnloadWeight());
+                totalUnloadWeight = totalUnloadWeight.add(waybillGoodsDto.getUnloadWeight());
             }
         }
-        BigDecimal weightDiff = totalLoadWeight.subtract(totalUnloadWeigth).abs();
+        BigDecimal weightDiff = totalLoadWeight.subtract(totalUnloadWeight).abs();
         BigDecimal weightDivide = weightDiff.divide(totalLoadWeight);
         if (DataConstant.DIFFWEIGHT.compareTo(weightDivide) == -1) {
             //插入预警提醒信息
