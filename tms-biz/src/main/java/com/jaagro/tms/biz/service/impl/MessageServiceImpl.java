@@ -37,6 +37,7 @@ public class MessageServiceImpl implements MessageService {
     private MessageMapperExt messageMapperExt;
     @Autowired
     private CurrentUserService currentUserService;
+
     /**
      * 分页查询消息
      *
@@ -45,13 +46,13 @@ public class MessageServiceImpl implements MessageService {
      */
     @Override
     public PageInfo<MessageReturnDto> listMessageByCriteriaDto(ListMessageCriteriaDto criteriaDto) {
-        PageHelper.startPage(criteriaDto.getPageNum(),criteriaDto.getPageSize());
+        PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
         criteriaDto.setToUserId(currentUserService.getCurrentUser() == null ? null : currentUserService.getCurrentUser().getId());
         List<MessageReturnDto> messageList = messageMapperExt.listMessageByCriteriaDto(criteriaDto);
-        for(MessageReturnDto messageReturnDto : messageList){
-            if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)){
+        for (MessageReturnDto messageReturnDto : messageList) {
+            if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)) {
                 messageReturnDto.setMsgCategory(MsgCategory.PUBLIC);
-            }else{
+            } else {
                 messageReturnDto.setMsgCategory(MsgCategory.INFORM);
             }
         }
@@ -67,8 +68,8 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public boolean readMessages(List<Integer> messageIdList) {
         Integer currentUserId = currentUserService.getCurrentUser() == null ? null : currentUserService.getCurrentUser().getId();
-        Integer successNum = messageMapperExt.readMessages(messageIdList,currentUserId);
-        if (messageIdList.size() == successNum){
+        Integer successNum = messageMapperExt.readMessages(messageIdList, currentUserId);
+        if (messageIdList.size() == successNum) {
             return true;
         }
         return false;
@@ -82,7 +83,7 @@ public class MessageServiceImpl implements MessageService {
      */
     @Override
     public List<MessageReturnDto> listUnreadMessages(ListUnReadMsgCriteriaDto criteriaDto) {
-        if (criteriaDto.getMsgStatus() == null){
+        if (criteriaDto.getMsgStatus() == null) {
             // 消息状态: 0-未读,1-已读
             criteriaDto.setMsgStatus(MsgStatusConstant.UNREAD);
         }
@@ -90,12 +91,12 @@ public class MessageServiceImpl implements MessageService {
         Integer currentUserId = currentUser == null ? null : currentUser.getId();
         criteriaDto.setToUserId(currentUserId);
         ListMessageCriteriaDto dto = new ListMessageCriteriaDto();
-        BeanUtils.copyProperties(criteriaDto,dto);
+        BeanUtils.copyProperties(criteriaDto, dto);
         List<MessageReturnDto> messageReturnDtos = messageMapperExt.listMessageByCriteriaDto(dto);
-        for(MessageReturnDto messageReturnDto : messageReturnDtos){
-            if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)){
+        for (MessageReturnDto messageReturnDto : messageReturnDtos) {
+            if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)) {
                 messageReturnDto.setMsgCategory(MsgCategory.PUBLIC);
-            }else{
+            } else {
                 messageReturnDto.setMsgCategory(MsgCategory.INFORM);
             }
         }
@@ -111,14 +112,16 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public boolean createMessage(CreateMessageDto createMessageDto) {
         Message message = new Message();
-        BeanUtils.copyProperties(createMessageDto,message);
+        BeanUtils.copyProperties(createMessageDto, message);
         message.setCreateTime(new Date());
-        UserInfo currentUser = currentUserService.getCurrentUser();
-        Integer currentUserId = currentUser == null ? null : currentUser.getId();
-        message.setCreateUserId(currentUserId);
+        if (createMessageDto.getCreateUserId() == null) {
+            UserInfo currentUser = currentUserService.getCurrentUser();
+            Integer currentUserId = currentUser == null ? null : currentUser.getId();
+            message.setCreateUserId(currentUserId);
+        }
         message.setEnabled(true);
         messageMapperExt.insertSelective(message);
-        if (message.getId() != null && message.getId() > 0){
+        if (message.getId() != null && message.getId() > 0) {
             return true;
         }
         return false;

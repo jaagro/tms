@@ -189,4 +189,5 @@ public interface WaybillService {
      * @author yj
      */
     boolean uploadReceiptImage(UploadReceiptImageDto uploadReceiptImageDto);
+
 }

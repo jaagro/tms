@@ -1,5 +1,7 @@
 package com.jaagro.tms.api.constant;
-
+/**
+ * @author @Gao.
+ */
 public final class DeductCompensationRoleType {
 
     /**
