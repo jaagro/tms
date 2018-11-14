@@ -68,7 +68,9 @@ public class OrderRefactorServiceImpl implements OrderRefactorService {
         }
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
-        order.setCreatedUserId(currentUserService.getShowUser().getId());
+        //待定
+//        order.setCreatedUserId(currentUserService.getShowUser().getId());
+        order.setCreatedUserId(1);
         //暂时将departmentId定为1，仅限小程序客户下单
         order.setDepartmentId(1);
         this.ordersMapper.insertSelective(order);

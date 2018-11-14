@@ -35,6 +35,13 @@ public interface OrderGoodsService {
     Map<String, Object> disableByItemsId(Integer itemId);
 
     /**
+     * 根据订单id删除
+     *
+     * @param orderId
+     */
+    Boolean deleteByOrderId(Integer orderId);
+
+    /**
      * 根据订单需求id获得订单需求明细列表
      *
      * @param id

@@ -68,6 +68,22 @@ public class OrderGoodsServiceImpl implements OrderGoodsService {
     }
 
     /**
+     * 根据订单id删除
+     *
+     * @param orderId
+     */
+    @Override
+    public Boolean deleteByOrderId(Integer orderId) {
+        Boolean result = false;
+        int msg = this.orderGoodsMapper.deleteByOrderId(orderId);
+        if (msg > 0) {
+            result = true;
+            return result;
+        }
+        return result;
+    }
+
+    /**
      * 根据订单需求id获得订单需求明细列表
      *
      * @param id
