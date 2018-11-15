@@ -122,13 +122,13 @@ public class ReceiptController {
                 if (!CollectionUtils.isEmpty(goods)) {
                     for (GetWaybillGoodsDto goodsDto : goods) {
                         WaybillGoodsVo waybillGoodsVo = new WaybillGoodsVo();
+                        BeanUtils.copyProperties(goodsDto, waybillGoodsVo);
                         waybillGoodsVo
                                 .setUnloadSiteName(showSiteDto == null ? null : showSiteDto.getSiteName())
                                 .setUnloadSiteId(getWaybillItemDto.getUnloadSiteId())
                                 .setWaybillItemId(getWaybillItemDto.getId())
                                 .setRequiredTime(getWaybillItemDto.getRequiredTime())
                                 .setSignStatus(getWaybillItemDto.getSignStatus());
-                        BeanUtils.copyProperties(goodsDto, waybillGoodsVo);
                         waybillGoodsList.add(waybillGoodsVo);
                     }
                 }
