@@ -11,11 +11,19 @@ public final class TrackingType {
      */
     public static final Integer TRANSPORT = 1;
     /**
-     * 补录轨迹
+     * 提货补录
      */
-    public static final Integer RECEIPT = 2;
+    public static final Integer LOAD_RECEIPT = 2;
     /**
-     * 补录单据轨迹
+     * 卸货补录
      */
-    public static final Integer RECEIPT_BILL = 3;
+    public static final Integer UNLOAD_RECEIPT = 3;
+    /**
+     * 提货单据补录
+     */
+    public static final Integer LOAD_BILLS_RECEIPT = 4;
+    /**
+     * 卸货单据补录
+     */
+    public static final Integer UNLOAD_BILLS_RECEIPT = 5;
 }

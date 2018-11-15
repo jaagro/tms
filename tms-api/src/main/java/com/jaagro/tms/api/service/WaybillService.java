@@ -2,6 +2,7 @@ package com.jaagro.tms.api.service;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.*;
+import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.waybill.*;
@@ -173,21 +174,29 @@ public interface WaybillService {
     List<ListWaybillDto> listWaybillWaitByOrderId(Integer id);
 
     /**
-     * 回单修改运单货物信息新增运单轨迹(回单补录)
+     * 回单修改提货信息
      *
-     * @param updateWaybillGoodsReceiptDto
+     * @param updateWaybillGoodsDtoList
      * @return
      * @author yj
      */
-    boolean updateWaybillGoodsReceipt(UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto);
+    boolean updateLoadGoodsReceipt(List<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList);
+
+    /**
+     * 回单修改卸货信息
+     * @param updateWaybillGoodsDtoList
+     * @return
+     * @author yj
+     */
+    boolean updateUnLoadGoodsReceipt(List<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList);
 
     /**
      * 上传回单图片
-     *
      * @param uploadReceiptImageDto
      * @return
      * @author yj
      */
+    @Deprecated
     boolean uploadReceiptImage(UploadReceiptImageDto uploadReceiptImageDto);
 
 }

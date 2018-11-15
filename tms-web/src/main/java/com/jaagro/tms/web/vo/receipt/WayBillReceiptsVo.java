@@ -18,15 +18,23 @@ public class WayBillReceiptsVo implements Serializable{
     /**
      * 运单货物信息
      */
-    private List<WaybillGoodsVo> waybillGoodsVoList;
+    private List<WaybillGoodsVo> waybillGoodsList;
     /**
-     * 运单轨迹信息(补录)
+     * 提货轨迹图片
      */
-    private List<WayBillTrackingVo> wayBillTrackingVoList;
+    private List<WaybillTrackingImagesVo> loadImagesList;
     /**
-     * 运单轨迹图片
+     * 卸货轨迹图片
      */
-    private List<WaybillTrackingImagesVo> waybillTrackingImagesVoList;
+    private List<WaybillTrackingImagesVo> unLoadImagesList;
+    /**
+     * 提货补录记录
+     */
+    private WayBillTrackingVo loadTracking;
+    /**
+     * 卸货补录记录
+     */
+    private WayBillTrackingVo unLoadTracking;
     /**
      * 客户id
      */
