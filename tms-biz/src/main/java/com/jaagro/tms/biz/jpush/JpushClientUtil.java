@@ -52,10 +52,10 @@ public abstract class JpushClientUtil {
 
         try {
             PushResult pushResult = jPushClient.sendPush(payload);
-            System.out.println(pushResult);
+            System.out.println("push successfully:"+pushResult);
         } catch (Exception e) {
             System.out.println("JPUSH Failed root cause:"+e.getMessage());
-            log.error("Jpush Connection error. Should retry later. ", e.getMessage());
+            log.error("Jpush Connection error. Should retry later,message:{}", e.getMessage());
         }
     }
 
