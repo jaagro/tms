@@ -65,4 +65,8 @@ public class WaybillAnomalyCondition implements Serializable {
      * 审核状态
      */
     private String auditStatus;
+    /**
+     *主要用于查询待审核数据
+     */
+    private Integer audit;
 }

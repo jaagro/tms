@@ -452,10 +452,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         }
         //审核拒绝
         if (AnomalyStatus.NO.equals(dto.getAuditStatus())) {
-            waybillAnomaly.setAuditStatus(AnomalyStatus.AUDIT_REFUSEL);
+            waybillAnomaly.setAuditStatus(AnomalyStatus.REFUSE);
             waybillAnomaly.setProcessingStatus(AnomalyStatus.DONE);
         }
-
         waybillAnomalyMapper.updateByPrimaryKeySelective(waybillAnomaly);
     }
 
