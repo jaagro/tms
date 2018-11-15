@@ -12,6 +12,7 @@ import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
+import com.jaagro.tms.web.vo.ValidList;
 import com.jaagro.tms.web.vo.receipt.WayBillReceiptsVo;
 import com.jaagro.tms.web.vo.receipt.WayBillTrackingVo;
 import com.jaagro.tms.web.vo.receipt.WaybillGoodsVo;
@@ -69,7 +70,7 @@ public class ReceiptController {
 
     @PutMapping("/updateLoadGoodsReceipt")
     @ApiOperation("回单修改提货信息")
-    public BaseResponse updateLoadGoodsReceipt(@RequestBody @Validated List<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList) {
+    public BaseResponse updateLoadGoodsReceipt(@RequestBody @Validated ValidList<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList) {
         log.info("updateLoadGoodsReceipt,{}", updateWaybillGoodsDtoList);
         if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)){
             return BaseResponse.errorInstance("提货信息不能为空");
@@ -83,7 +84,7 @@ public class ReceiptController {
 
     @PutMapping("/updateUnLoadGoodsReceipt")
     @ApiOperation("回单修改卸货信息")
-    public BaseResponse updateUnLoadGoodsReceipt(@RequestBody @Validated List<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList) {
+    public BaseResponse updateUnLoadGoodsReceipt(@RequestBody @Validated ValidList<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList) {
         log.info("updateUnLoadGoodsReceipt,{}", updateWaybillGoodsDtoList);
         if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)){
             return BaseResponse.errorInstance("卸货信息不能为空");
