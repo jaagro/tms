@@ -138,7 +138,6 @@ public class ReceiptController {
         //补录记录
         List<GetTrackingDto> trackingDtoList = waybillDetailDto.getTracking();
         if (!CollectionUtils.isEmpty(trackingDtoList)) {
-            SimpleDateFormat sdf = new SimpleDateFormat();
             for (GetTrackingDto trackingDto : trackingDtoList) {
                 if (trackingDto.getTrackingType().equals(TrackingType.LOAD_RECEIPT)) {
                     WayBillTrackingVo loadTrackingVo = new WayBillTrackingVo();
