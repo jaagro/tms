@@ -423,7 +423,6 @@ public class WaybillServiceImpl implements WaybillService {
             ShowSiteAppDto loadSiteAppDto = new ShowSiteAppDto();
             BeanUtils.copyProperties(loadSite, loadSiteAppDto);
             //提货时间
-//            Date loadTime = orders.getLoadTime();
             Date loadTime = waybillAppDtos.get(0).getLoadTime();
             loadSiteAppDto.setLoadTime(loadTime);
             //货物信息

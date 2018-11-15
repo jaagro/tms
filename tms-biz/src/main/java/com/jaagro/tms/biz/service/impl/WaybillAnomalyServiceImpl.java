@@ -274,6 +274,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             } catch (Exception e) {
                 log.error("获取司机基本信息失败={}", e);
                 e.printStackTrace();
+                throw new RuntimeException("获取司机基本信息失败");
             }
         }
         List<UserInfo> employeeLists = new ArrayList<>();
@@ -283,6 +284,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             } catch (Exception e) {
                 log.error("获取员工基本信息失败={}", e);
                 e.printStackTrace();
+                throw new RuntimeException("获取员工基本信息失败");
             }
         }
         for (WaybillAnomalyDto waybillAnomalyDto : waybillAnomalyDtos) {

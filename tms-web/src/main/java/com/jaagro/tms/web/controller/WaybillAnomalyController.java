@@ -138,9 +138,9 @@ public class WaybillAnomalyController {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         }
         List<AnomalyManagementListDto> anomalyManagementListDtos = waybillAnomalyService.anomalyManagementList(dto);
-        AnomalyAuditManagementListVo anomalyAuditManagementListVo = new AnomalyAuditManagementListVo();
         List<AnomalyAuditManagementListVo> anomalyAuditManagementListVos = new ArrayList<>();
         for (AnomalyManagementListDto anomalyManagementListDto : anomalyManagementListDtos) {
+            AnomalyAuditManagementListVo anomalyAuditManagementListVo = new AnomalyAuditManagementListVo();
             BeanUtils.copyProperties(anomalyManagementListDto, anomalyAuditManagementListVo);
             anomalyAuditManagementListVos.add(anomalyAuditManagementListVo);
         }
