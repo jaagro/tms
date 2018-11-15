@@ -1,5 +1,6 @@
 package com.jaagro.tms.web.controller;
 
+import com.jaagro.tms.api.constant.TrackingType;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.web.vo.chat.*;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -82,6 +84,14 @@ public class WebChatAppWaybillController {
         detailVo.setWaybillItems(waybillItemsVos);
         //运单轨迹以及图片
         List<GetTrackingDto> trackingDtos = detailDto.getTracking();
+        // 过滤非运输轨迹 add by jia.yu 20181115
+        Iterator<GetTrackingDto> iterator = trackingDtos.iterator();
+        while (iterator.hasNext()){
+            GetTrackingDto getTrackingDto = iterator.next();
+            if (!TrackingType.TRANSPORT.equals(getTrackingDto.getTrackingType())){
+                iterator.remove();
+            }
+        }
         List<WaybillTrackingVo> trackingVos = new ArrayList<>();
         for (GetTrackingDto trackingDto : trackingDtos) {
             WaybillTrackingVo waybillTrackingVo = new WaybillTrackingVo();
