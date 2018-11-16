@@ -91,11 +91,18 @@ public interface WaybillMapperExt extends WaybillMapper {
      */
     List<Waybill> listOverTimeWaybills();
 
-
     /**
      * 批量更新运单状态为拒绝
+     * @param waybills
      */
 
     void batchUpdateWaybillStatus(List<Waybill> waybills);
+
+    /**
+     * 查询出司机中所有在承运中的订单
+     * @param driverId
+     * @return
+     */
+    List<Waybill> listCriteriaWaybill(Integer driverId);
 
 }
