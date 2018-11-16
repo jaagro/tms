@@ -244,6 +244,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      */
     @Override
     public List<AnomalyManagementListDto> anomalyManagementList(WaybillAnomalyCondition dto) {
+        if (null == dto.getAudit()) {
+            dto.setAudit(2);
+        }
         if (null != dto.getPageNum() && null != dto.getPageSize()) {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         }
