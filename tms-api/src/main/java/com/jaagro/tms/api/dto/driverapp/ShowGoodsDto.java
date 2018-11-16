@@ -54,7 +54,7 @@ public class ShowGoodsDto implements Serializable {
     /**
      * 卸货重量
      */
-    private Integer unloadWeight;
+    private BigDecimal unloadWeight;
     /**
      * 卸货数量
      */

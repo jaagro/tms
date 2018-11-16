@@ -40,15 +40,16 @@
         where waybill_id = #{id,jdbcType=INTEGER}
     </select>
 
-    <select id="listWaybillIdIdAndSignStatus" resultType="java.util.Map" parameterType="com.jaagro.tms.biz.entity.WaybillItems">
+    <select id="listWaybillIdIdAndSignStatus" resultType="java.util.Map"
+            parameterType="com.jaagro.tms.biz.entity.WaybillItems">
         select id waybillItemId,unload_site_id unloadSiteId
-        from  waybill_items
+        from waybill_items
         where 1=1 and enabled=1
-        <if test="waybillId != null" >
-           and waybill_id=#{waybillId}
+        <if test="waybillId != null">
+            and waybill_id=#{waybillId}
         </if>
-        <if test="waybillId != null" >
-           and sign_status=#{signStatus}
+        <if test="waybillId != null">
+            and sign_status=#{signStatus}
         </if>
     </select>
 
@@ -69,35 +70,35 @@
                     </if>
                 </foreach>
             </trim>
-            <trim prefix="required_time =case" suffix="end," >
+            <trim prefix="required_time =case" suffix="end,">
                 <foreach collection="waybillItemsList" item="i" index="index">
                     <if test="i.requiredTime!=null">
                         when id=#{i.id} then #{i.requiredTime}
                     </if>
                 </foreach>
             </trim>
-            <trim prefix="enabled =case" suffix="end," >
+            <trim prefix="enabled =case" suffix="end,">
                 <foreach collection="waybillItemsList" item="i" index="index">
                     <if test="i.enabled!=null">
                         when id=#{i.id} then #{i.enabled}
                     </if>
                 </foreach>
             </trim>
-            <trim prefix="modify_time =case" suffix="end," >
+            <trim prefix="modify_time =case" suffix="end,">
                 <foreach collection="waybillItemsList" item="i" index="index">
                     <if test="i.modifyTime!=null">
                         when id=#{i.id} then #{i.modifyTime}
                     </if>
                 </foreach>
             </trim>
-            <trim prefix="modify_user_id =case" suffix="end," >
+            <trim prefix="modify_user_id =case" suffix="end,">
                 <foreach collection="waybillItemsList" item="i" index="index">
                     <if test="i.modifyUserId!=null">
                         when id=#{i.id} then #{i.modifyUserId}
                     </if>
                 </foreach>
             </trim>
-            <trim prefix="sign_status =case" suffix="end," >
+            <trim prefix="sign_status =case" suffix="end,">
                 <foreach collection="waybillItemsList" item="i" index="index">
                     <if test="i.signStatus!=null">
                         when id=#{i.id} then #{i.signStatus}
@@ -106,9 +107,28 @@
             </trim>
         </trim>
         where id in
-        <foreach collection="waybillItemsList" separator="," item="i" index="index" close=")" open="(" >
+        <foreach collection="waybillItemsList" separator="," item="i" index="index" close=")" open="(">
             #{i.id}
         </foreach>
     </update>
+
+    <delete id="deleteByWaybillId">
+        DELETE
+        from waybill_items
+        where waybill_id = #{waybillId}
+    </delete>
+
+    <insert id="batchInsert" parameterType="list">
+        insert into waybill_items (waybill_id, unload_site_id,
+        required_time, enabled, modify_time,
+        modify_user_id, sign_status)
+        values
+        <foreach collection="waybillItemsList" item="item" separator=",">
+            (#{item.waybillId,jdbcType=INTEGER}, #{item.unloadSiteId,jdbcType=INTEGER},
+            #{item.requiredTime,jdbcType=TIMESTAMP}, #{item.enabled,jdbcType=BIT},
+            #{item.modifyTime,jdbcType=TIMESTAMP},
+            #{item.modifyUserId,jdbcType=INTEGER}, #{item.signStatus,jdbcType=BIT})
+        </foreach>
+    </insert>
 
 </mapper>

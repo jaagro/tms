@@ -244,6 +244,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      */
     @Override
     public List<AnomalyManagementListDto> anomalyManagementList(WaybillAnomalyCondition dto) {
+        if (null == dto.getAudit()) {
+            dto.setAudit(2);
+        }
         if (null != dto.getPageNum() && null != dto.getPageSize()) {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         }
@@ -274,6 +277,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             } catch (Exception e) {
                 log.error("获取司机基本信息失败={}", e);
                 e.printStackTrace();
+                throw new RuntimeException("获取司机基本信息失败");
             }
         }
         List<UserInfo> employeeLists = new ArrayList<>();
@@ -283,6 +287,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             } catch (Exception e) {
                 log.error("获取员工基本信息失败={}", e);
                 e.printStackTrace();
+                throw new RuntimeException("获取员工基本信息失败");
             }
         }
         for (WaybillAnomalyDto waybillAnomalyDto : waybillAnomalyDtos) {
@@ -450,10 +455,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         }
         //审核拒绝
         if (AnomalyStatus.NO.equals(dto.getAuditStatus())) {
-            waybillAnomaly.setAuditStatus(AnomalyStatus.AUDIT_REFUSEL);
+            waybillAnomaly.setAuditStatus(AnomalyStatus.REFUSE);
             waybillAnomaly.setProcessingStatus(AnomalyStatus.DONE);
         }
-
         waybillAnomalyMapper.updateByPrimaryKeySelective(waybillAnomaly);
     }
 

@@ -51,4 +51,25 @@ public class WaybillItems implements Serializable {
      * 签收状态
      */
     private Boolean signStatus;
+
+    /**
+     * 重写hashcode和equals用于比较对象相等
+     * @author yj
+     * @return
+     */
+    @Override
+    public int hashCode() {
+        return waybillId.hashCode()+unloadSiteId.hashCode();
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj){
+            return true;
+        }
+        if (obj == null){
+            return false;
+        }
+        WaybillItems other = (WaybillItems) obj;
+        return other.waybillId.equals(this.waybillId) && other.unloadSiteId.equals(this.unloadSiteId);
+    }
 }

@@ -3,9 +3,7 @@ package com.jaagro.tms.biz.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
-import com.jaagro.tms.api.constant.UserType;
-import com.jaagro.tms.api.constant.WaybillConstant;
-import com.jaagro.tms.api.constant.WaybillStatus;
+import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
@@ -310,7 +308,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             List<Integer> driverIdList = new ArrayList<>();
             List<Integer> employeeIdList = new ArrayList<>();
             for (GetTrackingDto getTrackingDto : getTrackingDtos) {
-                if (getTrackingDto.getTrackingType() == 1) {
+                if (getTrackingDto.getTrackingType().equals(TrackingType.TRANSPORT)) {
                     driverIdList.add(getTrackingDto.getDriverId());
                 } else {
                     employeeIdList.add(getTrackingDto.getReferUserId());
@@ -322,7 +320,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 driverList.forEach(userInfo -> driverMap.put(userInfo.getId(), userInfo));
                 if (!driverMap.isEmpty()) {
                     for (GetTrackingDto getTrackingDto : getTrackingDtos) {
-                        if (getTrackingDto.getTrackingType() == 1) {
+                        if (getTrackingDto.getTrackingType().equals(TrackingType.TRANSPORT)) {
                             getTrackingDto.setUserInfo(driverMap.get(getTrackingDto.getDriverId()));
                         }
                     }
@@ -334,7 +332,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 employeeList.forEach(userInfo -> employeeMap.put(userInfo.getId(), userInfo));
                 if (!employeeMap.isEmpty()) {
                     for (GetTrackingDto getTrackingDto : getTrackingDtos) {
-                        if (getTrackingDto.getTrackingType() == 2) {
+                        if (!getTrackingDto.getTrackingType().equals(TrackingType.TRANSPORT)) {
                             getTrackingDto.setUserInfo(employeeMap.get(getTrackingDto.getReferUserId()));
                         }
                     }
@@ -350,7 +348,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             List<Integer> driverIdList = new ArrayList<>();
             List<Integer> employeeIdList = new ArrayList<>();
             for (GetTrackingImagesDto imagesDto : getTrackingImagesDtos) {
-                if (imagesDto.getImageType() != 3) {
+                if (!imagesDto.getImageType().equals(ImagesTypeConstant.RECEIPT_BILL)) {
                     driverIdList.add(imagesDto.getCreateUserId());
                 } else {
                     employeeIdList.add(imagesDto.getCreateUserId());
@@ -362,7 +360,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 driverList.forEach(userInfo -> driverMap.put(userInfo.getId(), userInfo));
                 if (!driverMap.isEmpty()) {
                     for (GetTrackingImagesDto imagesDto : getTrackingImagesDtos) {
-                        if (imagesDto.getImageType() != 3) {
+                        if (!imagesDto.getImageType().equals(ImagesTypeConstant.RECEIPT_BILL)) {
                             imagesDto.setUserInfo(driverMap.get(imagesDto.getCreateUserId()));
                         }
                     }
@@ -374,7 +372,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 employeeList.forEach(userInfo -> employeeMap.put(userInfo.getId(), userInfo));
                 if (!CollectionUtils.isEmpty(employeeMap)) {
                     for (GetTrackingImagesDto imagesDto : getTrackingImagesDtos) {
-                        if (imagesDto.getImageType() == 3) {
+                        if (imagesDto.getImageType().equals(ImagesTypeConstant.RECEIPT_BILL)) {
                             imagesDto.setUserInfo(employeeMap.get(imagesDto.getCreateUserId()));
                         }
                     }

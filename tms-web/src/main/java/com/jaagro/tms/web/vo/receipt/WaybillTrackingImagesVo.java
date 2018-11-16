@@ -15,7 +15,7 @@ import java.util.Date;
 @Accessors(chain = true)
 public class WaybillTrackingImagesVo implements Serializable{
     /**
-     * 图片类型：0-出库单 1-磅单 2- 签收单 3-回单补录
+     * 图片类型：0-出库单 1-磅单 2- 签收单 3-补传单据
      */
     private Integer imageType;
 

@@ -16,7 +16,7 @@ import java.util.Date;
 @Accessors(chain = true)
 public class WaybillGoodsVo implements Serializable{
     /**
-     * 运单货物iid
+     * 运单货物id
      */
     private Integer id;
 
@@ -75,18 +75,42 @@ public class WaybillGoodsVo implements Serializable{
     private BigDecimal unloadWeight;
 
     /**
-     * 要求送达时间
-     */
-    private Date requiredTime;
-
-    /**
      * 是否加药
      */
     private Boolean joinDrug;
+
+    /**
+     * 是否有效
+     */
+    private Boolean enabled;
+
+    /**
+     * 修改时间
+     */
+    private Date modifyTime;
+
+    /**
+     * 修改人id
+     */
+    private Integer modifyUserId;
+
+    /**
+     * 订单货物id
+     */
+    private Integer orderGoodsId;
 
     /**
      * 卸货地名称
      */
     private String unloadSiteName;
 
+    /**
+     * 要求送达时间
+     */
+    private Date requiredTime;
+
+    /**
+     * 签收状态
+     */
+    private Boolean signStatus;
 }

@@ -134,13 +134,15 @@ public class WaybillAnomalyController {
     @ApiOperation("异常审核管理列表")
     @PostMapping("anomalyAuditManagementList")
     public BaseResponse anomalyAuditManagementList(@RequestBody WaybillAnomalyCondition dto) {
+        //查询待审核数据
+        dto.setAudit(1);
         if (null != dto.getPageNum() && null != dto.getPageSize()) {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         }
         List<AnomalyManagementListDto> anomalyManagementListDtos = waybillAnomalyService.anomalyManagementList(dto);
-        AnomalyAuditManagementListVo anomalyAuditManagementListVo = new AnomalyAuditManagementListVo();
         List<AnomalyAuditManagementListVo> anomalyAuditManagementListVos = new ArrayList<>();
         for (AnomalyManagementListDto anomalyManagementListDto : anomalyManagementListDtos) {
+            AnomalyAuditManagementListVo anomalyAuditManagementListVo = new AnomalyAuditManagementListVo();
             BeanUtils.copyProperties(anomalyManagementListDto, anomalyAuditManagementListVo);
             anomalyAuditManagementListVos.add(anomalyAuditManagementListVo);
         }

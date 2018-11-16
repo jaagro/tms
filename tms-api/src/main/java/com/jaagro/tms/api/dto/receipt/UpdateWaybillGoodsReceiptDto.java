@@ -2,7 +2,6 @@ package com.jaagro.tms.api.dto.receipt;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.io.Serializable;
@@ -19,11 +18,6 @@ public class UpdateWaybillGoodsReceiptDto implements Serializable{
     /**
      * 运单货物列表
      */
-    @NotEmpty(message = "{updateWaybillgoodsDtoList.NotEmpty}")
-    private List<UpdateWaybillgoodsDto> updateWaybillgoodsDtoList;
-    /**
-     * 补录原因
-     */
-    @NotBlank(message = "{reason.NotBlank}")
-    private String reason;
+    @NotEmpty(message = "{updateWaybillGoodsDtoList.NotEmpty}")
+    private List<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList;
 }
