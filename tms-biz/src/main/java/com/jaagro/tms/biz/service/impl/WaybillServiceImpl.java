@@ -531,12 +531,12 @@ public class WaybillServiceImpl implements WaybillService {
                 .setCreateTime(new Date());
         //司机出发
         if (WaybillStatus.DEPART.equals(dto.getWaybillStatus())) {
-            Waybill wb = new Waybill();
-            wb.setDriverId(currentUser.getId());
-            List<ListWaybillDto> waybills = waybillMapper.listCriteriaWaybill(wb);
-            if (!CollectionUtils.isEmpty(waybills)) {
-                return ServiceResult.toResult(SignStatusConstant.CRITERIA);
-            }
+//            Waybill wb = new Waybill();
+//            wb.setDriverId(currentUser.getId());
+//            List<ListWaybillDto> waybills = waybillMapper.listCriteriaWaybill(wb);
+//            if (!CollectionUtils.isEmpty(waybills)) {
+//                return ServiceResult.toResult(SignStatusConstant.CRITERIA);
+//            }
             waybillTracking
                     .setNewStatus(WaybillStatus.ARRIVE_LOAD_SITE)
                     .setOldStatus(waybill.getWaybillStatus())
