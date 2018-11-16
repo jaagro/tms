@@ -26,8 +26,10 @@
         <if test="auditStatus != null and auditStatus!=''">
             and wa.audit_status = #{auditStatus}
         </if>
-        <if test="beginDate!=null and beginDate!='' and endDate!=null and endDate!=''">
-            and wa.create_time between #{beginDate} and #{endDate}
+        <if test="audit == 2">
+            <if test="beginDate!=null and endDate!=null">
+                and wa.create_time between #{beginDate} and #{endDate}
+            </if>
         </if>
         <if test="anomalyId != null and anomalyId!=''">
             and wa.id = #{anomalyId}
@@ -37,6 +39,9 @@
         </if>
         <if test="audit == 1">
             and wa.processing_status = "待审核"
+            <if test="beginDate!=null and endDate!=null">
+                and wa.audit_time between #{beginDate} and #{endDate}
+            </if>
         </if>
         order by wa.waybill_id ,wa.create_time desc
     </select>
