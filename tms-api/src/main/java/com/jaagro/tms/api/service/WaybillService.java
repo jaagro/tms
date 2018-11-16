@@ -3,7 +3,6 @@ package com.jaagro.tms.api.service;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
-import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.waybill.*;
 
@@ -199,4 +198,12 @@ public interface WaybillService {
     @Deprecated
     boolean uploadReceiptImage(UploadReceiptImageDto uploadReceiptImageDto);
 
+    /**
+     * 运单作废
+     * 20181116
+     * @param waybillId
+     * @return
+     * @Author gavin
+     */
+   boolean abandonWaybill(Integer waybillId);
 }

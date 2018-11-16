@@ -176,4 +176,20 @@ public class WaybillController {
         }
         return BaseResponse.successInstance("撤回成功");
     }
+
+    /**
+     * @Author gavin
+     * 20181116
+     * @param waybillId
+     * @return
+     */
+    @ApiOperation("运单作废")
+    @DeleteMapping("/abandonWaybill/{waybillId}")
+    public BaseResponse abandonWaybill(@PathVariable("waybillId") Integer waybillId) {
+        boolean result = waybillService.abandonWaybill(waybillId);
+        if(!result){
+            return BaseResponse.errorInstance("失败");
+        }
+        return BaseResponse.successInstance("成功");
+    }
 }
