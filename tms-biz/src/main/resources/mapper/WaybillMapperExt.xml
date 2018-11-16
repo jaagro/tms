@@ -87,9 +87,9 @@
         </if>
         order by create_time DESC
     </select>
-    <select id="listCriteriaWaybill" resultMap="DetailInfo" parameterType="java.lang.Integer">
+    <select id="listCriteriaWaybill" resultMap="ReturnMap" parameterType="com.jaagro.tms.biz.entity.Waybill">
         select
-        <include refid="Base_Column_List"/>
+        *
         from waybill
         where enabled = 1
         <if test="driverId != null">
