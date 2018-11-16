@@ -297,14 +297,20 @@ public class WeChatAppletOrderController {
             MyInfoVo myInfoVo = new MyInfoVo();
             if (customerUserDto.getCustomerType().equals(CustomerType.CUSTOER)) {
                 ShowCustomerDto customerDto = customerClientService.getShowCustomerById(customerUserDto.getRelevanceId());
-                myInfoVo
-                        .setName(customerDto.getCustomerName())
-                        .setPhone(customerUserDto.getPhoneNumber());
+                if (customerDto != null) {
+                    myInfoVo
+                            .setCustomerId(customerDto.getId())
+                            .setName(customerDto.getCustomerName())
+                            .setPhone(customerUserDto.getPhoneNumber());
+                }
             } else {
                 ShowSiteDto showSiteDto = customerClientService.getShowSiteById(customerUserDto.getRelevanceId());
-                myInfoVo
-                        .setName(showSiteDto.getSiteName())
-                        .setPhone(customerUserDto.getPhoneNumber());
+                if (showSiteDto != null) {
+                    myInfoVo
+                            .setCustomerId(showSiteDto.getCustomerId())
+                            .setName(showSiteDto.getSiteName())
+                            .setPhone(customerUserDto.getPhoneNumber());
+                }
             }
             return BaseResponse.successInstance(myInfoVo);
         }
