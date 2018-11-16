@@ -13,7 +13,6 @@ import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
-import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.DriverReturnDto;
@@ -21,7 +20,6 @@ import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.AccountService;
-import com.jaagro.tms.api.service.MessageService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.*;
@@ -1125,7 +1123,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-            ) {
+                    ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1541,7 +1539,7 @@ public class WaybillServiceImpl implements WaybillService {
                     .setToUserId(0)
                     .setReferId(waybillId)
                     .setCreateUserId(0)
-                    .setMsgSource(3)
+                    .setMsgSource(MsgSource.WEB)
                     .setFromUserId(0)
                     .setFromUserType(0)
                     .setMsgType(MsgType.POUNDS_DIFF)
@@ -1549,5 +1547,61 @@ public class WaybillServiceImpl implements WaybillService {
                     .setHeader("你有一个运单异常消息待接收");
             messageMapper.insertSelective(message);
         }
+    }
+
+    /**
+     * 运单作废
+     * 20181116
+     * @param waybillId
+     * @return
+     * @Author gavin
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public boolean abandonWaybill(Integer waybillId) {
+
+        Waybill waybillData = waybillMapper.selectByPrimaryKey(waybillId);
+        if (null == waybillData) {
+            throw new NullPointerException("运单不存在");
+        }
+        //1.只有带派单的运单才可以作废
+        if (!waybillData.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK)) {
+            throw new RuntimeException("只有【待派单】的运单才可以作废");
+        }
+
+        if (!waybillData.getEnabled()) {
+            throw new RuntimeException("该运单已删除");
+        }
+        //2.把运单状态修改为作废
+        waybillData.setWaybillStatus(WaybillStatus.ABANDON);
+        waybillMapper.updateByPrimaryKeySelective(waybillData);
+
+        //3.更新订单的状态为"已完成"
+        List<Waybill> waybillList = waybillMapper.listWaybillByOrderId(waybillData.getOrderId());
+        boolean canChangeFlag = true;
+        for (Waybill waybill : waybillList) {
+            boolean flag = waybill.getWaybillStatus().equals(WaybillStatus.RECEIVE) ||
+                    waybill.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK) ||
+                    waybill.getWaybillStatus().equals(WaybillStatus.DEPART) ||
+                    waybill.getWaybillStatus().equals(WaybillStatus.REJECT) ||
+                    waybill.getWaybillStatus().equals(WaybillStatus.SIGN) ||
+                    waybill.getWaybillStatus().equals(WaybillStatus.LOAD_PRODUCT) ||
+                    waybill.getWaybillStatus().equals(WaybillStatus.DELIVERY) ||
+                    waybill.getWaybillStatus().equals(WaybillStatus.CANCEL) ||
+                    waybill.getWaybillStatus().equals(WaybillStatus.DELIVERY) ||
+                    waybill.getWaybillStatus().equals(WaybillStatus.ARRIVE_LOAD_SITE);
+            if (flag) {
+                canChangeFlag = false;
+                break;
+            }
+        }
+        //4.只有订单下所有的运单的状态变成"已完成"或者"已作废"
+        if (canChangeFlag) {
+            Orders order = ordersMapper.selectByPrimaryKey(waybillData.getOrderId());
+            order.setOrderStatus(OrderStatus.ACCOMPLISH);
+            ordersMapper.updateByPrimaryKeySelective(order);
+
+        }
+        return true;
     }
 }
