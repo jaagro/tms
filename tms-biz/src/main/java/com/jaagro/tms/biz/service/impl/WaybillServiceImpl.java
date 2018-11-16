@@ -1537,7 +1537,7 @@ public class WaybillServiceImpl implements WaybillService {
                     .setToUserId(0)
                     .setReferId(waybillId)
                     .setCreateUserId(0)
-                    .setMsgSource(3)
+                    .setMsgSource(MsgSource.WEB)
                     .setFromUserId(0)
                     .setFromUserType(0)
                     .setMsgType(MsgType.POUNDS_DIFF)
