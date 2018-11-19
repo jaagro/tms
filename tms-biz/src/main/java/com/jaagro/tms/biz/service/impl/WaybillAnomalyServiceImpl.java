@@ -1,6 +1,7 @@
 package com.jaagro.tms.biz.service.impl;
 
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.anomaly.*;
@@ -243,7 +244,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      * @return
      */
     @Override
-    public List<AnomalyManagementListDto> anomalyManagementList(WaybillAnomalyCondition dto) {
+    public PageInfo<AnomalyManagementListDto> anomalyManagementList(WaybillAnomalyCondition dto) {
         if (null == dto.getAudit()) {
             dto.setAudit(2);
         }
@@ -343,7 +344,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             }
             anomalyManagementListDtos.add(anomalyManagementListDto);
         }
-        return anomalyManagementListDtos;
+        return new PageInfo(anomalyManagementListDtos);
     }
 
     /**
@@ -399,7 +400,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     } else {
                         //更新状态为待审核
                         record.setAuditStatus(AnomalyStatus.TO_AUDIT);
-                        record.setProcessingStatus(AnomalyStatus.TO_AUDIT);
+                        record.setProcessingStatus(AnomalyStatus.AUDIT);
                     }
                     break;
                 case AnomalyStatus.TO_AUDIT:

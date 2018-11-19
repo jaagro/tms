@@ -13,6 +13,8 @@ public final class AnomalyStatus {
 
     public final static String TO_AUDIT = "待审核";
 
+    public final static String AUDIT = "审核中";
+
     public final static String FINISH = "已结束";
 
     public final static String INVALID = "已作废";

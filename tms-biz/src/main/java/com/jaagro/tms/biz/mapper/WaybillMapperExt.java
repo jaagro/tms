@@ -4,6 +4,7 @@ import com.jaagro.tms.api.dto.driverapp.GetWaybillAppDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillCriteriaDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillDto;
 import com.jaagro.tms.biz.entity.Waybill;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -93,6 +94,7 @@ public interface WaybillMapperExt extends WaybillMapper {
 
     /**
      * 批量更新运单状态为拒绝
+     *
      * @param waybills
      */
 
@@ -100,9 +102,10 @@ public interface WaybillMapperExt extends WaybillMapper {
 
     /**
      * 查询出司机中所有在承运中的订单
-     * @param driverId
+     *
+     * @param waybill
      * @return
      */
-    List<Waybill> listCriteriaWaybill(Integer driverId);
+    List<ListWaybillDto> listCriteriaWaybill(Waybill waybill);
 
 }
