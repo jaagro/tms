@@ -26,24 +26,30 @@
         <if test="auditStatus != null and auditStatus!=''">
             and wa.audit_status = #{auditStatus}
         </if>
-        <if test="audit == 2">
-            <if test="beginDate!=null and endDate!=null">
-                and wa.create_time between #{beginDate} and #{endDate}
-            </if>
-        </if>
         <if test="anomalyId != null and anomalyId!=''">
             and wa.id = #{anomalyId}
         </if>
         <if test="anomalyTypeId != null and anomalyTypeId!=''">
             and wa.anomaly_type_id = #{anomalyTypeId}
         </if>
+        <if test="audit == 2">
+            <if test="beginDate!=null and endDate!=null">
+                and wa.create_time between #{beginDate} and #{endDate}
+            </if>
+        </if>
         <if test="audit == 1">
-            and wa.processing_status = "待审核"
+            and wa.audit_status in("已通过","待审核","已拒绝")
             <if test="beginDate!=null and endDate!=null">
                 and wa.audit_time between #{beginDate} and #{endDate}
             </if>
         </if>
-        order by wa.waybill_id ,wa.create_time desc
+        <if test="audit == 2">
+            order by FIELD(processing_status,'待处理','已处理','审核中','已结束','已作废')
+        </if>
+        <if test="audit == 1">
+            order by FIELD(processing_status,'待审核','已通过','已拒绝')
+        </if>
+
     </select>
 
     <update id="batchUpdateByPrimaryKeySelective" parameterType="list">

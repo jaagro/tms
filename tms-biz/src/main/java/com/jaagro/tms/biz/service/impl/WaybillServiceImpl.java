@@ -1531,7 +1531,7 @@ public class WaybillServiceImpl implements WaybillService {
             }
         }
         BigDecimal weightDiff = totalLoadWeight.subtract(totalUnloadWeight).abs();
-        if (BigDecimal.ZERO.equals(totalLoadWeight)) {
+        if (!BigDecimal.ZERO.equals(totalLoadWeight)) {
             BigDecimal weightDivide = weightDiff.divide(totalLoadWeight, 6, BigDecimal.ROUND_HALF_UP);
             if (DataConstant.DIFFWEIGHT.compareTo(weightDivide) == -1) {
                 //插入预警提醒信息
