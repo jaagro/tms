@@ -128,9 +128,7 @@ public class WaybillAnomalyController {
         if (null != dto.getPageNum() && null != dto.getPageSize()) {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         }
-        PageInfo<AnomalyManagementListDto> anomalyManagementListDtoPageInfo = waybillAnomalyService.anomalyManagementList(dto);
-        List<AnomalyManagementListDto> anomalyManagementListDtoPageInfoList = anomalyManagementListDtoPageInfo.getList();
-        return BaseResponse.successInstance(anomalyManagementListDtoPageInfoList);
+        return BaseResponse.successInstance(waybillAnomalyService.anomalyManagementList(dto));
     }
 
     @ApiOperation("异常审核管理列表")
@@ -141,7 +139,7 @@ public class WaybillAnomalyController {
         if (null != dto.getPageNum() && null != dto.getPageSize()) {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         }
-        PageInfo<AnomalyManagementListDto> anomalyManagementListDtoPageInfo = waybillAnomalyService.anomalyManagementList(dto);
+        PageInfo anomalyManagementListDtoPageInfo = waybillAnomalyService.anomalyManagementList(dto);
         List<AnomalyManagementListDto> anomalyManagementListDtos = anomalyManagementListDtoPageInfo.getList();
         List<AnomalyAuditManagementListVo> anomalyAuditManagementListVos = new ArrayList<>();
         for (AnomalyManagementListDto anomalyManagementListDto : anomalyManagementListDtos) {
@@ -149,7 +147,8 @@ public class WaybillAnomalyController {
             BeanUtils.copyProperties(anomalyManagementListDto, anomalyAuditManagementListVo);
             anomalyAuditManagementListVos.add(anomalyAuditManagementListVo);
         }
-        return BaseResponse.successInstance(anomalyAuditManagementListVos);
+        anomalyManagementListDtoPageInfo.setList(anomalyAuditManagementListVos);
+        return BaseResponse.successInstance(anomalyManagementListDtoPageInfo);
     }
 
     @ApiOperation("异常信息审核")
