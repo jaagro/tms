@@ -67,7 +67,7 @@ public interface WaybillAnomalyService {
      * @param dto
      * @return
      */
-    PageInfo<AnomalyManagementListDto> anomalyManagementList(WaybillAnomalyCondition dto);
+    PageInfo anomalyManagementList(WaybillAnomalyCondition dto);
 
     /**
      * 客户侧费用
