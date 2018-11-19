@@ -252,7 +252,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         }
         List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(dto);
-        List<AnomalyManagementListDto> anomalyManagementListDtos = new ArrayList<>();
+        //List<AnomalyManagementListDto> anomalyManagementListDtos = new ArrayList<>();
         List<Integer> driverList = new ArrayList<>();
         List<Integer> employeeList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(waybillAnomalyDtos)) {
@@ -292,8 +292,8 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             }
         }
         for (WaybillAnomalyDto waybillAnomalyDto : waybillAnomalyDtos) {
-            AnomalyManagementListDto anomalyManagementListDto = new AnomalyManagementListDto();
-            BeanUtils.copyProperties(waybillAnomalyDto, anomalyManagementListDto);
+            //AnomalyManagementListDto anomalyManagementListDto = new AnomalyManagementListDto();
+            //BeanUtils.copyProperties(waybillAnomalyDto, anomalyManagementListDto);
             WaybillFeeCondition waybillFeeCondition = new WaybillFeeCondition();
             waybillFeeCondition
                     .setAnomalyId(waybillAnomalyDto.getId());
@@ -302,10 +302,10 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             if (!CollectionUtils.isEmpty(waybillCustomerFeeDtos)) {
                 WaybillCustomerFeeDto waybillCustomerFeeDto = waybillCustomerFeeDtos.get(0);
                 if (CostType.COMPENSATE.equals(waybillCustomerFeeDto.getAdjustType())) {
-                    anomalyManagementListDto.setCompensateMoney("[客户] " + waybillCustomerFeeDto.getMoney());
+                    waybillAnomalyDto.setCompensateMoney("[客户] " + waybillCustomerFeeDto.getMoney());
                 }
                 if (CostType.DEDUCTION.equals(waybillCustomerFeeDto.getAdjustType())) {
-                    anomalyManagementListDto.setDeductMoney("[客户] " + "-" + waybillCustomerFeeDto.getMoney());
+                    waybillAnomalyDto.setDeductMoney("[客户] " + "-" + waybillCustomerFeeDto.getMoney());
                 }
             }
             //运力侧费用
@@ -313,38 +313,38 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             if (!CollectionUtils.isEmpty(waybillTruckFeeDtos)) {
                 WaybillTruckFeeDto waybillTruckFeeDto = waybillTruckFeeDtos.get(0);
                 if (CostType.COMPENSATE.equals(waybillTruckFeeDto.getAdjustType())) {
-                    anomalyManagementListDto.setCompensateMoney("[司机] " + waybillTruckFeeDto.getMoney());
+                    waybillAnomalyDto.setCompensateMoney("[司机] " + waybillTruckFeeDto.getMoney());
                 }
                 if (CostType.DEDUCTION.equals(waybillTruckFeeDto.getAdjustType())) {
-                    anomalyManagementListDto.setDeductMoney("[司机] " + "-" + waybillTruckFeeDto.getMoney());
+                    waybillAnomalyDto.setDeductMoney("[司机] " + "-" + waybillTruckFeeDto.getMoney());
                 }
             }
             //登记人
             if (!CollectionUtils.isEmpty(employeeLists) && null != waybillAnomalyDto.getCreateUserId()) {
                 if (UserType.EMPLOYEE.equals(waybillAnomalyDto.getCreateUserType())) {
                     UserInfo creatorName = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList()).get(0);
-                    anomalyManagementListDto.setCreatorName(creatorName.getName());
+                    waybillAnomalyDto.setCreatorName(creatorName.getName());
                 }
             }
             if (!CollectionUtils.isEmpty(driverLists) && null != waybillAnomalyDto.getCreateUserId()) {
                 if (UserType.DRIVER.equals(waybillAnomalyDto.getCreateUserType())) {
                     UserInfo driverName = driverLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList()).get(0);
-                    anomalyManagementListDto.setCreatorName(driverName.getName());
+                    waybillAnomalyDto.setCreatorName(driverName.getName());
                 }
             }
             //处理人
             if (!CollectionUtils.isEmpty(employeeLists) && null != waybillAnomalyDto.getProcessorUserId()) {
                 UserInfo processUser = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getProcessorUserId())).collect(Collectors.toList()).get(0);
-                anomalyManagementListDto.setProcessorName(processUser.getName());
+                waybillAnomalyDto.setProcessorName(processUser.getName());
             }
             //审核人
             if (!CollectionUtils.isEmpty(employeeLists) && null != waybillAnomalyDto.getAuditUserId()) {
                 UserInfo auditName = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getAuditUserId())).collect(Collectors.toList()).get(0);
-                anomalyManagementListDto.setAuditName(auditName.getName());
+                waybillAnomalyDto.setAuditName(auditName.getName());
             }
-            anomalyManagementListDtos.add(anomalyManagementListDto);
+            //anomalyManagementListDtos.add(anomalyManagementListDto);
         }
-        return new PageInfo(anomalyManagementListDtos);
+        return new PageInfo(waybillAnomalyDtos);
     }
 
     /**
