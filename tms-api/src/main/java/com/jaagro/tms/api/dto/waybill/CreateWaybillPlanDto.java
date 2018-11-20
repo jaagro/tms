@@ -33,4 +33,9 @@ public class CreateWaybillPlanDto implements Serializable {
      * 发货地和对应的货物明细列表 运单明细列表
      */
     private List<CreateWaybillItemsPlanDto> waybillItems;
+
+    /**
+     * 客户是否直接下单
+     */
+    private String enableDirectOrder;
 }

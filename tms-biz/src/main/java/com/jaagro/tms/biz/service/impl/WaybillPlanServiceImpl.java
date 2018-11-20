@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -64,6 +65,15 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         List<CreateWaybillItemsPlanDto> waybillItemsDtos = waybillDto.getWaybillItems();
         List<TruckDto> truckDtos = waybillDto.getTrucks();
         List<MiddleObjectBo> middleObjects = new ArrayList<>();
+        if (!StringUtils.isEmpty(waybillDto.getEnableDirectOrder()) && "y".equalsIgnoreCase(waybillDto.getEnableDirectOrder())) {
+            List<TruckDto> trucks = waybillDto.getTrucks();
+            //牧源需要重置计划量
+            Integer proportioning = 0 ;
+            for (TruckDto truck : trucks) {
+                proportioning += truck.getCapacity()*truck.getNumber();
+            }
+            waybillItemsDtos.get(0).getGoods().get(0).setProportioning(proportioning);
+        }
         for (CreateWaybillItemsPlanDto waybillItemsDto : waybillItemsDtos) {
             Integer orderItemId = waybillItemsDto.getOrderItemId();
             List<CreateWaybillGoodsPlanDto> goods = waybillItemsDto.getGoods();
@@ -92,7 +102,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             int goodType = waybillDtos.get(0).getGoodType();
             if (GoodsType.CHICKEN.equals(goodType)) {
                 Assert.notNull(waybillDto.getKillChain(), "毛鸡屠宰链不能为空");
-                waybillDtos = getloadTimeAndUnloadTime(waybillDtos, truckDtos,waybillDto.getKillChain());
+                waybillDtos = getloadTimeAndUnloadTime(waybillDtos, truckDtos, waybillDto.getKillChain());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -167,7 +177,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
      * @param truckDtos
      * @return
      */
-    private List<ListWaybillPlanDto> wayBillAlgorithm(List<MiddleObjectBo> middleObjects, List<TruckDto> truckDtos) throws RuntimeException{
+    private List<ListWaybillPlanDto> wayBillAlgorithm(List<MiddleObjectBo> middleObjects, List<TruckDto> truckDtos) throws RuntimeException {
         List<MiddleObjectBo> middleObjects_assigned = new ArrayList<>();
         List<ListWaybillPlanDto> waybillDtos = new ArrayList<>();
         //按配送地排序
@@ -254,7 +264,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         waybillPlanDto.setWaybillPlanTime(new Date());
         waybillPlanDto.setGoodType(ordersData.getGoodsType());
         List<ListWaybillItemsPlanDto> itemsList = new ArrayList<>();
-        int totalAmount =0;
+        int totalAmount = 0;
         for (MiddleObjectBo obj : assignList) {
             OrderGoods orderGoods = orderGoodsMapper.selectByPrimaryKey(obj.getOrderGoodsId());
             Integer goodsUnit = orderGoods.getGoodsUnit();
@@ -300,7 +310,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
      * @param truckDtos
      * @return
      */
-    private List<ListWaybillPlanDto> getloadTimeAndUnloadTime(List<ListWaybillPlanDto> waybillDtos, List<TruckDto> truckDtos,Integer killChain) throws RuntimeException{
+    private List<ListWaybillPlanDto> getloadTimeAndUnloadTime(List<ListWaybillPlanDto> waybillDtos, List<TruckDto> truckDtos, Integer killChain) throws RuntimeException {
         ShowSiteDto loadSite = customerClientService.getShowSiteById(waybillDtos.get(0).getLoadSiteId());
         if (GoodsType.CHICKEN.equals(loadSite.getProductType())) {
             ListWaybillPlanDto dtoPrevious = new ListWaybillPlanDto();
