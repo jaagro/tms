@@ -78,7 +78,7 @@ public class OrderServiceImpl implements OrderService {
         order.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
         this.ordersMapper.insertSelective(order);
         //如果是牧源客户，那么设置默认的卸货地、卸货时间、货物，装货地前端选择
-        if("y".equals(customerDto.getEnableDirectOrder())){
+        if(!StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder())){
             List<CreateOrderItemsDto> orderItems = new ArrayList<>();
             CreateOrderItemsDto itemsDto = new CreateOrderItemsDto();
             itemsDto.setUnloadId(0);
@@ -86,8 +86,8 @@ public class OrderServiceImpl implements OrderService {
 
             List<CreateOrderGoodsDto> goods = new ArrayList<>();
             CreateOrderGoodsDto goodsDto = new CreateOrderGoodsDto();
-            goodsDto.setGoodsName("客户补录货物");
-            goodsDto.setGoodsWeight(new BigDecimal(100));
+            goodsDto.setGoodsName("需客户补录货物");
+            goodsDto.setGoodsWeight(new BigDecimal(0));
             goodsDto.setGoodsUnit(GoodsUnit.TON);
             goods.add(goodsDto);
             itemsDto.setGoods(goods);
