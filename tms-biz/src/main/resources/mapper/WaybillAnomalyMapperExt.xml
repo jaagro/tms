@@ -47,7 +47,7 @@
             order by FIELD(processing_status,'待处理','已处理','审核中','已结束','已作废')
         </if>
         <if test="audit == 1">
-            order by FIELD(processing_status,'待审核','已通过','已拒绝')
+            order by FIELD(audit_status,'待审核','已通过','已拒绝')
         </if>
 
     </select>

@@ -252,7 +252,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         }
         List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(dto);
-        //List<AnomalyManagementListDto> anomalyManagementListDtos = new ArrayList<>();
         List<Integer> driverList = new ArrayList<>();
         List<Integer> employeeList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(waybillAnomalyDtos)) {
@@ -292,8 +291,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             }
         }
         for (WaybillAnomalyDto waybillAnomalyDto : waybillAnomalyDtos) {
-            //AnomalyManagementListDto anomalyManagementListDto = new AnomalyManagementListDto();
-            //BeanUtils.copyProperties(waybillAnomalyDto, anomalyManagementListDto);
             WaybillFeeCondition waybillFeeCondition = new WaybillFeeCondition();
             waybillFeeCondition
                     .setAnomalyId(waybillAnomalyDto.getId());
@@ -342,7 +339,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 UserInfo auditName = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getAuditUserId())).collect(Collectors.toList()).get(0);
                 waybillAnomalyDto.setAuditName(auditName.getName());
             }
-            //anomalyManagementListDtos.add(anomalyManagementListDto);
         }
         return new PageInfo(waybillAnomalyDtos);
     }
