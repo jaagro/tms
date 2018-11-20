@@ -2,6 +2,7 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.waybill.LocationDto;
 import com.jaagro.tms.biz.mapper.LocationMapperExt;
+import com.jaagro.tms.biz.service.UserClientService;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import com.jaagro.tms.biz.service.impl.GpsLocationAsync;
 import lombok.extern.slf4j.Slf4j;
@@ -123,5 +124,12 @@ public class TestController {
         long end = System.currentTimeMillis();
         System.out.println("-----耗时----------" + (start - end) + "---------------");
     }
+    @Autowired
+    private UserClientService userClientService;
 
+    @GetMapping("/test10")
+    public void test10(){
+        String result = userClientService.getDeptNameById(1);
+        System.out.println(result);
+    }
 }
