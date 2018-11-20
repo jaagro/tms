@@ -236,7 +236,11 @@ public class OrderController {
                         .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()));
                 //归属网点名称
                 ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
-                orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                if(showSiteDto != null){
+                    if(!StringUtils.isEmpty(showSiteDto.getDeptId())){
+                        orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                    }
+                }
                 //创单人
                 UserInfo userInfo = authClientService.getUserInfoById(orderDto.getCreatedUserId(), "employee");
                 if (userInfo != null) {
