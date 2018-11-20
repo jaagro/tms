@@ -1522,7 +1522,7 @@ public class WaybillServiceImpl implements WaybillService {
         BigDecimal totalUnloadWeight = BigDecimal.ZERO;
         for (GetWaybillGoodsDto waybillGoodsDto : waybillGoodsDtos) {
             boolean flag = ((null != waybillGoodsDto.getUnloadWeight() || null != waybillGoodsDto.getLoadWeight())
-                    && (GoodsUnit.YU.equals(waybillGoodsDto.getGoodsUnit()) || GoodsUnit.TON.equals(waybillGoodsDto.getGoodsUnit())));
+                    && GoodsUnit.TON.equals(waybillGoodsDto.getGoodsUnit()));
             if (flag) {
                 //单位 羽 吨 累计提货重量
                 totalLoadWeight = totalLoadWeight.add(waybillGoodsDto.getLoadWeight());
@@ -1531,7 +1531,7 @@ public class WaybillServiceImpl implements WaybillService {
             }
         }
         BigDecimal weightDiff = totalLoadWeight.subtract(totalUnloadWeight).abs();
-        if (!BigDecimal.ZERO.equals(totalLoadWeight)) {
+        if (totalLoadWeight.compareTo(BigDecimal.ZERO) != 0) {
             BigDecimal weightDivide = weightDiff.divide(totalLoadWeight, 6, BigDecimal.ROUND_HALF_UP);
             if (DataConstant.DIFFWEIGHT.compareTo(weightDivide) == -1) {
                 //插入预警提醒信息
