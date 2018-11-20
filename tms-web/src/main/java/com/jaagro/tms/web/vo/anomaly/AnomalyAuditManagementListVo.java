@@ -55,7 +55,4 @@ public class AnomalyAuditManagementListVo implements Serializable {
      * 处理结果
      */
     private String auditStatus;
-
-
-
 }
