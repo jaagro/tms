@@ -61,7 +61,6 @@ public class OrderController {
      */
     @ApiOperation("新增订单")
     @PostMapping("/order")
-
     public BaseResponse createOrder(@RequestBody CreateOrderDto orderDto) {
         if (StringUtils.isEmpty(orderDto.getCustomerId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
@@ -71,12 +70,6 @@ public class OrderController {
         }
         if (StringUtils.isEmpty(orderDto.getCustomerContractId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同id不能为空");
-        }
-        if (customerService.getShowCustomerById(orderDto.getCustomerId()) == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户不存在");
-        }
-        if (customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户合同不存在");
         }
         Map<String, Object> result;
         try {
@@ -96,17 +89,20 @@ public class OrderController {
     @ApiOperation("修改订单")
     @PutMapping("/order")
     public BaseResponse updateOrder(@RequestBody UpdateOrderDto orderDto) {
+        if (StringUtils.isEmpty(orderDto.getId())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单id不能为空");
+        }
         if (StringUtils.isEmpty(orderDto.getCustomerId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
         }
-        GetOrderDto getOrderDto;
+        Map<String, Object> result;
         try {
-            getOrderDto = orderService.updateOrder(orderDto);
+            result = orderService.updateOrder(orderDto);
         } catch (Exception ex) {
             ex.printStackTrace();
             return BaseResponse.errorInstance(ex.getMessage());
         }
-        return BaseResponse.successInstance(getOrderDto);
+        return BaseResponse.service(result);
     }
 
     /**
@@ -240,7 +236,11 @@ public class OrderController {
                         .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()));
                 //归属网点名称
                 ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
-                orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                if(showSiteDto != null){
+                    if(!StringUtils.isEmpty(showSiteDto.getDeptId())){
+                        orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                    }
+                }
                 //创单人
                 UserInfo userInfo = authClientService.getUserInfoById(orderDto.getCreatedUserId(), "employee");
                 if (userInfo != null) {
@@ -342,7 +342,9 @@ public class OrderController {
                         .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()));
                 //归属网点名称
                 ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
-                orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                if (showSiteDto != null) {
+                    orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                }
                 //创单人
                 UserInfo userInfo = authClientService.getUserInfoById(orderDto.getCreatedUserId(), "employee");
                 if (userInfo != null) {

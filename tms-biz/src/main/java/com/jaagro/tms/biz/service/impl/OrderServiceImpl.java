@@ -3,32 +3,32 @@ package com.jaagro.tms.biz.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.constant.GoodsUnit;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
-import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.biz.entity.OrderItems;
 import com.jaagro.tms.biz.entity.OrderModifyLog;
 import com.jaagro.tms.biz.entity.Orders;
-import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.AuthClientService;
 import com.jaagro.tms.biz.service.CustomerClientService;
-import com.jaagro.tms.biz.service.UserClientService;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author tony
@@ -54,8 +54,6 @@ public class OrderServiceImpl implements OrderService {
     private OrderModifyLogMapper modifyLogMapper;
     @Autowired
     private WaybillMapperExt waybillMapper;
-    @Autowired
-    private UserClientService userClientService;
 
     /**
      * 创建订单
@@ -66,15 +64,42 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createOrder(CreateOrderDto orderDto) {
+        ShowCustomerDto customerDto = customerService.getShowCustomerById(orderDto.getCustomerId());
+
+        if (customerDto == null) {
+            throw new RuntimeException("客户不存在");
+        }
+        if (customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
+            throw new RuntimeException("客户合同不存在");
+        }
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
         order.setCreatedUserId(currentUserService.getShowUser().getId());
         order.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
         this.ordersMapper.insertSelective(order);
+        //如果是牧源客户，那么设置默认的卸货地、卸货时间、货物，装货地前端选择
+        if(!StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder())){
+            List<CreateOrderItemsDto> orderItems = new ArrayList<>();
+            CreateOrderItemsDto itemsDto = new CreateOrderItemsDto();
+            itemsDto.setUnloadId(0);
+            itemsDto.setUnloadTime(new Date());
+
+            List<CreateOrderGoodsDto> goods = new ArrayList<>();
+            CreateOrderGoodsDto goodsDto = new CreateOrderGoodsDto();
+            goodsDto.setGoodsName("需客户补录货物");
+            goodsDto.setGoodsWeight(new BigDecimal(0));
+            goodsDto.setGoodsUnit(GoodsUnit.TON);
+            goods.add(goodsDto);
+            itemsDto.setGoods(goods);
+
+            orderItems.add(itemsDto);
+            orderDto.setOrderItems(orderItems);
+        }
+
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
             for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
                 if (StringUtils.isEmpty(itemsDto.getUnloadId())) {
-                    return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "卸货地不能为空");
+                    throw new RuntimeException("卸货地不能为空");
                 }
                 itemsDto.setOrderId(order.getId());
                 this.orderItemsService.createOrderItem(itemsDto);
@@ -93,12 +118,22 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public GetOrderDto updateOrder(UpdateOrderDto orderDto) {
+    public Map<String, Object> updateOrder(UpdateOrderDto orderDto) {
         if (orderDto.getId() == null) {
             throw new NullPointerException("订单id不能为空");
         }
-        if (ordersMapper.selectByPrimaryKey(orderDto.getId()) == null) {
+        Orders o = ordersMapper.selectByPrimaryKey(orderDto.getId());
+        if (o == null) {
             throw new NullPointerException("订单查询无数据");
+        }
+        if (!o.getOrderStatus().equals(OrderStatus.PLACE_ORDER)) {
+            throw new RuntimeException("在" + o.getOrderStatus() + "的订单状态不允许修改");
+        }
+        if (customerService.getShowCustomerById(orderDto.getCustomerId()) == null) {
+            throw new RuntimeException("客户不存在");
+        }
+        if (customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
+            throw new RuntimeException("客户合同不存在");
         }
         //修改order
         Orders orders = new Orders();
@@ -108,27 +143,26 @@ public class OrderServiceImpl implements OrderService {
                 .setModifyUserId(this.currentUserService.getShowUser().getId());
         this.ordersMapper.updateByPrimaryKeySelective(orders);
 
+        //删除order的全部货物信息，重新添加
         if (orderDto.getOrderItems() != null && orderDto.getOrderItems().size() > 0) {
-            for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
-                this.orderItemsService.updateItems(itemsDto);
+            //删除
+            Boolean result = orderItemsService.deleteByOrderId(orders.getId());
+            //新增
+            if (result) {
+                for (CreateOrderItemsDto itemsDto : orderDto.getOrderItems()) {
+                    itemsDto
+                            .setOrderId(orders.getId())
+                            .setId(null);
+                    try {
+                        this.orderItemsService.createOrderItem(itemsDto);
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex.getMessage());
+                    }
+
+                }
             }
         }
-
-        //返回
-        Orders order = this.ordersMapper.selectByPrimaryKey(orderDto.getId());
-        GetOrderDto getOrderDto = new GetOrderDto();
-        BeanUtils.copyProperties(order, orderDto);
-        getOrderDto
-                .setCustomer(this.customerService.getShowCustomerById(order.getCustomerId()))
-                .setCustomerContract(this.customerService.getShowCustomerContractById(order.getCustomerContractId()))
-                .setLoadSiteId(this.customerService.getShowSiteById(order.getLoadSiteId()));
-        UserInfo userInfo = this.authClientService.getUserInfoById(order.getCreatedUserId(), "employee");
-        if (userInfo != null) {
-            ShowUserDto userDto = new ShowUserDto();
-            userDto.setUserName(userInfo.getName());
-            getOrderDto.setCreatedUser(userDto);
-        }
-        return getOrderDto;
+        return ServiceResult.toResult("操作成功");
     }
 
     /**

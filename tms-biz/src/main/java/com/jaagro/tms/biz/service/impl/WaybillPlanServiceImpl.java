@@ -7,11 +7,11 @@ import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillPlanService;
+import com.jaagro.tms.biz.bo.MiddleObjectBo;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.TruckTypeClientService;
-import com.jaagro.tms.biz.bo.MiddleObjectBo;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -20,11 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -65,6 +65,15 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         List<CreateWaybillItemsPlanDto> waybillItemsDtos = waybillDto.getWaybillItems();
         List<TruckDto> truckDtos = waybillDto.getTrucks();
         List<MiddleObjectBo> middleObjects = new ArrayList<>();
+        if (!StringUtils.isEmpty(waybillDto.getEnableDirectOrder()) && "y".equalsIgnoreCase(waybillDto.getEnableDirectOrder())) {
+            List<TruckDto> trucks = waybillDto.getTrucks();
+            //牧源需要重置计划量
+            Integer proportioning = 0 ;
+            for (TruckDto truck : trucks) {
+                proportioning += truck.getCapacity()*truck.getNumber();
+            }
+            waybillItemsDtos.get(0).getGoods().get(0).setProportioning(proportioning);
+        }
         for (CreateWaybillItemsPlanDto waybillItemsDto : waybillItemsDtos) {
             Integer orderItemId = waybillItemsDto.getOrderItemId();
             List<CreateWaybillGoodsPlanDto> goods = waybillItemsDto.getGoods();
@@ -92,7 +101,8 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
             //更新运单货物是生鸡时的装货时间和卸货时间
             int goodType = waybillDtos.get(0).getGoodType();
             if (GoodsType.CHICKEN.equals(goodType)) {
-                waybillDtos = getloadTimeAndUnloadTime(waybillDtos, truckDtos);
+                Assert.notNull(waybillDto.getKillChain(), "毛鸡屠宰链不能为空");
+                waybillDtos = getloadTimeAndUnloadTime(waybillDtos, truckDtos, waybillDto.getKillChain());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -167,7 +177,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
      * @param truckDtos
      * @return
      */
-    private List<ListWaybillPlanDto> wayBillAlgorithm(List<MiddleObjectBo> middleObjects, List<TruckDto> truckDtos) throws RuntimeException{
+    private List<ListWaybillPlanDto> wayBillAlgorithm(List<MiddleObjectBo> middleObjects, List<TruckDto> truckDtos) throws RuntimeException {
         List<MiddleObjectBo> middleObjects_assigned = new ArrayList<>();
         List<ListWaybillPlanDto> waybillDtos = new ArrayList<>();
         //按配送地排序
@@ -254,7 +264,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         waybillPlanDto.setWaybillPlanTime(new Date());
         waybillPlanDto.setGoodType(ordersData.getGoodsType());
         List<ListWaybillItemsPlanDto> itemsList = new ArrayList<>();
-        int totalAmount =0;
+        int totalAmount = 0;
         for (MiddleObjectBo obj : assignList) {
             OrderGoods orderGoods = orderGoodsMapper.selectByPrimaryKey(obj.getOrderGoodsId());
             Integer goodsUnit = orderGoods.getGoodsUnit();
@@ -300,7 +310,7 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
      * @param truckDtos
      * @return
      */
-    private List<ListWaybillPlanDto> getloadTimeAndUnloadTime(List<ListWaybillPlanDto> waybillDtos, List<TruckDto> truckDtos) throws RuntimeException{
+    private List<ListWaybillPlanDto> getloadTimeAndUnloadTime(List<ListWaybillPlanDto> waybillDtos, List<TruckDto> truckDtos, Integer killChain) throws RuntimeException {
         ShowSiteDto loadSite = customerClientService.getShowSiteById(waybillDtos.get(0).getLoadSiteId());
         if (GoodsType.CHICKEN.equals(loadSite.getProductType())) {
             ListWaybillPlanDto dtoPrevious = new ListWaybillPlanDto();
@@ -317,7 +327,8 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                 if (i != 0) {
                     needTruckTypeId = dtoPrevious.getNeedTruckTypeId();
                     capacity = truckDtos.stream().filter(c -> c.getTruckId().equals(needTruckTypeId)).findAny().get().getCapacity();
-                    int marginTime = capacity * 480 / unloadSite.getKillChain();
+                    //int marginTime = capacity * 480 / unloadSite.getKillChain();
+                    int marginTime = capacity * 480 / killChain;
                     unloadTime = DateUtils.addMinutes(unloadTimePrevious, marginTime);
                     //计算并重设装货时间
                     CatchChickenTime catchChickenTime = new CatchChickenTime();
@@ -337,7 +348,8 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
                     }
                 } else {
                     Date killTime = unloadSite.getKillTime();
-                    int times = (capacity * 480 / unloadSite.getKillChain()) * i;
+                    //int times = (capacity * 480 / unloadSite.getKillChain()) * i;
+                    int times = (capacity * 480 / killChain) * i;
                     Date paramDate = DateUtils.addMinutes(killTime, times);
                     //计算并重设卸货时间
                     int waitKillTime = 0;

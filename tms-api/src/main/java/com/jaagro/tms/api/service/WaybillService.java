@@ -1,11 +1,9 @@
 package com.jaagro.tms.api.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
-import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
-import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
-import com.jaagro.tms.api.dto.driverapp.ShowWaybillTrackingDto;
-import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
+import com.jaagro.tms.api.dto.driverapp.*;
+import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
+import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.waybill.*;
 
 import java.util.List;
@@ -139,7 +137,7 @@ public interface WaybillService {
      *
      * @return
      */
-    Map<String, Object> personalCenter();
+    ShowPersonalCenter personalCenter();
 
     /**
      * 撤回待接单的运单
@@ -175,21 +173,37 @@ public interface WaybillService {
     List<ListWaybillDto> listWaybillWaitByOrderId(Integer id);
 
     /**
-     * 回单修改运单货物信息新增运单轨迹(回单补录)
+     * 回单修改提货信息
      *
-     * @param updateWaybillGoodsReceiptDto
+     * @param updateWaybillGoodsDtoList
      * @return
      * @author yj
      */
-    boolean updateWaybillGoodsReceipt(UpdateWaybillGoodsReceiptDto updateWaybillGoodsReceiptDto);
+    boolean updateLoadGoodsReceipt(List<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList);
+
+    /**
+     * 回单修改卸货信息
+     * @param updateWaybillGoodsDtoList
+     * @return
+     * @author yj
+     */
+    boolean updateUnLoadGoodsReceipt(List<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList);
 
     /**
      * 上传回单图片
-     *
-     * @param waybillId
-     * @param imageUrl
+     * @param uploadReceiptImageDto
      * @return
      * @author yj
      */
-    boolean uploadReceiptImage(Integer waybillId, String imageUrl);
+    @Deprecated
+    boolean uploadReceiptImage(UploadReceiptImageDto uploadReceiptImageDto);
+
+    /**
+     * 运单作废
+     * 20181116
+     * @param waybillId
+     * @return
+     * @Author gavin
+     */
+   boolean abandonWaybill(Integer waybillId);
 }

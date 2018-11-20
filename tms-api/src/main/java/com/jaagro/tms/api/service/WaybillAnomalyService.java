@@ -71,6 +71,8 @@ public interface WaybillAnomalyService {
 
     /**
      * 客户侧费用
+     * Author @Gao.
+     *
      * @param dto
      * @return
      */
@@ -79,6 +81,8 @@ public interface WaybillAnomalyService {
 
     /**
      * 运力侧费用
+     * Author @Gao.
+     *
      * @param dto
      * @return
      */
@@ -86,9 +90,20 @@ public interface WaybillAnomalyService {
 
     /**
      * 改变异常状态:入参为已处理则将状态改为待审核，入参为待审核则将状态改为已处理
+     *
      * @param nowStatus 当前状态
      * @param id
      * @return
      */
     boolean changeAnomalyStatus(int[] id, String nowStatus);
+
+    /**
+     * 异常审核
+     * Author @Gao.
+     *
+     * @param dto
+     * @return
+     */
+    void anomalyInformationAudit(AnomalyInformationAuditDto dto);
+
 }

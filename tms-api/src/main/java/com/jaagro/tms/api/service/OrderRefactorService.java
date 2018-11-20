@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.service;
 
+import com.jaagro.tms.api.dto.order.CreateOrderDto;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
 
@@ -9,6 +10,14 @@ import java.util.Map;
  * @author baiyiran
  */
 public interface OrderRefactorService {
+
+    /**
+     * 创建订单
+     *
+     * @param orderDto 入参json
+     * @return
+     */
+    Map<String, Object> createOrder(CreateOrderDto orderDto);
 
     /**
      * 获取单条订单

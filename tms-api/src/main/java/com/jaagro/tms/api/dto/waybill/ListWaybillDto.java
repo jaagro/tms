@@ -65,4 +65,9 @@ public class ListWaybillDto implements Serializable {
      * 创建人（派单人）
      */
     private ShowUserDto createdUserId;
+
+    /**
+     * 磅差超过千分之二 进行预警提醒
+     */
+    private boolean poundAlert;
 }

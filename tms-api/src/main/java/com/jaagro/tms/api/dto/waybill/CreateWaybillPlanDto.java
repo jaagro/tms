@@ -25,7 +25,17 @@ public class CreateWaybillPlanDto implements Serializable {
     private List<TruckDto> trucks;
 
     /**
+     * 毛鸡的屠宰链数(原来是卸货地属性，现在从界面直接输入)
+     */
+    private Integer killChain;
+
+    /**
      * 发货地和对应的货物明细列表 运单明细列表
      */
     private List<CreateWaybillItemsPlanDto> waybillItems;
+
+    /**
+     * 客户是否直接下单
+     */
+    private String enableDirectOrder;
 }

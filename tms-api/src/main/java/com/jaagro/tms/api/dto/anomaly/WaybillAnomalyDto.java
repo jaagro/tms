@@ -105,4 +105,27 @@ public class WaybillAnomalyDto implements Serializable {
      * 异常类型
      */
     private String typeName;
+    /**
+     * 扣款金额
+     */
+    private String deductMoney;
+    /**
+     * 赔款金额
+     */
+    private String compensateMoney;
+
+    /**
+     * 登记人
+     */
+    private String creatorName;
+
+    /**
+     * 处理人
+     */
+    private String processorName;
+
+    /**
+     * 审核人
+     */
+    private String auditName;
 }

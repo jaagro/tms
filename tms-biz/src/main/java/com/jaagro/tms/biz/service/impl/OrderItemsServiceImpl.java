@@ -12,6 +12,7 @@ import com.jaagro.tms.biz.mapper.OrdersMapperExt;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -59,6 +60,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
             for (CreateOrderGoodsDto goodsDto : orderItemDto.getGoods()
             ) {
                 goodsDto
+                        .setId(null)
                         .setOrderItemId(orderItem.getId())
                         .setOrderId(orderItem.getOrderId());
                 this.goodsService.createOrderGood(goodsDto);
@@ -159,5 +161,27 @@ public class OrderItemsServiceImpl implements OrderItemsService {
             }
         }
         return orderItemsDtoList;
+    }
+
+    /**
+     * 根据订单id删除orderItems
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public Boolean deleteByOrderId(Integer orderId) {
+        Boolean result = false;
+        int msg = orderItemsMapper.deleteByOrderId(orderId);
+        if (msg > 0) {
+            //删除货物详细信息goods
+            Boolean goodsResult = goodsService.deleteByOrderId(orderId);
+            if (goodsResult) {
+                result = true;
+                return result;
+            }
+            return result;
+        }
+        return result;
     }
 }

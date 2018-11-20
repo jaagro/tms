@@ -71,7 +71,7 @@ public class GetTrackingDto implements Serializable {
     private Date createTime;
 
     /**
-     * 跟踪类型：1-运输轨迹 2-补录轨迹
+     * 跟踪类型：1-运输轨迹 2-提货补录 3-卸货补录 4-提货单据补录 5-卸货单据补录
      */
     private Integer trackingType;
 

@@ -14,7 +14,12 @@ public final class SignStatusConstant {
     public static Boolean UNSIGN = false;
 
     /**
-     *全部签收
+     * 全部签收
      */
-    public static String  SIGN_ALL = "SIGN_ALL";
+    public static String SIGN_ALL = "SIGN_ALL";
+
+    /**
+     *
+     */
+    public static String CRITERIA = "CRITERIA";
 }

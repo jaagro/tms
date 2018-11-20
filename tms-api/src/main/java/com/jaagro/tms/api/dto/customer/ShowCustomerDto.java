@@ -18,4 +18,9 @@ public class ShowCustomerDto implements Serializable {
      * 客户名称(个体客户时，就是自然人姓名)
      */
     private String customerName;
+
+    /**
+     * 客户是否直接下单
+     */
+    private String enableDirectOrder;
 }

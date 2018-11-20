@@ -87,6 +87,16 @@
         </if>
         order by create_time DESC
     </select>
+    <select id="listCriteriaWaybill" resultMap="ReturnMap" parameterType="com.jaagro.tms.biz.entity.Waybill">
+        select
+        *
+        from waybill
+        where enabled = 1
+        <if test="driverId != null">
+            and driver_id = #{driverId,jdbcType=INTEGER}
+        </if>
+        and waybill_status in ('前往装货地','待装货','待送达','待签收')
+    </select>
     <select id="listWaybillIdByOrderId" resultType="java.lang.Integer">
         select id
         from waybill

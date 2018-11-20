@@ -2,6 +2,7 @@ package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.api.dto.waybill.LocationDto;
 import com.jaagro.tms.api.dto.waybill.ShowLocationDto;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -24,5 +25,5 @@ public interface LocationMapperExt extends LocationMapper {
      * @param waybillId
      * @return
      */
-    List<ShowLocationDto> listLocationsByWaybillId(Integer waybillId);
+    List<ShowLocationDto> listLocationsByWaybillId(@Param("waybillId") Integer waybillId, @Param("interval")Integer interval);
 }

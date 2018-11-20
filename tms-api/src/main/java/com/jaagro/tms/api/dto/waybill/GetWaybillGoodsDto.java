@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author tony
@@ -71,6 +72,21 @@ public class GetWaybillGoodsDto implements Serializable {
      * 是否加药
      */
     private Boolean joinDrug;
+
+    /**
+     * 是否有效
+     */
+    private Boolean enabled;
+
+    /**
+     * 修改时间
+     */
+    private Date modifyTime;
+
+    /**
+     * 修改人id
+     */
+    private Integer modifyUserId;
 
     /**
      * 订单货物id

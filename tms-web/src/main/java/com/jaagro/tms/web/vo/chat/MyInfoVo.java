@@ -16,6 +16,11 @@ public class MyInfoVo implements Serializable {
     /**
      * 名称
      */
+    private Integer customerId;
+
+    /**
+     * 名称
+     */
     private String Name;
 
     /**

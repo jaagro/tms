@@ -18,9 +18,12 @@
 
     <select id="listLocationsByWaybillId" parameterType="java.lang.Integer"
             resultType="com.jaagro.tms.api.dto.waybill.ShowLocationDto">
-        select
-          id,latitude, longitude,location_time
-        from location
-        where waybill_id = #{waybillId,jdbcType=INTEGER} order by id desc
+        select distinct * from
+        (
+            select
+              latitude,longitude
+            from location
+            where waybill_id = #{waybillId} and mod(id,#{interval}) = 0 order by id
+        ) t
     </select>
 </mapper>

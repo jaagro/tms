@@ -73,6 +73,12 @@
             <artifactId>spring-boot-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- cat监控 -->
+        <dependency>
+            <groupId>com.dianping.cat</groupId>
+            <artifactId>cat-client</artifactId>
+            <version>3.0.0</version>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -95,6 +101,14 @@
             <id>prod</id>
             <properties>
                 <profileActive>prod</profileActive>
+            </properties>
+        </profile>
+
+        <!--内部开发环境-->
+        <profile>
+            <id>dev-zheng</id>
+            <properties>
+                <profileActive>dev-zheng</profileActive>
             </properties>
         </profile>
     </profiles>

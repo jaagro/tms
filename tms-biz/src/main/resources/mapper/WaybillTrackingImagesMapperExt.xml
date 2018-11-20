@@ -25,4 +25,22 @@
       and  waybill_id = #{waybillId,jdbcType=INTEGER}
     </if>
   </select>
+  <delete id="deleteByWaybillIdAndImageType">
+    delete from waybill_tracking_images
+    where waybill_id = #{waybillId,jdbcType=INTEGER}
+    and image_type = #{imageType,jdbcType=INTEGER}
+  </delete>
+  <insert id="batchInsert" parameterType="com.jaagro.tms.biz.entity.WaybillTrackingImages">
+    insert into waybill_tracking_images (waybill_id, waybill_item_id,
+    site_id, waybill_tracking_id, image_type,
+    image_url, create_time, create_user_id
+    )
+    values
+    <foreach collection="imagesList" item="image" separator=",">
+      (#{image.waybillId,jdbcType=INTEGER}, #{image.waybillItemId,jdbcType=INTEGER},
+      #{image.siteId,jdbcType=INTEGER}, #{image.waybillTrackingId,jdbcType=INTEGER}, #{image.imageType,jdbcType=INTEGER},
+      #{image.imageUrl,jdbcType=VARCHAR}, #{image.createTime,jdbcType=TIMESTAMP}, #{image.createUserId,jdbcType=INTEGER}
+      )
+    </foreach>
+  </insert>
 </mapper>

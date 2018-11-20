@@ -47,4 +47,24 @@
         where waybill_id=#{waybillId} and new_status in ('待出发','前往装货地','待装货','待送达','待签收','已完成') order by id desc
     </select>
 
+    <delete id="deleteByWaybillIdAndTrackingType">
+        delete from waybill_tracking
+        where waybill_id=#{waybillId}
+        and tracking_type=#{trackingType}
+    </delete>
+    <insert id="batchInsert" parameterType="com.jaagro.tms.biz.entity.WaybillTracking">
+        insert into waybill_tracking (waybill_id, tracking_type,
+        old_status, new_status, driver_id,
+        latitude, longitude, tracking_info,
+        device, refer_user_id, create_time
+        )
+        values
+        <foreach collection="trackingList" item="tracking" separator=",">
+            (#{tracking.waybillId,jdbcType=INTEGER}, #{tracking.trackingType,jdbcType=INTEGER},
+            #{tracking.oldStatus,jdbcType=VARCHAR}, #{tracking.newStatus,jdbcType=VARCHAR}, #{tracking.driverId,jdbcType=INTEGER},
+            #{tracking.latitude,jdbcType=DECIMAL}, #{tracking.longitude,jdbcType=DECIMAL}, #{tracking.trackingInfo,jdbcType=VARCHAR},
+            #{tracking.device,jdbcType=VARCHAR}, #{tracking.referUserId,jdbcType=INTEGER}, #{tracking.createTime,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
 </mapper>

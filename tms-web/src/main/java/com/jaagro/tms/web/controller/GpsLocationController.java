@@ -3,11 +3,13 @@ package com.jaagro.tms.web.controller;
 import com.jaagro.tms.api.dto.waybill.LocationDto;
 import com.jaagro.tms.api.dto.waybill.ShowLocationDto;
 import com.jaagro.tms.api.service.LocationService;
+import com.jaagro.tms.biz.config.RabbitMqConfig;
 import com.jaagro.tms.biz.service.impl.GpsLocationAsync;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,9 +30,10 @@ public class GpsLocationController {
 
     @Autowired
     private LocationService locationService;
-
     @Autowired
     private GpsLocationAsync asyncTask;
+    @Autowired
+    private AmqpTemplate amqpTemplate;
 
     /**
      * 批量新增司机定位数据
@@ -40,21 +43,24 @@ public class GpsLocationController {
      */
     @ApiOperation("新增司机定位")
     @PostMapping("/insertBatch")
-    public BaseResponse insertBatch(@RequestBody List<LocationDto> locationDtos) {
-        long start = System.currentTimeMillis();
-        int count = locationService.insertBatch(locationDtos);
-        long end = System.currentTimeMillis();
-        log.info("-----同步耗时----------" + (start - end) + "---------------");
-        if (0 == count) {
-            return BaseResponse.errorInstance("定位失败");
-        }
-        return BaseResponse.successInstance("定位成功");
+    public void insertBatch(@RequestBody List<LocationDto> locationDtos) {
+        locationService.insertBatch(locationDtos);
     }
 
+    /**
+     * 把采集到的司机定位信息发布到rabbitMQ
+     *
+     * @param locationDtos
+     */
+    @ApiOperation("司机定位数据采集")
+    @PostMapping("/insertBatchMq")
+    public void insertBatchMq(@RequestBody List<LocationDto> locationDtos) {
+        amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "location.send", locationDtos);
+    }
 
     @ApiOperation("异步新增司机定位")
     @PostMapping("/asyncBatchInsert")
-    public BaseResponse asyncBatchInsert(@RequestBody List<LocationDto> locationDtos) {
+    public void asyncBatchInsert(@RequestBody List<LocationDto> locationDtos) {
         long start = System.currentTimeMillis();
         List<LocationDto> listA = locationDtos.subList(0, 100);
         List<LocationDto> listB = locationDtos.subList(100, 200);
@@ -70,16 +76,12 @@ public class GpsLocationController {
         }
         long end = System.currentTimeMillis();
         log.info("----异步耗时----------" + (start - end) + "---------------");
-        return BaseResponse.successInstance("定位成功");
     }
 
     @ApiOperation("运单轨迹定位数据")
-    @PostMapping("/listLocationsByWaybillId/{waybillId}")
-    public BaseResponse listLocationsByWaybillId(@PathVariable Integer waybillId) {
-        long start = System.currentTimeMillis();
-        List<ShowLocationDto> result = locationService.locationsByWaybillId(waybillId);
-        long end = System.currentTimeMillis();
-        log.info("----耗时----------" + (start - end) + "---------------");
+    @PostMapping("/listLocationsByWaybillId/{waybillId}/{interval}")
+    public BaseResponse listLocationsByWaybillId(@PathVariable(("waybillId")) Integer waybillId, @PathVariable("interval") Integer interval) {
+        List<ShowLocationDto> result = locationService.locationsByWaybillId(waybillId, interval);
         return BaseResponse.successInstance(result);
     }
 }
