@@ -1,4 +1,4 @@
-package com.jaagro.tms.web.config.cat;
+package com.jaagro.tms.biz.config.cat;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
