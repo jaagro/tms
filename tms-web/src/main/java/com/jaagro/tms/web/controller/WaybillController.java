@@ -184,7 +184,7 @@ public class WaybillController {
      * @return
      */
     @ApiOperation("运单作废")
-    @DeleteMapping("/abandonWaybill/{waybillId}")
+    @PostMapping("/abandonWaybill/{waybillId}")
     public BaseResponse abandonWaybill(@PathVariable("waybillId") Integer waybillId) {
         boolean result = waybillService.abandonWaybill(waybillId);
         if(!result){
