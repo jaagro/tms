@@ -1,4 +1,4 @@
-package com.jaagro.tms.biz.cat;
+package com.jaagro.tms.biz.config.cat;
 
 import com.dianping.cat.servlet.CatFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author tony
+ *
+ * @author zhengwenzhu
+ * @date 2017/1/17
  */
 @Configuration
 public class CatFilterConfigure {

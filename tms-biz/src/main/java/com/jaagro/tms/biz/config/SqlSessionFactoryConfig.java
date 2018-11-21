@@ -1,6 +1,6 @@
 package com.jaagro.tms.biz.config;
 
-import com.jaagro.tms.biz.cat.CatMybatisPlugin;
+import com.jaagro.tms.biz.config.cat.CatMybatisPlugin;
 import org.apache.ibatis.plugin.Interceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +13,6 @@ import java.io.IOException;
 /**
  * @author tony
  */
-
 @Configuration
 public class SqlSessionFactoryConfig {
 
