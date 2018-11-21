@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -253,7 +254,8 @@ public class OrderController {
                 if (waybills.size() > 0) {
                     orderVo.setWaybillCount(waybills.size());
                     //已派单
-                    List<ListWaybillDto> waitWaybills = waybillService.listWaybillWaitByOrderId(orderVo.getId());
+//                    List<ListWaybillDto> waitWaybills = waybillService.listWaybillWaitByOrderId(orderVo.getId());
+                    List<ListWaybillDto> waitWaybills = waybills.stream().filter(c->!c.getWaybillStatus().equals("待派单")).collect(Collectors.toList());
                     if (waitWaybills.size() > 0) {
                         orderVo.setWaybillAlready(waitWaybills.size());
                         orderVo.setWaybillWait(orderVo.getWaybillCount() - orderVo.getWaybillAlready());
