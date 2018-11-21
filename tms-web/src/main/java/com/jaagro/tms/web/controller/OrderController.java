@@ -237,8 +237,8 @@ public class OrderController {
                         .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()));
                 //归属网点名称
                 ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
-                if(showSiteDto != null){
-                    if(!StringUtils.isEmpty(showSiteDto.getDeptId())){
+                if (showSiteDto != null) {
+                    if (!StringUtils.isEmpty(showSiteDto.getDeptId())) {
                         orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
                     }
                 }
@@ -255,7 +255,7 @@ public class OrderController {
                     orderVo.setWaybillCount(waybills.size());
                     //已派单
 //                    List<ListWaybillDto> waitWaybills = waybillService.listWaybillWaitByOrderId(orderVo.getId());
-                    List<ListWaybillDto> waitWaybills = waybills.stream().filter(c->!c.getWaybillStatus().equals("待派单")).collect(Collectors.toList());
+                    List<ListWaybillDto> waitWaybills = waybills.stream().filter(c -> !c.getWaybillStatus().equals("待派单")).collect(Collectors.toList());
                     if (waitWaybills.size() > 0) {
                         orderVo.setWaybillAlready(waitWaybills.size());
                         orderVo.setWaybillWait(orderVo.getWaybillCount() - orderVo.getWaybillAlready());
