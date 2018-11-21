@@ -86,7 +86,7 @@ public class OrderServiceImpl implements OrderService {
 
             List<CreateOrderGoodsDto> goods = new ArrayList<>();
             CreateOrderGoodsDto goodsDto = new CreateOrderGoodsDto();
-            goodsDto.setGoodsName("需客户补录货物");
+            goodsDto.setGoodsName("需回单补录");
             goodsDto.setGoodsWeight(new BigDecimal(0));
             goodsDto.setGoodsUnit(GoodsUnit.TON);
             goods.add(goodsDto);

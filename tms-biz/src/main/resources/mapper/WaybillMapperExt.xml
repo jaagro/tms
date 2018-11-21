@@ -54,19 +54,20 @@
         and enabled = 1
     </select>
     <select id="selectWaybillByCarrierStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
-        select wb.*
-        from waybill wb
-        inner join waybill_tracking wt
-        on (wb.id=wt.waybill_id)
-        where wb.enabled = 1
-        and wb.waybill_status
-        in ('待出发','前往装货地','待装货','待送达','待签收')
-        <if test="driverId != null">
-            and wb.driver_id = #{driverId,jdbcType=INTEGER}
-        </if>
-        and wt.new_status='待出发'
-        order by wt.create_time DESC
-
+        select distinct * from (
+            select wb.*
+            from waybill wb
+            inner join waybill_tracking wt
+            on (wb.id=wt.waybill_id)
+            where wb.enabled = 1
+            and wb.waybill_status
+            in ('待出发','前往装货地','待装货','待送达','待签收')
+            <if test="driverId != null">
+                and wb.driver_id = #{driverId,jdbcType=INTEGER}
+            </if>
+            and wt.new_status='待出发'
+            order by wt.create_time DESC
+        ) t
     </select>
     <select id="selectWaybillByStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
         select

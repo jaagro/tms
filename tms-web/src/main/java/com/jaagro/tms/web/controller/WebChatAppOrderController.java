@@ -34,7 +34,7 @@ import java.util.Map;
 @RestController
 @Slf4j
 @Api(description = "微信小程序订单管理", produces = MediaType.APPLICATION_JSON_VALUE)
-public class WeChatAppletOrderController {
+public class WebChatAppOrderController {
 
     @Autowired
     private OrderService orderService;
