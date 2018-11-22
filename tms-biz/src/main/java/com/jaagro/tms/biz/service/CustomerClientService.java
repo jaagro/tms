@@ -61,4 +61,5 @@ public interface CustomerClientService {
      */
     @PostMapping("/getTruckIdsByTruckNum/{truckNumber}")
     List<Integer> getTruckIdsByTruckNum(@PathVariable("truckNumber") String truckNumber);
+
 }
