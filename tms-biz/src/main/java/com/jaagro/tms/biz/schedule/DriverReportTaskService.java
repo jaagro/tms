@@ -39,5 +39,5 @@ public class DriverReportTaskService {
         log.info("DriverReportTaskService.createDriverReport end use {} millionSeconds",System.currentTimeMillis()-begin);
     }
 
-    
+
 }
