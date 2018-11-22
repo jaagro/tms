@@ -51,7 +51,7 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
         <!--<table tableName="%" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
-        <table tableName="league" domainObjectName="League" enableCountByExample="true"
+        <table tableName="customer_report" domainObjectName="CustomerReport" enableCountByExample="true"
                enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"
                selectByExampleQueryId="false"></table>
         <!--<table tableName="waybill" domainObjectName="Waybill" enableCountByExample="false"-->
