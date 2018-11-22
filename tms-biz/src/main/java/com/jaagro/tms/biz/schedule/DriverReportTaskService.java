@@ -31,13 +31,12 @@ public class DriverReportTaskService {
         calendar.set(Calendar.SECOND,0);
         calendar.set(Calendar.MILLISECOND,0);
         Date beginTime = calendar.getTime();
-        calendar.set(Calendar.DAY_OF_MONTH,calendar.get(Calendar.DAY_OF_MONTH)+1);
+        calendar.add(Calendar.DAY_OF_MONTH,1);
         Date endTime = calendar.getTime();
         log.info("DriverReportTaskService.createDriverReport begin beginTime={},endTime={}",beginTime,endTime);
         long begin = System.currentTimeMillis();
         driverReportService.createReport(beginTime,endTime);
-        log.info("DriverReportTaskService.createDriverReport end use {} millionSeconds",System.currentTimeMillis()-begin);
+        log.info("DriverReportTaskService.createDriverReport end use {} millsSeconds",System.currentTimeMillis()-begin);
     }
-
 
 }
