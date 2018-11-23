@@ -49,7 +49,6 @@ import java.util.stream.Collectors;
  * @author tony
  */
 @Service
-@Slf4j
 public class WaybillServiceImpl implements WaybillService {
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
 
