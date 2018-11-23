@@ -32,22 +32,20 @@
         <if test="anomalyTypeId != null and anomalyTypeId!=''">
             and wa.anomaly_type_id = #{anomalyTypeId}
         </if>
-        <if test="audit == 2">
-            <if test="beginDate!=null and endDate!=null">
-                and wa.create_time between #{beginDate} and #{endDate}
-            </if>
+        <if test="beginDate!=null and endDate!=null and audit == 1">
+            and wa.audit_time between #{beginDate} and #{endDate}
+        </if>
+        <if test="beginDate!=null and endDate!=null and audit == 2">
+            and wa.create_time between #{beginDate} and #{endDate}
         </if>
         <if test="audit == 1">
             and wa.audit_status in("已通过","待审核","已拒绝")
-            <if test="beginDate!=null and endDate!=null">
-                and wa.audit_time between #{beginDate} and #{endDate}
-            </if>
-        </if>
-        <if test="audit == 2">
-            order by FIELD(processing_status,'待处理','已处理','审核中','已结束','已作废')
         </if>
         <if test="audit == 1">
             order by FIELD(audit_status,'待审核','已通过','已拒绝')
+        </if>
+        <if test="audit == 2">
+            order by FIELD(processing_status,'待处理','已处理','审核中','已结束','已作废')
         </if>
 
     </select>
