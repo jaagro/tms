@@ -29,7 +29,6 @@ import com.jaagro.tms.biz.service.*;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -164,7 +163,6 @@ public class WaybillServiceImpl implements WaybillService {
                         waybillItemsId = list.get(0).getId();
                     }
                 }
-
 
                 List<CreateWaybillGoodsDto> createWaybillGoodsDtoList = waybillItemsDto.getGoods();
                 for (CreateWaybillGoodsDto createWaybillGoodsDto : createWaybillGoodsDtoList) {
