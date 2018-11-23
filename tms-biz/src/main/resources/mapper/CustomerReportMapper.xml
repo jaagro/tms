@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jaagro.tms.biz.mapper.CustomerReportMapperExt">
+    <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.CustomerReport">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="report_time" property="reportTime" jdbcType="DATE"/>
+        <result column="customer_id" property="customerId" jdbcType="INTEGER"/>
+        <result column="customer_name" property="customerName" jdbcType="VARCHAR"/>
+        <result column="order_quantity" property="orderQuantity" jdbcType="INTEGER"/>
+        <result column="waybill_quantity" property="waybillQuantity" jdbcType="INTEGER"/>
+        <result column="anomaly_waybill_quantity" property="anomalyWaybillQuantity" jdbcType="INTEGER"/>
+        <result column="goods_type" property="goodsType" jdbcType="INTEGER"/>
+        <result column="amount" property="amount" jdbcType="INTEGER"/>
+        <result column="tonnage" property="tonnage" jdbcType="DECIMAL"/>
+        <result column="income_freight" property="incomeFreight" jdbcType="DECIMAL"/>
+        <result column="income_anomaly_cost" property="incomeAnomalyCost" jdbcType="DECIMAL"/>
+        <result column="expend_freight" property="expendFreight" jdbcType="DECIMAL"/>
+        <result column="expend_anomaly_cost" property="expendAnomalyCost" jdbcType="DECIMAL"/>
+        <result column="gross_profit" property="grossProfit" jdbcType="DECIMAL"/>
+        <result column="gross_profit_rate" property="grossProfitRate" jdbcType="DECIMAL"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, report_time, customer_id, customer_name, order_quantity, waybill_quantity, anomaly_waybill_quantity, 
+    goods_type, amount, tonnage, income_freight, income_anomaly_cost, expend_freight, 
+    expend_anomaly_cost, gross_profit, gross_profit_rate, enabled, create_time, modify_time
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from customer_report
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from customer_report
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.jaagro.tms.biz.entity.CustomerReport" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
+    insert into customer_report (id, report_time, customer_id, 
+      customer_name, order_quantity, waybill_quantity, 
+      anomaly_waybill_quantity, goods_type, amount, 
+      tonnage, income_freight, income_anomaly_cost, 
+      expend_freight, expend_anomaly_cost, gross_profit, 
+      gross_profit_rate, enabled, create_time, 
+      modify_time)
+    values (#{id,jdbcType=INTEGER}, #{reportTime,jdbcType=DATE}, #{customerId,jdbcType=INTEGER}, 
+      #{customerName,jdbcType=VARCHAR}, #{orderQuantity,jdbcType=INTEGER}, #{waybillQuantity,jdbcType=INTEGER}, 
+      #{anomalyWaybillQuantity,jdbcType=INTEGER}, #{goodsType,jdbcType=INTEGER}, #{amount,jdbcType=INTEGER}, 
+      #{tonnage,jdbcType=DECIMAL}, #{incomeFreight,jdbcType=DECIMAL}, #{incomeAnomalyCost,jdbcType=DECIMAL}, 
+      #{expendFreight,jdbcType=DECIMAL}, #{expendAnomalyCost,jdbcType=DECIMAL}, #{grossProfit,jdbcType=DECIMAL}, 
+      #{grossProfitRate,jdbcType=DECIMAL}, #{enabled,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{modifyTime,jdbcType=TIMESTAMP})
+  </insert>
+    <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.CustomerReport" useGeneratedKeys="true"
+            keyProperty="id" keyColumn="id">
+        insert into customer_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="reportTime != null">
+                report_time,
+            </if>
+            <if test="customerId != null">
+                customer_id,
+            </if>
+            <if test="customerName != null">
+                customer_name,
+            </if>
+            <if test="orderQuantity != null">
+                order_quantity,
+            </if>
+            <if test="waybillQuantity != null">
+                waybill_quantity,
+            </if>
+            <if test="anomalyWaybillQuantity != null">
+                anomaly_waybill_quantity,
+            </if>
+            <if test="goodsType != null">
+                goods_type,
+            </if>
+            <if test="amount != null">
+                amount,
+            </if>
+            <if test="tonnage != null">
+                tonnage,
+            </if>
+            <if test="incomeFreight != null">
+                income_freight,
+            </if>
+            <if test="incomeAnomalyCost != null">
+                income_anomaly_cost,
+            </if>
+            <if test="expendFreight != null">
+                expend_freight,
+            </if>
+            <if test="expendAnomalyCost != null">
+                expend_anomaly_cost,
+            </if>
+            <if test="grossProfit != null">
+                gross_profit,
+            </if>
+            <if test="grossProfitRate != null">
+                gross_profit_rate,
+            </if>
+            <if test="enabled != null">
+                enabled,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="modifyTime != null">
+                modify_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="reportTime != null">
+                #{reportTime,jdbcType=DATE},
+            </if>
+            <if test="customerId != null">
+                #{customerId,jdbcType=INTEGER},
+            </if>
+            <if test="customerName != null">
+                #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="orderQuantity != null">
+                #{orderQuantity,jdbcType=INTEGER},
+            </if>
+            <if test="waybillQuantity != null">
+                #{waybillQuantity,jdbcType=INTEGER},
+            </if>
+            <if test="anomalyWaybillQuantity != null">
+                #{anomalyWaybillQuantity,jdbcType=INTEGER},
+            </if>
+            <if test="goodsType != null">
+                #{goodsType,jdbcType=INTEGER},
+            </if>
+            <if test="amount != null">
+                #{amount,jdbcType=INTEGER},
+            </if>
+            <if test="tonnage != null">
+                #{tonnage,jdbcType=DECIMAL},
+            </if>
+            <if test="incomeFreight != null">
+                #{incomeFreight,jdbcType=DECIMAL},
+            </if>
+            <if test="incomeAnomalyCost != null">
+                #{incomeAnomalyCost,jdbcType=DECIMAL},
+            </if>
+            <if test="expendFreight != null">
+                #{expendFreight,jdbcType=DECIMAL},
+            </if>
+            <if test="expendAnomalyCost != null">
+                #{expendAnomalyCost,jdbcType=DECIMAL},
+            </if>
+            <if test="grossProfit != null">
+                #{grossProfit,jdbcType=DECIMAL},
+            </if>
+            <if test="grossProfitRate != null">
+                #{grossProfitRate,jdbcType=DECIMAL},
+            </if>
+            <if test="enabled != null">
+                #{enabled,jdbcType=BIT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.CustomerReport">
+        update customer_report
+        <set>
+            <if test="reportTime != null">
+                report_time = #{reportTime,jdbcType=DATE},
+            </if>
+            <if test="customerId != null">
+                customer_id = #{customerId,jdbcType=INTEGER},
+            </if>
+            <if test="customerName != null">
+                customer_name = #{customerName,jdbcType=VARCHAR},
+            </if>
+            <if test="orderQuantity != null">
+                order_quantity = #{orderQuantity,jdbcType=INTEGER},
+            </if>
+            <if test="waybillQuantity != null">
+                waybill_quantity = #{waybillQuantity,jdbcType=INTEGER},
+            </if>
+            <if test="anomalyWaybillQuantity != null">
+                anomaly_waybill_quantity = #{anomalyWaybillQuantity,jdbcType=INTEGER},
+            </if>
+            <if test="goodsType != null">
+                goods_type = #{goodsType,jdbcType=INTEGER},
+            </if>
+            <if test="amount != null">
+                amount = #{amount,jdbcType=INTEGER},
+            </if>
+            <if test="tonnage != null">
+                tonnage = #{tonnage,jdbcType=DECIMAL},
+            </if>
+            <if test="incomeFreight != null">
+                income_freight = #{incomeFreight,jdbcType=DECIMAL},
+            </if>
+            <if test="incomeAnomalyCost != null">
+                income_anomaly_cost = #{incomeAnomalyCost,jdbcType=DECIMAL},
+            </if>
+            <if test="expendFreight != null">
+                expend_freight = #{expendFreight,jdbcType=DECIMAL},
+            </if>
+            <if test="expendAnomalyCost != null">
+                expend_anomaly_cost = #{expendAnomalyCost,jdbcType=DECIMAL},
+            </if>
+            <if test="grossProfit != null">
+                gross_profit = #{grossProfit,jdbcType=DECIMAL},
+            </if>
+            <if test="grossProfitRate != null">
+                gross_profit_rate = #{grossProfitRate,jdbcType=DECIMAL},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=BIT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.CustomerReport">
+    update customer_report
+    set report_time = #{reportTime,jdbcType=DATE},
+      customer_id = #{customerId,jdbcType=INTEGER},
+      customer_name = #{customerName,jdbcType=VARCHAR},
+      order_quantity = #{orderQuantity,jdbcType=INTEGER},
+      waybill_quantity = #{waybillQuantity,jdbcType=INTEGER},
+      anomaly_waybill_quantity = #{anomalyWaybillQuantity,jdbcType=INTEGER},
+      goods_type = #{goodsType,jdbcType=INTEGER},
+      amount = #{amount,jdbcType=INTEGER},
+      tonnage = #{tonnage,jdbcType=DECIMAL},
+      income_freight = #{incomeFreight,jdbcType=DECIMAL},
+      income_anomaly_cost = #{incomeAnomalyCost,jdbcType=DECIMAL},
+      expend_freight = #{expendFreight,jdbcType=DECIMAL},
+      expend_anomaly_cost = #{expendAnomalyCost,jdbcType=DECIMAL},
+      gross_profit = #{grossProfit,jdbcType=DECIMAL},
+      gross_profit_rate = #{grossProfitRate,jdbcType=DECIMAL},
+      enabled = #{enabled,jdbcType=BIT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

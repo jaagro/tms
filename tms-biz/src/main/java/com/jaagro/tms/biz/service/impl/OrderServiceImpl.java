@@ -114,7 +114,6 @@ public class OrderServiceImpl implements OrderService {
      * 修改订单
      *
      * @param orderDto 入参json
-     * @return 修改后的order对象
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
