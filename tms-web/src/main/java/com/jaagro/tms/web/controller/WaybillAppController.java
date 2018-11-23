@@ -112,6 +112,7 @@ public class WaybillAppController {
     @ApiOperation("接单控制")
     @PostMapping("/upDateReceiptStatusApp")
     public BaseResponse upDateReceiptStatusApp(@RequestBody GetReceiptParamDto dto) {
+
         if (dto.getWaybillId() == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "接单参数不能为空");
         }

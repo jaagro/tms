@@ -1,6 +1,5 @@
 package com.jaagro.tms.web.vo.receipt;
 
-import com.jaagro.tms.web.vo.chat.WaybillTrackingVo;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

@@ -164,7 +164,6 @@ public class WaybillServiceImpl implements WaybillService {
                     }
                 }
 
-
                 List<CreateWaybillGoodsDto> createWaybillGoodsDtoList = waybillItemsDto.getGoods();
                 for (CreateWaybillGoodsDto createWaybillGoodsDto : createWaybillGoodsDtoList) {
                     WaybillGoods waybillGoods = new WaybillGoods();
@@ -870,7 +869,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> upDateReceiptStatus(GetReceiptParamDto dto) {
-
+        log.info("upDateReceiptStatus={}", dto);
         Integer waybillId = dto.getWaybillId();
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         UserInfo currentUser = currentUserService.getCurrentUser();
@@ -1363,10 +1362,14 @@ public class WaybillServiceImpl implements WaybillService {
             // 插入卸货补录轨迹
             WaybillTracking waybillTracking = new WaybillTracking();
             List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybillId);
+            boolean hasLoadTracking = false;
             if (!CollectionUtils.isEmpty(showTrackingDtos)) {
                 for (ShowTrackingDto showTrackingDto : showTrackingDtos) {
                     if (TrackingType.UNLOAD_RECEIPT.equals(showTrackingDto.getTrackingType())) {
                         throw new RuntimeException("补录实卸只能提交一次");
+                    }
+                    if (TrackingType.LOAD_RECEIPT.equals(showTrackingDto.getTrackingType())) {
+                        hasLoadTracking = true;
                     }
                 }
                 ShowTrackingDto showTrackingDto = showTrackingDtos.get(0);
@@ -1380,9 +1383,19 @@ public class WaybillServiceImpl implements WaybillService {
                     .setTrackingInfo("补录实卸")
                     .setReferUserId(currentUserId)
                     .setTrackingType(TrackingType.UNLOAD_RECEIPT);
-            Integer insertTrackingNum = waybillTrackingMapper.insertSelective(waybillTracking);
-            if (insertTrackingNum < 1) {
+            Integer insertUnloadTrackingNum = waybillTrackingMapper.insertSelective(waybillTracking);
+            if (insertUnloadTrackingNum < 1) {
                 throw new RuntimeException("插入运单轨迹(补录实卸)失败");
+            }
+            if (!hasLoadTracking){
+                waybillTracking
+                        .setId(null)
+                        .setTrackingInfo("补录实提")
+                        .setTrackingType(TrackingType.LOAD_RECEIPT);
+                Integer insertLoadTrackingNum = waybillTrackingMapper.insertSelective(waybillTracking);
+                if (insertLoadTrackingNum < 1) {
+                    throw new RuntimeException("插入运单轨迹(补录实提)失败");
+                }
             }
             waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
         }

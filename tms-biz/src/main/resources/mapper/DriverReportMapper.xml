@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jaagro.tms.biz.mapper.DriverReportMapperExt" >
+  <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.DriverReport" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="report_time" property="reportTime" jdbcType="DATE" />
+    <result column="driver_name" property="driverName" jdbcType="VARCHAR" />
+    <result column="driver_id" property="driverId" jdbcType="INTEGER" />
+    <result column="truck_number" property="truckNumber" jdbcType="VARCHAR" />
+    <result column="truck_id" property="truckId" jdbcType="INTEGER" />
+    <result column="receive_waybill_quantity" property="receiveWaybillQuantity" jdbcType="INTEGER" />
+    <result column="refuse_waybill_quantity" property="refuseWaybillQuantity" jdbcType="INTEGER" />
+    <result column="anomaly_waybill_quantity" property="anomalyWaybillQuantity" jdbcType="INTEGER" />
+    <result column="complete_waybill_quantity" property="completeWaybillQuantity" jdbcType="INTEGER" />
+    <result column="avg_receive_duration" property="avgReceiveDuration" jdbcType="DECIMAL" />
+    <result column="load_punctuality_rate" property="loadPunctualityRate" jdbcType="DECIMAL" />
+    <result column="unload_punctuality_rate" property="unloadPunctualityRate" jdbcType="DECIMAL" />
+    <result column="freight" property="freight" jdbcType="DECIMAL" />
+    <result column="anomaly_cost" property="anomalyCost" jdbcType="DECIMAL" />
+    <result column="total_cost" property="totalCost" jdbcType="DECIMAL" />
+    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, report_time, driver_name, driver_id, truck_number, truck_id, receive_waybill_quantity, 
+    refuse_waybill_quantity, anomaly_waybill_quantity, complete_waybill_quantity, avg_receive_duration, 
+    load_punctuality_rate, unload_punctuality_rate, freight, anomaly_cost, total_cost, 
+    enabled, create_time, modify_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from driver_report
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from driver_report
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.DriverReport" useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
+    insert into driver_report (id, report_time, driver_name, 
+      driver_id, truck_number, truck_id, 
+      receive_waybill_quantity, refuse_waybill_quantity, 
+      anomaly_waybill_quantity, complete_waybill_quantity, 
+      avg_receive_duration, load_punctuality_rate, 
+      unload_punctuality_rate, freight, anomaly_cost, 
+      total_cost, enabled, create_time, 
+      modify_time)
+    values (#{id,jdbcType=INTEGER}, #{reportTime,jdbcType=DATE}, #{driverName,jdbcType=VARCHAR}, 
+      #{driverId,jdbcType=INTEGER}, #{truckNumber,jdbcType=VARCHAR}, #{truckId,jdbcType=INTEGER}, 
+      #{receiveWaybillQuantity,jdbcType=INTEGER}, #{refuseWaybillQuantity,jdbcType=INTEGER}, 
+      #{anomalyWaybillQuantity,jdbcType=INTEGER}, #{completeWaybillQuantity,jdbcType=INTEGER}, 
+      #{avgReceiveDuration,jdbcType=DECIMAL}, #{loadPunctualityRate,jdbcType=DECIMAL}, 
+      #{unloadPunctualityRate,jdbcType=DECIMAL}, #{freight,jdbcType=DECIMAL}, #{anomalyCost,jdbcType=DECIMAL}, 
+      #{totalCost,jdbcType=DECIMAL}, #{enabled,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{modifyTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.DriverReport" useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
+    insert into driver_report
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="reportTime != null" >
+        report_time,
+      </if>
+      <if test="driverName != null" >
+        driver_name,
+      </if>
+      <if test="driverId != null" >
+        driver_id,
+      </if>
+      <if test="truckNumber != null" >
+        truck_number,
+      </if>
+      <if test="truckId != null" >
+        truck_id,
+      </if>
+      <if test="receiveWaybillQuantity != null" >
+        receive_waybill_quantity,
+      </if>
+      <if test="refuseWaybillQuantity != null" >
+        refuse_waybill_quantity,
+      </if>
+      <if test="anomalyWaybillQuantity != null" >
+        anomaly_waybill_quantity,
+      </if>
+      <if test="completeWaybillQuantity != null" >
+        complete_waybill_quantity,
+      </if>
+      <if test="avgReceiveDuration != null" >
+        avg_receive_duration,
+      </if>
+      <if test="loadPunctualityRate != null" >
+        load_punctuality_rate,
+      </if>
+      <if test="unloadPunctualityRate != null" >
+        unload_punctuality_rate,
+      </if>
+      <if test="freight != null" >
+        freight,
+      </if>
+      <if test="anomalyCost != null" >
+        anomaly_cost,
+      </if>
+      <if test="totalCost != null" >
+        total_cost,
+      </if>
+      <if test="enabled != null" >
+        enabled,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="modifyTime != null" >
+        modify_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="reportTime != null" >
+        #{reportTime,jdbcType=DATE},
+      </if>
+      <if test="driverName != null" >
+        #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverId != null" >
+        #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="truckNumber != null" >
+        #{truckNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="truckId != null" >
+        #{truckId,jdbcType=INTEGER},
+      </if>
+      <if test="receiveWaybillQuantity != null" >
+        #{receiveWaybillQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="refuseWaybillQuantity != null" >
+        #{refuseWaybillQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="anomalyWaybillQuantity != null" >
+        #{anomalyWaybillQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="completeWaybillQuantity != null" >
+        #{completeWaybillQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="avgReceiveDuration != null" >
+        #{avgReceiveDuration,jdbcType=DECIMAL},
+      </if>
+      <if test="loadPunctualityRate != null" >
+        #{loadPunctualityRate,jdbcType=DECIMAL},
+      </if>
+      <if test="unloadPunctualityRate != null" >
+        #{unloadPunctualityRate,jdbcType=DECIMAL},
+      </if>
+      <if test="freight != null" >
+        #{freight,jdbcType=DECIMAL},
+      </if>
+      <if test="anomalyCost != null" >
+        #{anomalyCost,jdbcType=DECIMAL},
+      </if>
+      <if test="totalCost != null" >
+        #{totalCost,jdbcType=DECIMAL},
+      </if>
+      <if test="enabled != null" >
+        #{enabled,jdbcType=BIT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null" >
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.DriverReport" >
+    update driver_report
+    <set >
+      <if test="reportTime != null" >
+        report_time = #{reportTime,jdbcType=DATE},
+      </if>
+      <if test="driverName != null" >
+        driver_name = #{driverName,jdbcType=VARCHAR},
+      </if>
+      <if test="driverId != null" >
+        driver_id = #{driverId,jdbcType=INTEGER},
+      </if>
+      <if test="truckNumber != null" >
+        truck_number = #{truckNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="truckId != null" >
+        truck_id = #{truckId,jdbcType=INTEGER},
+      </if>
+      <if test="receiveWaybillQuantity != null" >
+        receive_waybill_quantity = #{receiveWaybillQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="refuseWaybillQuantity != null" >
+        refuse_waybill_quantity = #{refuseWaybillQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="anomalyWaybillQuantity != null" >
+        anomaly_waybill_quantity = #{anomalyWaybillQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="completeWaybillQuantity != null" >
+        complete_waybill_quantity = #{completeWaybillQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="avgReceiveDuration != null" >
+        avg_receive_duration = #{avgReceiveDuration,jdbcType=DECIMAL},
+      </if>
+      <if test="loadPunctualityRate != null" >
+        load_punctuality_rate = #{loadPunctualityRate,jdbcType=DECIMAL},
+      </if>
+      <if test="unloadPunctualityRate != null" >
+        unload_punctuality_rate = #{unloadPunctualityRate,jdbcType=DECIMAL},
+      </if>
+      <if test="freight != null" >
+        freight = #{freight,jdbcType=DECIMAL},
+      </if>
+      <if test="anomalyCost != null" >
+        anomaly_cost = #{anomalyCost,jdbcType=DECIMAL},
+      </if>
+      <if test="totalCost != null" >
+        total_cost = #{totalCost,jdbcType=DECIMAL},
+      </if>
+      <if test="enabled != null" >
+        enabled = #{enabled,jdbcType=BIT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null" >
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.DriverReport" >
+    update driver_report
+    set report_time = #{reportTime,jdbcType=DATE},
+      driver_name = #{driverName,jdbcType=VARCHAR},
+      driver_id = #{driverId,jdbcType=INTEGER},
+      truck_number = #{truckNumber,jdbcType=VARCHAR},
+      truck_id = #{truckId,jdbcType=INTEGER},
+      receive_waybill_quantity = #{receiveWaybillQuantity,jdbcType=INTEGER},
+      refuse_waybill_quantity = #{refuseWaybillQuantity,jdbcType=INTEGER},
+      anomaly_waybill_quantity = #{anomalyWaybillQuantity,jdbcType=INTEGER},
+      complete_waybill_quantity = #{completeWaybillQuantity,jdbcType=INTEGER},
+      avg_receive_duration = #{avgReceiveDuration,jdbcType=DECIMAL},
+      load_punctuality_rate = #{loadPunctualityRate,jdbcType=DECIMAL},
+      unload_punctuality_rate = #{unloadPunctualityRate,jdbcType=DECIMAL},
+      freight = #{freight,jdbcType=DECIMAL},
+      anomaly_cost = #{anomalyCost,jdbcType=DECIMAL},
+      total_cost = #{totalCost,jdbcType=DECIMAL},
+      enabled = #{enabled,jdbcType=BIT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
