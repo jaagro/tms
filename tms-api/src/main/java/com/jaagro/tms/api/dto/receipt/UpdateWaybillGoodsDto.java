@@ -40,10 +40,9 @@ public class UpdateWaybillGoodsDto implements Serializable{
     private Integer waybillItemId;
 
     /**
-     * 卸货地id
+     * 卸货地id 牧原指定卸货地id为零
      */
     @NotNull(message = "{unloadSiteId.NotNull}")
-    @Min(value = 1,message = "{unloadSiteId.Min}")
     private Integer unloadSiteId;
 
     /**
