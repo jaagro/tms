@@ -29,10 +29,6 @@
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <sql id="Return_List">
-        id, order_id,, waybill_status,, send_time, distance, create_time
-    </sql>
-
     <update id="removeWaybillById">
         update waybill set enabled = 0 where id = #{waybillId};
         update waybill_items set enabled = 0 where waybill_id = #{waybillId};
