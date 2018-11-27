@@ -434,6 +434,10 @@ public class WaybillServiceImpl implements WaybillService {
                     List<GetWaybillItemsAppDto> waybillItems = waybillAppDto.getWaybillItems();
                     if (null != waybillItems && waybillItems.size() > 0) {
                         for (GetWaybillItemsAppDto waybillItem : waybillItems) {
+                            if(waybillItem.getUnloadSiteId()==0)
+                            {
+                                continue;
+                            }
                             List<ShowGoodsDto> goods = waybillItem.getGoods();
                             for (ShowGoodsDto good : goods) {
                                 showGoodsDtos.add(good);
