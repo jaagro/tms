@@ -237,6 +237,11 @@ public class WaybillServiceImpl implements WaybillService {
         List<GetWaybillItemDto> getWaybillItemsDtoList = new ArrayList<>();
         List<WaybillItems> waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybill.getId());
         for (WaybillItems items : waybillItemsList) {
+            //删掉无计划时指定的默认卸货地
+            if(items.getUnloadSiteId()==0)
+            {
+                continue;
+            }
             GetWaybillItemDto getWaybillItemsDto = new GetWaybillItemDto();
             BeanUtils.copyProperties(items, getWaybillItemsDto);
             List<GetWaybillGoodsDto> getWaybillGoodsDtoList = new LinkedList<>();
