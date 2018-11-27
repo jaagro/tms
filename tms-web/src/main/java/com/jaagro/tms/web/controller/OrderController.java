@@ -364,8 +364,20 @@ public class OrderController {
                     orderVo.setWaybillCount(waybills.size());
                     //已派单
                     List<ListWaybillDto> waitWaybills = waybillService.listWaybillWaitByOrderId(orderVo.getId());
-                    if (waitWaybills.size() > 0) {
+                    if (!CollectionUtils.isEmpty(waitWaybills)) {
                         orderVo.setWaybillAlready(waitWaybills.size());
+                    } else {
+                        orderVo.setWaybillAlready(0);
+                    }
+                    //已拒单
+                    Integer countWaybill = waybillService.listRejectWaybillByOrderId(orderDto.getId());
+                    if (!StringUtils.isEmpty(countWaybill)) {
+                        orderVo.setWaybillReject(countWaybill);
+                        if (countWaybill != waybills.size()) {
+                            //待派单数
+                            orderVo.setWaybillWait(orderVo.getWaybillCount() - orderVo.getWaybillAlready() - countWaybill);
+                        }
+                    } else {
                         orderVo.setWaybillWait(orderVo.getWaybillCount() - orderVo.getWaybillAlready());
                     }
                 }

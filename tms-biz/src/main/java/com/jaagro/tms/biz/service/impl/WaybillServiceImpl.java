@@ -237,6 +237,11 @@ public class WaybillServiceImpl implements WaybillService {
         List<GetWaybillItemDto> getWaybillItemsDtoList = new ArrayList<>();
         List<WaybillItems> waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybill.getId());
         for (WaybillItems items : waybillItemsList) {
+            //删掉无计划时指定的默认卸货地
+            if(items.getUnloadSiteId()==0)
+            {
+                continue;
+            }
             GetWaybillItemDto getWaybillItemsDto = new GetWaybillItemDto();
             BeanUtils.copyProperties(items, getWaybillItemsDto);
             List<GetWaybillGoodsDto> getWaybillGoodsDtoList = new LinkedList<>();
@@ -429,6 +434,11 @@ public class WaybillServiceImpl implements WaybillService {
                     List<GetWaybillItemsAppDto> waybillItems = waybillAppDto.getWaybillItems();
                     if (null != waybillItems && waybillItems.size() > 0) {
                         for (GetWaybillItemsAppDto waybillItem : waybillItems) {
+                            //删掉无计划时指定的默认卸货地和货物
+                            if(waybillItem.getUnloadSiteId()==0)
+                            {
+                                continue;
+                            }
                             List<ShowGoodsDto> goods = waybillItem.getGoods();
                             for (ShowGoodsDto good : goods) {
                                 showGoodsDtos.add(good);
@@ -455,6 +465,11 @@ public class WaybillServiceImpl implements WaybillService {
             List<GetWaybillItemsAppDto> waybillItems = waybillAppDtos.get(0).getWaybillItems();
             List<ShowSiteAppDto> unloadSiteList = new ArrayList<>();
             for (GetWaybillItemsAppDto waybillItem : waybillItems) {
+                //删掉无计划时指定的默认卸货地
+                if(waybillItem.getUnloadSiteId()==0)
+                {
+                    continue;
+                }
                 List<ShowGoodsDto> goods = waybillItem.getGoods();
                 ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
                 ShowSiteAppDto unloadSiteApp = new ShowSiteAppDto();
@@ -1387,7 +1402,7 @@ public class WaybillServiceImpl implements WaybillService {
             if (insertUnloadTrackingNum < 1) {
                 throw new RuntimeException("插入运单轨迹(补录实卸)失败");
             }
-            if (!hasLoadTracking){
+            if (!hasLoadTracking) {
                 waybillTracking
                         .setId(null)
                         .setTrackingInfo("补录实提")
@@ -1504,6 +1519,17 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public List<ListWaybillDto> listWaybillWaitByOrderId(Integer id) {
         return waybillMapper.listWaybillDtoWaitByOrderId(id);
+    }
+
+    /**
+     * 根据订单id查询已拒单的个数
+     *
+     * @param orderId
+     * @return
+     */
+    @Override
+    public Integer listRejectWaybillByOrderId(Integer orderId) {
+        return waybillMapper.listRejectWaybillByOrderId(orderId);
     }
 
     private Integer getUserId() {
