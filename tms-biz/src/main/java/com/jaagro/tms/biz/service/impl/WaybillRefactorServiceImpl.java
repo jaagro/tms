@@ -19,8 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -283,6 +281,11 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         List<GetWaybillItemDto> getWaybillItemsDtoList = new ArrayList<>();
         List<WaybillItems> waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
         for (WaybillItems waybillItems : waybillItemsList) {
+            //删掉无计划时指定的默认卸货地
+            if(waybillItems.getUnloadSiteId()==0)
+            {
+                continue;
+            }
             GetWaybillItemDto getWaybillItemsDto = new GetWaybillItemDto();
             BeanUtils.copyProperties(waybillItems, getWaybillItemsDto);
             List<GetWaybillGoodsDto> getWaybillGoodsDtoList = new LinkedList<>();
