@@ -460,6 +460,10 @@ public class WaybillServiceImpl implements WaybillService {
             List<GetWaybillItemsAppDto> waybillItems = waybillAppDtos.get(0).getWaybillItems();
             List<ShowSiteAppDto> unloadSiteList = new ArrayList<>();
             for (GetWaybillItemsAppDto waybillItem : waybillItems) {
+                if(waybillItem.getUnloadSiteId()==0)
+                {
+                    continue;
+                }
                 List<ShowGoodsDto> goods = waybillItem.getGoods();
                 ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
                 ShowSiteAppDto unloadSiteApp = new ShowSiteAppDto();
