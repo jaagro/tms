@@ -173,6 +173,14 @@ public interface WaybillService {
     List<ListWaybillDto> listWaybillWaitByOrderId(Integer id);
 
     /**
+     * 根据订单id查询已拒单的个数
+     *
+     * @param orderId
+     * @return
+     */
+    Integer listRejectWaybillByOrderId(Integer orderId);
+
+    /**
      * 回单修改提货信息
      *
      * @param updateWaybillGoodsDtoList
@@ -183,6 +191,7 @@ public interface WaybillService {
 
     /**
      * 回单修改卸货信息
+     *
      * @param updateWaybillGoodsDtoList
      * @return
      * @author yj
@@ -191,6 +200,7 @@ public interface WaybillService {
 
     /**
      * 上传回单图片
+     *
      * @param uploadReceiptImageDto
      * @return
      * @author yj
@@ -201,9 +211,10 @@ public interface WaybillService {
     /**
      * 运单作废
      * 20181116
+     *
      * @param waybillId
      * @return
      * @Author gavin
      */
-   boolean abandonWaybill(Integer waybillId);
+    boolean abandonWaybill(Integer waybillId);
 }
