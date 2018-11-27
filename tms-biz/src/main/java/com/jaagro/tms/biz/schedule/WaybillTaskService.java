@@ -82,7 +82,7 @@ public class WaybillTaskService {
      * @param startTime 开始时间
      * @param endTime   结束时间
      * @return
-     * @author jqlin
+     * @author gavin
      */
     public static boolean isEffectiveDate(Date nowTime, Date startTime, Date endTime) {
         if (nowTime.getTime() == startTime.getTime()
