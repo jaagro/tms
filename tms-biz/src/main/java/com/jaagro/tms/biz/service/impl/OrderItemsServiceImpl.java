@@ -1,5 +1,6 @@
 package com.jaagro.tms.biz.service.impl;
 
+import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
@@ -12,14 +13,11 @@ import com.jaagro.tms.biz.mapper.OrdersMapperExt;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -50,9 +48,9 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Map<String, Object> createOrderItem(CreateOrderItemsDto orderItemDto) {
-        if (this.customerService.getShowSiteById(orderItemDto.getUnloadId()) == null) {
+        /*if (this.customerService.getShowSiteById(orderItemDto.getUnloadId()) == null) {
             throw new NullPointerException("卸货地不存在");
-        }
+        }*/
         OrderItems orderItem = new OrderItems();
         BeanUtils.copyProperties(orderItemDto, orderItem);
         this.orderItemsMapper.insertSelective(orderItem);

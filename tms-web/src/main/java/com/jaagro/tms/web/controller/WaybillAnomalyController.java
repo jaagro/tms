@@ -84,25 +84,29 @@ public class WaybillAnomalyController {
             List<WaybillAnomalyImageDto> waybillAnomalyImageDtos = waybillAnomalyService.listWaybillAnomalyImageByCondition(waybillAnomalyImageCondition);
             if (!CollectionUtils.isEmpty(waybillAnomalyImageDtos)) {
                 for (WaybillAnomalyImageDto waybillAnomalyImageDto : waybillAnomalyImageDtos) {
-                    List<ImageUrlDto> imageUrlDtos = new ArrayList<>();
-                    AnomalyImageUrlDto anomalyImageUrlDto = new AnomalyImageUrlDto();
-                    //异常图片替换url地址
-                    String[] strArray1 = {waybillAnomalyImageDto.getImageUrl()};
-                    List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray1);
-                    //相对路径
-                    imageUrlDtos.add(new ImageUrlDto()
-                            .setImagesUrl(waybillAnomalyImageDto.getImageUrl())
-                            .setKey(1));
-                    //绝对路径
-                    imageUrlDtos.add(new ImageUrlDto()
-                            .setImagesUrl(urls.get(0).toString())
-                            .setKey(2));
-                    anomalyImageUrlDto
-                            .setImageType(waybillAnomalyImageDto.getImageType())
-                            .setAnomalyId(waybillAnomalyImageDto.getAnomalyId())
-                            .setAnomalyImageId(waybillAnomalyImageDto.getId())
-                            .setImageUrlDtos(imageUrlDtos);
-                    anomalyImageUrlDtos.add(anomalyImageUrlDto);
+                    if (null != waybillAnomalyImageDto) {
+                        List<ImageUrlDto> imageUrlDtos = new ArrayList<>();
+                        AnomalyImageUrlDto anomalyImageUrlDto = new AnomalyImageUrlDto();
+                        //异常图片替换url地址
+                        String[] strArray1 = {waybillAnomalyImageDto.getImageUrl()};
+                        List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray1);
+                        if (!CollectionUtils.isEmpty(urls)) {
+                            //相对路径
+                            imageUrlDtos.add(new ImageUrlDto()
+                                    .setImagesUrl(waybillAnomalyImageDto.getImageUrl())
+                                    .setKey(1));
+                            //绝对路径
+                            imageUrlDtos.add(new ImageUrlDto()
+                                    .setImagesUrl(urls.get(0).toString())
+                                    .setKey(2));
+                            anomalyImageUrlDto
+                                    .setImageType(waybillAnomalyImageDto.getImageType())
+                                    .setAnomalyId(waybillAnomalyImageDto.getAnomalyId())
+                                    .setAnomalyImageId(waybillAnomalyImageDto.getId())
+                                    .setImageUrlDtos(imageUrlDtos);
+                            anomalyImageUrlDtos.add(anomalyImageUrlDto);
+                        }
+                    }
                 }
                 anomalyInformationVo.setCreateAnomalyImageUrlDtos(anomalyImageUrlDtos);
             }

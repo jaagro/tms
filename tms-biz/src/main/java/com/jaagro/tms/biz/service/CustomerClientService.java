@@ -61,4 +61,13 @@ public interface CustomerClientService {
      */
     @PostMapping("/getTruckIdsByTruckNum/{truckNumber}")
     List<Integer> getTruckIdsByTruckNum(@PathVariable("truckNumber") String truckNumber);
+
+    /**
+     * 查询正常合作的全部客户
+     *
+     * @return
+     */
+    @GetMapping("/listNormalCustomer")
+    List<ShowCustomerDto> listNormalCustomer();
+
 }
