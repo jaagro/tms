@@ -39,7 +39,11 @@ public class WayBillReceiptsVo implements Serializable{
      */
     private Integer customerId;
     /**
-     *  货物类型
+     * 货物类型(1-毛鸡,2-饲料,3-母猪,4-公猪,5-仔猪,6-生猪)
      */
     private Integer goodsType;
+    /**
+     * 货物单位(1-筐,2-头,3-吨)
+     */
+    private Integer goodsUnit;
 }
