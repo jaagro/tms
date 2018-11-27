@@ -238,8 +238,7 @@ public class WaybillServiceImpl implements WaybillService {
         List<WaybillItems> waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybill.getId());
         for (WaybillItems items : waybillItemsList) {
             //删掉无计划时指定的默认卸货地
-            if(items.getUnloadSiteId()==0)
-            {
+            if (items.getUnloadSiteId() == 0) {
                 continue;
             }
             GetWaybillItemDto getWaybillItemsDto = new GetWaybillItemDto();
@@ -1160,6 +1159,20 @@ public class WaybillServiceImpl implements WaybillService {
                 if (waybill.getDriverId() != null) {
                     waybillDto.setDriver(this.driverClientService.getDriverReturnObject(waybill.getDriverId()));
 
+                }
+                //填充卸货地名称
+                List<WaybillItems> itemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillDto.getId());
+                if (!CollectionUtils.isEmpty(itemsList)) {
+                    List<Integer> siteIds = new ArrayList<>();
+                    for (WaybillItems items : itemsList) {
+                        siteIds.add(items.getUnloadSiteId());
+                    }
+                    if (!CollectionUtils.isEmpty(siteIds)) {
+                        List<String> siteNameList = customerClientService.listSiteNameByIds(siteIds);
+                        if (!CollectionUtils.isEmpty(siteNameList)) {
+                            waybillDto.setUnloadName(siteNameList);
+                        }
+                    }
                 }
                 //如果当前运单有预警提示消息 则在运单列表显示预警小图标
                 if (!CollectionUtils.isEmpty(listPoundAnomaly())) {
