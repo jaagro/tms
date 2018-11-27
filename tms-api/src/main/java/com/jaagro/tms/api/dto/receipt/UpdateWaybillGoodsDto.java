@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -60,31 +61,37 @@ public class UpdateWaybillGoodsDto implements Serializable{
     /**
      * 计划数量
      */
+    @Max(value = 9999999,message = "{goodsQuantity.Max}")
     private Integer goodsQuantity;
 
     /**
      * 计划重量
      */
+    @Max(value = 9999999,message = "{goodsWeight.Max}")
     private BigDecimal goodsWeight;
 
     /**
      * 装货数量
      */
+    @Max(value = 9999999,message = "{loadQuantity.Max}")
     private Integer loadQuantity;
 
     /**
      * 装货重量
      */
+    @Max(value = 9999999,message = "{loadWeight.Max}")
     private BigDecimal loadWeight;
 
     /**
      * 卸货数量
      */
+    @Max(value = 9999999,message = "{unloadQuantity.Max}")
     private Integer unloadQuantity;
 
     /**
      * 卸货重量
      */
+    @Max(value = 9999999,message = "{unloadWeight.Max}")
     private BigDecimal unloadWeight;
 
     /**
