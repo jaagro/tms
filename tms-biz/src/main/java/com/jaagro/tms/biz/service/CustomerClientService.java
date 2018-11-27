@@ -8,6 +8,7 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -69,5 +70,14 @@ public interface CustomerClientService {
      */
     @GetMapping("/listNormalCustomer")
     List<ShowCustomerDto> listNormalCustomer();
+
+    /**
+     * 根据地址id数组获得地址名称"
+     *
+     * @param siteIds
+     * @return
+     */
+    @PostMapping("/listSiteNameByIds")
+    List<String> listSiteNameByIds(@RequestBody List<Integer> siteIds);
 
 }
