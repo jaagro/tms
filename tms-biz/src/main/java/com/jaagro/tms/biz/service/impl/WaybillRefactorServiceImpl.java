@@ -142,6 +142,11 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 List<GetWaybillItemsAppDto> waybillItems = waybillDto.getWaybillItems();
                 if (null != waybillItems && waybillItems.size() > 0) {
                     for (GetWaybillItemsAppDto waybillItem : waybillItems) {
+                        //删掉无计划时指定的默认卸货地
+                        if(waybillItem.getUnloadSiteId()==0)
+                        {
+                            continue;
+                        }
                         if (null != waybillItem) {
                             ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
                             unloadSiteList.add(unloadSite);

@@ -1,6 +1,7 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.constant.GoodsUnit;
 import com.jaagro.tms.api.constant.TrackingType;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
@@ -112,6 +113,8 @@ public class ReceiptController {
         wayBillReceiptsVo.setCustomerId(waybillDetailDto.getLoadSiteDto() == null ? null : waybillDetailDto.getLoadSiteDto().getCustomerId());
         //货物类型
         wayBillReceiptsVo.setGoodsType(waybillDetailDto.getGoodType());
+        // 货物单位
+        wayBillReceiptsVo.setGoodsUnit(getGoodsUnitByGoodsType(waybillDetailDto.getGoodType()));
         //运单卸货地
         List<GetWaybillItemDto> waybillItems = waybillDetailDto.getWaybillItems();
         //运单货物信息
@@ -189,5 +192,26 @@ public class ReceiptController {
             wayBillReceiptsVo.setUnLoadImagesList(unLoadImagesList);
         }
         return wayBillReceiptsVo;
+    }
+    private Integer getGoodsUnitByGoodsType(Integer goodsType) {
+        if (goodsType != null && goodsType > 0) {
+            switch (goodsType.toString()) {
+                case "1":
+                    return GoodsUnit.YU;
+                case "2":
+                    return GoodsUnit.TON;
+                case "3":
+                    return GoodsUnit.TOU;
+                case "4":
+                    return GoodsUnit.TOU;
+                case "5":
+                    return GoodsUnit.TOU;
+                case "6":
+                    return GoodsUnit.TOU;
+                default:
+                    return null;
+            }
+        }
+        return null;
     }
 }

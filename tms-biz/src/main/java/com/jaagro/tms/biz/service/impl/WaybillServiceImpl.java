@@ -433,6 +433,11 @@ public class WaybillServiceImpl implements WaybillService {
                     List<GetWaybillItemsAppDto> waybillItems = waybillAppDto.getWaybillItems();
                     if (null != waybillItems && waybillItems.size() > 0) {
                         for (GetWaybillItemsAppDto waybillItem : waybillItems) {
+                            //删掉无计划时指定的默认卸货地和货物
+                            if(waybillItem.getUnloadSiteId()==0)
+                            {
+                                continue;
+                            }
                             List<ShowGoodsDto> goods = waybillItem.getGoods();
                             for (ShowGoodsDto good : goods) {
                                 showGoodsDtos.add(good);
@@ -459,6 +464,11 @@ public class WaybillServiceImpl implements WaybillService {
             List<GetWaybillItemsAppDto> waybillItems = waybillAppDtos.get(0).getWaybillItems();
             List<ShowSiteAppDto> unloadSiteList = new ArrayList<>();
             for (GetWaybillItemsAppDto waybillItem : waybillItems) {
+                //删掉无计划时指定的默认卸货地
+                if(waybillItem.getUnloadSiteId()==0)
+                {
+                    continue;
+                }
                 List<ShowGoodsDto> goods = waybillItem.getGoods();
                 ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
                 ShowSiteAppDto unloadSiteApp = new ShowSiteAppDto();
