@@ -108,4 +108,11 @@ public interface WaybillMapperExt extends WaybillMapper {
      */
     List<ListWaybillDto> listCriteriaWaybill(Waybill waybill);
 
+    /**
+     * 根据订单id查询已拒单的个数
+     *
+     * @param orderId
+     * @return
+     */
+    Integer listRejectWaybillByOrderId(@Param("orderId") Integer orderId);
 }

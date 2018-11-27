@@ -1387,7 +1387,7 @@ public class WaybillServiceImpl implements WaybillService {
             if (insertUnloadTrackingNum < 1) {
                 throw new RuntimeException("插入运单轨迹(补录实卸)失败");
             }
-            if (!hasLoadTracking){
+            if (!hasLoadTracking) {
                 waybillTracking
                         .setId(null)
                         .setTrackingInfo("补录实提")
@@ -1504,6 +1504,17 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public List<ListWaybillDto> listWaybillWaitByOrderId(Integer id) {
         return waybillMapper.listWaybillDtoWaitByOrderId(id);
+    }
+
+    /**
+     * 根据订单id查询已拒单的个数
+     *
+     * @param orderId
+     * @return
+     */
+    @Override
+    public Integer listRejectWaybillByOrderId(Integer orderId) {
+        return waybillMapper.listRejectWaybillByOrderId(orderId);
     }
 
     private Integer getUserId() {

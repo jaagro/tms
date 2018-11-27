@@ -55,18 +55,18 @@
     </select>
     <select id="selectWaybillByCarrierStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
         select distinct * from (
-            select wb.*
-            from waybill wb
-            inner join waybill_tracking wt
-            on (wb.id=wt.waybill_id)
-            where wb.enabled = 1
-            and wb.waybill_status
-            in ('待出发','前往装货地','待装货','待送达','待签收')
-            <if test="driverId != null">
-                and wb.driver_id = #{driverId,jdbcType=INTEGER}
-            </if>
-            and wt.new_status='待出发'
-            order by wt.create_time DESC
+        select wb.*
+        from waybill wb
+        inner join waybill_tracking wt
+        on (wb.id=wt.waybill_id)
+        where wb.enabled = 1
+        and wb.waybill_status
+        in ('待出发','前往装货地','待装货','待送达','待签收')
+        <if test="driverId != null">
+            and wb.driver_id = #{driverId,jdbcType=INTEGER}
+        </if>
+        and wt.new_status='待出发'
+        order by wt.create_time DESC
         ) t
     </select>
     <select id="selectWaybillByStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
@@ -97,6 +97,16 @@
             and driver_id = #{driverId,jdbcType=INTEGER}
         </if>
         and waybill_status in ('前往装货地','待装货','待送达','待签收')
+    </select>
+    <select id="listRejectWaybillByOrderId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        select
+        count(1)
+        from waybill
+        where enabled = 1
+        <if test="orderId != null">
+            and order_id = #{orderId,jdbcType=INTEGER}
+        </if>
+        and waybill_status = '已拒单'
     </select>
     <select id="listWaybillIdByOrderId" resultType="java.lang.Integer">
         select id
@@ -162,7 +172,7 @@
         where
         order_id = #{orderId,jdbcType=INTEGER}
         and enabled = 1
-        and waybill_status not in ('待派单')
+        and waybill_status = '已派单'
     </select>
     <select id="listOverTimeWaybills" resultMap="BaseResultMap">
         select
