@@ -142,6 +142,10 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 List<GetWaybillItemsAppDto> waybillItems = waybillDto.getWaybillItems();
                 if (null != waybillItems && waybillItems.size() > 0) {
                     for (GetWaybillItemsAppDto waybillItem : waybillItems) {
+                        if(waybillItem.getUnloadSiteId()==0)
+                        {
+                            continue;
+                        }
                         if (null != waybillItem) {
                             ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
                             unloadSiteList.add(unloadSite);
