@@ -58,9 +58,6 @@ public class ReceiptController {
         if (waybill == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "不存在");
         }
-        if (!WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单未完成");
-        }
         GetWaybillDetailDto waybillDetailDto = waybillRefactorService.getWaybillDetailById(id);
         if (waybillDetailDto == null) {
             return BaseResponse.errorInstance("回单运单详情为空");
