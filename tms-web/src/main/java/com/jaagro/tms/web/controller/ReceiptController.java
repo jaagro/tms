@@ -59,7 +59,7 @@ public class ReceiptController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "不存在");
         }
         if (!judgeWaybillStatus(waybill.getWaybillStatus())){
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "未提貨");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "未提货");
         }
         GetWaybillDetailDto waybillDetailDto = waybillRefactorService.getWaybillDetailById(id);
         if (waybillDetailDto == null) {
@@ -82,7 +82,7 @@ public class ReceiptController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "不存在");
         }
         if (!judgeWaybillStatus(waybill.getWaybillStatus())){
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未提貨");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未提货");
         }
         boolean success = waybillService.updateLoadGoodsReceipt(updateWaybillGoodsDtoList);
         if (success) {
@@ -104,7 +104,7 @@ public class ReceiptController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "不存在");
         }
         if (!judgeWaybillStatus(waybill.getWaybillStatus())){
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未提貨");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未提货");
         }
         boolean success = waybillService.updateUnLoadGoodsReceipt(updateWaybillGoodsDtoList);
         if (success) {
