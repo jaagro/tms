@@ -1274,7 +1274,7 @@ public class WaybillServiceImpl implements WaybillService {
             for (UpdateWaybillGoodsDto waybillGoodsDto : updateWaybillGoodsDtoList) {
                 waybillId = waybillGoodsDto.getWaybillId();
                 Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
-                if (waybill == null || !WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
+                if (waybill == null) {
                     throw new RuntimeException("运单id=" + waybillId + "不存在");
                 }
                 WaybillItems waybillItems = new WaybillItems();
