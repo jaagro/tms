@@ -1287,7 +1287,7 @@ public class WaybillServiceImpl implements WaybillService {
                         .setUnloadSiteId(waybillGoodsDto.getUnloadSiteId())
                         .setWaybillId(waybillId)
                         .setEnabled(true)
-                        .setSignStatus(waybillGoodsDto.getSignStatus());
+                        .setSignStatus(waybillGoodsDto.getSignStatus() == null ? false : waybillGoodsDto.getSignStatus());
                 waybillItemsSet.add(waybillItems);
             }
             // 插入提货补录轨迹
