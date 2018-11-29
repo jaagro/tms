@@ -58,6 +58,9 @@ public class ReceiptController {
         if (waybill == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "不存在");
         }
+        if (!judgeWaybillStatus(waybill.getWaybillStatus())){
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "未提货");
+        }
         GetWaybillDetailDto waybillDetailDto = waybillRefactorService.getWaybillDetailById(id);
         if (waybillDetailDto == null) {
             return BaseResponse.errorInstance("回单运单详情为空");
@@ -73,6 +76,14 @@ public class ReceiptController {
         if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)){
             return BaseResponse.errorInstance("提货信息不能为空");
         }
+        Integer waybillId = updateWaybillGoodsDtoList.get(0).getWaybillId();
+        Waybill waybill = waybillMapperExt.selectByPrimaryKey(waybillId);
+        if (waybill == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "不存在");
+        }
+        if (!judgeWaybillStatus(waybill.getWaybillStatus())){
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未提货");
+        }
         boolean success = waybillService.updateLoadGoodsReceipt(updateWaybillGoodsDtoList);
         if (success) {
             return BaseResponse.successInstance("回单修改提货信息成功");
@@ -86,6 +97,14 @@ public class ReceiptController {
         log.info("updateUnLoadGoodsReceipt,{}", updateWaybillGoodsDtoList);
         if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)){
             return BaseResponse.errorInstance("卸货信息不能为空");
+        }
+        Integer waybillId = updateWaybillGoodsDtoList.get(0).getWaybillId();
+        Waybill waybill = waybillMapperExt.selectByPrimaryKey(waybillId);
+        if (waybill == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "不存在");
+        }
+        if (!judgeWaybillStatus(waybill.getWaybillStatus())){
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未提货");
         }
         boolean success = waybillService.updateUnLoadGoodsReceipt(updateWaybillGoodsDtoList);
         if (success) {
@@ -210,5 +229,12 @@ public class ReceiptController {
             }
         }
         return null;
+    }
+
+    private boolean judgeWaybillStatus(String waybillStatus) {
+        if(WaybillStatus.SIGN.equals(waybillStatus) || WaybillStatus.DELIVERY.equals(waybillStatus) || WaybillStatus.ACCOMPLISH.equals(waybillStatus)){
+            return true;
+        }
+        return false;
     }
 }

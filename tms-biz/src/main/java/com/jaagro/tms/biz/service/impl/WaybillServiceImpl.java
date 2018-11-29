@@ -1276,7 +1276,7 @@ public class WaybillServiceImpl implements WaybillService {
             for (UpdateWaybillGoodsDto waybillGoodsDto : updateWaybillGoodsDtoList) {
                 waybillId = waybillGoodsDto.getWaybillId();
                 Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
-                if (waybill == null || !WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
+                if (waybill == null) {
                     throw new RuntimeException("运单id=" + waybillId + "不存在");
                 }
                 WaybillItems waybillItems = new WaybillItems();
@@ -1289,7 +1289,7 @@ public class WaybillServiceImpl implements WaybillService {
                         .setUnloadSiteId(waybillGoodsDto.getUnloadSiteId())
                         .setWaybillId(waybillId)
                         .setEnabled(true)
-                        .setSignStatus(waybillGoodsDto.getSignStatus());
+                        .setSignStatus(waybillGoodsDto.getSignStatus() == null ? false : waybillGoodsDto.getSignStatus());
                 waybillItemsSet.add(waybillItems);
             }
             // 插入提货补录轨迹
