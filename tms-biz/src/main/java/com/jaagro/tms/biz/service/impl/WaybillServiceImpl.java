@@ -434,8 +434,7 @@ public class WaybillServiceImpl implements WaybillService {
                     if (null != waybillItems && waybillItems.size() > 0) {
                         for (GetWaybillItemsAppDto waybillItem : waybillItems) {
                             //删掉无计划时指定的默认卸货地和货物
-                            if(waybillItem.getUnloadSiteId()==0)
-                            {
+                            if (waybillItem.getUnloadSiteId() == 0) {
                                 continue;
                             }
                             List<ShowGoodsDto> goods = waybillItem.getGoods();
@@ -465,8 +464,7 @@ public class WaybillServiceImpl implements WaybillService {
             List<ShowSiteAppDto> unloadSiteList = new ArrayList<>();
             for (GetWaybillItemsAppDto waybillItem : waybillItems) {
                 //删掉无计划时指定的默认卸货地
-                if(waybillItem.getUnloadSiteId()==0)
-                {
+                if (waybillItem.getUnloadSiteId() == 0) {
                     continue;
                 }
                 List<ShowGoodsDto> goods = waybillItem.getGoods();
@@ -633,7 +631,11 @@ public class WaybillServiceImpl implements WaybillService {
         //客户签收
         if (WaybillStatus.SIGN.equals(dto.getWaybillStatus())) {
             List<ConfirmProductDto> unLoadSiteConfirmProductDtos = dto.getConfirmProductDtos();
-            ShowSiteDto showSiteById = customerClientService.getShowSiteById(unLoadSiteConfirmProductDtos.get(0).getUnLoadSiteId());
+            ShowSiteDto showSiteById = null;
+            if (!CollectionUtils.isEmpty(unLoadSiteConfirmProductDtos) && null != unLoadSiteConfirmProductDtos.get(0)) {
+                showSiteById = customerClientService.getShowSiteById(unLoadSiteConfirmProductDtos.get(0).getUnLoadSiteId());
+            }
+
             //查询出卸货地未签收的
             WaybillItems waybillItemsCondition = new WaybillItems();
             waybillItemsCondition
