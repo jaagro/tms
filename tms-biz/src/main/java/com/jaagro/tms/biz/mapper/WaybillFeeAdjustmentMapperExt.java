@@ -1,7 +1,6 @@
 package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.biz.entity.WaybillFeeAdjustment;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * @author tony
