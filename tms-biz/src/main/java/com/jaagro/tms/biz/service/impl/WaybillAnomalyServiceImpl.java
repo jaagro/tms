@@ -518,12 +518,14 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 waybillFeeAdjustmentMapper.insertSelective(waybillFeeAdjustment);
             } else {
                 waybillCustomerFees
-                        .setMoney(anomalyDeductCompensationDto.getMoney());
+                        .setMoney(anomalyDeductCompensationDto.getMoney())
+                        .setEnabled(true);
                 waybillCustomerFeeMapper.updateByPrimaryKeySelective(waybillCustomerFees);
                 waybillFeeAdjustment
                         .setAdjustType(costType)
                         .setRelevanceId(waybillCustomerFees.getId())
-                        .setRelevanceType(DeductCompensationRoleType.CUSTOMER);
+                        .setRelevanceType(DeductCompensationRoleType.CUSTOMER)
+                        .setEnabled(true);
                 waybillFeeAdjustmentMapper.updateByRelevanceId(waybillFeeAdjustment);
             }
         }
@@ -548,12 +550,14 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 waybillFeeAdjustmentMapper.insertSelective(waybillFeeAdjustment);
             } else {
                 waybillTruckFees
-                        .setMoney(anomalyDeductCompensationDto.getMoney());
+                        .setMoney(anomalyDeductCompensationDto.getMoney())
+                        .setEnabled(true);
                 waybillTruckFeeMapper.updateByPrimaryKeySelective(waybillTruckFees);
                 waybillFeeAdjustment
                         .setAdjustType(costType)
                         .setRelevanceId(waybillTruckFees.getId())
-                        .setRelevanceType(DeductCompensationRoleType.DRIVER);
+                        .setRelevanceType(DeductCompensationRoleType.DRIVER)
+                        .setEnabled(true);
                 waybillFeeAdjustmentMapper.updateByRelevanceId(waybillFeeAdjustment);
             }
         }

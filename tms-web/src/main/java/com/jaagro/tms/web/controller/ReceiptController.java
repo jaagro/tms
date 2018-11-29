@@ -6,7 +6,6 @@ import com.jaagro.tms.api.constant.TrackingType;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
-import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillRefactorService;
@@ -30,7 +29,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +57,7 @@ public class ReceiptController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "不存在");
         }
         if (!judgeWaybillStatus(waybill.getWaybillStatus())){
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "未提货");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "未提货不能进行回单处理");
         }
         GetWaybillDetailDto waybillDetailDto = waybillRefactorService.getWaybillDetailById(id);
         if (waybillDetailDto == null) {
@@ -82,7 +80,7 @@ public class ReceiptController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "不存在");
         }
         if (!judgeWaybillStatus(waybill.getWaybillStatus())){
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未提货");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未提货不能补录实提");
         }
         boolean success = waybillService.updateLoadGoodsReceipt(updateWaybillGoodsDtoList);
         if (success) {
@@ -103,8 +101,8 @@ public class ReceiptController {
         if (waybill == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "不存在");
         }
-        if (!judgeWaybillStatus(waybill.getWaybillStatus())){
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未提货");
+        if (!judgeUnloadWaybillStatus(waybill.getWaybillStatus())){
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未完成不能补录实卸");
         }
         boolean success = waybillService.updateUnLoadGoodsReceipt(updateWaybillGoodsDtoList);
         if (success) {
@@ -233,6 +231,13 @@ public class ReceiptController {
 
     private boolean judgeWaybillStatus(String waybillStatus) {
         if(WaybillStatus.SIGN.equals(waybillStatus) || WaybillStatus.DELIVERY.equals(waybillStatus) || WaybillStatus.ACCOMPLISH.equals(waybillStatus)){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean judgeUnloadWaybillStatus(String waybillStatus) {
+        if(WaybillStatus.ACCOMPLISH.equals(waybillStatus)){
             return true;
         }
         return false;
