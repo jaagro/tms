@@ -153,6 +153,9 @@ public class OrderController {
                 //装货地
                 SiteVo siteVo = new SiteVo();
                 BeanUtils.copyProperties(getOrderDto.getLoadSiteId(), siteVo);
+                if (siteVo.getDeptId() != null) {
+                    siteVo.setDeptName(userClientService.getDeptNameById(siteVo.getDeptId()));
+                }
                 orderVo.setLoadSiteId(siteVo);
                 //修改人
                 if (getOrderDto.getModifyUser() != null) {
