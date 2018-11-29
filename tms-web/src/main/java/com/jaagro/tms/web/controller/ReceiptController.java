@@ -207,15 +207,7 @@ public class ReceiptController {
             }
             wayBillReceiptsVo.setLoadImagesList(loadImagesList);
             // 图片排序,磅单在前
-            Collections.sort(unLoadImagesList, new Comparator<WaybillTrackingImagesVo>() {
-                @Override
-                public int compare(WaybillTrackingImagesVo o1, WaybillTrackingImagesVo o2) {
-                    if (o2.getImageType() != null && o1.getImageType() != null) {
-                        return o1.getImageType() - o2.getImageType();
-                    }
-                    return 0;
-                }
-            });
+            Collections.sort(unLoadImagesList,Comparator.comparingInt(WaybillTrackingImagesVo::getImageType));
             wayBillReceiptsVo.setUnLoadImagesList(unLoadImagesList);
         }
         return wayBillReceiptsVo;
@@ -256,5 +248,4 @@ public class ReceiptController {
         }
         return false;
     }
-
 }
