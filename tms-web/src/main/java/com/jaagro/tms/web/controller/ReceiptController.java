@@ -28,8 +28,11 @@ import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import sun.applet.Main;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -56,7 +59,7 @@ public class ReceiptController {
         if (waybill == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "不存在");
         }
-        if (!judgeWaybillStatus(waybill.getWaybillStatus())){
+        if (!judgeWaybillStatus(waybill.getWaybillStatus())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "未提货不能进行回单处理");
         }
         GetWaybillDetailDto waybillDetailDto = waybillRefactorService.getWaybillDetailById(id);
@@ -71,7 +74,7 @@ public class ReceiptController {
     @ApiOperation("回单修改提货信息")
     public BaseResponse updateLoadGoodsReceipt(@RequestBody @Validated ValidList<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList) {
         log.info("updateLoadGoodsReceipt,{}", updateWaybillGoodsDtoList);
-        if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)){
+        if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)) {
             return BaseResponse.errorInstance("提货信息不能为空");
         }
         Integer waybillId = updateWaybillGoodsDtoList.get(0).getWaybillId();
@@ -79,7 +82,7 @@ public class ReceiptController {
         if (waybill == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "不存在");
         }
-        if (!judgeWaybillStatus(waybill.getWaybillStatus())){
+        if (!judgeWaybillStatus(waybill.getWaybillStatus())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未提货不能补录实提");
         }
         boolean success = waybillService.updateLoadGoodsReceipt(updateWaybillGoodsDtoList);
@@ -93,7 +96,7 @@ public class ReceiptController {
     @ApiOperation("回单修改卸货信息")
     public BaseResponse updateUnLoadGoodsReceipt(@RequestBody @Validated ValidList<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList) {
         log.info("updateUnLoadGoodsReceipt,{}", updateWaybillGoodsDtoList);
-        if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)){
+        if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)) {
             return BaseResponse.errorInstance("卸货信息不能为空");
         }
         Integer waybillId = updateWaybillGoodsDtoList.get(0).getWaybillId();
@@ -101,7 +104,7 @@ public class ReceiptController {
         if (waybill == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "不存在");
         }
-        if (!judgeUnloadWaybillStatus(waybill.getWaybillStatus())){
+        if (!judgeUnloadWaybillStatus(waybill.getWaybillStatus())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未完成不能补录实卸");
         }
         boolean success = waybillService.updateUnLoadGoodsReceipt(updateWaybillGoodsDtoList);
@@ -203,10 +206,21 @@ public class ReceiptController {
                 }
             }
             wayBillReceiptsVo.setLoadImagesList(loadImagesList);
+            // 图片排序,磅单在前
+            Collections.sort(unLoadImagesList, new Comparator<WaybillTrackingImagesVo>() {
+                @Override
+                public int compare(WaybillTrackingImagesVo o1, WaybillTrackingImagesVo o2) {
+                    if (o2.getImageType() != null && o1.getImageType() != null) {
+                        return o1.getImageType() - o2.getImageType();
+                    }
+                    return 0;
+                }
+            });
             wayBillReceiptsVo.setUnLoadImagesList(unLoadImagesList);
         }
         return wayBillReceiptsVo;
     }
+
     private Integer getGoodsUnitByGoodsType(Integer goodsType) {
         if (goodsType != null && goodsType > 0) {
             switch (goodsType.toString()) {
@@ -230,16 +244,17 @@ public class ReceiptController {
     }
 
     private boolean judgeWaybillStatus(String waybillStatus) {
-        if(WaybillStatus.SIGN.equals(waybillStatus) || WaybillStatus.DELIVERY.equals(waybillStatus) || WaybillStatus.ACCOMPLISH.equals(waybillStatus)){
+        if (WaybillStatus.SIGN.equals(waybillStatus) || WaybillStatus.DELIVERY.equals(waybillStatus) || WaybillStatus.ACCOMPLISH.equals(waybillStatus)) {
             return true;
         }
         return false;
     }
 
     private boolean judgeUnloadWaybillStatus(String waybillStatus) {
-        if(WaybillStatus.ACCOMPLISH.equals(waybillStatus)){
+        if (WaybillStatus.ACCOMPLISH.equals(waybillStatus)) {
             return true;
         }
         return false;
     }
+
 }
