@@ -73,6 +73,12 @@ public class OrderServiceImpl implements OrderService {
         if (customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
             throw new RuntimeException("客户合同不存在");
         }
+        if (orderDto.getLoadSiteId() != null) {
+            ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
+            if (showSiteDto == null) {
+                throw new RuntimeException("装货地不存在");
+            }
+        }
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
         order.setCreatedUserId(currentUserService.getShowUser().getId());
