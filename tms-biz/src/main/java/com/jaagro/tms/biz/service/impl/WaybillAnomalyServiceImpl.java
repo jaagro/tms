@@ -234,6 +234,28 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 }
             }
         }
+        if (false == dto.getAdjustStatus()) {
+            WaybillCustomerFee waybillCustomerFee = waybillCustomerFeeMapper.selectByAnomalyId(dto.getAnomalId());
+            if (null != waybillCustomerFee) {
+                waybillCustomerFee.setEnabled(false);
+                waybillCustomerFeeMapper.updateByPrimaryKeySelective(waybillCustomerFee);
+                WaybillTruckFee waybillTruckFee = waybillTruckFeeMapper.selectByAnomalyId(dto.getAnomalId());
+                WaybillFeeAdjustment waybillTruckFeeAdjustment = new WaybillFeeAdjustment();
+                waybillTruckFeeAdjustment
+                        .setRelevanceId(waybillTruckFee.getId())
+                        .setRelevanceType(DeductCompensationRoleType.DRIVER)
+                        .setEnabled(false);
+                waybillFeeAdjustmentMapper.updateByRelevanceId(waybillTruckFeeAdjustment);
+                waybillTruckFee.setEnabled(false);
+                waybillTruckFeeMapper.updateByPrimaryKeySelective(waybillTruckFee);
+                WaybillFeeAdjustment waybillCustomerFeeAdjustment = new WaybillFeeAdjustment();
+                waybillCustomerFeeAdjustment
+                        .setRelevanceType(DeductCompensationRoleType.CUSTOMER)
+                        .setRelevanceId(waybillCustomerFee.getId())
+                        .setEnabled(false);
+                waybillFeeAdjustmentMapper.updateByRelevanceId(waybillCustomerFeeAdjustment);
+            }
+        }
     }
 
     /**
