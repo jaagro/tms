@@ -12,5 +12,11 @@
             and anomaly_id=#{anomalyId}
         </if>
     </select>
-
+    <select id="selectByAnomalyId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from waybill_truck_fee
+        where anomaly_id = #{anomalyId,jdbcType=INTEGER}
+        limit 1
+    </select>
 </mapper>

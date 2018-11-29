@@ -477,7 +477,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 .setWaybillId(dto.getWaybillId());
         //客户
         if (DeductCompensationRoleType.CUSTOMER.equals(anomalyDeductCompensationDto.getUserType())) {
-            //插入客户费用表
+            WaybillCustomerFee waybillCustomerFees = waybillCustomerFeeMapper.selectByAnomalyId(dto.getAnomalId());
             WaybillCustomerFee waybillCustomerFee = new WaybillCustomerFee();
             waybillCustomerFee
                     .setAnomalyId(dto.getAnomalId())
@@ -485,30 +485,55 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     .setEarningType(CostType.ADDITIONAL)
                     .setWaybillId(dto.getWaybillId())
                     .setCreatedUserId(currentUserId);
-            waybillCustomerFeeMapper.insertSelective(waybillCustomerFee);
-            //插入费用调整表
-            waybillFeeAdjustment
-                    .setAdjustType(costType)
-                    .setRelevanceId(waybillCustomerFee.getId())
-                    .setRelevanceType(DeductCompensationRoleType.CUSTOMER);
+            if (null == waybillCustomerFees) {
+                //插入客户费用表
+                waybillCustomerFeeMapper.insertSelective(waybillCustomerFee);
+                waybillFeeAdjustment
+                        .setAdjustType(costType)
+                        .setRelevanceId(waybillCustomerFee.getId())
+                        .setRelevanceType(DeductCompensationRoleType.CUSTOMER);
+                //插入费用调整表
+                waybillFeeAdjustmentMapper.insertSelective(waybillFeeAdjustment);
+            } else {
+                waybillCustomerFees
+                        .setMoney(anomalyDeductCompensationDto.getMoney());
+                waybillCustomerFeeMapper.updateByPrimaryKeySelective(waybillCustomerFees);
+                waybillFeeAdjustment
+                        .setAdjustType(costType)
+                        .setRelevanceId(waybillCustomerFees.getId())
+                        .setRelevanceType(DeductCompensationRoleType.CUSTOMER);
+                waybillFeeAdjustmentMapper.updateByRelevanceId(waybillFeeAdjustment);
+            }
         }
         //司机
         if (DeductCompensationRoleType.DRIVER.equals(anomalyDeductCompensationDto.getUserType())) {
-            //插入司机费用表
+            WaybillTruckFee waybillTruckFees = waybillTruckFeeMapper.selectByAnomalyId(dto.getAnomalId());
             WaybillTruckFee waybillTruckFee = new WaybillTruckFee();
             waybillTruckFee
                     .setAnomalyId(dto.getAnomalId())
-                    .setCostType(costType)
+                    .setCostType(CostType.ADDITIONAL)
                     .setWaybillId(dto.getWaybillId())
                     .setMoney(anomalyDeductCompensationDto.getMoney())
                     .setCreatedUserId(currentUserId);
-            waybillTruckFeeMapper.insertSelective(waybillTruckFee);
-            //插入费用调整表
-            waybillFeeAdjustment
-                    .setAdjustType(costType)
-                    .setRelevanceId(waybillTruckFee.getId())
-                    .setRelevanceType(DeductCompensationRoleType.DRIVER);
+            if (null == waybillTruckFees) {
+                //插入司机费用表
+                waybillTruckFeeMapper.insertSelective(waybillTruckFee);
+                waybillFeeAdjustment
+                        .setAdjustType(costType)
+                        .setRelevanceId(waybillTruckFee.getId())
+                        .setRelevanceType(DeductCompensationRoleType.DRIVER);
+                //插入费用调整表
+                waybillFeeAdjustmentMapper.insertSelective(waybillFeeAdjustment);
+            } else {
+                waybillTruckFees
+                        .setMoney(anomalyDeductCompensationDto.getMoney());
+                waybillTruckFeeMapper.updateByPrimaryKeySelective(waybillTruckFees);
+                waybillFeeAdjustment
+                        .setAdjustType(costType)
+                        .setRelevanceId(waybillTruckFees.getId())
+                        .setRelevanceType(DeductCompensationRoleType.DRIVER);
+                waybillFeeAdjustmentMapper.updateByRelevanceId(waybillFeeAdjustment);
+            }
         }
-        waybillFeeAdjustmentMapper.insertSelective(waybillFeeAdjustment);
     }
 }
