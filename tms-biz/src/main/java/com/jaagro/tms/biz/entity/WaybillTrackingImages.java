@@ -56,5 +56,10 @@ public class WaybillTrackingImages {
      */
     private Integer createUserId;
 
+    /**
+     * 区分装卸货地 1--装货地 2--卸货地
+     */
+    private Integer type;
+
 
 }
