@@ -457,6 +457,7 @@ public class WaybillServiceImpl implements WaybillService {
                 //提货单
                 waybillTrackingImages.setWaybillId(waybillId);
                 waybillTrackingImages.setSiteId(orders.getLoadSiteId());
+                waybillTrackingImages.setType(1);
                 List<GetWaybillTrackingImagesDto> loadSiteWaybillTrackingImages = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
                 for (GetWaybillTrackingImagesDto loadSiteWaybillTrackingImage : loadSiteWaybillTrackingImages) {
                     //替换单据url地址
@@ -485,6 +486,7 @@ public class WaybillServiceImpl implements WaybillService {
                 //卸货单
                 waybillTrackingImages.setWaybillId(waybillId);
                 waybillTrackingImages.setSiteId(waybillItem.getUnloadSiteId());
+                waybillTrackingImages.setType(2);
                 List<GetWaybillTrackingImagesDto> waybillTrackingImagesDtosList = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
                 for (GetWaybillTrackingImagesDto getWaybillTrackingImagesDto : waybillTrackingImagesDtosList) {
                     //替换单据地址

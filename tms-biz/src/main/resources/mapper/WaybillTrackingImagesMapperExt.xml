@@ -1,46 +1,52 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.jaagro.tms.biz.mapper.WaybillTrackingImagesMapperExt" >
+<mapper namespace="com.jaagro.tms.biz.mapper.WaybillTrackingImagesMapperExt">
 
-  <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.GetWaybillTrackingImagesDto" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="waybill_id" property="waybillId" jdbcType="INTEGER" />
-    <result column="site_id" property="siteId" jdbcType="INTEGER" />
-    <result column="waybill_tracking_id" property="waybillTrackingId" jdbcType="INTEGER" />
-    <result column="image_type" property="imageType" jdbcType="INTEGER" />
-    <result column="image_url" property="imageUrl" jdbcType="VARCHAR" />
-    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-    <result column="create_user_id" property="createUserId" jdbcType="INTEGER" />
-  </resultMap>
+    <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.GetWaybillTrackingImagesDto">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="waybill_id" property="waybillId" jdbcType="INTEGER"/>
+        <result column="site_id" property="siteId" jdbcType="INTEGER"/>
+        <result column="waybill_tracking_id" property="waybillTrackingId" jdbcType="INTEGER"/>
+        <result column="image_type" property="imageType" jdbcType="INTEGER"/>
+        <result column="image_url" property="imageUrl" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user_id" property="createUserId" jdbcType="INTEGER"/>
+    </resultMap>
 
-  <select id="listWaybillTrackingImage" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.WaybillTrackingImages" >
-    select
-    <include refid="Base_Column_List" />
-    from waybill_tracking_images
-    where 1=1
-    <if test="siteId != null" >
-      and site_id = #{siteId,jdbcType=INTEGER}
-    </if>
-    <if test="waybillId != null" >
-      and  waybill_id = #{waybillId,jdbcType=INTEGER}
-    </if>
-  </select>
-  <delete id="deleteByWaybillIdAndImageType">
+    <select id="listWaybillTrackingImage" resultMap="DetailInfo"
+            parameterType="com.jaagro.tms.biz.entity.WaybillTrackingImages">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill_tracking_images
+        where 1=1
+        <if test="waybillId != null">
+            and waybill_id = #{waybillId,jdbcType=INTEGER}
+        </if>
+        <if test="type == 1">
+            and site_id = #{siteId,jdbcType=INTEGER}
+        </if>
+        <if test="type == 2">
+            and (site_id = #{siteId,jdbcType=INTEGER} or site_id=0)
+        </if>
+    </select>
+    <delete id="deleteByWaybillIdAndImageType">
     delete from waybill_tracking_images
     where waybill_id = #{waybillId,jdbcType=INTEGER}
     and image_type = #{imageType,jdbcType=INTEGER}
   </delete>
-  <insert id="batchInsert" parameterType="com.jaagro.tms.biz.entity.WaybillTrackingImages">
-    insert into waybill_tracking_images (waybill_id, waybill_item_id,
-    site_id, waybill_tracking_id, image_type,
-    image_url, create_time, create_user_id
-    )
-    values
-    <foreach collection="imagesList" item="image" separator=",">
-      (#{image.waybillId,jdbcType=INTEGER}, #{image.waybillItemId,jdbcType=INTEGER},
-      #{image.siteId,jdbcType=INTEGER}, #{image.waybillTrackingId,jdbcType=INTEGER}, #{image.imageType,jdbcType=INTEGER},
-      #{image.imageUrl,jdbcType=VARCHAR}, #{image.createTime,jdbcType=TIMESTAMP}, #{image.createUserId,jdbcType=INTEGER}
-      )
-    </foreach>
-  </insert>
+    <insert id="batchInsert" parameterType="com.jaagro.tms.biz.entity.WaybillTrackingImages">
+        insert into waybill_tracking_images (waybill_id, waybill_item_id,
+        site_id, waybill_tracking_id, image_type,
+        image_url, create_time, create_user_id
+        )
+        values
+        <foreach collection="imagesList" item="image" separator=",">
+            (#{image.waybillId,jdbcType=INTEGER}, #{image.waybillItemId,jdbcType=INTEGER},
+            #{image.siteId,jdbcType=INTEGER}, #{image.waybillTrackingId,jdbcType=INTEGER},
+            #{image.imageType,jdbcType=INTEGER},
+            #{image.imageUrl,jdbcType=VARCHAR}, #{image.createTime,jdbcType=TIMESTAMP},
+            #{image.createUserId,jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
 </mapper>

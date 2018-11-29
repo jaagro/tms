@@ -177,10 +177,12 @@ public class OrderController {
                         GetOrderItemsVo itemsVo = new GetOrderItemsVo();
                         BeanUtils.copyProperties(itemsDto, itemsVo);
                         //卸货地转换
-                        SiteVo vo = new SiteVo();
-                        BeanUtils.copyProperties(itemsDto.getUnload(), vo);
-                        itemsVo.setUnload(vo);
-                        itemsVoList.add(itemsVo);
+                        if (itemsDto.getUnload() != null) {
+                            SiteVo vo = new SiteVo();
+                            BeanUtils.copyProperties(itemsDto.getUnload(), vo);
+                            itemsVo.setUnload(vo);
+                            itemsVoList.add(itemsVo);
+                        }
                         /**
                          * 订单需求明细Dto转换为Vo
                          */
