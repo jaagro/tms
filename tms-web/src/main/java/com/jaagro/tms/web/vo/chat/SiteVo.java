@@ -17,6 +17,11 @@ public class SiteVo implements Serializable {
     private Integer id;
 
     /**
+     * 归属网点
+     */
+    private Integer deptId;
+
+    /**
      * 装货地名称
      */
     private String siteName;
