@@ -299,7 +299,16 @@ public class WaybillServiceImpl implements WaybillService {
                 List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
                 getTrackingImagesDto.setImageUrl(urls.get(0).toString());
             }
-
+            // 图片排序 add by jia.yu 20181129
+            Collections.sort(imageList, new Comparator<GetTrackingImagesDto>() {
+                @Override
+                public int compare(GetTrackingImagesDto o1, GetTrackingImagesDto o2) {
+                    if (o1.getImageType() != null && o2.getImageType() != null){
+                        return o1.getImageType()-o2.getImageType();
+                    }
+                    return 0;
+                }
+            });
             getTrackingDto.setImageList(imageList);
         }
         Orders ordersData = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
