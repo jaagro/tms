@@ -28,4 +28,24 @@ public class ShowDriverDto implements Serializable {
      * 手机号码
      */
     private String phoneNumber;
+
+    /**
+     * 身份证号码
+     */
+    private String identityCard;
+
+    /**
+     * 驾照类型(1 A1 2 B1 3 C1 4 C2)
+     */
+    private Integer drivingLicense;
+
+    /**
+     * 驾驶证到期时间
+     */
+    private String expiryDrivingLicense;
+
+    /**
+     * 驾驶员帐号状态(0；未审核  1；审核未通过 2－停止合作，3－正常合作)
+     */
+    private Integer status;
 }

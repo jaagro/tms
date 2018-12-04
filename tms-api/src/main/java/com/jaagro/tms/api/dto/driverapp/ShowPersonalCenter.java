@@ -22,4 +22,13 @@ public class ShowPersonalCenter implements Serializable {
      * 账户信息 add by yj 20181112
      */
     private AccountReturnDto accountInfo;
+    /**
+     * 我的驾照
+     */
+    private ListDriverLicenseDto driverLicenseDto;
+    /**
+     * 车辆证件信息
+     */
+    private ListTruckLicenseDto truckLicenseDto;
+
 }
