@@ -853,8 +853,7 @@ public class WaybillServiceImpl implements WaybillService {
         try {
             date = simpleDateFormat.parse(stringDate);
         } catch (ParseException e) {
-            e.printStackTrace();
-            log.error("转化异常", e);
+            log.error("I stringToDate-{}", e);
         }
         return date;
     }
