@@ -9,7 +9,7 @@ import java.util.Date;
 @Accessors(chain = true)
 public class RepairRecord {
     /**
-     *
+     * 
      */
     private Integer id;
 
@@ -82,5 +82,10 @@ public class RepairRecord {
      * 修改人id
      */
     private Integer modifyUserId;
+
+    /**
+     * 车队id
+     */
+    private Integer truckTeamId;
 
 }

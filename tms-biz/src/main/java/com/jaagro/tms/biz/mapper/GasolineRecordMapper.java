@@ -1,8 +1,8 @@
 package com.jaagro.tms.biz.mapper;
 
-import com.jaagro.tms.biz.entity.RepairRecord;
+import com.jaagro.tms.biz.entity.GasolineRecord;
 
-public interface RepairRecordMapper {
+public interface GasolineRecordMapper {
     /**
      *
      * @mbggenerated 2018-12-05
@@ -13,29 +13,29 @@ public interface RepairRecordMapper {
      *
      * @mbggenerated 2018-12-05
      */
-    int insert(RepairRecord record);
+    int insert(GasolineRecord record);
 
     /**
      *
      * @mbggenerated 2018-12-05
      */
-    int insertSelective(RepairRecord record);
+    int insertSelective(GasolineRecord record);
 
     /**
      *
      * @mbggenerated 2018-12-05
      */
-    RepairRecord selectByPrimaryKey(Integer id);
+    GasolineRecord selectByPrimaryKey(Integer id);
 
     /**
      *
      * @mbggenerated 2018-12-05
      */
-    int updateByPrimaryKeySelective(RepairRecord record);
+    int updateByPrimaryKeySelective(GasolineRecord record);
 
     /**
      *
      * @mbggenerated 2018-12-05
      */
-    int updateByPrimaryKey(RepairRecord record);
+    int updateByPrimaryKey(GasolineRecord record);
 }

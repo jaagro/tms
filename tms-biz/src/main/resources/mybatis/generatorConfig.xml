@@ -57,7 +57,7 @@
         <!--<table tableName="rpt_customer_order_monthly" domainObjectName="RptCustomerOrderMonthly" enableCountByExample="true"-->
                <!--enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"-->
                <!--selectByExampleQueryId="false"></table>-->
-        <table tableName="repair_record" domainObjectName="RepairRecord" enableCountByExample="false"
+        <table tableName="gasoline_record" domainObjectName="GasolineRecord" enableCountByExample="false"
         enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
         selectByExampleQueryId="false"></table>
     </context>
