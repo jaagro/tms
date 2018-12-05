@@ -12,5 +12,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(description = "周边服务管理", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PeripheralAppController {
-    
+
 }
