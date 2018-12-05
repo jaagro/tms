@@ -787,19 +787,26 @@ public class WaybillServiceImpl implements WaybillService {
         showPersonalCenter.setAccountInfo(accountService.getByQueryAccountDto(queryAccountDto));
         // 我的驾驶证信息 add by @Gao. 20181204
         ListDriverLicenseDto listDriverLicenseDto = new ListDriverLicenseDto();
-        ShowDriverDto driver = driverClientService.getDriverReturnObject(currentUser.getId());
-        listDriverLicenseDto
-                .setStatus(driver.getStatus())
-                .setIdentityCard(driver.getIdentityCard())
-                .setDrivingLicense(driver.getDrivingLicense())
-                .setValidityInspection(driver.getExpiryDrivingLicense())
-                .setExpiryDrivingLicense(driver.getExpiryDrivingLicense())
-                .setAllocationTime(allocationTime(driver.getExpiryDrivingLicense()));
-        showPersonalCenter.setDriverLicenseDto(listDriverLicenseDto);
+        ShowDriverDto driver = driverClientService.getDriverReturnObject(currentUser == null ? null : currentUser.getId());
+        if (null != driver) {
+            listDriverLicenseDto
+                    .setStatus(driver.getStatus())
+                    .setIdentityCard(driver.getIdentityCard())
+                    .setDrivingLicense(driver.getDrivingLicense())
+                    .setValidityInspection(driver.getExpiryDrivingLicense())
+                    .setExpiryDrivingLicense(driver.getExpiryDrivingLicense())
+                    .setAllocationTime(allocationTime(driver.getExpiryDrivingLicense()));
+            showPersonalCenter.setDriverLicenseDto(listDriverLicenseDto);
+        }
         // 我的车辆信息
         ListTruckLicenseDto listTruckLicenseDto = new ListTruckLicenseDto();
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
-        BeanUtils.copyProperties(truckByToken, listDriverLicenseDto);
+        listTruckLicenseDto
+                .setTruckNumber(truckByToken.getTruckNumber())
+                .setBuyTime(truckByToken.getBuyTime())
+                .setExpiryDate(truckByToken.getExpiryDate())
+                .setExpiryAnnual(truckByToken.getExpiryAnnual())
+                .setTruckStatus(truckByToken.getTruckStatus());
         showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
         return showPersonalCenter;
     }
