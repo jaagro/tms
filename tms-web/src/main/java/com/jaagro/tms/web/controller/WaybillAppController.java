@@ -37,7 +37,7 @@ public class WaybillAppController {
         if (StringUtils.isEmpty(dto.getWaybillStatus())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单状态参数为空");
         }
-        PageInfo  waybill= waybillRefactorService.listWaybillByStatus(dto);
+        PageInfo waybill = waybillRefactorService.listWaybillByStatus(dto);
         return BaseResponse.successInstance(waybill);
     }
 
@@ -58,10 +58,10 @@ public class WaybillAppController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单单参数不能为空");
         }
         ShowWaybillTrackingDto showWaybillTrackingDto = waybillService.showWaybillTrucking(waybillId);
-        if (showWaybillTrackingDto != null){
+        if (showWaybillTrackingDto != null) {
             return BaseResponse.successInstance(showWaybillTrackingDto);
         }
-        return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(),"查询不到有效的运单");
+        return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "查询不到有效的运单");
     }
 
     @ApiOperation("运单轨迹更新")
@@ -129,7 +129,7 @@ public class WaybillAppController {
     }
 
     @ApiOperation("个人中心")
-    @GetMapping ("personalCenterApp")
+    @GetMapping("personalCenterApp")
     public BaseResponse personalCenterApp() {
         return BaseResponse.successInstance(waybillService.personalCenter());
     }

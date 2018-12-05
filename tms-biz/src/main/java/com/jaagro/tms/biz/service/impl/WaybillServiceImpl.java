@@ -29,6 +29,7 @@ import com.jaagro.tms.biz.service.*;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -40,6 +41,9 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -300,7 +304,7 @@ public class WaybillServiceImpl implements WaybillService {
                 getTrackingImagesDto.setImageUrl(urls.get(0).toString());
             }
             // 图片排序 add by jia.yu 20181129
-            Collections.sort(imageList,Comparator.comparingInt(GetTrackingImagesDto::getImageType));
+            Collections.sort(imageList, Comparator.comparingInt(GetTrackingImagesDto::getImageType));
             getTrackingDto.setImageList(imageList);
         }
         Orders ordersData = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
@@ -781,7 +785,78 @@ public class WaybillServiceImpl implements WaybillService {
                 .setUserId(currentUser == null ? null : currentUser.getId())
                 .setUserType(AccountUserType.DRIVER);
         showPersonalCenter.setAccountInfo(accountService.getByQueryAccountDto(queryAccountDto));
+        // 我的驾驶证信息 add by @Gao. 20181204
+        ListDriverLicenseDto listDriverLicenseDto = new ListDriverLicenseDto();
+        ShowDriverDto driver = driverClientService.getDriverReturnObject(currentUser == null ? null : currentUser.getId());
+        if (null != driver) {
+            listDriverLicenseDto
+                    .setStatus(driver.getStatus())
+                    .setIdentityCard(driver.getIdentityCard())
+                    .setDrivingLicense(driver.getDrivingLicense())
+                    .setValidityInspection(driver.getExpiryDrivingLicense())
+                    .setExpiryDrivingLicense(driver.getExpiryDrivingLicense())
+                    .setAllocationTime(allocationTime(driver.getExpiryDrivingLicense()));
+            showPersonalCenter.setDriverLicenseDto(listDriverLicenseDto);
+        }
+        // 我的车辆信息
+        ListTruckLicenseDto listTruckLicenseDto = new ListTruckLicenseDto();
+        ShowTruckDto truckByToken = truckClientService.getTruckByToken();
+        listTruckLicenseDto
+                .setTruckNumber(truckByToken.getTruckNumber())
+                .setBuyTime(truckByToken.getBuyTime())
+                .setExpiryDate(truckByToken.getExpiryDate())
+                .setExpiryAnnual(truckByToken.getExpiryAnnual())
+                .setTruckStatus(truckByToken.getTruckStatus());
+        showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
         return showPersonalCenter;
+    }
+
+    /**
+     * 驾驶证清分时间
+     *
+     * @param expiryDate
+     * @return
+     * @Author @Gao.
+     */
+    private static String allocationTime(String expiryDate) {
+        SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+        SimpleDateFormat monthDayFormat = new SimpleDateFormat("MM-dd");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dateString = null;
+        if (null != expiryDate) {
+            String currentStringDate = simpleDateFormat.format(new Date());
+            Date currentDate = stringToDate(currentStringDate);
+            Date drivingLicenseDate = stringToDate(expiryDate);
+            String year = yearFormat.format(new Date());
+            String monthDay = monthDayFormat.format(drivingLicenseDate);
+            String yearMonth = year + "-" + monthDay;
+            Date yearMonthDate = stringToDate(yearMonth);
+            if (currentDate.equals(yearMonthDate) || currentDate.before(yearMonthDate)) {
+                dateString = simpleDateFormat.format(yearMonthDate);
+            } else {
+                dateString = simpleDateFormat.format(DateUtils.addYears(yearMonthDate, 1));
+            }
+        }
+        return dateString;
+    }
+
+    /**
+     * 将时间字符串转化为Date
+     *
+     * @param stringDate
+     * @return
+     * @Author @Gao.
+     */
+    private static Date stringToDate(String stringDate) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = null;
+        try {
+            date = simpleDateFormat.parse(stringDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            log.error("转化异常", e);
+        }
+        return date;
     }
 
     /**

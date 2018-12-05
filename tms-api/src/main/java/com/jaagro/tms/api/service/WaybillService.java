@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
+import com.jaagro.tms.api.dto.truck.DriverReturnDto;
 import com.jaagro.tms.api.dto.waybill.*;
 
 import java.util.List;
