@@ -20,6 +20,7 @@ import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
  * @author baiyiran
  */
 @RestController
+@Slf4j
 @Api(description = "订单管理", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrderController {
 
@@ -62,6 +64,7 @@ public class OrderController {
     @ApiOperation("新增订单")
     @PostMapping("/order")
     public BaseResponse createOrder(@RequestBody CreateOrderDto orderDto) {
+        log.info("O createOrder orderDto={}",orderDto);
         if (StringUtils.isEmpty(orderDto.getCustomerId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
         }
@@ -89,6 +92,7 @@ public class OrderController {
     @ApiOperation("修改订单")
     @PutMapping("/order")
     public BaseResponse updateOrder(@RequestBody UpdateOrderDto orderDto) {
+        log.info("O updateOrder orderDto={}",orderDto);
         if (StringUtils.isEmpty(orderDto.getId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单id不能为空");
         }
@@ -114,6 +118,7 @@ public class OrderController {
     @ApiOperation("删除订单")
     @DeleteMapping("/order")
     public BaseResponse deleteOrder(@PathVariable Integer id) {
+        log.info("O deleteOrder id={}",id);
         Map<String, Object> result;
         try {
             result = orderService.deleteOrderById(id);
@@ -310,6 +315,7 @@ public class OrderController {
     @ApiOperation("取消订单")
     @PostMapping("/cancelOrders/{orderId}/{detailInfo}")
     public BaseResponse cancelOrders(@PathVariable("orderId") Integer orderId, @PathVariable("detailInfo") String detailInfo) {
+        log.info("O cancelOrders orderId={},detailInfo={}",orderId,detailInfo);
         if (StringUtils.isEmpty(orderId)) {
             return BaseResponse.idNull("订单id不能为空");
         }
