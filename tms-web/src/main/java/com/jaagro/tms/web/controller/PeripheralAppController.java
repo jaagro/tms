@@ -92,10 +92,16 @@ public class PeripheralAppController {
         return BaseResponse.successInstance(pageInfo);
     }
 
-    @ApiOperation("加油记录")
-    @PostMapping("/gasolineApplyApp")
-    public BaseResponse gasolineApplyApp(@RequestBody CreateGasolineRecordDto dto) {
+    @ApiOperation("加油申请")
+    @PostMapping("/gasolineApply")
+    public BaseResponse gasolineApply(@RequestBody CreateGasolineRecordDto dto) {
         gasolinePlusService.gasolineApply(dto);
+        return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
+    }
+
+    @ApiOperation("加油记录列表")
+    @PostMapping("/listGasolineRecords")
+    public BaseResponse listGasolineRecords(@RequestBody CreateGasolineRecordDto dto) {
         return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
     }
 }

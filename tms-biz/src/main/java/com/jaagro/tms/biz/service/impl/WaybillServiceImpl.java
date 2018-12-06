@@ -962,7 +962,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> upDateReceiptStatus(GetReceiptParamDto dto) {
-        log.info("upDateReceiptStatus={}", dto);
+        log.info("O upDateReceiptStatus:{}", dto);
         Integer waybillId = dto.getWaybillId();
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         UserInfo currentUser = currentUserService.getCurrentUser();

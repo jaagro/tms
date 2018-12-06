@@ -11,6 +11,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author @Gao.
  */
@@ -35,11 +37,25 @@ public class GasolinePlusServiceImpl implements GasolinePlusService {
         GasolineRecord gasolineRecord = new GasolineRecord();
         UserInfo currentUser = currentUserService.getCurrentUser();
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
-        gasolineRecord
-                .setDriverId(currentUser.getId() == null ? null : currentUser.getId())
-                .setTruckId(truckByToken.getId() == null ? null : truckByToken.getId())
-                .setTruckTeamId(truckByToken.getTruckTeamId() == null ? null : truckByToken.getTruckTeamId());
-        BeanUtils.copyProperties(dto, gasolineRecord);
-        gasolineRecordMapper.insert(gasolineRecord);
+        if (null != currentUser && null != truckByToken) {
+            dto
+                    .setDriverId(currentUser.getId())
+                    .setTruckId(truckByToken.getId())
+                    .setTruckTeamId(truckByToken.getTruckTeamId())
+                    .setTruckNumber(truckByToken.getTruckNumber());
+            BeanUtils.copyProperties(dto, gasolineRecord);
+        }
+        gasolineRecordMapper.insertSelective(gasolineRecord);
+    }
+
+    /**
+     * 加油记录表
+     *
+     * @param driverId
+     * @return
+     */
+    @Override
+    public List<CreateGasolineRecordDto> listGasolineRecords(Integer driverId) {
+        return null;
     }
 }
