@@ -1,6 +1,6 @@
 package com.jaagro.tms.biz.mapper;
 
-import com.jaagro.tms.biz.entity.RepairRecord;
+import com.jaagro.tms.api.entity.RepairRecord;
 
 public interface RepairRecordMapper {
     /**
