@@ -14,8 +14,6 @@ import java.util.Date;
 @Accessors(chain = true)
 public class CreateGasolineRecordDto implements Serializable {
 
-
-
     /**
      * 司机id
      */
