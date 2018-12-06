@@ -192,5 +192,10 @@
             #{waybill.id}
         </foreach>
     </update>
-
+    <select id="getWaybillById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill
+        where enabled=1 and waybill_status!='已作废' and id = #{id,jdbcType=INTEGER}
+    </select>
 </mapper>

@@ -115,4 +115,13 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @return
      */
     Integer listRejectWaybillByOrderId(@Param("orderId") Integer orderId);
+
+    /**
+     * 根据id 查询未删除 未作废的 运单
+     *
+     * @param id
+     * @return
+     */
+    Waybill getWaybillById(Integer id);
+
 }

@@ -1256,7 +1256,9 @@ public class WaybillServiceImpl implements WaybillService {
                 //如果当前运单有预警提示消息 则在运单列表显示预警小图标
                 if (!CollectionUtils.isEmpty(listPoundAnomaly())) {
                     if (listPoundAnomaly().contains(waybill.getId())) {
-                        waybillDto.setPoundAlert(true);
+                        if (pounderAlert(waybill.getId())) {
+                            waybillDto.setPoundAlert(true);
+                        }
                     }
                 }
             }
@@ -1647,7 +1649,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
-    private void pounderAlert(Integer waybillId) {
+    private boolean pounderAlert(Integer waybillId) {
         List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
         BigDecimal totalLoadWeight = BigDecimal.ZERO;
         BigDecimal totalUnloadWeight = BigDecimal.ZERO;
@@ -1678,8 +1680,10 @@ public class WaybillServiceImpl implements WaybillService {
                         .setBody("运单号为（" + waybillId + "）的运单，出现磅差异常，请及时处理。")
                         .setHeader("你有一个运单异常消息待接收");
                 messageMapper.insertSelective(message);
+                return true;
             }
         }
+        return false;
     }
 
     /**
