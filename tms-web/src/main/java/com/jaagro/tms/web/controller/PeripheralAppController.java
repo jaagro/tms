@@ -93,7 +93,7 @@ public class PeripheralAppController {
     }
 
     @ApiOperation("加油记录")
-    @GetMapping("/gasolineApplyApp")
+    @PostMapping("/gasolineApplyApp")
     public BaseResponse gasolineApplyApp(@RequestBody CreateGasolineRecordDto dto) {
         gasolinePlusService.gasolineApply(dto);
         return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
