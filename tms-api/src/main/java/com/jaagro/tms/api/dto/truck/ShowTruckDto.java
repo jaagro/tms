@@ -25,6 +25,10 @@ public class ShowTruckDto implements Serializable {
      * 车牌号码
      */
     private String truckNumber;
+    /**
+     * 关联车队表ID
+     */
+    private Integer truckTeamId;
 
     /**
      * 关联车辆类型ID

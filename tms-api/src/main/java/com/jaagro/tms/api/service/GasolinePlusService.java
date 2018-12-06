@@ -1,6 +1,6 @@
 package com.jaagro.tms.api.service;
 
-import com.jaagro.tms.api.dto.driverapp.CreateGasolineRecordDto;
+import com.jaagro.tms.api.dto.peripheral.CreateGasolineRecordDto;
 
 /**
  * @author @Gao.

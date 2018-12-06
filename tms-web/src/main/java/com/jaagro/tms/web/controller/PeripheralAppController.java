@@ -1,7 +1,7 @@
 package com.jaagro.tms.web.controller;
 
 import com.github.pagehelper.PageInfo;
-import com.jaagro.tms.api.dto.driverapp.CreateGasolineRecordDto;
+import com.jaagro.tms.api.dto.peripheral.CreateGasolineRecordDto;
 import com.jaagro.tms.api.dto.peripheral.ListRepairRecordCriteriaDto;
 import com.jaagro.tms.api.entity.RepairRecord;
 import com.jaagro.tms.api.service.GasolinePlusService;
@@ -92,7 +92,7 @@ public class PeripheralAppController {
         return BaseResponse.successInstance(pageInfo);
     }
 
-    @ApiOperation("我要加油")
+    @ApiOperation("加油记录")
     @GetMapping("/gasolineApplyApp")
     public BaseResponse gasolineApplyApp(@RequestBody CreateGasolineRecordDto dto) {
         gasolinePlusService.gasolineApply(dto);
