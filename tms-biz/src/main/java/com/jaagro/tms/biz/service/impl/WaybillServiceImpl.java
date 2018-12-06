@@ -1258,6 +1258,10 @@ public class WaybillServiceImpl implements WaybillService {
                     if (listPoundAnomaly().contains(waybill.getId())) {
                         if (pounderAlert(waybill.getId())) {
                             waybillDto.setPoundAlert(true);
+                        } else {
+                            Message message = new Message();
+                            message.setEnabled(false);
+                            messageMapper.updateByPrimaryKey(message);
                         }
                     }
                 }
