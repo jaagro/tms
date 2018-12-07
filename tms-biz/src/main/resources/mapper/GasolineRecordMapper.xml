@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jaagro.tms.biz.mapper.GasolineRecordMapperExt">
+    <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.GasolineRecord">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
+        <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
+        <result column="truck_team_id" property="truckTeamId" jdbcType="INTEGER"/>
+        <result column="truck_number" property="truckNumber" jdbcType="VARCHAR"/>
+        <result column="gasoline_company" property="gasolineCompany" jdbcType="VARCHAR"/>
+        <result column="gasoline_type" property="gasolineType" jdbcType="VARCHAR"/>
+        <result column="gasoline_station_name" property="gasolineStationName" jdbcType="VARCHAR"/>
+        <result column="instant_gasoline" property="instantGasoline" jdbcType="DECIMAL"/>
+        <result column="gasoline_litre" property="gasolineLitre" jdbcType="DECIMAL"/>
+        <result column="gasoline_amount" property="gasolineAmount" jdbcType="DECIMAL"/>
+        <result column="payment_method" property="paymentMethod" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user_id" property="createUserId" jdbcType="INTEGER"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
+        <result column="note" property="note" jdbcType="VARCHAR"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, driver_id, truck_id, truck_team_id, truck_number, gasoline_company, gasoline_type, 
+    gasoline_station_name, instant_gasoline, gasoline_litre, gasoline_amount, payment_method, 
+    create_time, create_user_id, modify_time, modify_user_id, note, enabled
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from gasoline_record
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from gasoline_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.jaagro.tms.biz.entity.GasolineRecord">
+    insert into gasoline_record (id, driver_id, truck_id, 
+      truck_team_id, truck_number, gasoline_company, 
+      gasoline_type, gasoline_station_name, instant_gasoline, 
+      gasoline_litre, gasoline_amount, payment_method, 
+      create_time, create_user_id, modify_time, 
+      modify_user_id, note, enabled
+      )
+    values (#{id,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER}, #{truckId,jdbcType=INTEGER}, 
+      #{truckTeamId,jdbcType=INTEGER}, #{truckNumber,jdbcType=VARCHAR}, #{gasolineCompany,jdbcType=VARCHAR}, 
+      #{gasolineType,jdbcType=VARCHAR}, #{gasolineStationName,jdbcType=VARCHAR}, #{instantGasoline,jdbcType=DECIMAL}, 
+      #{gasolineLitre,jdbcType=DECIMAL}, #{gasolineAmount,jdbcType=DECIMAL}, #{paymentMethod,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{createUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, 
+      #{modifyUserId,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.GasolineRecord">
+        insert into gasoline_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="driverId != null">
+                driver_id,
+            </if>
+            <if test="truckId != null">
+                truck_id,
+            </if>
+            <if test="truckTeamId != null">
+                truck_team_id,
+            </if>
+            <if test="truckNumber != null">
+                truck_number,
+            </if>
+            <if test="gasolineCompany != null">
+                gasoline_company,
+            </if>
+            <if test="gasolineType != null">
+                gasoline_type,
+            </if>
+            <if test="gasolineStationName != null">
+                gasoline_station_name,
+            </if>
+            <if test="instantGasoline != null">
+                instant_gasoline,
+            </if>
+            <if test="gasolineLitre != null">
+                gasoline_litre,
+            </if>
+            <if test="gasolineAmount != null">
+                gasoline_amount,
+            </if>
+            <if test="paymentMethod != null">
+                payment_method,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="createUserId != null">
+                create_user_id,
+            </if>
+            <if test="modifyTime != null">
+                modify_time,
+            </if>
+            <if test="modifyUserId != null">
+                modify_user_id,
+            </if>
+            <if test="note != null">
+                note,
+            </if>
+            <if test="enabled != null">
+                enabled,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="driverId != null">
+                #{driverId,jdbcType=INTEGER},
+            </if>
+            <if test="truckId != null">
+                #{truckId,jdbcType=INTEGER},
+            </if>
+            <if test="truckTeamId != null">
+                #{truckTeamId,jdbcType=INTEGER},
+            </if>
+            <if test="truckNumber != null">
+                #{truckNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="gasolineCompany != null">
+                #{gasolineCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="gasolineType != null">
+                #{gasolineType,jdbcType=VARCHAR},
+            </if>
+            <if test="gasolineStationName != null">
+                #{gasolineStationName,jdbcType=VARCHAR},
+            </if>
+            <if test="instantGasoline != null">
+                #{instantGasoline,jdbcType=DECIMAL},
+            </if>
+            <if test="gasolineLitre != null">
+                #{gasolineLitre,jdbcType=DECIMAL},
+            </if>
+            <if test="gasolineAmount != null">
+                #{gasolineAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="paymentMethod != null">
+                #{paymentMethod,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUserId != null">
+                #{createUserId,jdbcType=INTEGER},
+            </if>
+            <if test="modifyTime != null">
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyUserId != null">
+                #{modifyUserId,jdbcType=INTEGER},
+            </if>
+            <if test="note != null">
+                #{note,jdbcType=VARCHAR},
+            </if>
+            <if test="enabled != null">
+                #{enabled,jdbcType=BIT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.GasolineRecord">
+        update gasoline_record
+        <set>
+            <if test="driverId != null">
+                driver_id = #{driverId,jdbcType=INTEGER},
+            </if>
+            <if test="truckId != null">
+                truck_id = #{truckId,jdbcType=INTEGER},
+            </if>
+            <if test="truckTeamId != null">
+                truck_team_id = #{truckTeamId,jdbcType=INTEGER},
+            </if>
+            <if test="truckNumber != null">
+                truck_number = #{truckNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="gasolineCompany != null">
+                gasoline_company = #{gasolineCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="gasolineType != null">
+                gasoline_type = #{gasolineType,jdbcType=VARCHAR},
+            </if>
+            <if test="gasolineStationName != null">
+                gasoline_station_name = #{gasolineStationName,jdbcType=VARCHAR},
+            </if>
+            <if test="instantGasoline != null">
+                instant_gasoline = #{instantGasoline,jdbcType=DECIMAL},
+            </if>
+            <if test="gasolineLitre != null">
+                gasoline_litre = #{gasolineLitre,jdbcType=DECIMAL},
+            </if>
+            <if test="gasolineAmount != null">
+                gasoline_amount = #{gasolineAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="paymentMethod != null">
+                payment_method = #{paymentMethod,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUserId != null">
+                create_user_id = #{createUserId,jdbcType=INTEGER},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyUserId != null">
+                modify_user_id = #{modifyUserId,jdbcType=INTEGER},
+            </if>
+            <if test="note != null">
+                note = #{note,jdbcType=VARCHAR},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=BIT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.GasolineRecord">
+    update gasoline_record
+    set driver_id = #{driverId,jdbcType=INTEGER},
+      truck_id = #{truckId,jdbcType=INTEGER},
+      truck_team_id = #{truckTeamId,jdbcType=INTEGER},
+      truck_number = #{truckNumber,jdbcType=VARCHAR},
+      gasoline_company = #{gasolineCompany,jdbcType=VARCHAR},
+      gasoline_type = #{gasolineType,jdbcType=VARCHAR},
+      gasoline_station_name = #{gasolineStationName,jdbcType=VARCHAR},
+      instant_gasoline = #{instantGasoline,jdbcType=DECIMAL},
+      gasoline_litre = #{gasolineLitre,jdbcType=DECIMAL},
+      gasoline_amount = #{gasolineAmount,jdbcType=DECIMAL},
+      payment_method = #{paymentMethod,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_user_id = #{createUserId,jdbcType=INTEGER},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      modify_user_id = #{modifyUserId,jdbcType=INTEGER},
+      note = #{note,jdbcType=VARCHAR},
+      enabled = #{enabled,jdbcType=BIT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

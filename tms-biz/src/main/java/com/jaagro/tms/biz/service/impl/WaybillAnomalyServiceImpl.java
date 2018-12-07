@@ -69,9 +69,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         if (null == dto.getWaybillId()) {
             throw new RuntimeException("运单号不能为空！");
         }
-        Waybill waybill = waybillMapper.selectByPrimaryKey(dto.getWaybillId());
+        Waybill waybill = waybillMapper.getWaybillById(dto.getWaybillId());
         if (null == waybill) {
-            throw new RuntimeException("该运单号不存在！");
+            throw new RuntimeException("该运单号删除或不存在！");
         }
         //插入异常表
         WaybillAnomaly waybillAnomaly = new WaybillAnomaly();
@@ -122,9 +122,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      */
     @Override
     public ShowCustomerDto getCustomerByWaybillId(Integer waybillId) {
-        Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+        Waybill waybill = waybillMapper.getWaybillById(waybillId);
         if (null == waybill) {
-            throw new RuntimeException("该运单号不存在！");
+            return null;
         }
         //根据订单id 查询客户信息
         Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
