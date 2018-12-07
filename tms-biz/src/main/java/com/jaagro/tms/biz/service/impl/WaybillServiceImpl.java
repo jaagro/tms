@@ -710,7 +710,7 @@ public class WaybillServiceImpl implements WaybillService {
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
                 waybillMapper.updateByPrimaryKeySelective(waybill);
                 //磅单超过千分之二 进行于预警判断
-                pounderAlert(waybillId);
+                pounderAlert(waybillId, true);
                 //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
                 List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
                 int count = 0;
@@ -1256,7 +1256,7 @@ public class WaybillServiceImpl implements WaybillService {
                 //如果当前运单有预警提示消息 则在运单列表显示预警小图标
                 if (!CollectionUtils.isEmpty(listPoundAnomaly())) {
                     if (listPoundAnomaly().contains(waybill.getId())) {
-                        if (pounderAlert(waybill.getId())) {
+                        if (pounderAlert(waybill.getId(), false)) {
                             waybillDto.setPoundAlert(true);
                         }
                     }
@@ -1441,7 +1441,7 @@ public class WaybillServiceImpl implements WaybillService {
                 throw new RuntimeException("插入运单货物失败");
             }
             // 磅差异常提醒
-            pounderAlert(waybillId);
+            pounderAlert(waybillId, true);
         }
         return true;
     }
@@ -1651,7 +1651,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
-    private boolean pounderAlert(Integer waybillId) {
+    private boolean pounderAlert(Integer waybillId, boolean sendMessage) {
         List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
         BigDecimal totalLoadWeight = BigDecimal.ZERO;
         BigDecimal totalUnloadWeight = BigDecimal.ZERO;
@@ -1668,7 +1668,7 @@ public class WaybillServiceImpl implements WaybillService {
         BigDecimal weightDiff = totalLoadWeight.subtract(totalUnloadWeight).abs();
         if (totalLoadWeight.compareTo(BigDecimal.ZERO) != 0) {
             BigDecimal weightDivide = weightDiff.divide(totalLoadWeight, 6, BigDecimal.ROUND_HALF_UP);
-            if (DataConstant.DIFFWEIGHT.compareTo(weightDivide) == -1) {
+            if (DataConstant.DIFFWEIGHT.compareTo(weightDivide) == -1 && true == sendMessage) {
                 //插入预警提醒信息
                 Message message = new Message();
                 message
