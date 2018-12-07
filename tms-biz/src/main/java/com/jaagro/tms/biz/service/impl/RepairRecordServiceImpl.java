@@ -1,10 +1,15 @@
 package com.jaagro.tms.biz.service.impl;
 
 import com.github.pagehelper.PageInfo;
+import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.peripheral.ListRepairRecordCriteriaDto;
+import com.jaagro.tms.api.dto.truck.ShowDriverDto;
+import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.entity.RepairRecord;
 import com.jaagro.tms.api.service.RepairRecordService;
 import com.jaagro.tms.biz.mapper.RepairRecordMapperExt;
+import com.jaagro.tms.biz.service.DriverClientService;
+import com.jaagro.tms.biz.service.TruckClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +22,13 @@ public class RepairRecordServiceImpl implements RepairRecordService {
 
     @Autowired
     private RepairRecordMapperExt repairRecordMapper;
+    @Autowired
+    private CurrentUserService currentUserService;
+    @Autowired
+    private TruckClientService truckClientService;
+    @Autowired
+    private DriverClientService driverClientService;
+
     /**
      * 新增维修记录
      *
@@ -25,7 +37,24 @@ public class RepairRecordServiceImpl implements RepairRecordService {
      */
     @Override
     public int createRepairRecord(RepairRecord record) {
-        return 0;
+
+        UserInfo userInfo = currentUserService.getCurrentUser();
+        Integer userId = null == userInfo ? null : userInfo.getId();
+
+        ShowDriverDto driverDto = driverClientService.getDriverReturnObject(record.getDriverId());
+        record.setCreateUserId(userId);
+        //根据司机id获取该司机的车辆
+        ShowTruckDto truckDto = truckClientService.getTruckByToken();
+        if(null!=truckDto)
+        {
+            record.setTruckId(truckDto.getId())
+                    .setTruckNumber(truckDto.getTruckNumber())
+                    .setTruckTeamId(truckDto.getTruckTeamId())
+                    .setDriverName(driverDto.getName())
+                    .setDriverId(truckDto.getDrivers().get(0).getId());
+
+        }
+        return repairRecordMapper.insertSelective(record);
     }
 
     /**
@@ -36,7 +65,7 @@ public class RepairRecordServiceImpl implements RepairRecordService {
      */
     @Override
     public RepairRecord getRepairRecordById(Integer id) {
-        return null;
+        return repairRecordMapper.selectByPrimaryKey(id);
     }
 
     /**

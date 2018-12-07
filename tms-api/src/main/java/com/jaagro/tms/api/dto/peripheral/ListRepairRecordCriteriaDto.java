@@ -3,12 +3,14 @@ package com.jaagro.tms.api.dto.peripheral;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 /**
  * @Author Gavin
  */
 @Data
 @Accessors(chain = true)
-public class ListRepairRecordCriteriaDto {
+public class ListRepairRecordCriteriaDto implements Serializable {
 
     /**
      * 当前页
