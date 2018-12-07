@@ -2,6 +2,10 @@ package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.biz.entity.WashTruckRecord;
 
+/**
+ * @author yj
+ * @since 20181207
+ */
 public interface WashTruckRecordMapper {
     /**
      *

@@ -2,6 +2,10 @@ package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.biz.entity.WashTruckImage;
 
+/**
+ * @author yj
+ * @since 20181207
+ */
 public interface WashTruckImageMapper {
     /**
      *
