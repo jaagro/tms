@@ -1509,6 +1509,8 @@ public class WaybillServiceImpl implements WaybillService {
                 }
             }
             waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
+            // 磅差异常提醒
+            pounderAlert(waybillId,true);
         }
         return true;
     }
