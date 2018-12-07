@@ -1,5 +1,7 @@
 package com.jaagro.tms.web.controller;
 
+import com.jaagro.tms.api.constant.OrderStatus;
+import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.OrderService;
@@ -45,6 +47,10 @@ public class WaybillController {
     @PostMapping("/waybillPlan")
     public BaseResponse createWaybillPlan(@RequestBody CreateWaybillPlanDto waybillDto) {
         Integer orderId = waybillDto.getOrderId();
+        GetOrderDto orderDto = orderService.getOrderById(orderId);
+        if(null==orderDto.getOrderStatus()|| OrderStatus.CANCEL.equals(orderDto.getOrderStatus())){
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单已取消，不能配载");
+        }
         if (StringUtils.isEmpty(orderId)) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单id不能为空");
         }
@@ -121,6 +127,13 @@ public class WaybillController {
     @ApiOperation("创建运单")
     @PostMapping("/createWaybill")
     public BaseResponse createWaybill(@RequestBody List<CreateWaybillDto> waybillDtoList) {
+
+        Integer orderId = waybillDtoList.get(0).getOrderId();
+        GetOrderDto orderDto = orderService.getOrderById(orderId);
+        if(null==orderDto.getOrderStatus()|| OrderStatus.CANCEL.equals(orderDto.getOrderStatus())){
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单已取消，不能配载");
+        }
+
         Map<String, Object> result;
         try {
             result = waybillService.createWaybill(waybillDtoList);

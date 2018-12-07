@@ -25,4 +25,5 @@ public interface TruckClientService {
      */
     @GetMapping("/getTruckByToken")
     ShowTruckDto getTruckByToken();
+
 }
