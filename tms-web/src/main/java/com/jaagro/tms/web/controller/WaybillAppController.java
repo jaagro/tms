@@ -8,10 +8,13 @@ import com.jaagro.tms.api.dto.driverapp.ShowWaybillTrackingDto;
 import com.jaagro.tms.api.dto.waybill.GetReceiptMessageParamDto;
 import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
+import com.jaagro.tms.biz.service.impl.WaybillServiceImpl;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
@@ -30,6 +33,7 @@ public class WaybillAppController {
     private WaybillService waybillService;
     @Autowired
     private WaybillRefactorService waybillRefactorService;
+    private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
 
     @ApiOperation("我的运单")
     @PostMapping("/listWaybillApp")
@@ -112,7 +116,7 @@ public class WaybillAppController {
     @ApiOperation("接单控制")
     @PostMapping("/upDateReceiptStatusApp")
     public BaseResponse upDateReceiptStatusApp(@RequestBody GetReceiptParamDto dto) {
-
+        log.info("O upDateReceiptStatusApp :{}", dto);
         if (dto.getWaybillId() == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "接单参数不能为空");
         }

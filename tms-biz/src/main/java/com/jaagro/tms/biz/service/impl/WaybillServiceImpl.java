@@ -549,12 +549,12 @@ public class WaybillServiceImpl implements WaybillService {
                 .setCreateTime(new Date());
         //司机出发
         if (WaybillStatus.DEPART.equals(dto.getWaybillStatus())) {
-//            Waybill wb = new Waybill();
-//            wb.setDriverId(currentUser.getId());
-//            List<ListWaybillDto> waybills = waybillMapper.listCriteriaWaybill(wb);
-//            if (!CollectionUtils.isEmpty(waybills)) {
-//                return ServiceResult.toResult(SignStatusConstant.CRITERIA);
-//            }
+            Waybill wb = new Waybill();
+            wb.setDriverId(currentUser.getId());
+            List<ListWaybillDto> waybills = waybillMapper.listCriteriaWaybill(wb);
+            if (!CollectionUtils.isEmpty(waybills)) {
+                return ServiceResult.toResult(SignStatusConstant.CRITERIA);
+            }
             waybillTracking
                     .setNewStatus(WaybillStatus.ARRIVE_LOAD_SITE)
                     .setOldStatus(waybill.getWaybillStatus())
@@ -962,7 +962,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> upDateReceiptStatus(GetReceiptParamDto dto) {
-        log.info("upDateReceiptStatus={}", dto);
+        log.info("O upDateReceiptStatus:{}", dto);
         Integer waybillId = dto.getWaybillId();
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         UserInfo currentUser = currentUserService.getCurrentUser();
@@ -1258,6 +1258,10 @@ public class WaybillServiceImpl implements WaybillService {
                     if (listPoundAnomaly().contains(waybill.getId())) {
                         if (pounderAlert(waybill.getId())) {
                             waybillDto.setPoundAlert(true);
+                        } else {
+                            Message message = new Message();
+                            message.setEnabled(false);
+                            messageMapper.updateByPrimaryKey(message);
                         }
                     }
                 }
@@ -1440,6 +1444,8 @@ public class WaybillServiceImpl implements WaybillService {
             if (!insertGoodsNum.equals(waybillGoodsList.size())) {
                 throw new RuntimeException("插入运单货物失败");
             }
+            // 磅差异常提醒
+            pounderAlert(waybillId);
         }
         return true;
     }
@@ -1742,4 +1748,5 @@ public class WaybillServiceImpl implements WaybillService {
         }
         return true;
     }
+
 }

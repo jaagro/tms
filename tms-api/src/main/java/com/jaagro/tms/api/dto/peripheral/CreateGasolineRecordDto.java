@@ -1,4 +1,4 @@
-package com.jaagro.tms.api.dto.driverapp;
+package com.jaagro.tms.api.dto.peripheral;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -13,6 +13,21 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 public class CreateGasolineRecordDto implements Serializable {
+
+    /**
+     * 司机id
+     */
+    private Integer driverId;
+
+    /**
+     * 车辆id
+     */
+    private Integer truckId;
+
+    /**
+     * 车队id
+     */
+    private Integer truckTeamId;
 
     /**
      * 车牌号码
@@ -58,6 +73,21 @@ public class CreateGasolineRecordDto implements Serializable {
      * 创建时间
      */
     private Date createTime;
+
+    /**
+     * 创建人id
+     */
+    private Integer createUserId;
+
+    /**
+     * 修改时间
+     */
+    private Date modifyTime;
+
+    /**
+     * 修改人
+     */
+    private Integer modifyUserId;
 
     /**
      * 备注

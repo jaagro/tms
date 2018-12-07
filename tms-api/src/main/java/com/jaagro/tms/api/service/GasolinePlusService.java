@@ -1,6 +1,8 @@
 package com.jaagro.tms.api.service;
 
-import com.jaagro.tms.api.dto.driverapp.CreateGasolineRecordDto;
+import com.jaagro.tms.api.dto.peripheral.CreateGasolineRecordDto;
+
+import java.util.List;
 
 /**
  * @author @Gao.
@@ -8,9 +10,18 @@ import com.jaagro.tms.api.dto.driverapp.CreateGasolineRecordDto;
 public interface GasolinePlusService {
     /**
      * 我要加油服务
-     * @author @Gao.
      *
      * @param dto
+     * @author @Gao.
      */
     void gasolineApply(CreateGasolineRecordDto dto);
+
+    /**
+     * 加油记录表
+     *
+     * @param driverId
+     * @return
+     */
+    List<CreateGasolineRecordDto> listGasolineRecords(Integer driverId);
+
 }
