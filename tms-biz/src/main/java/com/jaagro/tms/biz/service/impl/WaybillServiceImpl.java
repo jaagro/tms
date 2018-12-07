@@ -93,6 +93,8 @@ public class WaybillServiceImpl implements WaybillService {
     private UserClientService userClientService;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private CustomerClientService customerService;
 
     /**
      * @param waybillDtoList
@@ -718,8 +720,13 @@ public class WaybillServiceImpl implements WaybillService {
                 //更改运单状态
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
                 waybillMapper.updateByPrimaryKeySelective(waybill);
+                ShowCustomerDto customerDto = customerService.getShowCustomerById(orders.getCustomerId());
                 //磅单超过千分之二 进行于预警判断
-                pounderAlert(waybillId);
+                boolean flag = !StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder());
+                //牧原客户手机提交 不做磅差判断
+                if (!flag) {
+                    pounderAlert(waybillId, true);
+                }
                 //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
                 List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
                 int count = 0;
@@ -1265,12 +1272,8 @@ public class WaybillServiceImpl implements WaybillService {
                 //如果当前运单有预警提示消息 则在运单列表显示预警小图标
                 if (!CollectionUtils.isEmpty(listPoundAnomaly())) {
                     if (listPoundAnomaly().contains(waybill.getId())) {
-                        if (pounderAlert(waybill.getId())) {
+                        if (pounderAlert(waybill.getId(), false)) {
                             waybillDto.setPoundAlert(true);
-                        } else {
-                            Message message = new Message();
-                            message.setEnabled(false);
-                            messageMapper.updateByPrimaryKey(message);
                         }
                     }
                 }
@@ -1454,7 +1457,7 @@ public class WaybillServiceImpl implements WaybillService {
                 throw new RuntimeException("插入运单货物失败");
             }
             // 磅差异常提醒
-            pounderAlert(waybillId);
+            pounderAlert(waybillId, true);
         }
         return true;
     }
@@ -1522,6 +1525,8 @@ public class WaybillServiceImpl implements WaybillService {
                 }
             }
             waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
+            // 磅差异常提醒
+            pounderAlert(waybillId, true);
         }
         return true;
     }
@@ -1664,7 +1669,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
-    private boolean pounderAlert(Integer waybillId) {
+    private boolean pounderAlert(Integer waybillId, boolean sendMessage) {
         List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
         BigDecimal totalLoadWeight = BigDecimal.ZERO;
         BigDecimal totalUnloadWeight = BigDecimal.ZERO;
@@ -1683,18 +1688,20 @@ public class WaybillServiceImpl implements WaybillService {
             BigDecimal weightDivide = weightDiff.divide(totalLoadWeight, 6, BigDecimal.ROUND_HALF_UP);
             if (DataConstant.DIFFWEIGHT.compareTo(weightDivide) == -1) {
                 //插入预警提醒信息
-                Message message = new Message();
-                message
-                        .setToUserId(0)
-                        .setReferId(waybillId)
-                        .setCreateUserId(0)
-                        .setMsgSource(MsgSource.WEB)
-                        .setFromUserId(0)
-                        .setFromUserType(0)
-                        .setMsgType(MsgType.POUNDS_DIFF)
-                        .setBody("运单号为（" + waybillId + "）的运单，出现磅差异常，请及时处理。")
-                        .setHeader("你有一个运单异常消息待接收");
-                messageMapper.insertSelective(message);
+                if (true == sendMessage) {
+                    Message message = new Message();
+                    message
+                            .setToUserId(0)
+                            .setReferId(waybillId)
+                            .setCreateUserId(0)
+                            .setMsgSource(MsgSource.WEB)
+                            .setFromUserId(0)
+                            .setFromUserType(0)
+                            .setMsgType(MsgType.POUNDS_DIFF)
+                            .setBody("运单号为（" + waybillId + "）的运单，出现磅差异常，请及时处理。")
+                            .setHeader("你有一个运单异常消息待接收");
+                    messageMapper.insertSelective(message);
+                }
                 return true;
             }
         }
