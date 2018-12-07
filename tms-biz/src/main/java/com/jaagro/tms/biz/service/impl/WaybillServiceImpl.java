@@ -1510,7 +1510,7 @@ public class WaybillServiceImpl implements WaybillService {
             }
             waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
             // 磅差异常提醒
-            pounderAlert(waybillId,true);
+            pounderAlert(waybillId, true);
         }
         return true;
     }
@@ -1670,20 +1670,22 @@ public class WaybillServiceImpl implements WaybillService {
         BigDecimal weightDiff = totalLoadWeight.subtract(totalUnloadWeight).abs();
         if (totalLoadWeight.compareTo(BigDecimal.ZERO) != 0) {
             BigDecimal weightDivide = weightDiff.divide(totalLoadWeight, 6, BigDecimal.ROUND_HALF_UP);
-            if (DataConstant.DIFFWEIGHT.compareTo(weightDivide) == -1 && true == sendMessage) {
+            if (DataConstant.DIFFWEIGHT.compareTo(weightDivide) == -1) {
                 //插入预警提醒信息
-                Message message = new Message();
-                message
-                        .setToUserId(0)
-                        .setReferId(waybillId)
-                        .setCreateUserId(0)
-                        .setMsgSource(MsgSource.WEB)
-                        .setFromUserId(0)
-                        .setFromUserType(0)
-                        .setMsgType(MsgType.POUNDS_DIFF)
-                        .setBody("运单号为（" + waybillId + "）的运单，出现磅差异常，请及时处理。")
-                        .setHeader("你有一个运单异常消息待接收");
-                messageMapper.insertSelective(message);
+                if (true == sendMessage) {
+                    Message message = new Message();
+                    message
+                            .setToUserId(0)
+                            .setReferId(waybillId)
+                            .setCreateUserId(0)
+                            .setMsgSource(MsgSource.WEB)
+                            .setFromUserId(0)
+                            .setFromUserType(0)
+                            .setMsgType(MsgType.POUNDS_DIFF)
+                            .setBody("运单号为（" + waybillId + "）的运单，出现磅差异常，请及时处理。")
+                            .setHeader("你有一个运单异常消息待接收");
+                    messageMapper.insertSelective(message);
+                }
                 return true;
             }
         }
