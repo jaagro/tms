@@ -3,6 +3,7 @@ package com.jaagro.tms.web.controller;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.CreateGasolineRecordDto;
 import com.jaagro.tms.api.dto.peripheral.ListRepairRecordCriteriaDto;
+import com.jaagro.tms.api.dto.peripheral.RepairRecordDto;
 import com.jaagro.tms.api.entity.RepairRecord;
 import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.api.service.RepairRecordService;
@@ -11,6 +12,7 @@ import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
@@ -32,19 +34,20 @@ public class PeripheralAppController {
     /**
      * 新增维续记录
      *
-     * @param record
+     * @param source
      * @return
      * @Author Gavin
      */
     @ApiOperation("新增维修记录")
     @PostMapping("/createRepairRecord")
-    public BaseResponse createRepairRecord(RepairRecord record) {
-        Assert.notNull(record.getTruckNumber(), "车牌号码不能为空");
-        Assert.notNull(record.getDriverId(), "司机ID不能为空");
+    public BaseResponse createRepairRecord(@RequestBody RepairRecordDto source) {
+        Assert.notNull(source.getTruckNumber(), "车牌号码不能为空");
         try {
+            RepairRecord record = new RepairRecord();
+            BeanUtils.copyProperties(source,record);
             repairRecordService.createRepairRecord(record);
         } catch (Exception ex) {
-            log.error("O-createRepairRecord,param: " + record, ex);
+            log.error("O-createRepairRecord,param: " + source, ex);
             return BaseResponse.errorInstance("失败");
         }
         return BaseResponse.successInstance("成功");
