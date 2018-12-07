@@ -93,6 +93,8 @@ public class WaybillServiceImpl implements WaybillService {
     private UserClientService userClientService;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private CustomerClientService customerService;
 
     /**
      * @param waybillDtoList
@@ -709,8 +711,13 @@ public class WaybillServiceImpl implements WaybillService {
                 //更改运单状态
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
                 waybillMapper.updateByPrimaryKeySelective(waybill);
+                ShowCustomerDto customerDto = customerService.getShowCustomerById(orders.getCustomerId());
                 //磅单超过千分之二 进行于预警判断
-                pounderAlert(waybillId, true);
+                boolean flag = !StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder());
+                //牧原客户手机提交 不做磅差判断
+                if (!flag) {
+                    pounderAlert(waybillId, true);
+                }
                 //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
                 List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
                 int count = 0;
