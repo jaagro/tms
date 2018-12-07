@@ -6,15 +6,19 @@ import com.jaagro.tms.api.dto.peripheral.ListRepairRecordCriteriaDto;
 import com.jaagro.tms.api.entity.RepairRecord;
 import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.api.service.RepairRecordService;
+import com.jaagro.tms.web.vo.peripheral.GasolineRecordListVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author @Gao.
@@ -101,7 +105,12 @@ public class PeripheralAppController {
 
     @ApiOperation("加油记录列表")
     @PostMapping("/listGasolineRecords")
-    public BaseResponse listGasolineRecords(@RequestBody CreateGasolineRecordDto dto) {
-        return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
+    public BaseResponse listGasolineRecords() {
+        List<CreateGasolineRecordDto> gasolineRecordDtos = gasolinePlusService.listGasolineRecords();
+        GasolineRecordListVo gasolineRecordListVo = new GasolineRecordListVo();
+        for (CreateGasolineRecordDto gasolineRecordDto : gasolineRecordDtos) {
+            BeanUtils.copyProperties(gasolineRecordDto, gasolineRecordListVo);
+        }
+        return BaseResponse.successInstance(gasolineRecordListVo);
     }
 }

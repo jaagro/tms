@@ -1,5 +1,6 @@
 package com.jaagro.tms.biz.mapper;
 
+import com.jaagro.tms.api.dto.peripheral.CreateGasolineRecordDto;
 import com.jaagro.tms.api.dto.peripheral.GasolineRecordCondtion;
 import com.jaagro.tms.biz.entity.GasolineRecord;
 
@@ -12,5 +13,5 @@ public interface GasolineRecordMapperExt extends GasolineRecordMapper {
      * @param condition
      * @return
      */
-    List<GasolineRecord> listGasolineRecordByCondition(GasolineRecordCondtion condition);
+    List<CreateGasolineRecordDto> listGasolineRecordByCondition(GasolineRecordCondtion condition);
 }

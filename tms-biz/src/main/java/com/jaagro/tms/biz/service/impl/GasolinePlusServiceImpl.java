@@ -2,6 +2,7 @@ package com.jaagro.tms.biz.service.impl;
 
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.peripheral.CreateGasolineRecordDto;
+import com.jaagro.tms.api.dto.peripheral.GasolineRecordCondtion;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.biz.entity.GasolineRecord;
@@ -51,12 +52,16 @@ public class GasolinePlusServiceImpl implements GasolinePlusService {
     /**
      * 加油记录表
      *
-     * @param driverId
      * @return
      */
     @Override
-    public List<CreateGasolineRecordDto> listGasolineRecords(Integer driverId) {
-
-        return null;
+    public List<CreateGasolineRecordDto> listGasolineRecords() {
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        GasolineRecordCondtion gasolineRecordCondtion = new GasolineRecordCondtion();
+        if (null != currentUser) {
+            gasolineRecordCondtion.setDriverId(currentUser.getId());
+        }
+        List<CreateGasolineRecordDto> gasolineRecordDtos = gasolineRecordMapper.listGasolineRecordByCondition(gasolineRecordCondtion);
+        return gasolineRecordDtos;
     }
 }

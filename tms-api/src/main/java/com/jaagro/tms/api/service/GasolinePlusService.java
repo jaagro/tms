@@ -19,9 +19,9 @@ public interface GasolinePlusService {
     /**
      * 加油记录表
      *
-     * @param driverId
+     * @param
      * @return
      */
-    List<CreateGasolineRecordDto> listGasolineRecords(Integer driverId);
+    List<CreateGasolineRecordDto> listGasolineRecords();
 
 }
