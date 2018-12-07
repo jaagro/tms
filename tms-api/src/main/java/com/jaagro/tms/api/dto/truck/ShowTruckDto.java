@@ -30,10 +30,6 @@ public class ShowTruckDto implements Serializable {
     private Integer truckTeamId;
 
     /**
-     * 关联车队表ID
-     */
-    private Integer truckTeamId;
-    /**
      * 关联车辆类型ID
      */
     private ListTruckTypeDto truckTypeId;
