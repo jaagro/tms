@@ -9,4 +9,13 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class GasolineRecordParam {
+    /**
+     * 起始页
+     */
+    private Integer pageNum;
+
+    /**
+     * 每页条数
+     */
+    private Integer pageSize;
 }

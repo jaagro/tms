@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @Data
 @Accessors(chain = true)
-public class GasolineRecordCondtion implements Serializable {
+public class GasolineRecordCondition implements Serializable {
     /**
      * 司机id
      */
