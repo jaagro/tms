@@ -2,6 +2,7 @@ package com.jaagro.tms.web.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.peripheral.CreateGasolineRecordDto;
+import com.jaagro.tms.api.dto.peripheral.CreateWashTruckRecordDto;
 import com.jaagro.tms.api.dto.peripheral.ListRepairRecordCriteriaDto;
 import com.jaagro.tms.api.dto.peripheral.RepairRecordDto;
 import com.jaagro.tms.api.entity.RepairRecord;
@@ -17,6 +18,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +35,8 @@ public class PeripheralAppController {
     private RepairRecordService repairRecordService;
     @Autowired
     private GasolinePlusService gasolinePlusService;
+    @Autowired
+    private WashTruckService washTruckService;
 
     /**
      * 新增维续记录
@@ -115,4 +119,11 @@ public class PeripheralAppController {
         }
         return BaseResponse.successInstance(gasolineRecordListVo);
     }
+
+    @ApiOperation("提交洗车记录")
+    @PostMapping("/createWashTruckRecord")
+    public BaseResponse createWashTruckRecord(@RequestBody @Validated CreateWashTruckRecordDto createWashTruckRecordDto){
+        return BaseResponse.successInstance("");
+    }
+
 }
