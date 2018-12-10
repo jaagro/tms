@@ -133,4 +133,9 @@ public interface WaybillMapperExt extends WaybillMapper {
      */
     Waybill getWaybillById(Integer id);
 
+    /**
+     * @param id
+     * @return
+     */
+    Integer listWaitWaybillByOrderId(Integer id);
 }

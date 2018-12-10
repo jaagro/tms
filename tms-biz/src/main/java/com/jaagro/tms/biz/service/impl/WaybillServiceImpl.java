@@ -1535,6 +1535,17 @@ public class WaybillServiceImpl implements WaybillService {
         return waybillMapper.listRejectWaybillByOrderId(orderId);
     }
 
+    /**
+     * 根据订单id查询待派单的运单
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public Integer listWaitWaybillByOrderId(Integer id) {
+        return waybillMapper.listWaitWaybillByOrderId(id);
+    }
+
     private Integer getUserId() {
         UserInfo userInfo = null;
         try {
