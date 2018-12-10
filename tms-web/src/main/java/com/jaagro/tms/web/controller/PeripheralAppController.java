@@ -1,16 +1,11 @@
 package com.jaagro.tms.web.controller;
 
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jaagro.tms.api.dto.peripheral.CreateGasolineRecordDto;
-import com.jaagro.tms.api.dto.peripheral.GasolineRecordParam;
-import com.jaagro.tms.api.dto.peripheral.CreateWashTruckRecordDto;
-import com.jaagro.tms.api.dto.peripheral.ListRepairRecordCriteriaDto;
-import com.jaagro.tms.api.dto.peripheral.RepairRecordDto;
+import com.jaagro.tms.api.dto.peripheral.*;
 import com.jaagro.tms.api.entity.RepairRecord;
 import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.api.service.RepairRecordService;
-import com.jaagro.tms.web.vo.peripheral.GasolineRecordListVo;
+import com.jaagro.tms.api.service.WashTruckService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -22,9 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author @Gao.
@@ -40,6 +32,7 @@ public class PeripheralAppController {
     private GasolinePlusService gasolinePlusService;
     @Autowired
     private WashTruckService washTruckService;
+
 
     /**
      * 新增维续记录
