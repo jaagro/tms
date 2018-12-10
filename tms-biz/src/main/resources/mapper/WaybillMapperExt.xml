@@ -82,7 +82,6 @@
         <if test="driverId != null">
             and wb.driver_id = #{driverId,jdbcType=INTEGER}
         </if>
-        and wb.driver_id = 249
         and wt.new_status='待出发'
         ) tab order by trackingDate desc
 
