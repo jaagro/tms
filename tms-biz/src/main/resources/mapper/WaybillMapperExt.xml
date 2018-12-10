@@ -69,6 +69,7 @@
         and enabled = 1
     </select>
     <select id="selectWaybillByCarrierStatus" resultMap="ResultMap" parameterType="com.jaagro.tms.biz.entity.Waybill">
+
         select distinct * from (
         select wb.id, wb.order_id, wb.load_site_id, wb.truck_team_contract_id, wb.waybill_status, wb.need_truck_type,
         wb.truck_id, wb.driver_id, wb.send_time, wb.distance, wb.create_time, wb.created_user_id, wb.modify_time,
