@@ -1564,10 +1564,10 @@ public class WaybillServiceImpl implements WaybillService {
         } catch (Exception ex) {
             ex.printStackTrace();
             log.error("获取当前用户失败：currentUserService.getCurrentUser()");
-            return 999999999;
+            return 1;
         }
         if (null == userInfo) {
-            return 999999999;
+            return 1;
         } else {
             return userInfo.getId();
         }

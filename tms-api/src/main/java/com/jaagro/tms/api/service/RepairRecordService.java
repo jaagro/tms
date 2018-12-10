@@ -29,5 +29,5 @@ public interface RepairRecordService {
      * @param criteriaDto
      * @return
      */
-    PageInfo listRepairRecordByCriteria(ListRepairRecordCriteriaDto criteriaDto);
+    PageInfo<RepairRecord> listRepairRecordByCriteria(ListRepairRecordCriteriaDto criteriaDto);
 }

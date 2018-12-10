@@ -242,7 +242,7 @@
 
     <update id="batchUpdateWaybillStatus" parameterType="java.util.List">
         update waybill
-        set waybill_status='已拒单',modify_time=now(),modify_user_id=99999999 where id in
+        set waybill_status='已拒单',modify_time=now(),modify_user_id=1 where id in
         <foreach collection="list" item="waybill" index="index" separator="," open="(" close=")">
             #{waybill.id}
         </foreach>
