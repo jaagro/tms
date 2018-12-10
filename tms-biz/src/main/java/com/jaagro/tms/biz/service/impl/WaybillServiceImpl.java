@@ -1574,7 +1574,7 @@ public class WaybillServiceImpl implements WaybillService {
         BigDecimal totalLoadWeight = BigDecimal.ZERO;
         BigDecimal totalUnloadWeight = BigDecimal.ZERO;
         for (GetWaybillGoodsDto waybillGoodsDto : waybillGoodsDtos) {
-            boolean flag = ((null != waybillGoodsDto.getUnloadWeight() || null != waybillGoodsDto.getLoadWeight())
+            boolean flag = (null != waybillGoodsDto.getUnloadWeight() && null != waybillGoodsDto.getLoadWeight()
                     && GoodsUnit.TON.equals(waybillGoodsDto.getGoodsUnit()));
             if (flag) {
                 //单位 羽 吨 累计提货重量

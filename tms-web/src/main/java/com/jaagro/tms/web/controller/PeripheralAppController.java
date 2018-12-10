@@ -117,4 +117,11 @@ public class PeripheralAppController {
         PageInfo<CreateGasolineRecordDto> gasolineRecordDtos = gasolinePlusService.listGasolineRecords(param);
         return BaseResponse.successInstance(gasolineRecordDtos);
     }
+
+    @ApiOperation("加油详情")
+    @PostMapping("/gasolineList/{gasolineListId}")
+    public BaseResponse gasolineList(@PathVariable("gasolineListId") Integer gasolineListId) {
+        return BaseResponse.successInstance(gasolinePlusService.gasolineList(gasolineListId));
+    }
+
 }

@@ -6,6 +6,12 @@
         select
         <include refid="Base_Column_List"/>
         from gasoline_record
-        where enabled=1 and driver_id = #{driverId,jdbcType=INTEGER}
+        where enabled=1
+        <if test="id!=null">
+            and id=#{id}
+        </if>
+        <if test="driverId!=null">
+            and driver_id = #{driverId,jdbcType=INTEGER}
+        </if>
     </select>
 </mapper>
