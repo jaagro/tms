@@ -15,14 +15,6 @@ import java.util.Map;
 public interface WaybillService {
 
     /**
-     * 根据状态查询我的运单信息
-     *
-     * @param dto
-     * @return
-     */
-    Map<String, Object> listWaybillByStatus(GetWaybillParamDto dto);
-
-    /**
      * 查询订单详情页
      *
      * @param waybillId

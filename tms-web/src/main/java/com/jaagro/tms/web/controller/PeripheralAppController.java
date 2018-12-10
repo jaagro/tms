@@ -1,7 +1,9 @@
 package com.jaagro.tms.web.controller;
 
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.peripheral.CreateGasolineRecordDto;
+import com.jaagro.tms.api.dto.peripheral.GasolineRecordParam;
 import com.jaagro.tms.api.dto.peripheral.ListRepairRecordCriteriaDto;
 import com.jaagro.tms.api.dto.peripheral.RepairRecordDto;
 import com.jaagro.tms.api.entity.RepairRecord;
@@ -19,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,7 +50,7 @@ public class PeripheralAppController {
         Assert.notNull(source.getTruckNumber(), "车牌号码不能为空");
         try {
             RepairRecord record = new RepairRecord();
-            BeanUtils.copyProperties(source,record);
+            BeanUtils.copyProperties(source, record);
             repairRecordService.createRepairRecord(record);
         } catch (Exception ex) {
             log.error("O-createRepairRecord,param: " + source, ex);
@@ -107,12 +110,11 @@ public class PeripheralAppController {
 
     @ApiOperation("加油记录列表")
     @PostMapping("/listGasolineRecords")
-    public BaseResponse listGasolineRecords() {
-        List<CreateGasolineRecordDto> gasolineRecordDtos = gasolinePlusService.listGasolineRecords();
-        GasolineRecordListVo gasolineRecordListVo = new GasolineRecordListVo();
-        for (CreateGasolineRecordDto gasolineRecordDto : gasolineRecordDtos) {
-            BeanUtils.copyProperties(gasolineRecordDto, gasolineRecordListVo);
+    public BaseResponse listGasolineRecords(@RequestBody GasolineRecordParam param) {
+        if (null != param.getPageNum() || null != param.getPageSize()) {
+            throw new RuntimeException("参数不能为空");
         }
-        return BaseResponse.successInstance(gasolineRecordListVo);
+        PageInfo<CreateGasolineRecordDto> gasolineRecordDtos = gasolinePlusService.listGasolineRecords(param);
+        return BaseResponse.successInstance(gasolineRecordDtos);
     }
 }
