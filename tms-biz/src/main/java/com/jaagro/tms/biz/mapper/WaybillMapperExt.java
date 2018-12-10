@@ -1,6 +1,7 @@
 package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.api.dto.driverapp.GetWaybillAppDto;
+import com.jaagro.tms.api.dto.driverapp.ListWaybillAppDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillCriteriaDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillDto;
 import com.jaagro.tms.biz.entity.Waybill;
@@ -43,7 +44,7 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @param record
      * @return
      */
-    List<GetWaybillAppDto> selectWaybillByCarrierStatus(Waybill record);
+    List<ListWaybillAppDto> selectWaybillByCarrierStatus(Waybill record);
 
     /**
      * 查询完成与取消的运单
@@ -52,6 +53,14 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @return
      */
     List<GetWaybillAppDto> selectWaybillByStatus(Waybill record);
+
+    /**
+     * 根据状态查询订单
+     *
+     * @param record
+     * @return
+     */
+    List<ListWaybillAppDto> getWaybillByStatus(Waybill record);
 
     /**
      * 根据orderId获取waybillId的list
@@ -124,4 +133,9 @@ public interface WaybillMapperExt extends WaybillMapper {
      */
     Waybill getWaybillById(Integer id);
 
+    /**
+     * @param id
+     * @return
+     */
+    Integer listWaitWaybillByOrderId(Integer id);
 }

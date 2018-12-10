@@ -94,6 +94,8 @@ public class ListOrderVo implements Serializable {
     private Integer waybillAlready;
 
     /**
+
+    /**
      * 已拒单
      */
     private Integer waybillReject;

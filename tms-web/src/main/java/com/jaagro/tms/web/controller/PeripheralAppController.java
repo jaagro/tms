@@ -1,13 +1,11 @@
 package com.jaagro.tms.web.controller;
 
 import com.github.pagehelper.PageInfo;
-import com.jaagro.tms.api.dto.peripheral.CreateGasolineRecordDto;
-import com.jaagro.tms.api.dto.peripheral.ListRepairRecordCriteriaDto;
-import com.jaagro.tms.api.dto.peripheral.RepairRecordDto;
+import com.jaagro.tms.api.dto.peripheral.*;
 import com.jaagro.tms.api.entity.RepairRecord;
 import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.api.service.RepairRecordService;
-import com.jaagro.tms.web.vo.peripheral.GasolineRecordListVo;
+import com.jaagro.tms.api.service.WashTruckService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -17,9 +15,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @author @Gao.
@@ -33,6 +30,9 @@ public class PeripheralAppController {
     private RepairRecordService repairRecordService;
     @Autowired
     private GasolinePlusService gasolinePlusService;
+    @Autowired
+    private WashTruckService washTruckService;
+
 
     /**
      * 新增维续记录
@@ -47,7 +47,7 @@ public class PeripheralAppController {
         Assert.notNull(source.getTruckNumber(), "车牌号码不能为空");
         try {
             RepairRecord record = new RepairRecord();
-            BeanUtils.copyProperties(source,record);
+            BeanUtils.copyProperties(source, record);
             repairRecordService.createRepairRecord(record);
         } catch (Exception ex) {
             log.error("O-createRepairRecord,param: " + source, ex);
@@ -107,12 +107,25 @@ public class PeripheralAppController {
 
     @ApiOperation("加油记录列表")
     @PostMapping("/listGasolineRecords")
-    public BaseResponse listGasolineRecords() {
-        List<CreateGasolineRecordDto> gasolineRecordDtos = gasolinePlusService.listGasolineRecords();
-        GasolineRecordListVo gasolineRecordListVo = new GasolineRecordListVo();
-        for (CreateGasolineRecordDto gasolineRecordDto : gasolineRecordDtos) {
-            BeanUtils.copyProperties(gasolineRecordDto, gasolineRecordListVo);
+    public BaseResponse listGasolineRecords(@RequestBody GasolineRecordParam param) {
+        if (null != param.getPageNum() || null != param.getPageSize()) {
+            throw new RuntimeException("参数不能为空");
         }
-        return BaseResponse.successInstance(gasolineRecordListVo);
+        PageInfo<CreateGasolineRecordDto> gasolineRecordDtos = gasolinePlusService.listGasolineRecords(param);
+        return BaseResponse.successInstance(gasolineRecordDtos);
     }
+
+    @ApiOperation("提交洗车记录")
+    @PostMapping("/createWashTruckRecord")
+    public BaseResponse createWashTruckRecord(@RequestBody @Validated CreateWashTruckRecordDto createWashTruckRecordDto){
+        return BaseResponse.successInstance("");
+    }
+
+
+    @ApiOperation("加油详情")
+    @PostMapping("/gasolineList/{gasolineListId}")
+    public BaseResponse gasolineList(@PathVariable("gasolineListId") Integer gasolineListId) {
+        return BaseResponse.successInstance(gasolinePlusService.gasolineList(gasolineListId));
+    }
+
 }
