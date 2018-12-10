@@ -70,6 +70,11 @@ public class ListOrderCriteriaDto implements Serializable {
     private Date loadEndTime;
 
     /**
+     * 部门编号
+     */
+    private Integer departId;
+
+    /**
      * 登陆人所在部门和下属所有部门
      */
     private List<Integer> departIds;

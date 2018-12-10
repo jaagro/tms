@@ -61,7 +61,11 @@ public class WaybillAnomalyController {
     @ApiOperation("根据运单Id显示客户信息")
     @GetMapping("getCustomerByWaybillId/{waybillId}")
     public BaseResponse getCustomerByWaybillId(@PathVariable Integer waybillId) {
-        return BaseResponse.successInstance(waybillAnomalyService.getCustomerByWaybillId(waybillId));
+        ShowCustomerDto customer = waybillAnomalyService.getCustomerByWaybillId(waybillId);
+        if (null == customer) {
+            return BaseResponse.successInstance(ResponseStatusCode.QUERY_DATA_ERROR);
+        }
+        return BaseResponse.successInstance(customer);
     }
 
     @ApiOperation("异常信息显示")

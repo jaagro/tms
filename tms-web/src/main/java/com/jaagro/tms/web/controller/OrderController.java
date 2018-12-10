@@ -4,7 +4,6 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
-import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.dto.waybill.ListWaybillDto;
 import com.jaagro.tms.api.service.OrderRefactorService;
@@ -21,6 +20,7 @@ import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
  * @author baiyiran
  */
 @RestController
+@Slf4j
 @Api(description = "订单管理", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrderController {
 
@@ -63,6 +64,7 @@ public class OrderController {
     @ApiOperation("新增订单")
     @PostMapping("/order")
     public BaseResponse createOrder(@RequestBody CreateOrderDto orderDto) {
+        log.info("O createOrder orderDto={}", orderDto);
         if (StringUtils.isEmpty(orderDto.getCustomerId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
         }
@@ -90,6 +92,7 @@ public class OrderController {
     @ApiOperation("修改订单")
     @PutMapping("/order")
     public BaseResponse updateOrder(@RequestBody UpdateOrderDto orderDto) {
+        log.info("O updateOrder orderDto={}", orderDto);
         if (StringUtils.isEmpty(orderDto.getId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单id不能为空");
         }
@@ -115,6 +118,7 @@ public class OrderController {
     @ApiOperation("删除订单")
     @DeleteMapping("/order")
     public BaseResponse deleteOrder(@PathVariable Integer id) {
+        log.info("O deleteOrder id={}", id);
         Map<String, Object> result;
         try {
             result = orderService.deleteOrderById(id);
@@ -154,6 +158,9 @@ public class OrderController {
                 //装货地
                 SiteVo siteVo = new SiteVo();
                 BeanUtils.copyProperties(getOrderDto.getLoadSiteId(), siteVo);
+                if (siteVo.getDeptId() != null) {
+                    siteVo.setDeptName(userClientService.getDeptNameById(siteVo.getDeptId()));
+                }
                 orderVo.setLoadSiteId(siteVo);
                 //修改人
                 if (getOrderDto.getModifyUser() != null) {
@@ -175,10 +182,12 @@ public class OrderController {
                         GetOrderItemsVo itemsVo = new GetOrderItemsVo();
                         BeanUtils.copyProperties(itemsDto, itemsVo);
                         //卸货地转换
-                        SiteVo vo = new SiteVo();
-                        BeanUtils.copyProperties(itemsDto.getUnload(), vo);
-                        itemsVo.setUnload(vo);
-                        itemsVoList.add(itemsVo);
+                        if (itemsDto.getUnload() != null) {
+                            SiteVo vo = new SiteVo();
+                            BeanUtils.copyProperties(itemsDto.getUnload(), vo);
+                            itemsVo.setUnload(vo);
+                            itemsVoList.add(itemsVo);
+                        }
                         /**
                          * 订单需求明细Dto转换为Vo
                          */
@@ -218,9 +227,17 @@ public class OrderController {
         if (StringUtils.isEmpty(criteriaDto.getPageSize())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
-        List<Integer> departIds = userClientService.getDownDepartment();
-        if (!CollectionUtils.isEmpty(departIds)) {
-            criteriaDto.setDepartIds(departIds);
+        //部门隔离
+        if (criteriaDto.getDepartId() != null) {
+            List<Integer> departIds = userClientService.getDownDepartmentByDeptId(criteriaDto.getDepartId());
+            if (!CollectionUtils.isEmpty(departIds)) {
+                criteriaDto.setDepartIds(departIds);
+            }
+        } else {
+            List<Integer> departIds = userClientService.getDownDepartment();
+            if (!CollectionUtils.isEmpty(departIds)) {
+                criteriaDto.setDepartIds(departIds);
+            }
         }
         //得到订单分页
         PageInfo pageInfo = orderService.listOrderByCriteria(criteriaDto);
@@ -234,14 +251,8 @@ public class OrderController {
                 orderVo
                         .setCustomerId(customerService.getShowCustomerById(orderDto.getCustomerId()))
                         .setCustomerContract(customerService.getShowCustomerContractById(orderDto.getCustomerContractId()))
-                        .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()));
-                //归属网点名称
-                ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
-                if (showSiteDto != null) {
-                    if (!StringUtils.isEmpty(showSiteDto.getDeptId())) {
-                        orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
-                    }
-                }
+                        .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()))
+                        .setDepartmentName(userClientService.getDeptNameById(orderDto.getDepartmentId()));
                 //创单人
                 UserInfo userInfo = authClientService.getUserInfoById(orderDto.getCreatedUserId(), "employee");
                 if (userInfo != null) {
@@ -304,6 +315,7 @@ public class OrderController {
     @ApiOperation("取消订单")
     @PostMapping("/cancelOrders/{orderId}/{detailInfo}")
     public BaseResponse cancelOrders(@PathVariable("orderId") Integer orderId, @PathVariable("detailInfo") String detailInfo) {
+        log.info("O cancelOrders orderId={},detailInfo={}", orderId, detailInfo);
         if (StringUtils.isEmpty(orderId)) {
             return BaseResponse.idNull("订单id不能为空");
         }
@@ -325,9 +337,16 @@ public class OrderController {
         //区分订单列表和待派单列表
         criteriaDto.setWaitOrders(OrderStatus.PLACE_ORDER);
         //部门隔离
-        List<Integer> departIds = userClientService.getDownDepartment();
-        if (!CollectionUtils.isEmpty(departIds)) {
-            criteriaDto.setDepartIds(departIds);
+        if (criteriaDto.getDepartId() != null) {
+            List<Integer> departIds = userClientService.getDownDepartmentByDeptId(criteriaDto.getDepartId());
+            if (!CollectionUtils.isEmpty(departIds)) {
+                criteriaDto.setDepartIds(departIds);
+            }
+        } else {
+            List<Integer> departIds = userClientService.getDownDepartment();
+            if (!CollectionUtils.isEmpty(departIds)) {
+                criteriaDto.setDepartIds(departIds);
+            }
         }
         //得到订单分页
         PageInfo pageInfo = orderService.listOrderByCriteria(criteriaDto);
@@ -341,14 +360,8 @@ public class OrderController {
                 orderVo
                         .setCustomerId(customerService.getShowCustomerById(orderDto.getCustomerId()))
                         .setCustomerContract(customerService.getShowCustomerContractById(orderDto.getCustomerContractId()))
-                        .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()));
-                //归属网点名称
-                ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
-                if (showSiteDto != null) {
-                    if (!StringUtils.isEmpty(showSiteDto.getDeptId())) {
-                        orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
-                    }
-                }
+                        .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()))
+                        .setDepartmentName(userClientService.getDeptNameById(orderDto.getDepartmentId()));
                 //创单人
                 UserInfo userInfo = authClientService.getUserInfoById(orderDto.getCreatedUserId(), "employee");
                 if (userInfo != null) {
@@ -360,11 +373,20 @@ public class OrderController {
                 List<ListWaybillDto> waybills = waybillService.listWaybillByOrderId(orderVo.getId());
                 if (waybills.size() > 0) {
                     orderVo.setWaybillCount(waybills.size());
+                    //待派单
+                    Integer countWait = waybillService.listWaitWaybillByOrderId(orderVo.getId());
+                    if (!StringUtils.isEmpty(countWait)) {
+                        orderVo.setWaybillWait(countWait);
+                    }
                     //已派单
                     List<ListWaybillDto> waitWaybills = waybillService.listWaybillWaitByOrderId(orderVo.getId());
-                    if (waitWaybills.size() > 0) {
+                    if (!CollectionUtils.isEmpty(waitWaybills)) {
                         orderVo.setWaybillAlready(waitWaybills.size());
-                        orderVo.setWaybillWait(orderVo.getWaybillCount() - orderVo.getWaybillAlready());
+                    }
+                    //已拒单
+                    Integer countWaybill = waybillService.listRejectWaybillByOrderId(orderDto.getId());
+                    if (!StringUtils.isEmpty(countWaybill)) {
+                        orderVo.setWaybillReject(countWaybill);
                     }
                 }
                 /**

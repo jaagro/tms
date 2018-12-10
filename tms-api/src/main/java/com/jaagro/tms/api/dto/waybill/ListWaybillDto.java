@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tony
@@ -25,6 +26,11 @@ public class ListWaybillDto implements Serializable {
      * 订单号
      */
     private Integer orderId;
+
+    /**
+     * 卸货地名称
+     */
+    private List<String> unloadName;
 
     /**
      * 客户名称

@@ -15,14 +15,6 @@ import java.util.Map;
 public interface WaybillService {
 
     /**
-     * 根据状态查询我的运单信息
-     *
-     * @param dto
-     * @return
-     */
-    Map<String, Object> listWaybillByStatus(GetWaybillParamDto dto);
-
-    /**
      * 查询订单详情页
      *
      * @param waybillId
@@ -165,12 +157,20 @@ public interface WaybillService {
     PageInfo listWaybillByCriteriaForWechat(ListWaybillCriteriaDto criteriaDto);
 
     /**
-     * 根据订单id查询 待派单的运单
+     * 根据订单id查询 已派单的运单
      *
      * @param id
      * @return
      */
     List<ListWaybillDto> listWaybillWaitByOrderId(Integer id);
+
+    /**
+     * 根据订单id查询已拒单的个数
+     *
+     * @param orderId
+     * @return
+     */
+    Integer listRejectWaybillByOrderId(Integer orderId);
 
     /**
      * 回单修改提货信息
@@ -183,6 +183,7 @@ public interface WaybillService {
 
     /**
      * 回单修改卸货信息
+     *
      * @param updateWaybillGoodsDtoList
      * @return
      * @author yj
@@ -191,6 +192,7 @@ public interface WaybillService {
 
     /**
      * 上传回单图片
+     *
      * @param uploadReceiptImageDto
      * @return
      * @author yj
@@ -201,9 +203,18 @@ public interface WaybillService {
     /**
      * 运单作废
      * 20181116
+     *
      * @param waybillId
      * @return
      * @Author gavin
      */
-   boolean abandonWaybill(Integer waybillId);
+    boolean abandonWaybill(Integer waybillId);
+
+    /**
+     * 根据订单id查询待派单的运单
+     *
+     * @param id
+     * @return
+     */
+    Integer listWaitWaybillByOrderId(Integer id);
 }

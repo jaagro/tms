@@ -7,7 +7,7 @@ package com.jaagro.tms.api.constant;
 public final class GoodsUnit {
 
     /**
-     * 羽 -- 拼音
+     * 羽/筐 -- 拼音
      */
     public static final Integer YU = 1;
 

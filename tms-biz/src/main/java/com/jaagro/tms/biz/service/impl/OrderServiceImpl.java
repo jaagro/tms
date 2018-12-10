@@ -7,6 +7,7 @@ import com.jaagro.tms.api.constant.GoodsUnit;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
@@ -18,6 +19,7 @@ import com.jaagro.tms.biz.service.AuthClientService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ import java.util.Map;
  * @author tony
  */
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -72,13 +75,19 @@ public class OrderServiceImpl implements OrderService {
         if (customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
             throw new RuntimeException("客户合同不存在");
         }
+        if (orderDto.getLoadSiteId() != null) {
+            ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
+            if (showSiteDto == null) {
+                throw new RuntimeException("装货地不存在");
+            }
+        }
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
         order.setCreatedUserId(currentUserService.getShowUser().getId());
         order.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
         this.ordersMapper.insertSelective(order);
         //如果是牧源客户，那么设置默认的卸货地、卸货时间、货物，装货地前端选择
-        if(!StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder())){
+        if (!StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder())) {
             List<CreateOrderItemsDto> orderItems = new ArrayList<>();
             CreateOrderItemsDto itemsDto = new CreateOrderItemsDto();
             itemsDto.setUnloadId(0);
@@ -124,6 +133,12 @@ public class OrderServiceImpl implements OrderService {
         Orders o = ordersMapper.selectByPrimaryKey(orderDto.getId());
         if (o == null) {
             throw new NullPointerException("订单查询无数据");
+        }
+        if (orderDto.getLoadSiteId() != null) {
+            ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
+            if (showSiteDto == null) {
+                throw new RuntimeException("装货地不存在");
+            }
         }
         if (!o.getOrderStatus().equals(OrderStatus.PLACE_ORDER)) {
             throw new RuntimeException("在" + o.getOrderStatus() + "的订单状态不允许修改");
@@ -254,6 +269,7 @@ public class OrderServiceImpl implements OrderService {
                 .setOrderStatus(OrderStatus.CANCEL)
                 .setModifyUserId(this.currentUserService.getCurrentUser().getId())
                 .setModifyTime(new Date());
+        log.info("O updateByPrimaryKeySelective orderId={},detailInfo={},orders={}",orderId,detailInfo,orders);
         this.ordersMapper.updateByPrimaryKeySelective(orders);
         // 订单明细
         List<OrderItems> orderItems = this.orderItemsMapper.listByOrderId(orders.getId());

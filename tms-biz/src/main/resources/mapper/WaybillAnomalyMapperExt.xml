@@ -42,10 +42,10 @@
             and wa.audit_status in("已通过","待审核","已拒绝")
         </if>
         <if test="audit == 1">
-            order by FIELD(audit_status,'待审核','已通过','已拒绝')
+            order by FIELD(audit_status,'待审核','已通过','已拒绝'),wa.audit_time desc
         </if>
         <if test="audit == 2">
-            order by FIELD(processing_status,'待处理','已处理','审核中','已结束','已作废')
+            order by FIELD(processing_status,'待处理','已处理','审核中','已结束','已作废') ,wa.processor_time desc
         </if>
 
     </select>

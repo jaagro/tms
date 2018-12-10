@@ -1,11 +1,11 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.constant.GoodsUnit;
 import com.jaagro.tms.api.constant.TrackingType;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
-import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.WaybillRefactorService;
@@ -28,9 +28,11 @@ import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import sun.applet.Main;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -57,8 +59,8 @@ public class ReceiptController {
         if (waybill == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "不存在");
         }
-        if (!WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单未完成");
+        if (!judgeWaybillStatus(waybill.getWaybillStatus())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + id + "未提货不能进行回单处理");
         }
         GetWaybillDetailDto waybillDetailDto = waybillRefactorService.getWaybillDetailById(id);
         if (waybillDetailDto == null) {
@@ -72,8 +74,16 @@ public class ReceiptController {
     @ApiOperation("回单修改提货信息")
     public BaseResponse updateLoadGoodsReceipt(@RequestBody @Validated ValidList<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList) {
         log.info("updateLoadGoodsReceipt,{}", updateWaybillGoodsDtoList);
-        if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)){
+        if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)) {
             return BaseResponse.errorInstance("提货信息不能为空");
+        }
+        Integer waybillId = updateWaybillGoodsDtoList.get(0).getWaybillId();
+        Waybill waybill = waybillMapperExt.selectByPrimaryKey(waybillId);
+        if (waybill == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "不存在");
+        }
+        if (!judgeWaybillStatus(waybill.getWaybillStatus())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未提货不能补录实提");
         }
         boolean success = waybillService.updateLoadGoodsReceipt(updateWaybillGoodsDtoList);
         if (success) {
@@ -86,8 +96,16 @@ public class ReceiptController {
     @ApiOperation("回单修改卸货信息")
     public BaseResponse updateUnLoadGoodsReceipt(@RequestBody @Validated ValidList<UpdateWaybillGoodsDto> updateWaybillGoodsDtoList) {
         log.info("updateUnLoadGoodsReceipt,{}", updateWaybillGoodsDtoList);
-        if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)){
+        if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)) {
             return BaseResponse.errorInstance("卸货信息不能为空");
+        }
+        Integer waybillId = updateWaybillGoodsDtoList.get(0).getWaybillId();
+        Waybill waybill = waybillMapperExt.selectByPrimaryKey(waybillId);
+        if (waybill == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "不存在");
+        }
+        if (!judgeUnloadWaybillStatus(waybill.getWaybillStatus())) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未完成不能补录实卸");
         }
         boolean success = waybillService.updateUnLoadGoodsReceipt(updateWaybillGoodsDtoList);
         if (success) {
@@ -112,6 +130,8 @@ public class ReceiptController {
         wayBillReceiptsVo.setCustomerId(waybillDetailDto.getLoadSiteDto() == null ? null : waybillDetailDto.getLoadSiteDto().getCustomerId());
         //货物类型
         wayBillReceiptsVo.setGoodsType(waybillDetailDto.getGoodType());
+        // 货物单位
+        wayBillReceiptsVo.setGoodsUnit(getGoodsUnitByGoodsType(waybillDetailDto.getGoodType()));
         //运单卸货地
         List<GetWaybillItemDto> waybillItems = waybillDetailDto.getWaybillItems();
         //运单货物信息
@@ -186,8 +206,46 @@ public class ReceiptController {
                 }
             }
             wayBillReceiptsVo.setLoadImagesList(loadImagesList);
+            // 图片排序,磅单在前
+            Collections.sort(unLoadImagesList,Comparator.comparingInt(WaybillTrackingImagesVo::getImageType));
             wayBillReceiptsVo.setUnLoadImagesList(unLoadImagesList);
         }
         return wayBillReceiptsVo;
+    }
+
+    private Integer getGoodsUnitByGoodsType(Integer goodsType) {
+        if (goodsType != null && goodsType > 0) {
+            switch (goodsType.toString()) {
+                case "1":
+                    return GoodsUnit.YU;
+                case "2":
+                    return GoodsUnit.TON;
+                case "3":
+                    return GoodsUnit.TOU;
+                case "4":
+                    return GoodsUnit.TOU;
+                case "5":
+                    return GoodsUnit.TOU;
+                case "6":
+                    return GoodsUnit.TOU;
+                default:
+                    return null;
+            }
+        }
+        return null;
+    }
+
+    private boolean judgeWaybillStatus(String waybillStatus) {
+        if (WaybillStatus.SIGN.equals(waybillStatus) || WaybillStatus.DELIVERY.equals(waybillStatus) || WaybillStatus.ACCOMPLISH.equals(waybillStatus)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean judgeUnloadWaybillStatus(String waybillStatus) {
+        if (WaybillStatus.ACCOMPLISH.equals(waybillStatus)) {
+            return true;
+        }
+        return false;
     }
 }

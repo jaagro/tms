@@ -29,6 +29,7 @@ import com.jaagro.tms.biz.service.*;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -40,6 +41,9 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -89,6 +93,8 @@ public class WaybillServiceImpl implements WaybillService {
     private UserClientService userClientService;
     @Autowired
     private AccountService accountService;
+    @Autowired
+    private CustomerClientService customerService;
 
     /**
      * @param waybillDtoList
@@ -237,6 +243,10 @@ public class WaybillServiceImpl implements WaybillService {
         List<GetWaybillItemDto> getWaybillItemsDtoList = new ArrayList<>();
         List<WaybillItems> waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybill.getId());
         for (WaybillItems items : waybillItemsList) {
+            //删掉无计划时指定的默认卸货地
+            if (items.getUnloadSiteId() == 0) {
+                continue;
+            }
             GetWaybillItemDto getWaybillItemsDto = new GetWaybillItemDto();
             BeanUtils.copyProperties(items, getWaybillItemsDto);
             List<GetWaybillGoodsDto> getWaybillGoodsDtoList = new LinkedList<>();
@@ -295,7 +305,8 @@ public class WaybillServiceImpl implements WaybillService {
                 List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
                 getTrackingImagesDto.setImageUrl(urls.get(0).toString());
             }
-
+            // 图片排序 add by jia.yu 20181129
+            Collections.sort(imageList, Comparator.comparingInt(GetTrackingImagesDto::getImageType));
             getTrackingDto.setImageList(imageList);
         }
         Orders ordersData = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
@@ -346,47 +357,6 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     /**
-     * 根据状态查询我的运单信息
-     *
-     * @param dto
-     * @return
-     * @author @Gao.
-     */
-    @Override
-    public Map<String, Object> listWaybillByStatus(GetWaybillParamDto dto) {
-
-        UserInfo currentUser = currentUserService.getCurrentUser();
-        Integer currentUserId = currentUser.getId();
-        Waybill waybill = new Waybill();
-        waybill.setDriverId(currentUserId);
-        List<ListWaybillAppDto> listWaybillAppDtos;
-        //承运中订单
-        if (WaybillConstant.CARRIER.equals(dto.getWaybillStatus())) {
-            PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-            List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByCarrierStatus(waybill);
-            listWaybillAppDtos = listWaybill(waybillDtos, currentUserId);
-            return ServiceResult.toResult(new PageInfo<>(listWaybillAppDtos));
-        }
-        //已完成运单
-        if (WaybillConstant.ACCOMPLISH.equals(dto.getWaybillStatus())) {
-            PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-            waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
-            List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByStatus(waybill);
-            listWaybillAppDtos = listWaybill(waybillDtos, currentUserId);
-            return ServiceResult.toResult(new PageInfo<>(listWaybillAppDtos));
-        }
-        //取消运单
-        if (WaybillConstant.CANCEL.equals(dto.getWaybillStatus())) {
-            PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-            waybill.setWaybillStatus(WaybillStatus.CANCEL);
-            List<GetWaybillAppDto> waybillDtos = waybillMapper.selectWaybillByStatus(waybill);
-            listWaybillAppDtos = listWaybill(waybillDtos, currentUserId);
-            return ServiceResult.toResult(new PageInfo<>(listWaybillAppDtos));
-        }
-        return ServiceResult.error(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "没有相关运单");
-    }
-
-    /**
      * 运单详情页
      *
      * @param waybillId
@@ -429,6 +399,10 @@ public class WaybillServiceImpl implements WaybillService {
                     List<GetWaybillItemsAppDto> waybillItems = waybillAppDto.getWaybillItems();
                     if (null != waybillItems && waybillItems.size() > 0) {
                         for (GetWaybillItemsAppDto waybillItem : waybillItems) {
+                            //删掉无计划时指定的默认卸货地和货物
+                            if (waybillItem.getUnloadSiteId() == 0) {
+                                continue;
+                            }
                             List<ShowGoodsDto> goods = waybillItem.getGoods();
                             for (ShowGoodsDto good : goods) {
                                 showGoodsDtos.add(good);
@@ -440,6 +414,7 @@ public class WaybillServiceImpl implements WaybillService {
                 //提货单
                 waybillTrackingImages.setWaybillId(waybillId);
                 waybillTrackingImages.setSiteId(orders.getLoadSiteId());
+                waybillTrackingImages.setType(1);
                 List<GetWaybillTrackingImagesDto> loadSiteWaybillTrackingImages = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
                 for (GetWaybillTrackingImagesDto loadSiteWaybillTrackingImage : loadSiteWaybillTrackingImages) {
                     //替换单据url地址
@@ -455,6 +430,10 @@ public class WaybillServiceImpl implements WaybillService {
             List<GetWaybillItemsAppDto> waybillItems = waybillAppDtos.get(0).getWaybillItems();
             List<ShowSiteAppDto> unloadSiteList = new ArrayList<>();
             for (GetWaybillItemsAppDto waybillItem : waybillItems) {
+                //删掉无计划时指定的默认卸货地
+                if (waybillItem.getUnloadSiteId() == 0) {
+                    continue;
+                }
                 List<ShowGoodsDto> goods = waybillItem.getGoods();
                 ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
                 ShowSiteAppDto unloadSiteApp = new ShowSiteAppDto();
@@ -464,6 +443,7 @@ public class WaybillServiceImpl implements WaybillService {
                 //卸货单
                 waybillTrackingImages.setWaybillId(waybillId);
                 waybillTrackingImages.setSiteId(waybillItem.getUnloadSiteId());
+                waybillTrackingImages.setType(2);
                 List<GetWaybillTrackingImagesDto> waybillTrackingImagesDtosList = waybillTrackingImagesMapper.listWaybillTrackingImage(waybillTrackingImages);
                 for (GetWaybillTrackingImagesDto getWaybillTrackingImagesDto : waybillTrackingImagesDtosList) {
                     //替换单据地址
@@ -530,12 +510,12 @@ public class WaybillServiceImpl implements WaybillService {
                 .setCreateTime(new Date());
         //司机出发
         if (WaybillStatus.DEPART.equals(dto.getWaybillStatus())) {
-//            Waybill wb = new Waybill();
-//            wb.setDriverId(currentUser.getId());
-//            List<ListWaybillDto> waybills = waybillMapper.listCriteriaWaybill(wb);
-//            if (!CollectionUtils.isEmpty(waybills)) {
-//                return ServiceResult.toResult(SignStatusConstant.CRITERIA);
-//            }
+            Waybill wb = new Waybill();
+            wb.setDriverId(currentUser.getId());
+            List<ListWaybillDto> waybills = waybillMapper.listCriteriaWaybill(wb);
+            if (!CollectionUtils.isEmpty(waybills)) {
+                return ServiceResult.toResult(SignStatusConstant.CRITERIA);
+            }
             waybillTracking
                     .setNewStatus(WaybillStatus.ARRIVE_LOAD_SITE)
                     .setOldStatus(waybill.getWaybillStatus())
@@ -619,7 +599,11 @@ public class WaybillServiceImpl implements WaybillService {
         //客户签收
         if (WaybillStatus.SIGN.equals(dto.getWaybillStatus())) {
             List<ConfirmProductDto> unLoadSiteConfirmProductDtos = dto.getConfirmProductDtos();
-            ShowSiteDto showSiteById = customerClientService.getShowSiteById(unLoadSiteConfirmProductDtos.get(0).getUnLoadSiteId());
+            ShowSiteDto showSiteById = null;
+            if (!CollectionUtils.isEmpty(unLoadSiteConfirmProductDtos) && null != unLoadSiteConfirmProductDtos.get(0)) {
+                showSiteById = customerClientService.getShowSiteById(unLoadSiteConfirmProductDtos.get(0).getUnLoadSiteId());
+            }
+
             //查询出卸货地未签收的
             WaybillItems waybillItemsCondition = new WaybillItems();
             waybillItemsCondition
@@ -686,8 +670,13 @@ public class WaybillServiceImpl implements WaybillService {
                 //更改运单状态
                 waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
                 waybillMapper.updateByPrimaryKeySelective(waybill);
+                ShowCustomerDto customerDto = customerService.getShowCustomerById(orders.getCustomerId());
                 //磅单超过千分之二 进行于预警判断
-                pounderAlert(waybillId);
+                boolean flag = !StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder());
+                //牧原客户手机提交 不做磅差判断
+                if (!flag) {
+                    pounderAlert(waybillId, true);
+                }
                 //判断当前订单 下的运单是否全部签收 如果全部签收 更新订单状态
                 List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
                 int count = 0;
@@ -762,7 +751,77 @@ public class WaybillServiceImpl implements WaybillService {
                 .setUserId(currentUser == null ? null : currentUser.getId())
                 .setUserType(AccountUserType.DRIVER);
         showPersonalCenter.setAccountInfo(accountService.getByQueryAccountDto(queryAccountDto));
+        // 我的驾驶证信息 add by @Gao. 20181204
+        ListDriverLicenseDto listDriverLicenseDto = new ListDriverLicenseDto();
+        ShowDriverDto driver = driverClientService.getDriverReturnObject(currentUser == null ? null : currentUser.getId());
+        if (null != driver) {
+            listDriverLicenseDto
+                    .setStatus(driver.getStatus())
+                    .setIdentityCard(driver.getIdentityCard())
+                    .setDrivingLicense(driver.getDrivingLicense())
+                    .setValidityInspection(driver.getExpiryDrivingLicense())
+                    .setExpiryDrivingLicense(driver.getExpiryDrivingLicense())
+                    .setAllocationTime(allocationTime(driver.getExpiryDrivingLicense()));
+            showPersonalCenter.setDriverLicenseDto(listDriverLicenseDto);
+        }
+        // 我的车辆信息
+        ListTruckLicenseDto listTruckLicenseDto = new ListTruckLicenseDto();
+        ShowTruckDto truckByToken = truckClientService.getTruckByToken();
+        listTruckLicenseDto
+                .setTruckNumber(truckByToken.getTruckNumber())
+                .setBuyTime(truckByToken.getBuyTime())
+                .setExpiryDate(truckByToken.getExpiryDate())
+                .setExpiryAnnual(truckByToken.getExpiryAnnual())
+                .setTruckStatus(truckByToken.getTruckStatus());
+        showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
         return showPersonalCenter;
+    }
+
+    /**
+     * 驾驶证清分时间
+     *
+     * @param expiryDate
+     * @return
+     * @Author @Gao.
+     */
+    private static String allocationTime(String expiryDate) {
+        SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+        SimpleDateFormat monthDayFormat = new SimpleDateFormat("MM-dd");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dateString = null;
+        if (null != expiryDate) {
+            String currentStringDate = simpleDateFormat.format(new Date());
+            Date currentDate = stringToDate(currentStringDate);
+            Date drivingLicenseDate = stringToDate(expiryDate);
+            String year = yearFormat.format(new Date());
+            String monthDay = monthDayFormat.format(drivingLicenseDate);
+            String yearMonth = year + "-" + monthDay;
+            Date yearMonthDate = stringToDate(yearMonth);
+            if (currentDate.equals(yearMonthDate) || currentDate.before(yearMonthDate)) {
+                dateString = simpleDateFormat.format(yearMonthDate);
+            } else {
+                dateString = simpleDateFormat.format(DateUtils.addYears(yearMonthDate, 1));
+            }
+        }
+        return dateString;
+    }
+
+    /**
+     * 将时间字符串转化为Date
+     *
+     * @param stringDate
+     * @return
+     * @Author @Gao.
+     */
+    private static Date stringToDate(String stringDate) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = null;
+        try {
+            date = simpleDateFormat.parse(stringDate);
+        } catch (ParseException e) {
+            log.error("I stringToDate-{}", e);
+        }
+        return date;
     }
 
     /**
@@ -869,7 +928,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> upDateReceiptStatus(GetReceiptParamDto dto) {
-        log.info("upDateReceiptStatus={}", dto);
+        log.info("O upDateReceiptStatus:{}", dto);
         Integer waybillId = dto.getWaybillId();
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         UserInfo currentUser = currentUserService.getCurrentUser();
@@ -924,67 +983,6 @@ public class WaybillServiceImpl implements WaybillService {
         message.setToUserId(currentUser.getId());
         List<Message> messages = messageMapper.listMessageByCondtion(message);
         return ServiceResult.toResult(new PageInfo<>(messages));
-    }
-
-    /**
-     * 运单列表公共方法
-     *
-     * @return
-     * @author @Gao.
-     */
-    private List<ListWaybillAppDto> listWaybill(List<GetWaybillAppDto> waybillDtos, Integer currentUserId) {
-        List<ListWaybillAppDto> listWaybillAppDtos = new ArrayList<>();
-        if (null != waybillDtos && waybillDtos.size() > 0) {
-            for (GetWaybillAppDto waybillDto : waybillDtos) {
-                ListWaybillAppDto listWaybillAppDto = new ListWaybillAppDto();
-                List<ShowGoodsDto> showGoodsDtos = new ArrayList<>();
-                List<ShowSiteDto> unloadSiteList = new ArrayList<>();
-                //运单号
-                listWaybillAppDto.setWaybillId(waybillDto.getId());
-                //运单状态
-                listWaybillAppDto.setWaybillStatus(waybillDto.getWaybillStatus());
-                //接单时间
-                WaybillTracking waybillTrackingCondition = new WaybillTracking();
-                waybillTrackingCondition
-                        .setWaybillId(waybillDto.getId())
-                        .setNewStatus(WaybillStatus.DEPART)
-                        .setDriverId(currentUserId);
-                WaybillTracking waybillTracking = waybillTrackingMapper.selectSingleTime(waybillTrackingCondition);
-                if (null != waybillTracking) {
-                    listWaybillAppDto.setSingleTime(waybillTracking.getCreateTime());
-                }
-                //客户信息
-                Orders orders = ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
-                if (null != orders) {
-                    ShowCustomerDto showCustomerDto = customerClientService.getShowCustomerById(orders.getCustomerId());
-                    listWaybillAppDto.setCustomer(showCustomerDto);
-                }
-                //货物信息
-                List<GetWaybillItemsAppDto> waybillItems = waybillDto.getWaybillItems();
-                if (null != waybillItems && waybillItems.size() > 0) {
-                    for (GetWaybillItemsAppDto waybillItem : waybillItems) {
-                        if (null != waybillItem) {
-                            ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
-                            unloadSiteList.add(unloadSite);
-                        }
-                        List<ShowGoodsDto> goods = waybillItem.getGoods();
-                        for (ShowGoodsDto good : goods) {
-                            showGoodsDtos.add(good);
-                        }
-                    }
-                }
-                listWaybillAppDto.setGoods(showGoodsDtos);
-                //装货地
-                if (null != orders) {
-                    ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
-                    listWaybillAppDto.setLoadSite(loadSite);
-                }
-                //卸货地
-                listWaybillAppDto.setUnloadSite(unloadSiteList);
-                listWaybillAppDtos.add(listWaybillAppDto);
-            }
-        }
-        return listWaybillAppDtos;
     }
 
     /**
@@ -1146,10 +1144,26 @@ public class WaybillServiceImpl implements WaybillService {
                     waybillDto.setDriver(this.driverClientService.getDriverReturnObject(waybill.getDriverId()));
 
                 }
+                //填充卸货地名称
+                List<WaybillItems> itemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillDto.getId());
+                if (!CollectionUtils.isEmpty(itemsList)) {
+                    List<Integer> siteIds = new ArrayList<>();
+                    for (WaybillItems items : itemsList) {
+                        siteIds.add(items.getUnloadSiteId());
+                    }
+                    if (!CollectionUtils.isEmpty(siteIds)) {
+                        List<String> siteNameList = customerClientService.listSiteNameByIds(siteIds);
+                        if (!CollectionUtils.isEmpty(siteNameList)) {
+                            waybillDto.setUnloadName(siteNameList);
+                        }
+                    }
+                }
                 //如果当前运单有预警提示消息 则在运单列表显示预警小图标
                 if (!CollectionUtils.isEmpty(listPoundAnomaly())) {
                     if (listPoundAnomaly().contains(waybill.getId())) {
-                        waybillDto.setPoundAlert(true);
+                        if (pounderAlert(waybill.getId(), false)) {
+                            waybillDto.setPoundAlert(true);
+                        }
                     }
                 }
             }
@@ -1246,7 +1260,7 @@ public class WaybillServiceImpl implements WaybillService {
             for (UpdateWaybillGoodsDto waybillGoodsDto : updateWaybillGoodsDtoList) {
                 waybillId = waybillGoodsDto.getWaybillId();
                 Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
-                if (waybill == null || !WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
+                if (waybill == null) {
                     throw new RuntimeException("运单id=" + waybillId + "不存在");
                 }
                 WaybillItems waybillItems = new WaybillItems();
@@ -1259,7 +1273,7 @@ public class WaybillServiceImpl implements WaybillService {
                         .setUnloadSiteId(waybillGoodsDto.getUnloadSiteId())
                         .setWaybillId(waybillId)
                         .setEnabled(true)
-                        .setSignStatus(waybillGoodsDto.getSignStatus());
+                        .setSignStatus(waybillGoodsDto.getSignStatus() == null ? false : waybillGoodsDto.getSignStatus());
                 waybillItemsSet.add(waybillItems);
             }
             // 插入提货补录轨迹
@@ -1387,7 +1401,7 @@ public class WaybillServiceImpl implements WaybillService {
             if (insertUnloadTrackingNum < 1) {
                 throw new RuntimeException("插入运单轨迹(补录实卸)失败");
             }
-            if (!hasLoadTracking){
+            if (!hasLoadTracking) {
                 waybillTracking
                         .setId(null)
                         .setTrackingInfo("补录实提")
@@ -1398,6 +1412,12 @@ public class WaybillServiceImpl implements WaybillService {
                 }
             }
             waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
+            // 磅差异常提醒
+            try {
+                pounderAlert(waybillId, true);
+            }catch (Exception ex){
+                log.error("pounderAlert error waybillId="+waybillId,ex);
+            }
         }
         return true;
     }
@@ -1506,6 +1526,28 @@ public class WaybillServiceImpl implements WaybillService {
         return waybillMapper.listWaybillDtoWaitByOrderId(id);
     }
 
+    /**
+     * 根据订单id查询已拒单的个数
+     *
+     * @param orderId
+     * @return
+     */
+    @Override
+    public Integer listRejectWaybillByOrderId(Integer orderId) {
+        return waybillMapper.listRejectWaybillByOrderId(orderId);
+    }
+
+    /**
+     * 根据订单id查询待派单的运单
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public Integer listWaitWaybillByOrderId(Integer id) {
+        return waybillMapper.listWaitWaybillByOrderId(id);
+    }
+
     private Integer getUserId() {
         UserInfo userInfo = null;
         try {
@@ -1529,12 +1571,12 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
-    private void pounderAlert(Integer waybillId) {
+    private boolean pounderAlert(Integer waybillId, boolean sendMessage) {
         List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
         BigDecimal totalLoadWeight = BigDecimal.ZERO;
         BigDecimal totalUnloadWeight = BigDecimal.ZERO;
         for (GetWaybillGoodsDto waybillGoodsDto : waybillGoodsDtos) {
-            boolean flag = ((null != waybillGoodsDto.getUnloadWeight() || null != waybillGoodsDto.getLoadWeight())
+            boolean flag = (null != waybillGoodsDto.getUnloadWeight() && null != waybillGoodsDto.getLoadWeight()
                     && GoodsUnit.TON.equals(waybillGoodsDto.getGoodsUnit()));
             if (flag) {
                 //单位 羽 吨 累计提货重量
@@ -1548,20 +1590,24 @@ public class WaybillServiceImpl implements WaybillService {
             BigDecimal weightDivide = weightDiff.divide(totalLoadWeight, 6, BigDecimal.ROUND_HALF_UP);
             if (DataConstant.DIFFWEIGHT.compareTo(weightDivide) == -1) {
                 //插入预警提醒信息
-                Message message = new Message();
-                message
-                        .setToUserId(0)
-                        .setReferId(waybillId)
-                        .setCreateUserId(0)
-                        .setMsgSource(MsgSource.WEB)
-                        .setFromUserId(0)
-                        .setFromUserType(0)
-                        .setMsgType(MsgType.POUNDS_DIFF)
-                        .setBody("运单号为（" + waybillId + "）的运单，出现磅差异常，请及时处理。")
-                        .setHeader("你有一个运单异常消息待接收");
-                messageMapper.insertSelective(message);
+                if (true == sendMessage) {
+                    Message message = new Message();
+                    message
+                            .setToUserId(0)
+                            .setReferId(waybillId)
+                            .setCreateUserId(0)
+                            .setMsgSource(MsgSource.WEB)
+                            .setFromUserId(0)
+                            .setFromUserType(0)
+                            .setMsgType(MsgType.POUNDS_DIFF)
+                            .setBody("运单号为（" + waybillId + "）的运单，出现磅差异常，请及时处理。")
+                            .setHeader("你有一个运单异常消息待接收");
+                    messageMapper.insertSelective(message);
+                }
+                return true;
             }
         }
+        return false;
     }
 
     /**
@@ -1620,4 +1666,5 @@ public class WaybillServiceImpl implements WaybillService {
         }
         return true;
     }
+
 }

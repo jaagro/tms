@@ -24,6 +24,14 @@ public interface UserClientService {
     List<Integer> getDownDepartment();
 
     /**
+     * 获取指定部门id及下属部门id数组
+     *
+     * @return
+     */
+    @PostMapping("/getDownDepartmentByDeptId/{deptId}")
+    List<Integer> getDownDepartmentByDeptId(@PathVariable("deptId") Integer deptId);
+
+    /**
      * 根据部门id查询部门名称
      *
      * @param id
