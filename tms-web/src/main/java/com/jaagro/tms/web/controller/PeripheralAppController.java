@@ -115,13 +115,6 @@ public class PeripheralAppController {
             throw new RuntimeException("参数不能为空");
         }
         PageInfo<CreateGasolineRecordDto> gasolineRecordDtos = gasolinePlusService.listGasolineRecords(param);
-        List<CreateGasolineRecordDto> list = gasolineRecordDtos.getList();
-        GasolineRecordListVo gasolineRecordListVo = new GasolineRecordListVo();
-        List<GasolineRecordListVo> gasolineRecordListVos = new ArrayList<>();
-        for (CreateGasolineRecordDto createGasolineRecordDto : list) {
-            BeanUtils.copyProperties(createGasolineRecordDto, gasolineRecordListVo);
-            gasolineRecordListVos.add(gasolineRecordListVo);
-        }
-        return BaseResponse.successInstance(gasolineRecordListVos);
+        return BaseResponse.successInstance(gasolineRecordDtos);
     }
 }
