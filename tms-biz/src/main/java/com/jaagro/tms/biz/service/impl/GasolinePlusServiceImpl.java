@@ -68,4 +68,15 @@ public class GasolinePlusServiceImpl implements GasolinePlusService {
         List<CreateGasolineRecordDto> gasolineRecordDtos = gasolineRecordMapper.listGasolineRecordByCondition(gasolineRecordCondition);
         return new PageInfo(gasolineRecordDtos);
     }
+
+    /**
+     * 加油记录详情
+     *
+     * @param gasolineId
+     * @return
+     */
+    @Override
+    public List<CreateGasolineRecordDto> gasolineList(Integer gasolineId) {
+        return null;
+    }
 }
