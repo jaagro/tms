@@ -137,11 +137,5 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @param id
      * @return
      */
-    Integer listFinishWaybillByOrderId(Integer id);
-
-    /**
-     * @param id
-     * @return
-     */
     Integer listWaitWaybillByOrderId(Integer id);
 }

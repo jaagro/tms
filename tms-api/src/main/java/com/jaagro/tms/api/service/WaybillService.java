@@ -211,14 +211,6 @@ public interface WaybillService {
     boolean abandonWaybill(Integer waybillId);
 
     /**
-     * 根据订单id查询已完成的运单
-     *
-     * @param id
-     * @return
-     */
-    Integer listFinishWaybillByOrderId(Integer id);
-
-    /**
      * 根据订单id查询待派单的运单
      *
      * @param id

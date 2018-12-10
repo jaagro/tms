@@ -388,11 +388,6 @@ public class OrderController {
                     if (!StringUtils.isEmpty(countWaybill)) {
                         orderVo.setWaybillReject(countWaybill);
                     }
-                    //已完成
-                    Integer countFinish = waybillService.listFinishWaybillByOrderId(orderDto.getId());
-                    if (!StringUtils.isEmpty(countFinish)) {
-                        orderVo.setWaybillFinish(countFinish);
-                    }
                 }
                 /**
                  * 替换订单需求Dto为Vo

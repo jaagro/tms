@@ -1536,17 +1536,6 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     /**
-     * 根据订单id查询已完成的运单
-     *
-     * @param id
-     * @return
-     */
-    @Override
-    public Integer listFinishWaybillByOrderId(Integer id) {
-        return waybillMapper.listFinishWaybillByOrderId(id);
-    }
-
-    /**
      * 根据订单id查询待派单的运单
      *
      * @param id
