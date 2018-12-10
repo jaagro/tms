@@ -1345,8 +1345,6 @@ public class WaybillServiceImpl implements WaybillService {
             if (!insertGoodsNum.equals(waybillGoodsList.size())) {
                 throw new RuntimeException("插入运单货物失败");
             }
-            // 磅差异常提醒
-            pounderAlert(waybillId, true);
         }
         return true;
     }
@@ -1415,7 +1413,11 @@ public class WaybillServiceImpl implements WaybillService {
             }
             waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
             // 磅差异常提醒
-            pounderAlert(waybillId, true);
+            try {
+                pounderAlert(waybillId, true);
+            }catch (Exception ex){
+                log.error("pounderAlert error waybillId="+waybillId,ex);
+            }
         }
         return true;
     }
