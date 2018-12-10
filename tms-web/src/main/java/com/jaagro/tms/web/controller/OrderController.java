@@ -64,7 +64,7 @@ public class OrderController {
     @ApiOperation("新增订单")
     @PostMapping("/order")
     public BaseResponse createOrder(@RequestBody CreateOrderDto orderDto) {
-        log.info("O createOrder orderDto={}",orderDto);
+        log.info("O createOrder orderDto={}", orderDto);
         if (StringUtils.isEmpty(orderDto.getCustomerId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "客户id不能为空");
         }
@@ -92,7 +92,7 @@ public class OrderController {
     @ApiOperation("修改订单")
     @PutMapping("/order")
     public BaseResponse updateOrder(@RequestBody UpdateOrderDto orderDto) {
-        log.info("O updateOrder orderDto={}",orderDto);
+        log.info("O updateOrder orderDto={}", orderDto);
         if (StringUtils.isEmpty(orderDto.getId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单id不能为空");
         }
@@ -118,7 +118,7 @@ public class OrderController {
     @ApiOperation("删除订单")
     @DeleteMapping("/order")
     public BaseResponse deleteOrder(@PathVariable Integer id) {
-        log.info("O deleteOrder id={}",id);
+        log.info("O deleteOrder id={}", id);
         Map<String, Object> result;
         try {
             result = orderService.deleteOrderById(id);
@@ -315,7 +315,7 @@ public class OrderController {
     @ApiOperation("取消订单")
     @PostMapping("/cancelOrders/{orderId}/{detailInfo}")
     public BaseResponse cancelOrders(@PathVariable("orderId") Integer orderId, @PathVariable("detailInfo") String detailInfo) {
-        log.info("O cancelOrders orderId={},detailInfo={}",orderId,detailInfo);
+        log.info("O cancelOrders orderId={},detailInfo={}", orderId, detailInfo);
         if (StringUtils.isEmpty(orderId)) {
             return BaseResponse.idNull("订单id不能为空");
         }
@@ -373,23 +373,20 @@ public class OrderController {
                 List<ListWaybillDto> waybills = waybillService.listWaybillByOrderId(orderVo.getId());
                 if (waybills.size() > 0) {
                     orderVo.setWaybillCount(waybills.size());
+                    //待派单
+                    Integer countWait = waybillService.listWaitWaybillByOrderId(orderVo.getId());
+                    if (!StringUtils.isEmpty(countWait)) {
+                        orderVo.setWaybillWait(countWait);
+                    }
                     //已派单
                     List<ListWaybillDto> waitWaybills = waybillService.listWaybillWaitByOrderId(orderVo.getId());
                     if (!CollectionUtils.isEmpty(waitWaybills)) {
                         orderVo.setWaybillAlready(waitWaybills.size());
-                    } else {
-                        orderVo.setWaybillAlready(0);
                     }
                     //已拒单
                     Integer countWaybill = waybillService.listRejectWaybillByOrderId(orderDto.getId());
                     if (!StringUtils.isEmpty(countWaybill)) {
                         orderVo.setWaybillReject(countWaybill);
-                        if (countWaybill != waybills.size()) {
-                            //待派单数
-                            orderVo.setWaybillWait(orderVo.getWaybillCount() - orderVo.getWaybillAlready() - countWaybill);
-                        }
-                    } else {
-                        orderVo.setWaybillWait(orderVo.getWaybillCount() - orderVo.getWaybillAlready());
                     }
                 }
                 /**

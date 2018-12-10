@@ -1,8 +1,11 @@
 package com.jaagro.tms.biz.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.peripheral.CreateGasolineRecordDto;
-import com.jaagro.tms.api.dto.peripheral.GasolineRecordCondtion;
+import com.jaagro.tms.api.dto.peripheral.GasolineRecordCondition;
+import com.jaagro.tms.api.dto.peripheral.GasolineRecordParam;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.biz.entity.GasolineRecord;
@@ -55,13 +58,14 @@ public class GasolinePlusServiceImpl implements GasolinePlusService {
      * @return
      */
     @Override
-    public List<CreateGasolineRecordDto> listGasolineRecords() {
+    public PageInfo<CreateGasolineRecordDto> listGasolineRecords(GasolineRecordParam param) {
+        PageHelper.startPage(param.getPageNum(), param.getPageSize());
         UserInfo currentUser = currentUserService.getCurrentUser();
-        GasolineRecordCondtion gasolineRecordCondtion = new GasolineRecordCondtion();
+        GasolineRecordCondition gasolineRecordCondition = new GasolineRecordCondition();
         if (null != currentUser) {
-            gasolineRecordCondtion.setDriverId(currentUser.getId());
+            gasolineRecordCondition.setDriverId(currentUser.getId());
         }
-        List<CreateGasolineRecordDto> gasolineRecordDtos = gasolineRecordMapper.listGasolineRecordByCondition(gasolineRecordCondtion);
-        return gasolineRecordDtos;
+        List<CreateGasolineRecordDto> gasolineRecordDtos = gasolineRecordMapper.listGasolineRecordByCondition(gasolineRecordCondition);
+        return new PageInfo(gasolineRecordDtos);
     }
 }

@@ -20,6 +20,25 @@
         <collection property="waybillItems" column="id"
                     select="com.jaagro.tms.biz.mapper.WaybillItemsMapperExt.listByWaybillId"></collection>
     </resultMap>
+    <resultMap id="ResultMap" type="com.jaagro.tms.api.dto.driverapp.ListWaybillAppDto">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="INTEGER"/>
+        <result column="truck_team_contract_id" property="truckTeamContractId" jdbcType="INTEGER"/>
+        <result column="waybill_status" property="waybillStatus" jdbcType="VARCHAR"/>
+        <result column="need_truck_type" property="needTruckType" jdbcType="INTEGER"/>
+        <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
+        <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
+        <result column="send_time" property="sendTime" jdbcType="TIMESTAMP"/>
+        <result column="distance" property="distance" jdbcType="DECIMAL"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="created_user_id" property="createdUserId" jdbcType="INTEGER"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
+        <result column="load_site_id" property="loadSiteId" jdbcType="INTEGER"/>
+        <result column="load_time" jdbcType="TIMESTAMP" property="loadTime"/>
+        <collection property="waybillItems" column="id"
+                    select="com.jaagro.tms.biz.mapper.WaybillItemsMapperExt.listByWaybillId"></collection>
+    </resultMap>
     <resultMap id="ReturnMap" type="com.jaagro.tms.api.dto.waybill.ListWaybillDto">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="order_id" property="orderId" jdbcType="INTEGER"/>
@@ -49,9 +68,12 @@
         where order_id = #{orderId,jdbcType=INTEGER}
         and enabled = 1
     </select>
-    <select id="selectWaybillByCarrierStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
+    <select id="selectWaybillByCarrierStatus" resultMap="ResultMap" parameterType="com.jaagro.tms.biz.entity.Waybill">
+
         select distinct * from (
-        select wb.*
+        select wb.id, wb.order_id, wb.load_site_id, wb.truck_team_contract_id, wb.waybill_status, wb.need_truck_type,
+        wb.truck_id, wb.driver_id, wb.send_time, wb.distance, wb.create_time, wb.created_user_id, wb.modify_time,
+        wb.modify_user_id, wb.enabled, wb.load_time, wb.department_id, wt.create_time trackingDate
         from waybill wb
         inner join waybill_tracking wt
         on (wb.id=wt.waybill_id)
@@ -62,8 +84,27 @@
             and wb.driver_id = #{driverId,jdbcType=INTEGER}
         </if>
         and wt.new_status='待出发'
-        order by wt.create_time DESC
-        ) t
+        ) tab order by trackingDate desc
+
+    </select>
+    <select id="getWaybillByStatus" resultMap="ResultMap" parameterType="com.jaagro.tms.biz.entity.Waybill">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill
+        where enabled = 1
+        <if test="waybillStatus != null">
+            and waybill_status=#{waybillStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="driverId != null">
+            and driver_id = #{driverId,jdbcType=INTEGER}
+        </if>
+        <if test="id != null">
+            and id = #{id,jdbcType=INTEGER}
+        </if>
+        <if test="truckId != null">
+            and truck_Id = #{truckId,jdbcType=INTEGER}
+        </if>
+        order by create_time DESC
     </select>
     <select id="selectWaybillByStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.biz.entity.Waybill">
         select
@@ -103,6 +144,20 @@
             and order_id = #{orderId,jdbcType=INTEGER}
         </if>
         and waybill_status = '已拒单'
+    </select>
+    <select id="listFinishWaybillByOrderId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select
+        count(1)
+        from waybill
+        where enabled = 1 and order_id = #{orderId,jdbcType=INTEGER}
+        and waybill_status = '已完成'
+    </select>
+    <select id="listWaitWaybillByOrderId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select
+        count(1)
+        from waybill
+        where enabled = 1 and order_id = #{orderId,jdbcType=INTEGER}
+        and waybill_status = '待派单'
     </select>
     <select id="listWaybillIdByOrderId" resultType="java.lang.Integer">
         select id
@@ -168,7 +223,7 @@
         where
         order_id = #{orderId,jdbcType=INTEGER}
         and enabled = 1
-        and waybill_status = '已派单'
+        and waybill_status in ('待接单','待出发','待出发','前往装货地','待装货','待送达',"待签收","已完成")
     </select>
     <select id="listOverTimeWaybills" resultMap="BaseResultMap">
         select
