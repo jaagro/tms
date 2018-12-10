@@ -70,7 +70,9 @@
     </select>
     <select id="selectWaybillByCarrierStatus" resultMap="ResultMap" parameterType="com.jaagro.tms.biz.entity.Waybill">
         select distinct * from (
-        select wb.*
+        select wb.id, wb.order_id, wb.load_site_id, wb.truck_team_contract_id, wb.waybill_status, wb.need_truck_type,
+        wb.truck_id, wb.driver_id, wb.send_time, wb.distance, wb.create_time, wb.created_user_id, wb.modify_time,
+        wb.modify_user_id, wb.enabled, wb.load_time, wb.department_id, wt.create_time trackingDate
         from waybill wb
         inner join waybill_tracking wt
         on (wb.id=wt.waybill_id)
@@ -80,9 +82,10 @@
         <if test="driverId != null">
             and wb.driver_id = #{driverId,jdbcType=INTEGER}
         </if>
+        and wb.driver_id = 249
         and wt.new_status='待出发'
-        order by wt.create_time DESC
-        ) t
+        ) tab order by trackingDate desc
+
     </select>
     <select id="getWaybillByStatus" resultMap="ResultMap" parameterType="com.jaagro.tms.biz.entity.Waybill">
         select
