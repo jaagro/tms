@@ -4,7 +4,6 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
-import com.jaagro.tms.api.dto.truck.DriverReturnDto;
 import com.jaagro.tms.api.dto.waybill.*;
 
 import java.util.List;
@@ -166,7 +165,7 @@ public interface WaybillService {
     PageInfo listWaybillByCriteriaForWechat(ListWaybillCriteriaDto criteriaDto);
 
     /**
-     * 根据订单id查询 待派单的运单
+     * 根据订单id查询 已派单的运单
      *
      * @param id
      * @return
@@ -218,4 +217,20 @@ public interface WaybillService {
      * @Author gavin
      */
     boolean abandonWaybill(Integer waybillId);
+
+    /**
+     * 根据订单id查询已完成的运单
+     *
+     * @param id
+     * @return
+     */
+    Integer listFinishWaybillByOrderId(Integer id);
+
+    /**
+     * 根据订单id查询待派单的运单
+     *
+     * @param id
+     * @return
+     */
+    Integer listWaitWaybillByOrderId(Integer id);
 }

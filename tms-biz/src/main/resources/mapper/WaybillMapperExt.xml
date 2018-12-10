@@ -104,6 +104,20 @@
         </if>
         and waybill_status = '已拒单'
     </select>
+    <select id="listFinishWaybillByOrderId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select
+        count(1)
+        from waybill
+        where enabled = 1 and order_id = #{orderId,jdbcType=INTEGER}
+        and waybill_status = '已完成'
+    </select>
+    <select id="listWaitWaybillByOrderId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select
+        count(1)
+        from waybill
+        where enabled = 1 and order_id = #{orderId,jdbcType=INTEGER}
+        and waybill_status = '待派单'
+    </select>
     <select id="listWaybillIdByOrderId" resultType="java.lang.Integer">
         select id
         from waybill
