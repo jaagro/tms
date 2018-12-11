@@ -79,7 +79,7 @@ public class GasolinePlusServiceImpl implements GasolinePlusService {
      * @return
      */
     @Override
-    public List<CreateGasolineRecordDto> gasolineList(Integer gasolineId) {
+    public List<CreateGasolineRecordDto> gasolineDetails(Integer gasolineId) {
         GasolineRecordCondition gasolineRecordCondition = new GasolineRecordCondition();
         gasolineRecordCondition.setId(gasolineId);
         List<CreateGasolineRecordDto> gasolineRecordDtos = gasolineRecordMapper.listGasolineRecordByCondition(gasolineRecordCondition);

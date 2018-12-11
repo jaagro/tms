@@ -3,10 +3,12 @@ package com.jaagro.tms.web.controller;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.peripheral.*;
 import com.jaagro.tms.api.entity.RepairRecord;
+import com.jaagro.tms.api.enums.GasolineCompanyNameEnum;
 import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.api.service.RepairRecordService;
 import com.jaagro.tms.api.service.WashTruckService;
 import com.jaagro.tms.biz.entity.WashTruckRecord;
+import com.jaagro.tms.web.vo.peripheral.GasolineRecordListVo;
 import com.jaagro.tms.web.vo.peripheral.WashTruckRecordVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
@@ -16,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -116,31 +119,46 @@ public class PeripheralAppController {
         if (null == param.getPageNum() || null == param.getPageSize()) {
             throw new RuntimeException("参数不能为空");
         }
-        PageInfo<CreateGasolineRecordDto> gasolineRecordDtos = gasolinePlusService.listGasolineRecords(param);
+        PageInfo gasolineRecordDtos = gasolinePlusService.listGasolineRecords(param);
+        List<CreateGasolineRecordDto> createGasolineRecordDtos = gasolineRecordDtos.getList();
+        List<GasolineRecordListVo> gasolineRecordListVos = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(createGasolineRecordDtos)) {
+            for (CreateGasolineRecordDto gasolineRecordList : createGasolineRecordDtos) {
+                GasolineRecordListVo vo = new GasolineRecordListVo();
+                BeanUtils.copyProperties(gasolineRecordList, vo);
+                vo.setGasolineCompany(GasolineCompanyNameEnum.getTypeByDesc(gasolineRecordList.getGasolineCompany()));
+                gasolineRecordListVos.add(vo);
+            }
+        }
+        gasolineRecordDtos.setList(gasolineRecordListVos);
         return BaseResponse.successInstance(gasolineRecordDtos);
     }
 
     @ApiOperation("加油详情")
-    @GetMapping("/gasolineList/{gasolineListId}")
-    public BaseResponse gasolineList(@PathVariable("gasolineListId") Integer gasolineListId) {
-        return BaseResponse.successInstance(gasolinePlusService.gasolineList(gasolineListId));
+    @GetMapping("/gasolineDetails/{gasolineId}")
+    public BaseResponse gasolineDetails(@PathVariable("gasolineId") Integer gasolineId) {
+        return BaseResponse.successInstance(gasolinePlusService.gasolineDetails(gasolineId));
     }
 
     @ApiOperation("提交洗车记录")
     @PostMapping("/createWashTruckRecord")
-    public BaseResponse createWashTruckRecord(@RequestBody @Validated CreateWashTruckRecordDto createWashTruckRecordDto){
+    public BaseResponse createWashTruckRecord(@RequestBody @Validated CreateWashTruckRecordDto createWashTruckRecordDto) {
         washTruckService.createWashTruckRecord(createWashTruckRecordDto);
         return BaseResponse.successInstance("提交洗车记录成功");
     }
 
     @ApiOperation("洗车记录列表")
     @PostMapping("/listWashTruckRecordByCriteria")
-    public BaseResponse listWashTruckRecordByCriteria(@RequestBody @Validated ListWashTruckRecordCriteria criteria){
+    public BaseResponse listWashTruckRecordByCriteria(@RequestBody @Validated ListWashTruckRecordCriteria criteria) {
         PageInfo pageInfo = washTruckService.listWashTruckRecordByCriteria(criteria);
         List<WashTruckRecord> recordList = pageInfo.getList();
-        if (!recordList.isEmpty()){
+        if (!recordList.isEmpty()) {
             List<WashTruckRecordVo> washTruckRecordVoList = new ArrayList<>();
-            recordList.forEach(record->{WashTruckRecordVo vo = new WashTruckRecordVo();BeanUtils.copyProperties(record,vo); washTruckRecordVoList.add(vo);});
+            recordList.forEach(record -> {
+                WashTruckRecordVo vo = new WashTruckRecordVo();
+                BeanUtils.copyProperties(record, vo);
+                washTruckRecordVoList.add(vo);
+            });
             pageInfo.setList(washTruckRecordVoList);
         }
         return BaseResponse.successInstance(pageInfo);
