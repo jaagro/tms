@@ -6,6 +6,7 @@ import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.peripheral.CreateWashTruckImageDto;
 import com.jaagro.tms.api.dto.peripheral.CreateWashTruckRecordDto;
 import com.jaagro.tms.api.dto.peripheral.ListWashTruckRecordCriteria;
+import com.jaagro.tms.api.dto.peripheral.WashTruckRecordDto;
 import com.jaagro.tms.api.service.WashTruckService;
 import com.jaagro.tms.biz.entity.WashTruckImage;
 import com.jaagro.tms.biz.entity.WashTruckRecord;
@@ -78,5 +79,14 @@ public class WashTruckServiceImpl implements WashTruckService {
         PageHelper.startPage(criteria.getPageNum(),criteria.getPageSize());
         List<WashTruckRecord> washTruckRecordList = washTruckRecordMapperExt.listWashTruckRecordByCriteria(criteria);
         return new PageInfo(washTruckRecordList);
+    }
+
+    /**
+     * @param id
+     * @return
+     */
+    @Override
+    public WashTruckRecordDto getById(Integer id) {
+        return null;
     }
 }
