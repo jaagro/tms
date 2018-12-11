@@ -24,6 +24,14 @@ public interface GasolinePlusService {
      * @param
      * @return
      */
-   PageInfo<CreateGasolineRecordDto> listGasolineRecords(GasolineRecordParam param);
+    PageInfo<CreateGasolineRecordDto> listGasolineRecords(GasolineRecordParam param);
+
+    /**
+     * 加油记录详情
+     *
+     * @param gasolineId
+     * @return
+     */
+    List<CreateGasolineRecordDto> gasolineList(Integer gasolineId);
 
 }

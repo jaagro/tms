@@ -1,33 +1,26 @@
 package com.jaagro.tms.web.controller;
 
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.jaagro.tms.api.dto.peripheral.CreateGasolineRecordDto;
-import com.jaagro.tms.api.dto.peripheral.GasolineRecordParam;
-import com.jaagro.tms.api.dto.peripheral.ListRepairRecordCriteriaDto;
-import com.jaagro.tms.api.dto.peripheral.RepairRecordDto;
+import com.jaagro.tms.api.dto.peripheral.*;
 import com.jaagro.tms.api.entity.RepairRecord;
 import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.api.service.RepairRecordService;
-import com.jaagro.tms.web.vo.peripheral.GasolineRecordListVo;
+import com.jaagro.tms.api.service.WashTruckService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.util.Assert;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author @Gao.
  */
-@Log4j
+@Slf4j
 @RestController
 @Api(description = "周边服务管理", produces = MediaType.APPLICATION_JSON_VALUE)
 public class PeripheralAppController {
@@ -36,6 +29,9 @@ public class PeripheralAppController {
     private RepairRecordService repairRecordService;
     @Autowired
     private GasolinePlusService gasolinePlusService;
+    @Autowired
+    private WashTruckService washTruckService;
+
 
     /**
      * 新增维续记录
@@ -47,7 +43,7 @@ public class PeripheralAppController {
     @ApiOperation("新增维修记录")
     @PostMapping("/createRepairRecord")
     public BaseResponse createRepairRecord(@RequestBody RepairRecordDto source) {
-        Assert.notNull(source.getTruckNumber(), "车牌号码不能为空");
+        log.info("O createRepairRecord param={}",source);
         try {
             RepairRecord record = new RepairRecord();
             BeanUtils.copyProperties(source, record);
@@ -68,7 +64,8 @@ public class PeripheralAppController {
      */
     @ApiOperation("获取单个维修记录")
     @RequestMapping("/getRepairRecord/{id}")
-    public BaseResponse getRepairRecord(@PathVariable("id") Integer id) {
+    public BaseResponse getRepairRecordById(@PathVariable("id") Integer id) {
+        log.info("O getRepairRecord id={}",id);
         RepairRecord repairRecord;
         try {
             repairRecord = repairRecordService.getRepairRecordById(id);
@@ -88,13 +85,13 @@ public class PeripheralAppController {
      */
     @ApiOperation("维修记录列表分页")
     @PostMapping("/listRepairRecords")
-    public BaseResponse listRepairRecords(@RequestBody ListRepairRecordCriteriaDto criteriaDto) {
-        PageInfo pageInfo = null;
-
+    public BaseResponse listRepairRecords(@RequestBody ListRepairRecordCriteriaDto criteriaDto){
+        log.info("O listRepairRecords criteriaDto={}", criteriaDto);
+        PageInfo<RepairRecord> pageInfo = null;
         try {
             pageInfo = repairRecordService.listRepairRecordByCriteria(criteriaDto);
         } catch (Exception ex) {
-            log.error("O-listRepairRecords,param: " + criteriaDto, ex);
+            log.error("O listRepairRecords,param: " + criteriaDto, ex);
             return BaseResponse.errorInstance("查询失败");
         }
 
@@ -117,4 +114,18 @@ public class PeripheralAppController {
         PageInfo<CreateGasolineRecordDto> gasolineRecordDtos = gasolinePlusService.listGasolineRecords(param);
         return BaseResponse.successInstance(gasolineRecordDtos);
     }
+
+    @ApiOperation("提交洗车记录")
+    @PostMapping("/createWashTruckRecord")
+    public BaseResponse createWashTruckRecord(@RequestBody @Validated CreateWashTruckRecordDto createWashTruckRecordDto){
+        return BaseResponse.successInstance("");
+    }
+
+
+    @ApiOperation("加油详情")
+    @PostMapping("/gasolineList/{gasolineListId}")
+    public BaseResponse gasolineList(@PathVariable("gasolineListId") Integer gasolineListId) {
+        return BaseResponse.successInstance(gasolinePlusService.gasolineList(gasolineListId));
+    }
+
 }

@@ -12,6 +12,10 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class GasolineRecordCondition implements Serializable {
     /**
+     *
+     */
+    private Integer id;
+    /**
      * 司机id
      */
     private Integer driverId;

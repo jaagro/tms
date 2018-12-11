@@ -4,6 +4,7 @@ package com.jaagro.tms.biz.schedule;
 import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -70,6 +71,8 @@ public class WaybillTaskService {
             System.out.println(startTime);
             System.out.println(endTime);
             System.out.println(isEffectiveDate(nowTime, startTime, endTime));
+
+            System.out.println(DateUtils.addDays(new Date(), -1));
         } catch (ParseException e) {
             e.printStackTrace();
         }
