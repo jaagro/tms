@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
+import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.dto.waybill.ListWaybillDto;
 import com.jaagro.tms.api.service.OrderRefactorService;
@@ -251,8 +252,14 @@ public class OrderController {
                 orderVo
                         .setCustomerId(customerService.getShowCustomerById(orderDto.getCustomerId()))
                         .setCustomerContract(customerService.getShowCustomerContractById(orderDto.getCustomerContractId()))
-                        .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()))
-                        .setDepartmentName(userClientService.getDeptNameById(orderDto.getDepartmentId()));
+                        .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()));
+                //归属网点名称
+                ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
+                if (showSiteDto != null) {
+                    if (!StringUtils.isEmpty(showSiteDto.getDeptId())) {
+                        orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                    }
+                }
                 //创单人
                 UserInfo userInfo = authClientService.getUserInfoById(orderDto.getCreatedUserId(), "employee");
                 if (userInfo != null) {
@@ -360,8 +367,14 @@ public class OrderController {
                 orderVo
                         .setCustomerId(customerService.getShowCustomerById(orderDto.getCustomerId()))
                         .setCustomerContract(customerService.getShowCustomerContractById(orderDto.getCustomerContractId()))
-                        .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()))
-                        .setDepartmentName(userClientService.getDeptNameById(orderDto.getDepartmentId()));
+                        .setLoadSite(customerService.getShowSiteById(orderDto.getLoadSiteId()));
+                //归属网点名称
+                ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
+                if (showSiteDto != null) {
+                    if (!StringUtils.isEmpty(showSiteDto.getDeptId())) {
+                        orderVo.setDepartmentName(userClientService.getDeptNameById(showSiteDto.getDeptId()));
+                    }
+                }
                 //创单人
                 UserInfo userInfo = authClientService.getUserInfoById(orderDto.getCreatedUserId(), "employee");
                 if (userInfo != null) {
