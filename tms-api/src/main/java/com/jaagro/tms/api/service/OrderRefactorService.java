@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.service;
 
+import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.order.CreateOrderDto;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
@@ -33,7 +34,7 @@ public interface OrderRefactorService {
      * @param criteriaDto 查询条件 json
      * @return 订单列表
      */
-    Map<String, Object> listWeChatOrderByCriteria(ListOrderCriteriaDto criteriaDto);
+    PageInfo listWeChatOrderByCriteria(ListOrderCriteriaDto criteriaDto);
 
 
 }
