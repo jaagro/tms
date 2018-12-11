@@ -30,5 +30,9 @@ public class ShowPersonalCenter implements Serializable {
      * 车辆证件信息
      */
     private ListTruckLicenseDto truckLicenseDto;
+    /**
+     * 车辆信息
+     */
+    private ShowTruckDto truckInfo;
 
 }

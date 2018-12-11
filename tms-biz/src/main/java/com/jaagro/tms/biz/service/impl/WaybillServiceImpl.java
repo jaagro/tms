@@ -773,7 +773,7 @@ public class WaybillServiceImpl implements WaybillService {
                     .setAllocationTime(allocationTime(driver.getExpiryDrivingLicense()));
             showPersonalCenter.setDriverLicenseDto(listDriverLicenseDto);
         }
-        // 我的车辆信息
+        // 我的车辆证照信息
         ListTruckLicenseDto listTruckLicenseDto = new ListTruckLicenseDto();
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         listTruckLicenseDto
@@ -783,7 +783,31 @@ public class WaybillServiceImpl implements WaybillService {
                 .setExpiryAnnual(truckByToken.getExpiryAnnual())
                 .setTruckStatus(truckByToken.getTruckStatus());
         showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
+        // 车辆信息 add by jia.yu
+        setTruckInfo(showPersonalCenter, truckByToken);
         return showPersonalCenter;
+    }
+
+    private void setTruckInfo(ShowPersonalCenter showPersonalCenter, ShowTruckDto truckByToken) {
+        if (showPersonalCenter != null && truckByToken != null) {
+            com.jaagro.tms.api.dto.driverapp.ShowTruckDto showTruckDto = new com.jaagro.tms.api.dto.driverapp.ShowTruckDto();
+            BeanUtils.copyProperties(truckByToken, showTruckDto);
+            showTruckDto.setTruckId(truckByToken.getId());
+            if (!CollectionUtils.isEmpty(truckByToken.getDrivers())) {
+                UserInfo currentUser = currentUserService.getCurrentUser();
+                if (currentUser != null) {
+                    for (ShowDriverDto driverDto : truckByToken.getDrivers()) {
+                        if (currentUser.getId().equals(driverDto.getId())) {
+                            BeanUtils.copyProperties(driverDto, showTruckDto);
+                            showTruckDto.setDriverId(driverDto.getId())
+                                    .setDriverName(driverDto.getName())
+                                    .setMainDriver(driverDto.getMaindriver());
+                        }
+                    }
+                }
+                showPersonalCenter.setTruckInfo(showTruckDto);
+            }
+        }
     }
 
     /**
@@ -1354,6 +1378,15 @@ public class WaybillServiceImpl implements WaybillService {
             if (!insertGoodsNum.equals(waybillGoodsList.size())) {
                 throw new RuntimeException("插入运单货物失败");
             }
+            // 修改运单回单状态(不设置修改人和修改时间防止影响统计运单完成数)
+            Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+            if (waybill != null){
+                waybill.setReceiptStatus(ReceiptStatus.LOAD_RECEIPT);
+                int updateWaybillNum = waybillMapper.updateByPrimaryKeySelective(waybill);
+                if (updateWaybillNum < 1){
+                    throw new RuntimeException("修改运单失败");
+                }
+            }
         }
         return true;
     }
@@ -1421,11 +1454,20 @@ public class WaybillServiceImpl implements WaybillService {
                 }
             }
             waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
+            // 修改运单回单状态(不设置修改人和修改时间防止影响统计运单完成数)
+            Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+            if (waybill != null){
+                waybill.setReceiptStatus(ReceiptStatus.UNLOAD_RECEIPT);
+                int updateWaybillNum = waybillMapper.updateByPrimaryKeySelective(waybill);
+                if (updateWaybillNum < 1){
+                    throw new RuntimeException("修改运单失败");
+                }
+            }
             // 磅差异常提醒
             try {
                 pounderAlert(waybillId, true);
-            }catch (Exception ex){
-                log.error("pounderAlert error waybillId="+waybillId,ex);
+            } catch (Exception ex) {
+                log.error("pounderAlert error waybillId=" + waybillId, ex);
             }
         }
         return true;
