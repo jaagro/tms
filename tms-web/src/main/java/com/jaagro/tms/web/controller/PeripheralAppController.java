@@ -130,5 +130,7 @@ public class PeripheralAppController {
 
 //    @ApiOperation("洗车记录列表")
 //    @PostMapping("/listWashTruckRecordByCriteria")
-//    public BaseResponse listWashTruckRecordByCriteria()
+//    public BaseResponse listWashTruckRecordByCriteria(@RequestBody @Validated ListWashTruckRecordCriteria criteria){
+//
+//    }
 }

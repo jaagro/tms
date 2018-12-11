@@ -43,8 +43,9 @@ public class GpsLocationController {
      */
     @ApiOperation("新增司机定位")
     @PostMapping("/insertBatch")
-    public void insertBatch(@RequestBody List<LocationDto> locationDtos) {
+    public BaseResponse insertBatch(@RequestBody List<LocationDto> locationDtos) {
         locationService.insertBatch(locationDtos);
+        return BaseResponse.successInstance("同步插入司机定位数据成功");
     }
 
     /**
@@ -54,13 +55,14 @@ public class GpsLocationController {
      */
     @ApiOperation("司机定位数据采集")
     @PostMapping("/insertBatchMq")
-    public void insertBatchMq(@RequestBody List<LocationDto> locationDtos) {
+    public BaseResponse insertBatchMq(@RequestBody List<LocationDto> locationDtos) {
         amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "location.send", locationDtos);
+        return BaseResponse.successInstance("插入司机定位数据到MQ成功");
     }
 
     @ApiOperation("异步新增司机定位")
     @PostMapping("/asyncBatchInsert")
-    public void asyncBatchInsert(@RequestBody List<LocationDto> locationDtos) {
+    public BaseResponse asyncBatchInsert(@RequestBody List<LocationDto> locationDtos) {
         long start = System.currentTimeMillis();
         List<LocationDto> listA = locationDtos.subList(0, 100);
         List<LocationDto> listB = locationDtos.subList(100, 200);
@@ -76,6 +78,7 @@ public class GpsLocationController {
         }
         long end = System.currentTimeMillis();
         log.info("----异步耗时----------" + (start - end) + "---------------");
+        return BaseResponse.successInstance("异步插入司机定位数据成功");
     }
 
     @ApiOperation("运单轨迹定位数据")
