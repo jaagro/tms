@@ -9,6 +9,7 @@ import com.jaagro.tms.api.dto.Message.MessageReturnDto;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
+import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.driverapp.*;
@@ -43,7 +44,6 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -322,6 +322,15 @@ public class WaybillServiceImpl implements WaybillService {
                 .setGoodType(ordersData.getGoodsType())
                 .setTotalQuantity(getWaybillDto.getWaybillItems().stream().mapToInt(GetWaybillItemDto::getTotalQuantity).sum())
                 .setTotalWeight(getWaybillDto.getWaybillItems().stream().map(GetWaybillItemDto::getTotalWeight).reduce(BigDecimal.ZERO, BigDecimal::add));
+
+        //订单的客户20181207 begin
+        ShowCustomerDto customerDto = customerClientService.getShowCustomerById(ordersData.getCustomerId());
+
+        //客户的联系人
+        CustomerContactsReturnDto customerContactsDto = customerClientService.getCustomerContactByCustomerId(ordersData.getCustomerId());
+        getWaybillDto.setCustomerDto(customerDto);
+        getWaybillDto.setCustomerContactsDto(customerContactsDto);
+        //20181207 end
         return getWaybillDto;
     }
 
@@ -1120,7 +1129,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-            ) {
+                    ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1555,10 +1564,10 @@ public class WaybillServiceImpl implements WaybillService {
         } catch (Exception ex) {
             ex.printStackTrace();
             log.error("获取当前用户失败：currentUserService.getCurrentUser()");
-            return 999999999;
+            return 1;
         }
         if (null == userInfo) {
-            return 999999999;
+            return 1;
         } else {
             return userInfo.getId();
         }
