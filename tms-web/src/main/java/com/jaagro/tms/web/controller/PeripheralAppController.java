@@ -115,17 +115,20 @@ public class PeripheralAppController {
         return BaseResponse.successInstance(gasolineRecordDtos);
     }
 
-    @ApiOperation("提交洗车记录")
-    @PostMapping("/createWashTruckRecord")
-    public BaseResponse createWashTruckRecord(@RequestBody @Validated CreateWashTruckRecordDto createWashTruckRecordDto){
-        return BaseResponse.successInstance("");
-    }
-
-
     @ApiOperation("加油详情")
     @PostMapping("/gasolineList/{gasolineListId}")
     public BaseResponse gasolineList(@PathVariable("gasolineListId") Integer gasolineListId) {
         return BaseResponse.successInstance(gasolinePlusService.gasolineList(gasolineListId));
     }
 
+    @ApiOperation("提交洗车记录")
+    @PostMapping("/createWashTruckRecord")
+    public BaseResponse createWashTruckRecord(@RequestBody @Validated CreateWashTruckRecordDto createWashTruckRecordDto){
+        washTruckService.createWashTruckRecord(createWashTruckRecordDto);
+        return BaseResponse.successInstance("提交洗车记录成功");
+    }
+
+//    @ApiOperation("洗车记录列表")
+//    @PostMapping("/listWashTruckRecordByCriteria")
+//    public BaseResponse listWashTruckRecordByCriteria()
 }
