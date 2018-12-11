@@ -7,6 +7,7 @@ import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.api.service.RepairRecordService;
 import com.jaagro.tms.api.service.WashTruckService;
 import com.jaagro.tms.biz.entity.WashTruckRecord;
+import com.jaagro.tms.web.vo.peripheral.WashTruckRecordDetailVo;
 import com.jaagro.tms.web.vo.peripheral.WashTruckRecordVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
@@ -146,4 +147,10 @@ public class PeripheralAppController {
         return BaseResponse.successInstance(pageInfo);
     }
 
+    @ApiOperation("洗车详情")
+    @PostMapping("/getWashTruckRecordDetailById/{id}")
+    public WashTruckRecordDetailVo getWashTruckRecordDetailById(@PathVariable("id") Integer id){
+        WashTruckRecordDto recordDto = washTruckService.getById(id);
+        return null;
+    }
 }

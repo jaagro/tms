@@ -25,7 +25,7 @@ public interface WashTruckService {
     PageInfo listWashTruckRecordByCriteria(ListWashTruckRecordCriteria criteria);
 
     /**
-     *
+     * 根据id查询洗车详情
      * @param id
      * @return
      */
