@@ -800,7 +800,8 @@ public class WaybillServiceImpl implements WaybillService {
                         if (currentUser.getId().equals(driverDto.getId())) {
                             BeanUtils.copyProperties(driverDto, showTruckDto);
                             showTruckDto.setDriverId(driverDto.getId())
-                                    .setDriverName(driverDto.getName());
+                                    .setDriverName(driverDto.getName())
+                                    .setMainDriver(driverDto.getMaindriver());
                         }
                     }
                 }
@@ -1377,6 +1378,15 @@ public class WaybillServiceImpl implements WaybillService {
             if (!insertGoodsNum.equals(waybillGoodsList.size())) {
                 throw new RuntimeException("插入运单货物失败");
             }
+            // 修改运单回单状态(不设置修改人和修改时间防止影响统计运单完成数)
+            Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+            if (waybill != null){
+                waybill.setReceiptStatus(ReceiptStatus.LOAD_RECEIPT);
+                int updateWaybillNum = waybillMapper.updateByPrimaryKeySelective(waybill);
+                if (updateWaybillNum < 1){
+                    throw new RuntimeException("修改运单失败");
+                }
+            }
         }
         return true;
     }
@@ -1444,6 +1454,15 @@ public class WaybillServiceImpl implements WaybillService {
                 }
             }
             waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
+            // 修改运单回单状态(不设置修改人和修改时间防止影响统计运单完成数)
+            Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+            if (waybill != null){
+                waybill.setReceiptStatus(ReceiptStatus.UNLOAD_RECEIPT);
+                int updateWaybillNum = waybillMapper.updateByPrimaryKeySelective(waybill);
+                if (updateWaybillNum < 1){
+                    throw new RuntimeException("修改运单失败");
+                }
+            }
             // 磅差异常提醒
             try {
                 pounderAlert(waybillId, true);

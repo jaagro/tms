@@ -6,6 +6,7 @@
         <result column="order_id" property="orderId" jdbcType="INTEGER"/>
         <result column="truck_team_contract_id" property="truckTeamContractId" jdbcType="INTEGER"/>
         <result column="waybill_status" property="waybillStatus" jdbcType="VARCHAR"/>
+        <result column="receipt_status" property="receiptStatus" jdbcType="INTEGER"/>
         <result column="need_truck_type" property="needTruckType" jdbcType="INTEGER"/>
         <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
         <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
@@ -25,6 +26,7 @@
         <result column="order_id" property="orderId" jdbcType="INTEGER"/>
         <result column="truck_team_contract_id" property="truckTeamContractId" jdbcType="INTEGER"/>
         <result column="waybill_status" property="waybillStatus" jdbcType="VARCHAR"/>
+        <result column="receipt_status" property="receiptStatus" jdbcType="INTEGER"/>
         <result column="need_truck_type" property="needTruckType" jdbcType="INTEGER"/>
         <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
         <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
@@ -71,7 +73,7 @@
     <select id="selectWaybillByCarrierStatus" resultMap="ResultMap" parameterType="com.jaagro.tms.biz.entity.Waybill">
 
         select distinct * from (
-        select wb.id, wb.order_id, wb.load_site_id, wb.truck_team_contract_id, wb.waybill_status, wb.need_truck_type,
+        select wb.id, wb.order_id, wb.load_site_id, wb.truck_team_contract_id, wb.waybill_status, wb.receipt_status, wb.need_truck_type,
         wb.truck_id, wb.driver_id, wb.send_time, wb.distance, wb.create_time, wb.created_user_id, wb.modify_time,
         wb.modify_user_id, wb.enabled, wb.load_time, wb.department_id, wt.create_time trackingDate
         from waybill wb

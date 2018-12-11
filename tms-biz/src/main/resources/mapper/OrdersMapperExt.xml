@@ -72,7 +72,12 @@
             and t.unload_id = #{customerId}
         </if>
         GROUP BY o.id
-        order by o.load_time desc
+        <if test="differentiateStatus == null">
+            order by o.load_time desc
+        </if>
+        <if test="differentiateStatus != null and differentiateStatus == 'WeChat'">
+            order by o.create_time desc
+        </if>
     </select>
     <select id="getOrderIdsByCustomerId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
         select id from orders
