@@ -124,13 +124,13 @@ public class OrderRefactorServiceImpl implements OrderRefactorService {
      * @return 订单列表
      */
     @Override
-    public Map<String, Object> listWeChatOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
+    public PageInfo listWeChatOrderByCriteria(ListOrderCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
         if (criteriaDto.getCustomerId() == null) {
-            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "获取当前用户失败");
+            throw new RuntimeException("获取当前用户失败");
         }
         if (criteriaDto.getCustomerType() == null) {
-            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "获取当前用户类型失败");
+            throw new RuntimeException("获取当前用户类型失败");
         }
         List<WeChatListOrderDto> orderDtos = this.ordersMapper.listWeChatOrdersByCriteria(criteriaDto);
         if (orderDtos != null && orderDtos.size() > 0) {
@@ -158,6 +158,6 @@ public class OrderRefactorServiceImpl implements OrderRefactorService {
                 }
             }
         }
-        return ServiceResult.toResult(new PageInfo<>(orderDtos));
+        return new PageInfo<>(orderDtos);
     }
 }

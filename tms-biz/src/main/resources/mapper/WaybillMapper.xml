@@ -7,6 +7,7 @@
     <result column="load_site_id" jdbcType="INTEGER" property="loadSiteId" />
     <result column="truck_team_contract_id" jdbcType="INTEGER" property="truckTeamContractId" />
     <result column="waybill_status" jdbcType="VARCHAR" property="waybillStatus" />
+    <result column="receipt_status" jdbcType="INTEGER" property="receiptStatus" />
     <result column="need_truck_type" jdbcType="INTEGER" property="needTruckType" />
     <result column="truck_id" jdbcType="INTEGER" property="truckId" />
     <result column="driver_id" jdbcType="INTEGER" property="driverId" />
@@ -21,7 +22,7 @@
     <result column="department_id" jdbcType="INTEGER" property="departmentId" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, order_id, load_site_id, truck_team_contract_id, waybill_status, need_truck_type, 
+    id, order_id, load_site_id, truck_team_contract_id, waybill_status,receipt_status, need_truck_type,
     truck_id, driver_id, send_time, distance, create_time, created_user_id, modify_time, 
     modify_user_id, enabled, load_time, department_id
   </sql>
@@ -38,13 +39,13 @@
   <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Waybill" useGeneratedKeys="true"
           keyProperty="id" keyColumn="id">
     insert into waybill (id, order_id, load_site_id, 
-      truck_team_contract_id, waybill_status, need_truck_type, 
+      truck_team_contract_id, waybill_status,receipt_status, need_truck_type,
       truck_id, driver_id, send_time, 
       distance, create_time, created_user_id, 
       modify_time, modify_user_id, enabled, 
       load_time, department_id)
     values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{loadSiteId,jdbcType=INTEGER}, 
-      #{truckTeamContractId,jdbcType=INTEGER}, #{waybillStatus,jdbcType=VARCHAR}, #{needTruckType,jdbcType=INTEGER}, 
+      #{truckTeamContractId,jdbcType=INTEGER}, #{waybillStatus,jdbcType=VARCHAR}, #{receiptStatus,jdbcType=INTEGER}, #{needTruckType,jdbcType=INTEGER},
       #{truckId,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER}, #{sendTime,jdbcType=TIMESTAMP}, 
       #{distance,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{createdUserId,jdbcType=INTEGER}, 
       #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER}, #{enabled,jdbcType=BIT}, 
@@ -68,6 +69,9 @@
       </if>
       <if test="waybillStatus != null">
         waybill_status,
+      </if>
+      <if test="receiptStatus != null">
+        receipt_status,
       </if>
       <if test="needTruckType != null">
         need_truck_type,
@@ -122,6 +126,9 @@
       <if test="waybillStatus != null">
         #{waybillStatus,jdbcType=VARCHAR},
       </if>
+      <if test="receiptStatus != null">
+        #{receiptStatus,jdbcType=INTEGER},
+      </if>
       <if test="needTruckType != null">
         #{needTruckType,jdbcType=INTEGER},
       </if>
@@ -175,6 +182,9 @@
       <if test="waybillStatus != null">
         waybill_status = #{waybillStatus,jdbcType=VARCHAR},
       </if>
+      <if test="receiptStatus != null">
+        receipt_status = #{receiptStatus,jdbcType=INTEGER},
+      </if>
       <if test="needTruckType != null">
         need_truck_type = #{needTruckType,jdbcType=INTEGER},
       </if>
@@ -220,6 +230,7 @@
       load_site_id = #{loadSiteId,jdbcType=INTEGER},
       truck_team_contract_id = #{truckTeamContractId,jdbcType=INTEGER},
       waybill_status = #{waybillStatus,jdbcType=VARCHAR},
+      receipt_status = #{receiptStatus,jdbcType=INTEGER},
       need_truck_type = #{needTruckType,jdbcType=INTEGER},
       truck_id = #{truckId,jdbcType=INTEGER},
       driver_id = #{driverId,jdbcType=INTEGER},

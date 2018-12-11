@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jaagro.tms.biz.mapper.WashTruckImageMapperExt">
-
+    <insert id="batchInsert" parameterType="list">
+        insert into wash_truck_image (wash_truck_record_id, image_type,
+          image_url, create_time, create_user_id )
+        values
+        <foreach collection="imageList" separator="," item="image">
+            ( #{image.washTruckRecordId,jdbcType=INTEGER}, #{image.imageType,jdbcType=INTEGER},
+            #{image.imageUrl,jdbcType=VARCHAR}, #{image.createTime,jdbcType=TIMESTAMP}, #{image.createUserId,jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+    <select id="listByWashTruckRecordId" resultType="com.jaagro.tms.api.dto.peripheral.WashTruckImageDto">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM wash_truck_image
+        WHERE wash_truck_record_id = #{washTruckRecordId}
+    </select>
 </mapper>

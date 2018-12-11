@@ -1,6 +1,9 @@
 package com.jaagro.tms.api.service;
 
+import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.peripheral.CreateWashTruckRecordDto;
+import com.jaagro.tms.api.dto.peripheral.ListWashTruckRecordCriteria;
+import com.jaagro.tms.api.dto.peripheral.WashTruckRecordDto;
 
 /**
  * 洗车服务
@@ -13,4 +16,18 @@ public interface WashTruckService {
      * @param createWashTruckRecordDto
      */
     void createWashTruckRecord (CreateWashTruckRecordDto createWashTruckRecordDto);
+
+    /**
+     * 洗车记录列表
+     * @param criteria
+     * @return
+     */
+    PageInfo listWashTruckRecordByCriteria(ListWashTruckRecordCriteria criteria);
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    WashTruckRecordDto getById(Integer id);
 }

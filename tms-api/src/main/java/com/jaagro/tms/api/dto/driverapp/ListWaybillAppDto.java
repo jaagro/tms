@@ -45,6 +45,11 @@ public class ListWaybillAppDto implements Serializable {
     private String waybillStatus;
 
     /**
+     * 回单状态 0-未回单,1-已补录实提,2-已补录实卸
+     */
+    private Integer receiptStatus;
+
+    /**
      * 需求车型
      */
     private Integer needTruckType;
