@@ -1,5 +1,6 @@
 package com.jaagro.tms.biz.service.impl;
 
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.peripheral.ListRepairRecordCriteriaDto;
@@ -12,6 +13,8 @@ import com.jaagro.tms.biz.service.DriverClientService;
 import com.jaagro.tms.biz.service.TruckClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @Author Gavin
@@ -40,7 +43,7 @@ public class RepairRecordServiceImpl implements RepairRecordService {
 
         UserInfo userInfo = currentUserService.getCurrentUser();
         Integer userId = null == userInfo ? null : userInfo.getId();
-
+        //司机信息
         ShowDriverDto driverDto = driverClientService.getDriverReturnObject(record.getDriverId());
         record.setCreateUserId(userId);
         //根据司机id获取该司机的车辆
@@ -75,7 +78,9 @@ public class RepairRecordServiceImpl implements RepairRecordService {
      * @return
      */
     @Override
-    public PageInfo listRepairRecordByCriteria(ListRepairRecordCriteriaDto criteriaDto) {
-        return null;
+    public PageInfo<RepairRecord> listRepairRecordByCriteria(ListRepairRecordCriteriaDto criteriaDto) {
+        PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        List<RepairRecord> repairRecordList  = repairRecordMapper.listRepairRecordByCondition(criteriaDto);
+        return new PageInfo(repairRecordList);
     }
 }
