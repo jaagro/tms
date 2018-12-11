@@ -7,6 +7,9 @@ import com.jaagro.tms.api.dto.peripheral.CreateGasolineRecordDto;
 import com.jaagro.tms.api.dto.peripheral.GasolineRecordCondition;
 import com.jaagro.tms.api.dto.peripheral.GasolineRecordParam;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
+import com.jaagro.tms.api.enums.GasolineCompanyNameEnum;
+import com.jaagro.tms.api.enums.GasolineTypeEnum;
+import com.jaagro.tms.api.enums.PaymentMethodEnum;
 import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.biz.entity.GasolineRecord;
 import com.jaagro.tms.biz.mapper.GasolineRecordMapperExt;
@@ -77,6 +80,22 @@ public class GasolinePlusServiceImpl implements GasolinePlusService {
      */
     @Override
     public List<CreateGasolineRecordDto> gasolineList(Integer gasolineId) {
-        return null;
+        GasolineRecordCondition gasolineRecordCondition = new GasolineRecordCondition();
+        gasolineRecordCondition.setId(gasolineId);
+        List<CreateGasolineRecordDto> gasolineRecordDtos = gasolineRecordMapper.listGasolineRecordByCondition(gasolineRecordCondition);
+        for (CreateGasolineRecordDto gasolineRecordDto : gasolineRecordDtos) {
+            if (null != gasolineRecordDto.getGasolineCompany()) {
+                gasolineRecordDto
+                        .setGasolineCompany(GasolineCompanyNameEnum.getTypeByDesc(gasolineRecordDto.getGasolineCompany()));
+            }
+            if (null != gasolineRecordDto.getGasolineType()) {
+                gasolineRecordDto
+                        .setGasolineType(GasolineTypeEnum.getTypeByDesc(gasolineRecordDto.getGasolineType()));
+            }
+            if (null != gasolineRecordDto.getPaymentMethod()) {
+                gasolineRecordDto.setPaymentMethod(PaymentMethodEnum.getTypeByDesc(gasolineRecordDto.getPaymentMethod()));
+            }
+        }
+        return gasolineRecordDtos;
     }
 }

@@ -108,7 +108,7 @@ public class PeripheralAppController {
     @ApiOperation("加油记录列表")
     @PostMapping("/listGasolineRecords")
     public BaseResponse listGasolineRecords(@RequestBody GasolineRecordParam param) {
-        if (null != param.getPageNum() || null != param.getPageSize()) {
+        if (null == param.getPageNum() || null == param.getPageSize()) {
             throw new RuntimeException("参数不能为空");
         }
         PageInfo<CreateGasolineRecordDto> gasolineRecordDtos = gasolinePlusService.listGasolineRecords(param);
@@ -117,7 +117,7 @@ public class PeripheralAppController {
 
     @ApiOperation("提交洗车记录")
     @PostMapping("/createWashTruckRecord")
-    public BaseResponse createWashTruckRecord(@RequestBody @Validated CreateWashTruckRecordDto createWashTruckRecordDto){
+    public BaseResponse createWashTruckRecord(@RequestBody @Validated CreateWashTruckRecordDto createWashTruckRecordDto) {
         return BaseResponse.successInstance("");
     }
 
