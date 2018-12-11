@@ -6,6 +6,8 @@ import com.jaagro.tms.api.entity.RepairRecord;
 import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.api.service.RepairRecordService;
 import com.jaagro.tms.api.service.WashTruckService;
+import com.jaagro.tms.biz.entity.WashTruckRecord;
+import com.jaagro.tms.web.vo.peripheral.WashTruckRecordVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
@@ -16,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author @Gao.
@@ -128,9 +133,17 @@ public class PeripheralAppController {
         return BaseResponse.successInstance("提交洗车记录成功");
     }
 
-//    @ApiOperation("洗车记录列表")
-//    @PostMapping("/listWashTruckRecordByCriteria")
-//    public BaseResponse listWashTruckRecordByCriteria(@RequestBody @Validated ListWashTruckRecordCriteria criteria){
-//
-//    }
+    @ApiOperation("洗车记录列表")
+    @PostMapping("/listWashTruckRecordByCriteria")
+    public BaseResponse listWashTruckRecordByCriteria(@RequestBody @Validated ListWashTruckRecordCriteria criteria){
+        PageInfo pageInfo = washTruckService.listWashTruckRecordByCriteria(criteria);
+        List<WashTruckRecord> recordList = pageInfo.getList();
+        if (!recordList.isEmpty()){
+            List<WashTruckRecordVo> washTruckRecordVoList = new ArrayList<>();
+            recordList.forEach(record->{WashTruckRecordVo vo = new WashTruckRecordVo();BeanUtils.copyProperties(record,vo); washTruckRecordVoList.add(vo);});
+            pageInfo.setList(washTruckRecordVoList);
+        }
+        return BaseResponse.successInstance(pageInfo);
+    }
+
 }
