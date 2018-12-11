@@ -43,7 +43,7 @@ public class PeripheralAppController {
     @ApiOperation("新增维修记录")
     @PostMapping("/createRepairRecord")
     public BaseResponse createRepairRecord(@RequestBody RepairRecordDto source) {
-        log.info("O createRepairRecord param={}",source);
+        log.info("O createRepairRecord param={}", source);
         try {
             RepairRecord record = new RepairRecord();
             BeanUtils.copyProperties(source, record);
@@ -65,7 +65,7 @@ public class PeripheralAppController {
     @ApiOperation("获取单个维修记录")
     @RequestMapping("/getRepairRecord/{id}")
     public BaseResponse getRepairRecordById(@PathVariable("id") Integer id) {
-        log.info("O getRepairRecord id={}",id);
+        log.info("O getRepairRecord id={}", id);
         RepairRecord repairRecord;
         try {
             repairRecord = repairRecordService.getRepairRecordById(id);
@@ -85,7 +85,7 @@ public class PeripheralAppController {
      */
     @ApiOperation("维修记录列表分页")
     @PostMapping("/listRepairRecords")
-    public BaseResponse listRepairRecords(@RequestBody ListRepairRecordCriteriaDto criteriaDto){
+    public BaseResponse listRepairRecords(@RequestBody ListRepairRecordCriteriaDto criteriaDto) {
         log.info("O listRepairRecords criteriaDto={}", criteriaDto);
         PageInfo<RepairRecord> pageInfo = null;
         try {
@@ -123,9 +123,8 @@ public class PeripheralAppController {
 
 
     @ApiOperation("加油详情")
-    @PostMapping("/gasolineList/{gasolineListId}")
+    @GetMapping("/gasolineList/{gasolineListId}")
     public BaseResponse gasolineList(@PathVariable("gasolineListId") Integer gasolineListId) {
         return BaseResponse.successInstance(gasolinePlusService.gasolineList(gasolineListId));
     }
-
 }
