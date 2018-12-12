@@ -33,7 +33,8 @@
     delete from orders
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Orders">
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Orders" useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
     insert into orders (id, customer_contract_id, goods_type, 
       order_status, customer_id, load_site_id, 
       load_time, paper_receipt, notes, 
@@ -47,7 +48,8 @@
       #{modifyUserId,jdbcType=INTEGER}, #{departmentId,jdbcType=INTEGER}, #{directOrderFlag,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Orders">
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Orders" useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
     insert into orders
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -144,7 +146,8 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.Orders">
+  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.Orders" useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
     update orders
     <set>
       <if test="customerContractId != null">
@@ -192,7 +195,8 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.Orders">
+  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.Orders" useGeneratedKeys="true"
+          keyProperty="id" keyColumn="id">
     update orders
     set customer_contract_id = #{customerContractId,jdbcType=INTEGER},
       goods_type = #{goodsType,jdbcType=INTEGER},
