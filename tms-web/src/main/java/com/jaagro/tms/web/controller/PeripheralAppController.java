@@ -7,16 +7,19 @@ import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.api.service.RepairRecordService;
 import com.jaagro.tms.api.service.WashTruckService;
 import com.jaagro.tms.biz.entity.WashTruckRecord;
+import com.jaagro.tms.web.vo.peripheral.WashTruckImageVo;
 import com.jaagro.tms.web.vo.peripheral.WashTruckRecordDetailVo;
 import com.jaagro.tms.web.vo.peripheral.WashTruckRecordVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -149,8 +152,19 @@ public class PeripheralAppController {
 
     @ApiOperation("洗车详情")
     @PostMapping("/getWashTruckRecordDetailById/{id}")
-    public WashTruckRecordDetailVo getWashTruckRecordDetailById(@PathVariable("id") Integer id){
+    public BaseResponse<WashTruckRecordDetailVo> getWashTruckRecordDetailById(@PathVariable("id") Integer id){
         WashTruckRecordDto recordDto = washTruckService.getById(id);
-        return null;
+        if (recordDto != null){
+            WashTruckRecordDetailVo detailVo = new WashTruckRecordDetailVo();
+            BeanUtils.copyProperties(recordDto,detailVo);
+            List<WashTruckImageDto> washTruckImageDtoList = recordDto.getWashTruckImageDtoList();
+            if (!CollectionUtils.isEmpty(washTruckImageDtoList)){
+                List<WashTruckImageVo> imageVoList = new ArrayList<>();
+                washTruckImageDtoList.forEach(imageDto->{WashTruckImageVo imageVo = new WashTruckImageVo();BeanUtils.copyProperties(imageDto,imageVo);imageVoList.add(imageVo);});
+                detailVo.setImageList(imageVoList);
+            }
+            BaseResponse.successInstance(detailVo);
+        }
+        return BaseResponse.queryDataEmpty();
     }
 }
