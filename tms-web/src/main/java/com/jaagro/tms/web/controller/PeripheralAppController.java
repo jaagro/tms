@@ -56,7 +56,7 @@ public class PeripheralAppController {
      */
     @ApiOperation("新增维修记录")
     @PostMapping("/createRepairRecord")
-    public BaseResponse createRepairRecord(@RequestBody RepairRecordDto source) {
+    public BaseResponse createRepairRecord(@RequestBody @Validated RepairRecordDto source) {
         log.info("O createRepairRecord param={}", source);
         try {
             RepairRecord record = new RepairRecord();

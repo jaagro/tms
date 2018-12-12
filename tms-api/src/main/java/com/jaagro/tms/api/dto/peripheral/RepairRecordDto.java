@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -46,4 +48,11 @@ public class RepairRecordDto implements Serializable {
      * 维修详细描述
      */
     private String description;
+
+    /**
+     * 司机Id
+     */
+    @NotNull(message = "{driverId.NotNull}")
+    @Min(value = 1,message = "{driverId.Min}")
+    private Integer driverId;
 }
