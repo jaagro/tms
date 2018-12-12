@@ -32,6 +32,6 @@ public interface GasolinePlusService {
      * @param gasolineId
      * @return
      */
-    List<CreateGasolineRecordDto> gasolineList(Integer gasolineId);
+    List<CreateGasolineRecordDto> gasolineDetails(Integer gasolineId);
 
 }

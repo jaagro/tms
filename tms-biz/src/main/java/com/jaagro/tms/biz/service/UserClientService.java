@@ -1,6 +1,7 @@
 package com.jaagro.tms.biz.service;
 
 import com.jaagro.constant.UserInfo;
+import com.jaagro.utils.BaseResponse;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,4 +50,13 @@ public interface UserClientService {
      */
     @GetMapping("/listUserInfo")
     List<UserInfo> listUserInfo(@RequestParam("userIdList") List<Integer> userIdList, @RequestParam("userType") String userType);
+
+    /**
+     * 根据userId获取对应的用户数据
+     *
+     * @param userId
+     * @return
+     */
+    @GetMapping("/getGlobalUser/{userId}")
+    BaseResponse<UserInfo> getGlobalUser(@PathVariable("userId") int userId);
 }

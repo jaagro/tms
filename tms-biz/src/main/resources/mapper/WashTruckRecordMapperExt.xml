@@ -1,5 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jaagro.tms.biz.mapper.WashTruckRecordMapperExt">
-
+    <resultMap id="DetailResultMap" type="com.jaagro.tms.api.dto.peripheral.WashTruckRecordDto">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="truck_team_id" property="truckTeamId" jdbcType="INTEGER"/>
+        <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
+        <result column="truck_number" property="truckNumber" jdbcType="VARCHAR"/>
+        <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
+        <result column="driver_name" property="driverName" jdbcType="VARCHAR"/>
+        <result column="detail_address" property="detailAddress" jdbcType="VARCHAR"/>
+        <result column="notes" property="notes" jdbcType="VARCHAR"/>
+        <result column="enable" property="enable" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="create_user_id" property="createUserId" jdbcType="INTEGER"/>
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP"/>
+        <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
+        <collection property="washTruckImageDtoList" column="id" select="com.jaagro.tms.biz.mapper.WashTruckImageMapperExt.listByWashTruckRecordId"/>
+    </resultMap>
+    <select id="listWashTruckRecordByCriteria" parameterType="com.jaagro.tms.api.dto.peripheral.ListWashTruckRecordCriteria" resultType="com.jaagro.tms.biz.entity.WashTruckRecord">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM wash_truck_record
+        WHERE enable = 1
+        <if test="driverId != null and driverId > 0">
+            AND driver_id = #{driverId}
+        </if>
+        <if test="truckNumber != null and truckNumber != ''">
+            <![CDATA[and (truck_number like concat(#{truckNumber},'%') )]]>
+        </if>
+        order by create_time desc
+    </select>
+    <select id="selectById" resultMap="DetailResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM wash_truck_record
+        WHERE enable = 1
+        AND id = #{id}
+    </select>
 </mapper>

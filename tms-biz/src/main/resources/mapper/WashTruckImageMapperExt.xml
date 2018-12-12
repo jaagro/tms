@@ -11,5 +11,10 @@
             )
         </foreach>
     </insert>
-
+    <select id="listByWashTruckRecordId" resultType="com.jaagro.tms.api.dto.peripheral.WashTruckImageDto">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM wash_truck_image
+        WHERE wash_truck_record_id = #{washTruckRecordId}
+    </select>
 </mapper>

@@ -217,4 +217,10 @@ public interface WaybillService {
      * @return
      */
     Integer listWaitWaybillByOrderId(Integer id);
+
+    /**
+     * 获取当前登录司机的车辆信息
+     * @return
+     */
+    ShowTruckDto getTruckInfo();
 }

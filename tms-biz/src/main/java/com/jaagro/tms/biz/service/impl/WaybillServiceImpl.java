@@ -784,12 +784,12 @@ public class WaybillServiceImpl implements WaybillService {
                 .setTruckStatus(truckByToken.getTruckStatus());
         showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
         // 车辆信息 add by jia.yu
-        setTruckInfo(showPersonalCenter, truckByToken);
+        showPersonalCenter.setTruckInfo(getTruckInfo(truckByToken));
         return showPersonalCenter;
     }
 
-    private void setTruckInfo(ShowPersonalCenter showPersonalCenter, ShowTruckDto truckByToken) {
-        if (showPersonalCenter != null && truckByToken != null) {
+    private com.jaagro.tms.api.dto.driverapp.ShowTruckDto getTruckInfo(ShowTruckDto truckByToken) {
+        if (truckByToken != null) {
             com.jaagro.tms.api.dto.driverapp.ShowTruckDto showTruckDto = new com.jaagro.tms.api.dto.driverapp.ShowTruckDto();
             BeanUtils.copyProperties(truckByToken, showTruckDto);
             showTruckDto.setTruckId(truckByToken.getId());
@@ -805,9 +805,10 @@ public class WaybillServiceImpl implements WaybillService {
                         }
                     }
                 }
-                showPersonalCenter.setTruckInfo(showTruckDto);
+                return showTruckDto;
             }
         }
+        return null;
     }
 
     /**
@@ -1597,6 +1598,20 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public Integer listWaitWaybillByOrderId(Integer id) {
         return waybillMapper.listWaitWaybillByOrderId(id);
+    }
+
+    /**
+     * 获取当前登录司机的车辆信息
+     *
+     * @return
+     */
+    @Override
+    public com.jaagro.tms.api.dto.driverapp.ShowTruckDto getTruckInfo() {
+        ShowTruckDto truckByToken = truckClientService.getTruckByToken();
+        if (truckByToken != null){
+            return getTruckInfo(truckByToken);
+        }
+        return null;
     }
 
     private Integer getUserId() {
