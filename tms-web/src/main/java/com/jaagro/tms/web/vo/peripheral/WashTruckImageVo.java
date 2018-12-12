@@ -1,5 +1,8 @@
 package com.jaagro.tms.web.vo.peripheral;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -8,6 +11,8 @@ import java.util.Date;
  * @author yj
  * @since 2018/12/11
  */
+@Data
+@Accessors(chain = true)
 public class WashTruckImageVo implements Serializable{
     /**
      * 图片类型 1-车前,2-车中,3-车后

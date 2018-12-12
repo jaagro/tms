@@ -3,6 +3,7 @@ package com.jaagro.tms.biz.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.constant.RequestSource;
 import com.jaagro.tms.api.dto.peripheral.*;
 import com.jaagro.tms.api.service.WashTruckService;
 import com.jaagro.tms.biz.entity.WashTruckImage;
@@ -49,7 +50,6 @@ public class WashTruckServiceImpl implements WashTruckService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createWashTruckRecord(CreateWashTruckRecordDto createWashTruckRecordDto) {
-        log.info("O createWashTruckRecord {}", createWashTruckRecordDto);
         WashTruckRecord record = new WashTruckRecord();
         BeanUtils.copyProperties(createWashTruckRecordDto, record);
         UserInfo currentUser = currentUserService.getCurrentUser();
@@ -81,6 +81,14 @@ public class WashTruckServiceImpl implements WashTruckService {
     @Override
     public PageInfo listWashTruckRecordByCriteria(ListWashTruckRecordCriteria criteria) {
         PageHelper.startPage(criteria.getPageNum(), criteria.getPageSize());
+        if (RequestSource.APP.equals(criteria.getRequestSource())){
+            UserInfo currentUser = currentUserService.getCurrentUser();
+            Integer currentUserId = currentUser == null ? null : currentUser.getId();
+            if (currentUserId == null){
+                throw new RuntimeException("登录超时");
+            }
+            criteria.setDriverId(currentUserId);
+        }
         List<WashTruckRecord> washTruckRecordList = washTruckRecordMapperExt.listWashTruckRecordByCriteria(criteria);
         return new PageInfo(washTruckRecordList);
     }
