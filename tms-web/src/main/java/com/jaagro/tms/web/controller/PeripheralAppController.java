@@ -3,10 +3,12 @@ package com.jaagro.tms.web.controller;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.peripheral.*;
 import com.jaagro.tms.api.entity.RepairRecord;
+import com.jaagro.tms.api.enums.GasolineCompanyNameEnum;
 import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.api.service.RepairRecordService;
 import com.jaagro.tms.api.service.WashTruckService;
 import com.jaagro.tms.biz.entity.WashTruckRecord;
+import com.jaagro.tms.web.vo.peripheral.GasolineRecordListVo;
 import com.jaagro.tms.web.vo.peripheral.WashTruckImageVo;
 import com.jaagro.tms.web.vo.peripheral.WashTruckRecordDetailVo;
 import com.jaagro.tms.web.vo.peripheral.WashTruckRecordVo;
@@ -52,7 +54,7 @@ public class PeripheralAppController {
     @ApiOperation("新增维修记录")
     @PostMapping("/createRepairRecord")
     public BaseResponse createRepairRecord(@RequestBody RepairRecordDto source) {
-        log.info("O createRepairRecord param={}",source);
+        log.info("O createRepairRecord param={}", source);
         try {
             RepairRecord record = new RepairRecord();
             BeanUtils.copyProperties(source, record);
@@ -74,7 +76,7 @@ public class PeripheralAppController {
     @ApiOperation("获取单个维修记录")
     @RequestMapping("/getRepairRecord/{id}")
     public BaseResponse getRepairRecordById(@PathVariable("id") Integer id) {
-        log.info("O getRepairRecord id={}",id);
+        log.info("O getRepairRecord id={}", id);
         RepairRecord repairRecord;
         try {
             repairRecord = repairRecordService.getRepairRecordById(id);
@@ -94,7 +96,7 @@ public class PeripheralAppController {
      */
     @ApiOperation("维修记录列表分页")
     @PostMapping("/listRepairRecords")
-    public BaseResponse listRepairRecords(@RequestBody ListRepairRecordCriteriaDto criteriaDto){
+    public BaseResponse listRepairRecords(@RequestBody ListRepairRecordCriteriaDto criteriaDto) {
         log.info("O listRepairRecords criteriaDto={}", criteriaDto);
         PageInfo<RepairRecord> pageInfo = null;
         try {
@@ -117,34 +119,49 @@ public class PeripheralAppController {
     @ApiOperation("加油记录列表")
     @PostMapping("/listGasolineRecords")
     public BaseResponse listGasolineRecords(@RequestBody GasolineRecordParam param) {
-        if (null != param.getPageNum() || null != param.getPageSize()) {
+        if (null == param.getPageNum() || null == param.getPageSize()) {
             throw new RuntimeException("参数不能为空");
         }
-        PageInfo<CreateGasolineRecordDto> gasolineRecordDtos = gasolinePlusService.listGasolineRecords(param);
+        PageInfo gasolineRecordDtos = gasolinePlusService.listGasolineRecords(param);
+        List<CreateGasolineRecordDto> createGasolineRecordDtos = gasolineRecordDtos.getList();
+        List<GasolineRecordListVo> gasolineRecordListVos = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(createGasolineRecordDtos)) {
+            for (CreateGasolineRecordDto gasolineRecordList : createGasolineRecordDtos) {
+                GasolineRecordListVo vo = new GasolineRecordListVo();
+                BeanUtils.copyProperties(gasolineRecordList, vo);
+                vo.setGasolineCompany(GasolineCompanyNameEnum.getTypeByDesc(gasolineRecordList.getGasolineCompany()));
+                gasolineRecordListVos.add(vo);
+            }
+        }
+        gasolineRecordDtos.setList(gasolineRecordListVos);
         return BaseResponse.successInstance(gasolineRecordDtos);
     }
 
     @ApiOperation("加油详情")
-    @PostMapping("/gasolineList/{gasolineListId}")
-    public BaseResponse gasolineList(@PathVariable("gasolineListId") Integer gasolineListId) {
-        return BaseResponse.successInstance(gasolinePlusService.gasolineList(gasolineListId));
+    @GetMapping("/gasolineDetails/{gasolineId}")
+    public BaseResponse gasolineDetails(@PathVariable("gasolineId") Integer gasolineId) {
+        return BaseResponse.successInstance(gasolinePlusService.gasolineDetails(gasolineId));
     }
 
     @ApiOperation("提交洗车记录")
     @PostMapping("/createWashTruckRecord")
-    public BaseResponse createWashTruckRecord(@RequestBody @Validated CreateWashTruckRecordDto createWashTruckRecordDto){
+    public BaseResponse createWashTruckRecord(@RequestBody @Validated CreateWashTruckRecordDto createWashTruckRecordDto) {
         washTruckService.createWashTruckRecord(createWashTruckRecordDto);
         return BaseResponse.successInstance("提交洗车记录成功");
     }
 
     @ApiOperation("洗车记录列表")
     @PostMapping("/listWashTruckRecordByCriteria")
-    public BaseResponse listWashTruckRecordByCriteria(@RequestBody @Validated ListWashTruckRecordCriteria criteria){
+    public BaseResponse listWashTruckRecordByCriteria(@RequestBody @Validated ListWashTruckRecordCriteria criteria) {
         PageInfo pageInfo = washTruckService.listWashTruckRecordByCriteria(criteria);
         List<WashTruckRecord> recordList = pageInfo.getList();
-        if (!recordList.isEmpty()){
+        if (!recordList.isEmpty()) {
             List<WashTruckRecordVo> washTruckRecordVoList = new ArrayList<>();
-            recordList.forEach(record->{WashTruckRecordVo vo = new WashTruckRecordVo();BeanUtils.copyProperties(record,vo); washTruckRecordVoList.add(vo);});
+            recordList.forEach(record -> {
+                WashTruckRecordVo vo = new WashTruckRecordVo();
+                BeanUtils.copyProperties(record, vo);
+                washTruckRecordVoList.add(vo);
+            });
             pageInfo.setList(washTruckRecordVoList);
         }
         return BaseResponse.successInstance(pageInfo);
