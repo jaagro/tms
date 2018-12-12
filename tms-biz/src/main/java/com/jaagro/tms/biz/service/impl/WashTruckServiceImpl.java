@@ -81,10 +81,10 @@ public class WashTruckServiceImpl implements WashTruckService {
     @Override
     public PageInfo listWashTruckRecordByCriteria(ListWashTruckRecordCriteria criteria) {
         PageHelper.startPage(criteria.getPageNum(), criteria.getPageSize());
-        if (RequestSource.APP.equals(criteria.getRequestSource())){
+        if (RequestSource.APP.equals(criteria.getRequestSource())) {
             UserInfo currentUser = currentUserService.getCurrentUser();
             Integer currentUserId = currentUser == null ? null : currentUser.getId();
-            if (currentUserId == null){
+            if (currentUserId == null) {
                 throw new RuntimeException("登录超时");
             }
             criteria.setDriverId(currentUserId);
@@ -105,17 +105,17 @@ public class WashTruckServiceImpl implements WashTruckService {
         if (washTruckRecordDto != null) {
             List<WashTruckImageDto> washTruckImageDtoList = washTruckRecordDto.getWashTruckImageDtoList();
             if (!CollectionUtils.isEmpty(washTruckImageDtoList)) {
-                washTruckImageDtoList.forEach(imageDto->convertImageUrl(imageDto));
+                washTruckImageDtoList.forEach(imageDto -> convertImageUrl(imageDto));
             }
         }
         return washTruckRecordDto;
     }
 
     private void convertImageUrl(WashTruckImageDto imageDto) {
-        if (imageDto != null && StringUtils.hasText(imageDto.getImageUrl())){
+        if (imageDto != null && StringUtils.hasText(imageDto.getImageUrl())) {
             String[] strArray = {imageDto.getImageUrl()};
             List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
-            if(!CollectionUtils.isEmpty(urls)){
+            if (!CollectionUtils.isEmpty(urls)) {
                 imageDto.setImageUrl(urls.get(0).toString());
             }
         }
