@@ -16,7 +16,6 @@ import com.jaagro.tms.web.vo.peripheral.WashTruckRecordDetailVo;
 import com.jaagro.tms.web.vo.peripheral.WashTruckRecordVo;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -158,7 +157,7 @@ public class PeripheralAppController {
     @ApiOperation("洗车记录列表")
     @PostMapping("/listWashTruckRecordByCriteria")
     public BaseResponse listWashTruckRecordByCriteria(@RequestBody @Validated ListWashTruckRecordCriteria criteria) {
-        log.info("O listWashTruckRecordByCriteria {}",criteria);
+        log.info("O listWashTruckRecordByCriteria {}", criteria);
         PageInfo pageInfo = washTruckService.listWashTruckRecordByCriteria(criteria);
         List<WashTruckRecord> recordList = pageInfo.getList();
         if (!recordList.isEmpty()) {
@@ -175,16 +174,20 @@ public class PeripheralAppController {
 
     @ApiOperation("洗车详情")
     @PostMapping("/getWashTruckRecordDetailById/{id}")
-    public BaseResponse<WashTruckRecordDetailVo> getWashTruckRecordDetailById(@PathVariable("id") Integer id){
-        log.info("O getWashTruckRecordDetailById id={}",id);
+    public BaseResponse<WashTruckRecordDetailVo> getWashTruckRecordDetailById(@PathVariable("id") Integer id) {
+        log.info("O getWashTruckRecordDetailById id={}", id);
         WashTruckRecordDto recordDto = washTruckService.getById(id);
-        if (recordDto != null){
+        if (recordDto != null) {
             WashTruckRecordDetailVo detailVo = new WashTruckRecordDetailVo();
-            BeanUtils.copyProperties(recordDto,detailVo);
+            BeanUtils.copyProperties(recordDto, detailVo);
             List<WashTruckImageDto> washTruckImageDtoList = recordDto.getWashTruckImageDtoList();
-            if (!CollectionUtils.isEmpty(washTruckImageDtoList)){
+            if (!CollectionUtils.isEmpty(washTruckImageDtoList)) {
                 List<WashTruckImageVo> imageVoList = new ArrayList<>();
-                washTruckImageDtoList.forEach(imageDto->{WashTruckImageVo imageVo = new WashTruckImageVo();BeanUtils.copyProperties(imageDto,imageVo);imageVoList.add(imageVo);});
+                washTruckImageDtoList.forEach(imageDto -> {
+                    WashTruckImageVo imageVo = new WashTruckImageVo();
+                    BeanUtils.copyProperties(imageDto, imageVo);
+                    imageVoList.add(imageVo);
+                });
                 detailVo.setImageList(imageVoList);
             }
             return BaseResponse.successInstance(detailVo);
@@ -194,9 +197,9 @@ public class PeripheralAppController {
 
     @ApiOperation("获取车辆信息")
     @GetMapping("/getTruckInfo")
-    public BaseResponse<ShowTruckDto> getTruckInfo(){
+    public BaseResponse<ShowTruckDto> getTruckInfo() {
         ShowTruckDto truckInfo = waybillService.getTruckInfo();
-        if (truckInfo != null){
+        if (truckInfo != null) {
             return BaseResponse.successInstance(truckInfo);
         }
         return BaseResponse.queryDataEmpty();
