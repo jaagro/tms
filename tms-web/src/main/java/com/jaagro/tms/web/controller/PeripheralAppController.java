@@ -78,7 +78,7 @@ public class PeripheralAppController {
      * @Author Gavin
      */
     @ApiOperation("获取单个维修记录")
-    @RequestMapping("/getRepairRecord/{id}")
+    @GetMapping("/getRepairRecord/{id}")
     public BaseResponse getRepairRecordById(@PathVariable("id") Integer id) {
         log.info("O getRepairRecord id={}", id);
         RepairRecord repairRecord;
