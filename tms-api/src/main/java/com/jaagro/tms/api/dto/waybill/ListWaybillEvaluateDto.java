@@ -1,15 +1,17 @@
-package com.jaagro.tms.biz.entity;
+package com.jaagro.tms.api.dto.waybill;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.Date;
+
 /**
  * @author @Gao.
  */
 @Data
 @Accessors(chain = true)
-public class WaybillEvaluate {
+public class ListWaybillEvaluateDto implements Serializable {
     /**
      * 主键id
      */
@@ -61,7 +63,7 @@ public class WaybillEvaluate {
     private Date modifyTime;
 
     /**
-     * 
+     *
      */
     private Boolean enabled;
 

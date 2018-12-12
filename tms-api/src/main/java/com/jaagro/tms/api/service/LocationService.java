@@ -21,6 +21,12 @@ public interface LocationService {
     int insertBatch(List<LocationDto> locationList);
 
     /**
+     * 批量新增司机定位数据到MQ
+     * @param LocationDtos
+     */
+    void insertBatchMQ(List<LocationDto> LocationDtos);
+
+    /**
      * 根据运单Id查询轨迹
      *
      * @param waybillId

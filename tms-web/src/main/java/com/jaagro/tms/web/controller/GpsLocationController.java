@@ -3,13 +3,11 @@ package com.jaagro.tms.web.controller;
 import com.jaagro.tms.api.dto.waybill.LocationDto;
 import com.jaagro.tms.api.dto.waybill.ShowLocationDto;
 import com.jaagro.tms.api.service.LocationService;
-import com.jaagro.tms.biz.config.RabbitMqConfig;
 import com.jaagro.tms.biz.service.impl.GpsLocationAsync;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.log4j.Log4j;
-import org.springframework.amqp.core.AmqpTemplate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +21,7 @@ import java.util.concurrent.Future;
 /**
  * @author gavin
  */
-@Log4j
+@Slf4j
 @RestController
 @Api(description = "司机定位管理", produces = MediaType.APPLICATION_JSON_VALUE)
 public class GpsLocationController {
@@ -32,8 +30,7 @@ public class GpsLocationController {
     private LocationService locationService;
     @Autowired
     private GpsLocationAsync asyncTask;
-    @Autowired
-    private AmqpTemplate amqpTemplate;
+
 
     /**
      * 批量新增司机定位数据
@@ -50,12 +47,13 @@ public class GpsLocationController {
     /**
      * 把采集到的司机定位信息发布到rabbitMQ
      *
-     * @param locationDtos
+     * @param locationDtoList
      */
     @ApiOperation("司机定位数据采集")
     @PostMapping("/insertBatchMq")
-    public void insertBatchMq(@RequestBody List<LocationDto> locationDtos) {
-        amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "location.send", locationDtos);
+    public void insertBatchMq(@RequestBody List<LocationDto> locationDtoList) {
+        log.info("O GpsLocationController.insertBatchMq locationDtoList:{}", locationDtoList);
+        locationService.insertBatchMQ(locationDtoList);
     }
 
     @ApiOperation("异步新增司机定位")

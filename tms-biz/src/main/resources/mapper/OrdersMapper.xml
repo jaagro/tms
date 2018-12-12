@@ -16,11 +16,12 @@
     <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
     <result column="modify_user_id" jdbcType="INTEGER" property="modifyUserId" />
     <result column="department_id" jdbcType="INTEGER" property="departmentId" />
+    <result column="direct_order_flag" jdbcType="VARCHAR" property="directOrderFlag" />
   </resultMap>
   <sql id="Base_Column_List">
     id, customer_contract_id, goods_type, order_status, customer_id, load_site_id, load_time, 
     paper_receipt, notes, create_time, created_user_id, modify_time, modify_user_id, 
-    department_id
+    department_id, direct_order_flag
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -32,21 +33,21 @@
     delete from orders
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Orders" useGeneratedKeys="true"
-          keyProperty="id" keyColumn="id">
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Orders">
     insert into orders (id, customer_contract_id, goods_type, 
       order_status, customer_id, load_site_id, 
       load_time, paper_receipt, notes, 
       create_time, created_user_id, modify_time, 
-      modify_user_id, department_id)
+      modify_user_id, department_id, direct_order_flag
+      )
     values (#{id,jdbcType=INTEGER}, #{customerContractId,jdbcType=INTEGER}, #{goodsType,jdbcType=INTEGER}, 
       #{orderStatus,jdbcType=VARCHAR}, #{customerId,jdbcType=INTEGER}, #{loadSiteId,jdbcType=INTEGER}, 
       #{loadTime,jdbcType=TIMESTAMP}, #{paperReceipt,jdbcType=BIT}, #{notes,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{createdUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, 
-      #{modifyUserId,jdbcType=INTEGER}, #{departmentId,jdbcType=INTEGER})
+      #{modifyUserId,jdbcType=INTEGER}, #{departmentId,jdbcType=INTEGER}, #{directOrderFlag,jdbcType=VARCHAR}
+      )
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Orders" useGeneratedKeys="true"
-          keyProperty="id" keyColumn="id">
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Orders">
     insert into orders
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -90,6 +91,9 @@
       </if>
       <if test="departmentId != null">
         department_id,
+      </if>
+      <if test="directOrderFlag != null">
+        direct_order_flag,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -135,6 +139,9 @@
       <if test="departmentId != null">
         #{departmentId,jdbcType=INTEGER},
       </if>
+      <if test="directOrderFlag != null">
+        #{directOrderFlag,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.Orders">
@@ -179,6 +186,9 @@
       <if test="departmentId != null">
         department_id = #{departmentId,jdbcType=INTEGER},
       </if>
+      <if test="directOrderFlag != null">
+        direct_order_flag = #{directOrderFlag,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -196,7 +206,8 @@
       created_user_id = #{createdUserId,jdbcType=INTEGER},
       modify_time = #{modifyTime,jdbcType=TIMESTAMP},
       modify_user_id = #{modifyUserId,jdbcType=INTEGER},
-      department_id = #{departmentId,jdbcType=INTEGER}
+      department_id = #{departmentId,jdbcType=INTEGER},
+      direct_order_flag = #{directOrderFlag,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

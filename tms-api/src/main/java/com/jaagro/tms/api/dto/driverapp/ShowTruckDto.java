@@ -1,20 +1,19 @@
 package com.jaagro.tms.api.dto.driverapp;
 
-import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 车辆信息
+ *
  * @author yj
  * @since 2018/12/11
  */
 @Data
 @Accessors(chain = true)
-public class ShowTruckDto implements Serializable{
+public class ShowTruckDto implements Serializable {
     /**
      * 主键车辆表ID
      */

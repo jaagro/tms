@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.constant.TrackingType;
 import com.jaagro.tms.api.dto.base.MyInfoVo;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.service.WaybillEvaluateService;
 import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
@@ -31,6 +32,8 @@ public class WebChatAppWaybillController {
 
     @Autowired
     private WaybillRefactorService waybillRefactorService;
+    @Autowired
+    private WaybillEvaluateService waybillEvaluateService;
     @Autowired
     private CurrentUserService userService;
     @Autowired
@@ -115,6 +118,26 @@ public class WebChatAppWaybillController {
         }
         detailVo.setTracking(trackingVos);
         return BaseResponse.successInstance(detailVo);
+    }
+
+    @ApiOperation("评价描述")
+    @GetMapping("/listEvaluateType/{lever}")
+    public BaseResponse listEvaluateType(@PathVariable("lever") Integer lever) {
+        List<ListEvaluateTypeDto> listEvaluateTypeDtos = waybillEvaluateService.listEvaluateType(lever);
+        List<ListEvaluateTypeVo> listEvaluateTypeVos = new ArrayList<>();
+        for (ListEvaluateTypeDto listEvaluateTypeDto : listEvaluateTypeDtos) {
+            ListEvaluateTypeVo listEvaluateTypeVo = new ListEvaluateTypeVo();
+            BeanUtils.copyProperties(listEvaluateTypeDto, listEvaluateTypeVo);
+            listEvaluateTypeVos.add(listEvaluateTypeVo);
+        }
+        return BaseResponse.successInstance(listEvaluateTypeVos);
+    }
+
+    @ApiOperation("运单评价")
+    @PostMapping("/waybillEvaluate")
+    public BaseResponse waybillEvaluate(@RequestBody CreateWaybillEvaluateDto dto) {
+        waybillEvaluateService.createWaybillEvaluate(dto);
+        return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
     }
 
     /**
