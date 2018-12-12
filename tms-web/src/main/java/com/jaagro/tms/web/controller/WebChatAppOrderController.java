@@ -3,10 +3,13 @@ package com.jaagro.tms.web.controller;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.constant.CustomerType;
 import com.jaagro.tms.api.dto.base.GetCustomerUserDto;
+import com.jaagro.tms.api.dto.base.MyInfoVo;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.order.*;
-import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.dto.waybill.GetWaybillDto;
+import com.jaagro.tms.api.dto.waybill.GetWaybillItemDto;
+import com.jaagro.tms.api.dto.waybill.ListWaybillCriteriaDto;
 import com.jaagro.tms.api.service.OrderRefactorService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
@@ -170,43 +173,53 @@ public class WebChatAppOrderController {
         if (StringUtils.isEmpty(criteriaDto.getOrderId())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单id不能为空");
         }
-        //运单列表
+        //订单详情中的 运单列表
         PageInfo pageInfo = waybillService.listWaybillByCriteriaForWechat(criteriaDto);
         List<GetWaybillDto> getWaybillDtos = pageInfo.getList();
         if (getWaybillDtos.size() > 0) {
             List<ListWaybillVo> waybillVoList = new ArrayList<>();
-            //运单
-            for (GetWaybillDto waybillDto : getWaybillDtos) {
-                ListWaybillVo waybillVo = new ListWaybillVo();
-                BeanUtils.copyProperties(waybillDto, waybillVo);
-                //运单装货地
-                if (waybillDto.getLoadSite() != null) {
-                    ShowSiteVo showSiteVo = new ShowSiteVo();
-                    BeanUtils.copyProperties(waybillDto.getLoadSite(), showSiteVo);
-                    waybillVo.setLoadSiteVo(showSiteVo);
-                }
-                List<ListWaybillItemsVo> listWaybillItemsVoList = new ArrayList<>();
-                //运单详细
-                if (waybillDto.getWaybillItems().size() > 0) {
-                    for (GetWaybillItemDto itemDto : waybillDto.getWaybillItems()) {
-                        ListWaybillItemsVo itemsVo = new ListWaybillItemsVo();
-                        BeanUtils.copyProperties(itemDto, itemsVo);
-                        //运单详情的卸货地址
-                        if (itemDto.getShowSiteDto() != null) {
-                            ShowSiteVo showSiteVo = new ShowSiteVo();
-                            BeanUtils.copyProperties(itemDto.getShowSiteDto(), showSiteVo);
-                            itemsVo.setUploadSiteVo(showSiteVo);
-                        }
-                        listWaybillItemsVoList.add(itemsVo);
-                    }
-                }
-                waybillVo.setWaybillItemsVoList(listWaybillItemsVoList);
-                waybillVoList.add(waybillVo);
-            }
+            this.setWaybillDetail(getWaybillDtos, waybillVoList);
             pageInfo.setList(waybillVoList);
         }
         return BaseResponse.successInstance(pageInfo);
 
+    }
+
+    /**
+     * 填充运单详情
+     *
+     * @param getWaybillDtos
+     * @param waybillVoList
+     */
+    public void setWaybillDetail(List<GetWaybillDto> getWaybillDtos, List<ListWaybillVo> waybillVoList) {
+        //运单
+        for (GetWaybillDto waybillDto : getWaybillDtos) {
+            ListWaybillVo waybillVo = new ListWaybillVo();
+            BeanUtils.copyProperties(waybillDto, waybillVo);
+            //运单装货地
+            if (waybillDto.getLoadSite() != null) {
+                ShowSiteVo showSiteVo = new ShowSiteVo();
+                BeanUtils.copyProperties(waybillDto.getLoadSite(), showSiteVo);
+                waybillVo.setLoadSiteVo(showSiteVo);
+            }
+            List<ListWaybillItemsVo> listWaybillItemsVoList = new ArrayList<>();
+            //运单详细
+            if (waybillDto.getWaybillItems().size() > 0) {
+                for (GetWaybillItemDto itemDto : waybillDto.getWaybillItems()) {
+                    ListWaybillItemsVo itemsVo = new ListWaybillItemsVo();
+                    BeanUtils.copyProperties(itemDto, itemsVo);
+                    //运单详情的卸货地址
+                    if (itemDto.getShowSiteDto() != null) {
+                        ShowSiteVo showSiteVo = new ShowSiteVo();
+                        BeanUtils.copyProperties(itemDto.getShowSiteDto(), showSiteVo);
+                        itemsVo.setUploadSiteVo(showSiteVo);
+                    }
+                    listWaybillItemsVoList.add(itemsVo);
+                }
+            }
+            waybillVo.setWaybillItemsVoList(listWaybillItemsVoList);
+            waybillVoList.add(waybillVo);
+        }
     }
 
     /**
@@ -291,29 +304,6 @@ public class WebChatAppOrderController {
     @ApiOperation("小程序-我的")
     @PostMapping("/getCurrentUserPhone")
     public BaseResponse getCurrentUserPhone() {
-        //获得customer_user中的关联用户id
-        GetCustomerUserDto customerUserDto = userService.getCustomerUserById();
-        if (customerUserDto != null) {
-            MyInfoVo myInfoVo = new MyInfoVo();
-            if (customerUserDto.getCustomerType().equals(CustomerType.CUSTOER)) {
-                ShowCustomerDto customerDto = customerClientService.getShowCustomerById(customerUserDto.getRelevanceId());
-                if (customerDto != null) {
-                    myInfoVo
-                            .setCustomerId(customerDto.getId())
-                            .setName(customerDto.getCustomerName())
-                            .setPhone(customerUserDto.getPhoneNumber());
-                }
-            } else {
-                ShowSiteDto showSiteDto = customerClientService.getShowSiteById(customerUserDto.getRelevanceId());
-                if (showSiteDto != null) {
-                    myInfoVo
-                            .setCustomerId(showSiteDto.getCustomerId())
-                            .setName(showSiteDto.getSiteName())
-                            .setPhone(customerUserDto.getPhoneNumber());
-                }
-            }
-            return BaseResponse.successInstance(myInfoVo);
-        }
-        return BaseResponse.successInstance(null);
+        return BaseResponse.successInstance(userService.getWebChatCurrentByCustomerUser());
     }
 }
