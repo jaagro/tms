@@ -49,20 +49,18 @@ public class WaybillEvaluateServiceImpl implements WaybillEvaluateService {
     public void createWaybillEvaluate(CreateWaybillEvaluateDto dto) {
         WaybillEvaluate waybillEvaluate = new WaybillEvaluate();
         UserInfo currentUser = currentUserService.getCurrentUser();
-        if (null != currentUser && null != dto.getCreateEvaluateType()) {
-            List<CreateEvaluateTypeDto> createEvaluateType = dto.getCreateEvaluateType();
+        List<CreateEvaluateTypeDto> createEvaluateType = dto.getCreateEvaluateType();
+        waybillEvaluate
+                .setWaybillId(dto.getWaybillId() == null ? null : dto.getWaybillId())
+                .setDriverId(dto.getDriverId() == null ? null : dto.getDriverId())
+                .setNote(dto.getNote() == null ? null : dto.getNote())
+                .setCreateUserId(currentUser.getId() == null ? null : currentUser.getId());
+        if (!CollectionUtils.isEmpty(createEvaluateType)) {
             String satisfactionLeverDesc = JSON.toJSONString(createEvaluateType);
-            if (!CollectionUtils.isEmpty(createEvaluateType)) {
-                waybillEvaluate
-                        .setNote(dto.getNote() == null ? null : dto.getNote())
-                        .setSatisfactionLeverDesc(satisfactionLeverDesc)
-                        .setCreateUserId(currentUser.getId())
-                        .setSatisfactionLever(createEvaluateType.get(0).getSatisfactionLever())
-                        .setDriverId(dto.getDriverId() == null ? null : dto.getDriverId())
-                        .setWaybillId(dto.getWaybillId() == null ? null : dto.getWaybillId())
-                        .setCreateUserId(currentUser.getId());
-            }
+            waybillEvaluate
+                    .setSatisfactionLeverDesc(satisfactionLeverDesc)
+                    .setSatisfactionLever(createEvaluateType.get(0).getSatisfactionLever());
         }
-        waybillEvaluateMapper.insert(waybillEvaluate);
+        waybillEvaluateMapper.insertSelective(waybillEvaluate);
     }
 }
