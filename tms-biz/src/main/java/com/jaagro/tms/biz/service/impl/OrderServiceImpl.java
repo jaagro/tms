@@ -85,6 +85,9 @@ public class OrderServiceImpl implements OrderService {
         BeanUtils.copyProperties(orderDto, order);
         order.setCreatedUserId(currentUserService.getShowUser().getId());
         order.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
+        if (!StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder())) {
+            order.setDirectOrderFlag("y");
+        }
         this.ordersMapper.insertSelective(order);
         //如果是牧源客户，那么设置默认的卸货地、卸货时间、货物，装货地前端选择
         if (!StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder())) {
