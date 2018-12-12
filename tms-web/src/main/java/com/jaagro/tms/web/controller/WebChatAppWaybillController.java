@@ -2,18 +2,18 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.constant.TrackingType;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.service.WaybillEvaluateService;
 import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.web.vo.chat.*;
 import com.jaagro.utils.BaseResponse;
+import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,6 +28,8 @@ public class WebChatAppWaybillController {
 
     @Autowired
     private WaybillRefactorService waybillService;
+    @Autowired
+    private WaybillEvaluateService waybillEvaluateService;
 
     /**
      * @param id
@@ -42,11 +44,11 @@ public class WebChatAppWaybillController {
         GetWaybillDetailDto detailDto = waybillService.getWaybillDetailById(id);
         BeanUtils.copyProperties(detailDto, detailVo);
         detailVo.setTruckNumber(detailDto.getAssginedTruckDto() == null ? "--" : detailDto.getAssginedTruckDto().getTruckNumber());
-        if(null == detailDto.getAssginedTruckDto()){
+        if (null == detailDto.getAssginedTruckDto()) {
             detailVo.setDriverName("--");
             detailVo.setDriverPhoneNumber("--");
 
-        }else {
+        } else {
             if (CollectionUtils.isEmpty(detailDto.getAssginedTruckDto().getDrivers())) {
                 detailVo.setDriverName("--");
                 detailVo.setDriverPhoneNumber("--");
@@ -86,9 +88,9 @@ public class WebChatAppWaybillController {
         List<GetTrackingDto> trackingDtos = detailDto.getTracking();
         // 过滤非运输轨迹 add by jia.yu 20181115
         Iterator<GetTrackingDto> iterator = trackingDtos.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             GetTrackingDto getTrackingDto = iterator.next();
-            if (!TrackingType.TRANSPORT.equals(getTrackingDto.getTrackingType())){
+            if (!TrackingType.TRANSPORT.equals(getTrackingDto.getTrackingType())) {
                 iterator.remove();
             }
         }
@@ -112,4 +114,23 @@ public class WebChatAppWaybillController {
         return BaseResponse.successInstance(detailVo);
     }
 
+    @ApiOperation("评价描述")
+    @GetMapping("/listEvaluateType/{lever}")
+    public BaseResponse listEvaluateType(@PathVariable("lever") Integer lever) {
+        List<ListEvaluateTypeDto> listEvaluateTypeDtos = waybillEvaluateService.listEvaluateType(lever);
+        List<ListEvaluateTypeVo> listEvaluateTypeVos = new ArrayList<>();
+        for (ListEvaluateTypeDto listEvaluateTypeDto : listEvaluateTypeDtos) {
+            ListEvaluateTypeVo listEvaluateTypeVo = new ListEvaluateTypeVo();
+            BeanUtils.copyProperties(listEvaluateTypeDto, listEvaluateTypeVo);
+            listEvaluateTypeVos.add(listEvaluateTypeVo);
+        }
+        return BaseResponse.successInstance(listEvaluateTypeVos);
+    }
+
+    @ApiOperation("运单评价")
+    @PostMapping("/waybillEvaluate")
+    public BaseResponse waybillEvaluate(@RequestBody CreateWaybillEvaluateDto dto) {
+        waybillEvaluateService.createWaybillEvaluate(dto);
+        return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
+    }
 }
