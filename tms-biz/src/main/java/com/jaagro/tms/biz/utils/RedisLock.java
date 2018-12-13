@@ -3,13 +3,9 @@ package com.jaagro.tms.biz.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import redis.clients.jedis.Jedis;
 
-import java.util.Collections;
-import java.util.UUID;
 
 /**
  * @author @Gao.
