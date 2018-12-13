@@ -1,29 +1,21 @@
-package com.jaagro.tms.biz.entity;
+package com.jaagro.tms.api.dto.waybill;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.Date;
+
 /**
  * @author @Gao.
  */
 @Data
 @Accessors(chain = true)
-public class WaybillEvaluate {
+public class ListEvaluateTypeDto implements Serializable {
     /**
-     * 主键id
+     * 主键Id
      */
     private Integer id;
-
-    /**
-     * 运单id
-     */
-    private Integer waybillId;
-
-    /**
-     * 司机id
-     */
-    private Integer driverId;
 
     /**
      * 满意度 （1- 非常差 2- 一般 3-超级赞）
@@ -34,11 +26,6 @@ public class WaybillEvaluate {
      * 满意度描述
      */
     private String satisfactionLeverDesc;
-
-    /**
-     * 备注
-     */
-    private String note;
 
     /**
      * 创建人 id
@@ -61,8 +48,7 @@ public class WaybillEvaluate {
     private Date modifyTime;
 
     /**
-     * 
+     *
      */
     private Boolean enabled;
-
 }
