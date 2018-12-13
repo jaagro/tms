@@ -27,6 +27,7 @@ import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
+import com.jaagro.tms.biz.utils.RedisLock;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
@@ -53,7 +54,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class WaybillServiceImpl implements WaybillService {
+
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
+    private static final int TIMEOUT = 10 * 1000;
 
     @Autowired
     private CurrentUserService currentUserService;
@@ -95,6 +98,8 @@ public class WaybillServiceImpl implements WaybillService {
     private AccountService accountService;
     @Autowired
     private CustomerClientService customerService;
+    @Autowired
+    private RedisLock redisLock;
 
     /**
      * @param waybillDtoList
@@ -964,6 +969,12 @@ public class WaybillServiceImpl implements WaybillService {
     public Map<String, Object> upDateReceiptStatus(GetReceiptParamDto dto) {
         log.info("O upDateReceiptStatus:{}", dto);
         Integer waybillId = dto.getWaybillId();
+        //加锁
+        long time = System.currentTimeMillis() + TIMEOUT;
+        boolean success = redisLock.lock("redisLock" + waybillId + dto.getReceiptStatus(), String.valueOf(time));
+        if (!success) {
+            throw new RuntimeException("加锁失败");
+        }
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         UserInfo currentUser = currentUserService.getCurrentUser();
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
@@ -999,6 +1010,8 @@ public class WaybillServiceImpl implements WaybillService {
             waybillTrackingMapper.insertSelective(waybillTracking);
             return ServiceResult.toResult(ReceiptConstant.OPERATION_SUCCESS);
         }
+        //解锁
+        redisLock.unLock("redisLock" + waybillId + dto.getReceiptStatus(), String.valueOf(time));
         return ServiceResult.toResult(ReceiptConstant.OPERATION_FAILED);
     }
 
@@ -1154,7 +1167,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-                    ) {
+            ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1381,10 +1394,10 @@ public class WaybillServiceImpl implements WaybillService {
             }
             // 修改运单回单状态(不设置修改人和修改时间防止影响统计运单完成数)
             Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
-            if (waybill != null){
+            if (waybill != null) {
                 waybill.setReceiptStatus(ReceiptStatus.LOAD_RECEIPT);
                 int updateWaybillNum = waybillMapper.updateByPrimaryKeySelective(waybill);
-                if (updateWaybillNum < 1){
+                if (updateWaybillNum < 1) {
                     throw new RuntimeException("修改运单失败");
                 }
             }
@@ -1457,10 +1470,10 @@ public class WaybillServiceImpl implements WaybillService {
             waybillGoodsMapper.batchUpdateByPrimaryKeySelective(waybillGoodsList);
             // 修改运单回单状态(不设置修改人和修改时间防止影响统计运单完成数)
             Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
-            if (waybill != null){
+            if (waybill != null) {
                 waybill.setReceiptStatus(ReceiptStatus.UNLOAD_RECEIPT);
                 int updateWaybillNum = waybillMapper.updateByPrimaryKeySelective(waybill);
-                if (updateWaybillNum < 1){
+                if (updateWaybillNum < 1) {
                     throw new RuntimeException("修改运单失败");
                 }
             }
@@ -1608,7 +1621,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public com.jaagro.tms.api.dto.driverapp.ShowTruckDto getTruckInfo() {
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
-        if (truckByToken != null){
+        if (truckByToken != null) {
             return getTruckInfo(truckByToken);
         }
         return null;
