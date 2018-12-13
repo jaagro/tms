@@ -13,7 +13,7 @@ import java.util.UUID;
 
 /**
  * @author @Gao.
- * 分布式锁
+ * redis分布式锁
  */
 @Slf4j
 @Component

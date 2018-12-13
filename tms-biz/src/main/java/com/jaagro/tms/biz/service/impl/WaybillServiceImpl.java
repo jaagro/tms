@@ -973,7 +973,7 @@ public class WaybillServiceImpl implements WaybillService {
         long time = System.currentTimeMillis() + TIMEOUT;
         boolean success = redisLock.lock("redisLock" + waybillId + dto.getReceiptStatus(), String.valueOf(time));
         if (!success) {
-            throw new RuntimeException("加锁失败");
+            throw new RuntimeException("请求正在处理中");
         }
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         UserInfo currentUser = currentUserService.getCurrentUser();
