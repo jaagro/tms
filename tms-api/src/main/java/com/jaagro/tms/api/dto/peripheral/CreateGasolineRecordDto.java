@@ -20,6 +20,11 @@ public class CreateGasolineRecordDto implements Serializable {
     private Integer driverId;
 
     /**
+     * 司机姓名
+     */
+    private String driverName;
+
+    /**
      * 车辆id
      */
     private Integer truckId;

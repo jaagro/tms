@@ -18,4 +18,10 @@ public class GasolineRecordParam {
      * 每页条数
      */
     private Integer pageSize;
+    /**
+     * 车牌号码
+     */
+    private String truckNumber;
+
+
 }

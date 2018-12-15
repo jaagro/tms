@@ -682,7 +682,9 @@ public class WaybillServiceImpl implements WaybillService {
             //如果运单全部签收 运单状态
             if (unSignUnloadSite.size() == 1) {
                 //更改运单状态
-                waybill.setWaybillStatus(WaybillStatus.ACCOMPLISH);
+                waybill
+                        .setWaybillStatus(WaybillStatus.ACCOMPLISH)
+                        .setModifyTime(new Date());
                 waybillMapper.updateByPrimaryKeySelective(waybill);
                 ShowCustomerDto customerDto = customerService.getShowCustomerById(orders.getCustomerId());
                 //磅单超过千分之二 进行于预警判断
