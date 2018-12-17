@@ -1,6 +1,7 @@
 package com.jaagro.tms.biz.service.impl;
 
 import com.jaagro.tms.api.constant.OrderStatus;
+import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.dto.waybill.LocationDto;
 import com.jaagro.tms.api.dto.waybill.ShowLocationDto;
@@ -74,14 +75,18 @@ public class LocationServiceImpl implements LocationService {
     public void insertBatchMQ(List<LocationDto> list) {
 
         ShowTruckDto truckDto = truckClientService.getTruckByToken();
-        if (truckDto != null) {
-            for (LocationDto locationDto : list) {
-                locationDto.setDriverId(truckDto.getDrivers().get(0).getId());
-                locationDto.setTruckId(truckDto.getId());
+        List<ShowDriverDto> driverList = truckDto.getDrivers();
+        if (!CollectionUtils.isEmpty(driverList)) {
+            Integer driverId = truckDto.getDrivers().get(0).getId();
+            if (truckDto != null) {
+                for (LocationDto locationDto : list) {
+                    locationDto.setDriverId(driverId);
+                    locationDto.setTruckId(truckDto.getId());
+                }
             }
-        }
 
-        amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "location.send", list);
+            amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "location.send", list);
+        }
     }
 
 
