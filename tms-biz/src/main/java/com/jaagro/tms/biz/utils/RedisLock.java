@@ -1,12 +1,18 @@
 package com.jaagro.tms.biz.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
 
 /**
  * @author @Gao.
+ * redis分布式锁
  */
+@Slf4j
+@Component
 public class RedisLock {
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -33,6 +39,13 @@ public class RedisLock {
         return false;
     }
 
+    /**
+     * 解锁
+     *
+     * @param key
+     * @param value
+     * @return
+     */
     public boolean unLock(String key, String value) {
         try {
             String currentValue = redisTemplate.opsForValue().get(key);
@@ -40,7 +53,7 @@ public class RedisLock {
                 redisTemplate.opsForValue().getOperations().delete(key);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("O unLock error:{}", e);
         }
         return true;
     }

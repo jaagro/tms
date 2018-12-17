@@ -19,4 +19,8 @@ public class GasolineRecordCondition implements Serializable {
      * 司机id
      */
     private Integer driverId;
+    /**
+     * 车牌号码
+     */
+    private String truckNumber;
 }

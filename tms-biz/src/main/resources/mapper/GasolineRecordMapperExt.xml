@@ -13,5 +13,8 @@
         <if test="driverId!=null">
             and driver_id = #{driverId,jdbcType=INTEGER}
         </if>
+        <if test="truckNumber!=null">
+            and truck_number like CONCAT('%',#{truckNumber},'%')
+        </if>
     </select>
 </mapper>

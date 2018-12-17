@@ -4,6 +4,7 @@
     <resultMap id="BaseResultMap" type="com.jaagro.tms.biz.entity.GasolineRecord">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="driver_id" property="driverId" jdbcType="INTEGER"/>
+        <result column="driver_name" property="driverName" jdbcType="VARCHAR"/>
         <result column="truck_id" property="truckId" jdbcType="INTEGER"/>
         <result column="truck_team_id" property="truckTeamId" jdbcType="INTEGER"/>
         <result column="truck_number" property="truckNumber" jdbcType="VARCHAR"/>
@@ -22,7 +23,7 @@
         <result column="enabled" property="enabled" jdbcType="BIT"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, driver_id, truck_id, truck_team_id, truck_number, gasoline_company, gasoline_type, 
+    id, driver_id, driver_name,truck_id, truck_team_id, truck_number, gasoline_company, gasoline_type,
     gasoline_station_name, instant_gasoline, gasoline_litre, gasoline_amount, payment_method, 
     create_time, create_user_id, modify_time, modify_user_id, note, enabled
   </sql>
@@ -37,14 +38,14 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
     <insert id="insert" parameterType="com.jaagro.tms.biz.entity.GasolineRecord">
-    insert into gasoline_record (id, driver_id, truck_id, 
+    insert into gasoline_record (id, driver_id, driver_name,truck_id,
       truck_team_id, truck_number, gasoline_company, 
       gasoline_type, gasoline_station_name, instant_gasoline, 
       gasoline_litre, gasoline_amount, payment_method, 
       create_time, create_user_id, modify_time, 
       modify_user_id, note, enabled
       )
-    values (#{id,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER}, #{truckId,jdbcType=INTEGER}, 
+    values (#{id,jdbcType=INTEGER}, #{driverId,jdbcType=INTEGER}, #{driverName,jdbcType=VARCHAR},#{truckId,jdbcType=INTEGER},
       #{truckTeamId,jdbcType=INTEGER}, #{truckNumber,jdbcType=VARCHAR}, #{gasolineCompany,jdbcType=VARCHAR}, 
       #{gasolineType,jdbcType=VARCHAR}, #{gasolineStationName,jdbcType=VARCHAR}, #{instantGasoline,jdbcType=DECIMAL}, 
       #{gasolineLitre,jdbcType=DECIMAL}, #{gasolineAmount,jdbcType=DECIMAL}, #{paymentMethod,jdbcType=VARCHAR}, 
@@ -60,6 +61,9 @@
             </if>
             <if test="driverId != null">
                 driver_id,
+            </if>
+            <if test="driverName != null">
+                driver_name,
             </if>
             <if test="truckId != null">
                 truck_id,
@@ -117,6 +121,9 @@
             <if test="driverId != null">
                 #{driverId,jdbcType=INTEGER},
             </if>
+            <if test="driverName != null">
+                #{driverName,jdbcType=VARCHAR},
+            </if>
             <if test="truckId != null">
                 #{truckId,jdbcType=INTEGER},
             </if>
@@ -173,6 +180,9 @@
             <if test="driverId != null">
                 driver_id = #{driverId,jdbcType=INTEGER},
             </if>
+            <if test="driverName != null">
+                driver_name = #{driverName,jdbcType=VARCHAR},
+            </if>
             <if test="truckId != null">
                 truck_id = #{truckId,jdbcType=INTEGER},
             </if>
@@ -227,6 +237,7 @@
     <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.GasolineRecord">
     update gasoline_record
     set driver_id = #{driverId,jdbcType=INTEGER},
+      driver_name = #{driverName,jdbcType=VARCHAR},
       truck_id = #{truckId,jdbcType=INTEGER},
       truck_team_id = #{truckTeamId,jdbcType=INTEGER},
       truck_number = #{truckNumber,jdbcType=VARCHAR},

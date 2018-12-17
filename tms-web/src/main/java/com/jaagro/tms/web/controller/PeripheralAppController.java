@@ -146,6 +146,12 @@ public class PeripheralAppController {
         return BaseResponse.successInstance(gasolinePlusService.gasolineDetails(gasolineId));
     }
 
+    @ApiOperation("加油管理")
+    @PostMapping("/gasolineManagement")
+    public BaseResponse gasolineManagement(@RequestBody GasolineRecordParam param) {
+        return BaseResponse.successInstance(gasolinePlusService.gasolineManagement(param));
+    }
+
     @ApiOperation("提交洗车记录")
     @PostMapping("/createWashTruckRecord")
     public BaseResponse createWashTruckRecord(@RequestBody @Validated CreateWashTruckRecordDto createWashTruckRecordDto) {
