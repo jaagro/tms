@@ -32,12 +32,12 @@ public class WaybillEvaluateServiceImpl implements WaybillEvaluateService {
     /**
      * 根据满意度等级 查询对应的描述
      *
-     * @param lever
+     * @param
      * @return
      */
     @Override
-    public List<ListEvaluateTypeDto> listEvaluateType(Integer lever) {
-        return evaluateTypeMapper.listEvaluateType(lever);
+    public List<ListEvaluateTypeDto> listEvaluateType() {
+        return evaluateTypeMapper.listEvaluateType();
     }
 
     /**
