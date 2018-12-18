@@ -765,13 +765,13 @@ public class WaybillServiceImpl implements WaybillService {
                 .setAccountType(AccountType.CASH)
                 .setUserId(currentUser == null ? null : currentUser.getId())
                 .setUserType(AccountUserType.DRIVER);
-        showPersonalCenter.setAccountInfo(accountService.getByQueryAccountDto(queryAccountDto));
+      //  showPersonalCenter.setAccountInfo(accountService.getByQueryAccountDto(queryAccountDto));
         // 我的驾驶证信息 add by @Gao. 20181204
         ListDriverLicenseDto listDriverLicenseDto = new ListDriverLicenseDto();
         ShowDriverDto driver = driverClientService.getDriverReturnObject(currentUser == null ? null : currentUser.getId());
         if (null != driver) {
             listDriverLicenseDto
-                    .setStatus(driver.getStatus())
+                    .setStatus(expiryDrivingLicenseIsNormal(driver))
                     .setIdentityCard(driver.getIdentityCard())
                     .setDrivingLicense(driver.getDrivingLicense())
                     .setValidityInspection(driver.getExpiryDrivingLicense())
@@ -787,7 +787,7 @@ public class WaybillServiceImpl implements WaybillService {
                 .setBuyTime(truckByToken.getBuyTime())
                 .setExpiryDate(truckByToken.getExpiryDate())
                 .setExpiryAnnual(truckByToken.getExpiryAnnual())
-                .setTruckStatus(truckByToken.getTruckStatus());
+                .setTruckStatus(truckIsNormal(truckByToken));
         showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
         // 车辆信息 add by jia.yu
         showPersonalCenter.setTruckInfo(getTruckInfo(truckByToken));
@@ -844,6 +844,41 @@ public class WaybillServiceImpl implements WaybillService {
             }
         }
         return dateString;
+    }
+
+    /**
+     * 判断驾驶证是否过期
+     *
+     * @param driver
+     * @return
+     * @Author @Gao.
+     */
+    private boolean expiryDrivingLicenseIsNormal(ShowDriverDto driver) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String currentStringDate = simpleDateFormat.format(new Date());
+        Date currentDate = stringToDate(currentStringDate);
+        Date expiryDrivingLicense = stringToDate(driver.getExpiryDrivingLicense() == null ? null : driver.getExpiryDrivingLicense());
+        if (currentDate.after(expiryDrivingLicense)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 判断车辆是否过期
+     *
+     * @param
+     * @return
+     */
+    private boolean truckIsNormal(ShowTruckDto truck) {
+        Date currentStringDate = new Date();
+        if (null == truck.getExpiryAnnual() || null == truck.getExpiryDate()) {
+            return false;
+        }
+        if (currentStringDate.after(truck.getExpiryAnnual()) || currentStringDate.before(truck.getExpiryDate())) {
+            return false;
+        }
+        return true;
     }
 
     /**
