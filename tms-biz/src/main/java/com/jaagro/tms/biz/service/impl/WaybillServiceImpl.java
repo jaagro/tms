@@ -870,7 +870,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @param
      * @return
      */
-    private boolean truckIsNormal(ShowTruckDto truck) {
+    private boolean truckIsNormal(com.jaagro.tms.api.dto.truck.ShowTruckDto truck) {
         Date currentStringDate = new Date();
         if (null == truck.getExpiryAnnual() || null == truck.getExpiryDate()) {
             return false;
