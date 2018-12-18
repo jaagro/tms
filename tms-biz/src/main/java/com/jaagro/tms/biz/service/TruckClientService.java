@@ -1,11 +1,12 @@
 package com.jaagro.tms.biz.service;
 
 import com.jaagro.tms.api.dto.truck.ChangeTruckDto;
+import com.jaagro.tms.api.dto.truck.ListTruckQualificationDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
+import com.jaagro.tms.api.dto.truck.TruckQualification;
 import com.jaagro.utils.BaseResponse;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,5 +39,23 @@ public interface TruckClientService {
      */
     @GetMapping("/listTruckByTruckTeamId/{truckTeamId}")
     BaseResponse<List<ChangeTruckDto>> listTruckByTruckTeamId(@PathVariable("truckTeamId") Integer truckTeamId);
+
+    /**
+     * 获取司机资质
+     *
+     * @param driverId
+     * @return
+     */
+    @PostMapping("/listQualificationByDriverId/{driverId}")
+    BaseResponse<List<ListTruckQualificationDto>> listQualificationByDriverId(@PathVariable("driverId") Integer driverId);
+
+    /**
+     * 修改资质
+     *
+     * @param qualification
+     * @return
+     */
+    @PutMapping("/truckQualificationToFeign")
+    BaseResponse truckQualificationToFeign(@RequestBody TruckQualification qualification);
 
 }

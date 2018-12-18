@@ -1722,7 +1722,7 @@ public class WaybillServiceImpl implements WaybillService {
             return ServiceResult.error(ex.getMessage());
         }
         //修改司机资质的信息
-        BaseResponse baseResponse = driverClientService.listQualificationByDriverId(truckDto.getDriverId());
+        BaseResponse baseResponse = truckClientService.listQualificationByDriverId(truckDto.getDriverId());
         if (baseResponse != null) {
             List<ListTruckQualificationDto> qualificationDtoList = (List<ListTruckQualificationDto>) baseResponse.getData();
             if (!CollectionUtils.isEmpty(qualificationDtoList)) {
@@ -1733,7 +1733,7 @@ public class WaybillServiceImpl implements WaybillService {
                             .setTruckId(truckDto.getTruckId())
                             .setDriverId(truckDto.getDriverId())
                             .setTruckTeamId(showTruckDto.getTruckTeamId());
-                    driverClientService.truckQualificationToFeign(truckQualification);
+                    truckClientService.truckQualificationToFeign(truckQualification);
                 }
             }
         }
