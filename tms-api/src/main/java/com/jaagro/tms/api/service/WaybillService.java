@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
+import com.jaagro.tms.api.dto.truck.ChangeTruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 
 import java.util.List;
@@ -220,7 +221,23 @@ public interface WaybillService {
 
     /**
      * 获取当前登录司机的车辆信息
+     *
      * @return
      */
     ShowTruckDto getTruckInfo();
+
+    /**
+     * 我要换车列表
+     *
+     * @return
+     */
+    List<ChangeTruckDto> getChangeTruckList();
+
+    /**
+     * 换车提交
+     *
+     * @param truckDto
+     * @return
+     */
+    Map<String, Object> changeTruck(TransferTruckDto truckDto);
 }
