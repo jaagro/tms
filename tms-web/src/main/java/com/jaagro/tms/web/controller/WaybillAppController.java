@@ -1,10 +1,7 @@
 package com.jaagro.tms.web.controller;
 
 import com.github.pagehelper.PageInfo;
-import com.jaagro.tms.api.dto.driverapp.GetReceiptParamDto;
-import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
-import com.jaagro.tms.api.dto.driverapp.GetWaybillTruckingParamDto;
-import com.jaagro.tms.api.dto.driverapp.ShowWaybillTrackingDto;
+import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.waybill.GetReceiptMessageParamDto;
 import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
@@ -137,4 +134,44 @@ public class WaybillAppController {
     public BaseResponse personalCenterApp() {
         return BaseResponse.successInstance(waybillService.personalCenter());
     }
+
+    /**
+     * 我要换车
+     *
+     * @return
+     * @author baiyiran
+     * @date 2018/12/18
+     */
+    @ApiOperation("我要换车")
+    @GetMapping("getChangeTruckListApp")
+    public BaseResponse getChangeTruckListApp() {
+        return BaseResponse.successInstance(waybillService.getChangeTruckList());
+    }
+
+    /**
+     * 提交换车
+     *
+     * @return
+     * @author baiyiran
+     * @date 2018/12/18
+     */
+    @ApiOperation("提交换车")
+    @PostMapping("changeTruckApp")
+    public BaseResponse changeTruckApp(@RequestBody TransferTruckDto truckDto) {
+        if (truckDto.getDriverId() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "司机id不能为空");
+        }
+        if (truckDto.getTruckId() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "车辆id不能为空");
+        }
+        Map<String, Object> result;
+        try {
+            result = waybillService.changeTruck(truckDto);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), ex.getMessage());
+        }
+        return BaseResponse.service(result);
+    }
+
 }

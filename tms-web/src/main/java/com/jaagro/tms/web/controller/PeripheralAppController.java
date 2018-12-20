@@ -1,7 +1,7 @@
 package com.jaagro.tms.web.controller;
 
 import com.github.pagehelper.PageInfo;
-import com.jaagro.tms.api.dto.driverapp.ShowTruckDto;
+import com.jaagro.tms.api.dto.driverapp.ShowTruckInfoDto;
 import com.jaagro.tms.api.dto.peripheral.*;
 import com.jaagro.tms.api.entity.RepairRecord;
 import com.jaagro.tms.api.enums.GasolineCompanyNameEnum;
@@ -203,8 +203,8 @@ public class PeripheralAppController {
 
     @ApiOperation("获取车辆信息")
     @GetMapping("/getTruckInfo")
-    public BaseResponse<ShowTruckDto> getTruckInfo() {
-        ShowTruckDto truckInfo = waybillService.getTruckInfo();
+    public BaseResponse<ShowTruckInfoDto> getTruckInfo() {
+        ShowTruckInfoDto truckInfo = waybillService.getTruckInfo();
         if (truckInfo != null) {
             return BaseResponse.successInstance(truckInfo);
         }

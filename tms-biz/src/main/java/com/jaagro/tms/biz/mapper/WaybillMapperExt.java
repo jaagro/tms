@@ -147,4 +147,12 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @return
      */
     List<ListWaybillDto> listWebChatWaybillByCriteria(ListWebChatWaybillCriteriaDto criteriaDto);
+
+    /**
+     * 根据司机id统计未完成的运单数说
+     *
+     * @param driverId
+     * @return
+     */
+    Integer countUnDoneByDriverId(@Param("driverId") Integer driverId);
 }
