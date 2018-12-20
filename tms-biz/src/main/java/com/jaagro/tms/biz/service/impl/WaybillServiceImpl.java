@@ -238,7 +238,7 @@ public class WaybillServiceImpl implements WaybillService {
             showDriverDto = driverClientService.getDriverReturnObject(waybill.getDriverId());
         }
         //车辆对象
-        com.jaagro.tms.api.dto.truck.ShowTruckDto truckDto = null;
+        ShowTruckDto truckDto = null;
         if (!StringUtils.isEmpty(waybill.getTruckId())) {
             truckDto = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
         }
@@ -780,7 +780,7 @@ public class WaybillServiceImpl implements WaybillService {
         }
         // 我的车辆证照信息
         ListTruckLicenseDto listTruckLicenseDto = new ListTruckLicenseDto();
-        com.jaagro.tms.api.dto.truck.ShowTruckDto truckByToken = truckClientService.getTruckByToken();
+        ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         listTruckLicenseDto
                 .setTruckNumber(truckByToken.getTruckNumber())
                 .setBuyTime(truckByToken.getBuyTime())
@@ -869,7 +869,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @param
      * @return
      */
-    private boolean truckIsNormal(com.jaagro.tms.api.dto.truck.ShowTruckDto truck) {
+    private boolean truckIsNormal(ShowTruckDto truck) {
         Date currentStringDate = new Date();
         if (null == truck.getExpiryAnnual() || null == truck.getExpiryDate()) {
             return false;
@@ -938,7 +938,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public Map<String, Object> receiptList(GetReceiptParamDto dto) {
 
-        com.jaagro.tms.api.dto.truck.ShowTruckDto truckByToken;
+        ShowTruckDto truckByToken;
         try {
             truckByToken = truckClientService.getTruckByToken();
         } catch (Exception e) {
@@ -1012,7 +1012,7 @@ public class WaybillServiceImpl implements WaybillService {
         }
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         UserInfo currentUser = currentUserService.getCurrentUser();
-        com.jaagro.tms.api.dto.truck.ShowTruckDto truckByToken = truckClientService.getTruckByToken();
+        ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         if (null != waybill.getDriverId()) {
             return ServiceResult.toResult(ReceiptConstant.ALREADY_RECEIVED);
         }
@@ -1701,7 +1701,7 @@ public class WaybillServiceImpl implements WaybillService {
             return ServiceResult.error("司机信息有误");
         }
         //判断要换的车辆是否符合条件
-        com.jaagro.tms.api.dto.truck.ShowTruckDto showTruckDto = truckClientService.getTruckByIdReturnObject(truckDto.getTruckId());
+        ShowTruckDto showTruckDto = truckClientService.getTruckByIdReturnObject(truckDto.getTruckId());
         if (showTruckDto == null) {
             return ServiceResult.error("车辆信息有误");
         }
