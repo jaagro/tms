@@ -766,7 +766,7 @@ public class WaybillServiceImpl implements WaybillService {
                 .setAccountType(AccountType.CASH)
                 .setUserId(currentUser == null ? null : currentUser.getId())
                 .setUserType(AccountUserType.DRIVER);
-      //  showPersonalCenter.setAccountInfo(accountService.getByQueryAccountDto(queryAccountDto));
+        showPersonalCenter.setAccountInfo(accountService.getByQueryAccountDto(queryAccountDto));
         // 我的驾驶证信息 add by @Gao. 20181204
         ListDriverLicenseDto listDriverLicenseDto = new ListDriverLicenseDto();
         ShowDriverDto driver = driverClientService.getDriverReturnObject(currentUser == null ? null : currentUser.getId());
@@ -775,8 +775,8 @@ public class WaybillServiceImpl implements WaybillService {
                     .setStatus(expiryDrivingLicenseIsNormal(driver))
                     .setIdentityCard(driver.getIdentityCard())
                     .setDrivingLicense(driver.getDrivingLicense())
-                    .setValidityInspection(driver.getExpiryDrivingLicense())
-                    .setExpiryDrivingLicense(driver.getExpiryDrivingLicense())
+                    .setValidityInspection(dateToString(stringToDate(driver.getExpiryDrivingLicense())))
+                    .setExpiryDrivingLicense(dateToString(stringToDate(driver.getExpiryDrivingLicense())))
                     .setAllocationTime(allocationTime(driver.getExpiryDrivingLicense()));
             showPersonalCenter.setDriverLicenseDto(listDriverLicenseDto);
         }
@@ -785,9 +785,9 @@ public class WaybillServiceImpl implements WaybillService {
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         listTruckLicenseDto
                 .setTruckNumber(truckByToken.getTruckNumber())
-                .setBuyTime(truckByToken.getBuyTime())
-                .setExpiryDate(truckByToken.getExpiryDate())
-                .setExpiryAnnual(truckByToken.getExpiryAnnual())
+                .setBuyTime(dateFormat(truckByToken.getBuyTime()))
+                .setExpiryDate(dateFormat(truckByToken.getExpiryDate()))
+                .setExpiryAnnual(dateFormat(truckByToken.getExpiryAnnual()))
                 .setTruckStatus(truckIsNormal(truckByToken));
         showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
         // 车辆信息 add by jia.yu
@@ -855,12 +855,12 @@ public class WaybillServiceImpl implements WaybillService {
      * @Author @Gao.
      */
     private boolean expiryDrivingLicenseIsNormal(ShowDriverDto driver) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String currentStringDate = simpleDateFormat.format(new Date());
-        Date currentDate = stringToDate(currentStringDate);
-        Date expiryDrivingLicense = stringToDate(driver.getExpiryDrivingLicense() == null ? null : driver.getExpiryDrivingLicense());
-        if (currentDate.after(expiryDrivingLicense)) {
-            return false;
+        Date currentDate = dateFormat(new Date());
+        if (driver.getExpiryDrivingLicense() != null) {
+            Date expiryDrivingLicense = stringToDate(driver.getExpiryDrivingLicense());
+            if (currentDate.after(expiryDrivingLicense)) {
+                return false;
+            }
         }
         return true;
     }
@@ -872,14 +872,24 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      */
     private boolean truckIsNormal(ShowTruckDto truck) {
-        Date currentStringDate = new Date();
+        Date currentStringDate = dateFormat(new Date());
         if (null == truck.getExpiryAnnual() || null == truck.getExpiryDate()) {
             return false;
         }
-        if (currentStringDate.after(truck.getExpiryAnnual()) || currentStringDate.before(truck.getExpiryDate())) {
+        if (currentStringDate.after(dateFormat(truck.getExpiryAnnual())) || currentStringDate.after(dateFormat(truck.getExpiryDate()))) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @param date
+     * @return
+     */
+    private static Date dateFormat(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String format = simpleDateFormat.format(date);
+        return stringToDate(format);
     }
 
     /**
@@ -898,6 +908,17 @@ public class WaybillServiceImpl implements WaybillService {
             log.error("I stringToDate-{}", e);
         }
         return date;
+    }
+
+    /**
+     * 将时间转化为字符串
+     *
+     * @param date
+     * @return
+     */
+    private String dateToString(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return simpleDateFormat.format(date);
     }
 
     /**
