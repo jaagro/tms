@@ -33,7 +33,7 @@ public class ListTruckLicenseDto implements Serializable {
     private Date expiryAnnual;
 
     /**
-     * 车辆状态(0；未审核  1；审核未通过 2－停止合作，3－正常合作)
+     * 车辆状态 false 不正常 true 正常
      */
-    private Integer truckStatus;
+    private boolean truckStatus;
 }

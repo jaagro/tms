@@ -121,9 +121,9 @@ public class WebChatAppWaybillController {
     }
 
     @ApiOperation("评价描述")
-    @GetMapping("/listEvaluateType/{lever}")
-    public BaseResponse listEvaluateType(@PathVariable("lever") Integer lever) {
-        List<ListEvaluateTypeDto> listEvaluateTypeDtos = waybillEvaluateService.listEvaluateType(lever);
+    @GetMapping("/listEvaluateType")
+    public BaseResponse listEvaluateType() {
+        List<ListEvaluateTypeDto> listEvaluateTypeDtos = waybillEvaluateService.listEvaluateType();
         List<ListEvaluateTypeVo> listEvaluateTypeVos = new ArrayList<>();
         for (ListEvaluateTypeDto listEvaluateTypeDto : listEvaluateTypeDtos) {
             ListEvaluateTypeVo listEvaluateTypeVo = new ListEvaluateTypeVo();

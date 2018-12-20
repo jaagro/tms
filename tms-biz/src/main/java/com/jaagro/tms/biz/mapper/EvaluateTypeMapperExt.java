@@ -9,8 +9,9 @@ public interface EvaluateTypeMapperExt extends EvaluateTypeMapper {
 
     /**
      * 根据满意度等级 查询对应的描述
-     * @param lever
+     *
+     * @param
      * @return
      */
-    List<ListEvaluateTypeDto> listEvaluateType(@Param("lever") Integer lever);
+    List<ListEvaluateTypeDto> listEvaluateType();
 }
