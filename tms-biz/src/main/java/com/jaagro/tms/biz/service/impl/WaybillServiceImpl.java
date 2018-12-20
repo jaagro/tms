@@ -16,9 +16,7 @@ import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
-import com.jaagro.tms.api.dto.truck.DriverReturnDto;
-import com.jaagro.tms.api.dto.truck.ShowDriverDto;
-import com.jaagro.tms.api.dto.truck.ShowTruckDto;
+import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.AccountService;
 import com.jaagro.tms.api.service.OrderService;
@@ -795,9 +793,9 @@ public class WaybillServiceImpl implements WaybillService {
         return showPersonalCenter;
     }
 
-    private com.jaagro.tms.api.dto.driverapp.ShowTruckDto getTruckInfo(ShowTruckDto truckByToken) {
+    private ShowTruckInfoDto getTruckInfo(ShowTruckDto truckByToken) {
         if (truckByToken != null) {
-            com.jaagro.tms.api.dto.driverapp.ShowTruckDto showTruckDto = new com.jaagro.tms.api.dto.driverapp.ShowTruckDto();
+            ShowTruckInfoDto showTruckDto = new ShowTruckInfoDto();
             BeanUtils.copyProperties(truckByToken, showTruckDto);
             showTruckDto.setTruckId(truckByToken.getId());
             if (!CollectionUtils.isEmpty(truckByToken.getDrivers())) {
@@ -1677,12 +1675,89 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      */
     @Override
-    public com.jaagro.tms.api.dto.driverapp.ShowTruckDto getTruckInfo() {
+    public ShowTruckInfoDto getTruckInfo() {
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         if (truckByToken != null) {
             return getTruckInfo(truckByToken);
         }
         return null;
+    }
+
+    /**
+     * 我要换车列表
+     *
+     * @return
+     */
+    @Override
+    public List<ChangeTruckDto> getChangeTruckList() {
+        UserInfo userInfo = currentUserService.getCurrentUser();
+        if (userInfo != null) {
+            DriverReturnDto driverDto = driverClientService.getDriverByIdFeign(userInfo == null ? null : userInfo.getId());
+            if (driverDto != null) {
+                BaseResponse<List<ChangeTruckDto>> baseResponse = truckClientService.listTruckByTruckTeamId(driverDto.getTruckTeamId());
+                if (baseResponse != null) {
+                    List<ChangeTruckDto> changeTruckDtoList = baseResponse.getData();
+                    return changeTruckDtoList;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 换车提交
+     *
+     * @param truckDto
+     * @return
+     */
+    @Override
+    public Map<String, Object> changeTruck(TransferTruckDto truckDto) {
+        //判断当前车辆是否满足换车条件
+        Integer amount = waybillMapper.countUnDoneByDriverId(truckDto.getDriverId());
+        if (amount != null && amount > 0) {
+            return ServiceResult.error("本次及之前任务未完成的车辆不能申请换车");
+        }
+        ShowDriverDto driverDto = driverClientService.getDriverReturnObject(truckDto.getDriverId());
+        if (driverDto == null) {
+            return ServiceResult.error("司机信息有误");
+        }
+        //判断要换的车辆是否符合条件
+        ShowTruckDto showTruckDto = truckClientService.getTruckByIdReturnObject(truckDto.getTruckId());
+        if (showTruckDto == null) {
+            return ServiceResult.error("车辆信息有误");
+        }
+        if (showTruckDto.getTruckStatus() != 1) {
+            return ServiceResult.error("车辆状态不符合换车条件");
+        }
+        //满足条件--将司机所属车辆换掉
+        UpdateDriverDto updateDriverDto = new UpdateDriverDto();
+        updateDriverDto
+                .setId(truckDto.getDriverId())
+                .setTruckId(truckDto.getTruckId())
+                .setTruckTeamId(showTruckDto.getTruckTeamId());
+        try {
+            driverClientService.updateDriverFeign(updateDriverDto);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ServiceResult.error(ex.getMessage());
+        }
+        //修改司机资质的信息
+        BaseResponse baseResponse = truckClientService.listQualificationByDriverId(truckDto.getDriverId());
+        if (baseResponse != null) {
+            List<ListTruckQualificationDto> qualificationDtoList = (List<ListTruckQualificationDto>) baseResponse.getData();
+            if (!CollectionUtils.isEmpty(qualificationDtoList)) {
+                for (ListTruckQualificationDto qualificationDto : qualificationDtoList) {
+                    TruckQualification truckQualification = new TruckQualification();
+                    BeanUtils.copyProperties(qualificationDto, truckQualification);
+                    truckQualification
+                            .setTruckId(truckDto.getTruckId())
+                            .setDriverId(truckDto.getDriverId())
+                            .setTruckTeamId(showTruckDto.getTruckTeamId());
+                    truckClientService.truckQualificationToFeign(truckQualification);
+                }
+            }
+        }
+        return ServiceResult.toResult("换车成功");
     }
 
     private Integer getUserId() {

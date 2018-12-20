@@ -287,4 +287,12 @@
             ORDER BY t.required_time DESC
         </if>
     </select>
+    <select id="countUnDoneByDriverId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+      select
+      count(1)
+      from
+      waybill
+      where driver_id = #{driverId}
+      and waybill_status in ('待出发','待出发','待装货','待送达','待签收')
+    </select>
 </mapper>
