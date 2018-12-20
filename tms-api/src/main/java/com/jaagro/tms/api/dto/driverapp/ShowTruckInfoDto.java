@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 @Data
 @Accessors(chain = true)
-public class ShowTruckDto implements Serializable {
+public class ShowTruckInfoDto implements Serializable {
     /**
      * 主键车辆表ID
      */

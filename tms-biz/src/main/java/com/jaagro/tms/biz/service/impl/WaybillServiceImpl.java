@@ -795,9 +795,9 @@ public class WaybillServiceImpl implements WaybillService {
         return showPersonalCenter;
     }
 
-    private com.jaagro.tms.api.dto.driverapp.ShowTruckDto getTruckInfo(ShowTruckDto truckByToken) {
+    private ShowTruckInfoDto getTruckInfo(ShowTruckDto truckByToken) {
         if (truckByToken != null) {
-            com.jaagro.tms.api.dto.driverapp.ShowTruckDto showTruckDto = new com.jaagro.tms.api.dto.driverapp.ShowTruckDto();
+            ShowTruckInfoDto showTruckDto = new ShowTruckInfoDto();
             BeanUtils.copyProperties(truckByToken, showTruckDto);
             showTruckDto.setTruckId(truckByToken.getId());
             if (!CollectionUtils.isEmpty(truckByToken.getDrivers())) {
@@ -1621,7 +1621,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      */
     @Override
-    public com.jaagro.tms.api.dto.driverapp.ShowTruckDto getTruckInfo() {
+    public ShowTruckInfoDto getTruckInfo() {
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         if (truckByToken != null) {
             return getTruckInfo(truckByToken);

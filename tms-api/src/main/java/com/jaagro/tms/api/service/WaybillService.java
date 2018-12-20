@@ -222,5 +222,5 @@ public interface WaybillService {
      * 获取当前登录司机的车辆信息
      * @return
      */
-    ShowTruckDto getTruckInfo();
+    ShowTruckInfoDto getTruckInfo();
 }
