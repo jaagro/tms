@@ -30,9 +30,9 @@ public class ListDriverLicenseDto implements Serializable {
      */
     private String allocationTime;
     /**
-     * 驾驶员帐号状态(false 不正常 true 正常)
+     * 驾驶员帐号状态(1 不正常 3 正常)
      */
-    private boolean status;
+    private Integer status;
     /**
      * 驾照类型(1 A1 2 B1 3 C1 4 C2)
      */

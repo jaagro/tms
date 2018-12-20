@@ -852,15 +852,15 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      * @Author @Gao.
      */
-    private boolean expiryDrivingLicenseIsNormal(ShowDriverDto driver) {
+    private int expiryDrivingLicenseIsNormal(ShowDriverDto driver) {
         Date currentDate = dateFormat(new Date());
         if (driver.getExpiryDrivingLicense() != null) {
             Date expiryDrivingLicense = stringToDate(driver.getExpiryDrivingLicense());
             if (currentDate.after(expiryDrivingLicense)) {
-                return false;
+                return 1;
             }
         }
-        return true;
+        return 3;
     }
 
     /**
@@ -869,15 +869,15 @@ public class WaybillServiceImpl implements WaybillService {
      * @param
      * @return
      */
-    private boolean truckIsNormal(ShowTruckDto truck) {
+    private int truckIsNormal(ShowTruckDto truck) {
         Date currentStringDate = dateFormat(new Date());
         if (null == truck.getExpiryAnnual() || null == truck.getExpiryDate()) {
-            return false;
+            return 1;
         }
         if (currentStringDate.after(dateFormat(truck.getExpiryAnnual())) || currentStringDate.after(dateFormat(truck.getExpiryDate()))) {
-            return false;
+            return 1;
         }
-        return true;
+        return 3;
     }
 
     /**
