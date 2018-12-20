@@ -127,6 +127,10 @@ public class WaybillServiceImpl implements WaybillService {
             if (StringUtils.isEmpty(createWaybillDto.getLoadSiteId())) {
                 throw new NullPointerException("装货地id为空");
             }
+            ShowSiteDto showSiteDto = customerService.getShowSiteById(createWaybillDto.getLoadSiteId());
+            if (showSiteDto == null) {
+                throw new RuntimeException("装货地不存在");
+            }
             Integer orderId = createWaybillDto.getOrderId();
             Waybill waybill = new Waybill();
             waybill.setOrderId(orderId);
@@ -138,6 +142,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setCreateTime(new Date());
             waybill.setCreatedUserId(userId);
             waybill.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
+            waybill.setNetworkId(showSiteDto.getDeptId());
             waybillMapper.insertSelective(waybill);
             int waybillId = waybill.getId();
             List<CreateWaybillItemsDto> waybillItemsList = createWaybillDto.getWaybillItems();
