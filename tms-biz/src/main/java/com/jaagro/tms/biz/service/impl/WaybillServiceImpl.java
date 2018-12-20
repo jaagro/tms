@@ -13,7 +13,6 @@ import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.driverapp.*;
-import com.jaagro.tms.api.dto.driverapp.ShowTruckDto;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
@@ -794,7 +793,6 @@ public class WaybillServiceImpl implements WaybillService {
         return showPersonalCenter;
     }
 
-    private com.jaagro.tms.api.dto.driverapp.ShowTruckDto getTruckInfo(com.jaagro.tms.api.dto.truck.ShowTruckDto truckByToken) {
     private ShowTruckInfoDto getTruckInfo(ShowTruckDto truckByToken) {
         if (truckByToken != null) {
             ShowTruckInfoDto showTruckDto = new ShowTruckInfoDto();
@@ -1656,8 +1654,6 @@ public class WaybillServiceImpl implements WaybillService {
      * @return
      */
     @Override
-    public com.jaagro.tms.api.dto.driverapp.ShowTruckDto getTruckInfo() {
-        com.jaagro.tms.api.dto.truck.ShowTruckDto truckByToken = truckClientService.getTruckByToken();
     public ShowTruckInfoDto getTruckInfo() {
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         if (truckByToken != null) {
