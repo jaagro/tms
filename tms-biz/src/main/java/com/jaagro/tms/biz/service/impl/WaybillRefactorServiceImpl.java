@@ -266,6 +266,19 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         return getWaybillDto;
     }
 
+    /**
+     * 我的运单列表【装卸货端】
+     *
+     * @param criteriaDto
+     * @return
+     */
+    @Override
+    public PageInfo listWebChatWaybillByCriteria(ListWebChatWaybillCriteriaDto criteriaDto) {
+        PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        List<ListWaybillDto> listWaybillDtoList = waybillMapper.listWebChatWaybillByCriteria(criteriaDto);
+        return new PageInfo<>(listWaybillDtoList);
+    }
+
 
     /**
      * 根据waybillId获取Items和goods

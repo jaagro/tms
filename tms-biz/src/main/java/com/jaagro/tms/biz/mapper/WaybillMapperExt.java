@@ -4,6 +4,7 @@ import com.jaagro.tms.api.dto.driverapp.GetWaybillAppDto;
 import com.jaagro.tms.api.dto.driverapp.ListWaybillAppDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillCriteriaDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillDto;
+import com.jaagro.tms.api.dto.waybill.ListWebChatWaybillCriteriaDto;
 import com.jaagro.tms.biz.entity.Waybill;
 import org.apache.ibatis.annotations.Param;
 
@@ -138,4 +139,20 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @return
      */
     Integer listWaitWaybillByOrderId(Integer id);
+
+    /**
+     * 根据当前用户查询运单列表
+     *
+     * @param criteriaDto
+     * @return
+     */
+    List<ListWaybillDto> listWebChatWaybillByCriteria(ListWebChatWaybillCriteriaDto criteriaDto);
+
+    /**
+     * 根据司机id统计未完成的运单数说
+     *
+     * @param driverId
+     * @return
+     */
+    Integer countUnDoneByDriverId(@Param("driverId") Integer driverId);
 }

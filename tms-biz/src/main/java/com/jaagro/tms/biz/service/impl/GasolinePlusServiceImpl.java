@@ -47,9 +47,11 @@ public class GasolinePlusServiceImpl implements GasolinePlusService {
         if (null != currentUser && null != truckByToken) {
             dto
                     .setDriverId(currentUser.getId())
+                    .setDriverName(currentUser.getName())
                     .setTruckId(truckByToken.getId())
                     .setTruckTeamId(truckByToken.getTruckTeamId())
-                    .setTruckNumber(truckByToken.getTruckNumber());
+                    .setTruckNumber(truckByToken.getTruckNumber())
+                    .setCreateUserId(currentUser.getId());
             BeanUtils.copyProperties(dto, gasolineRecord);
         }
         gasolineRecordMapper.insertSelective(gasolineRecord);
@@ -97,5 +99,26 @@ public class GasolinePlusServiceImpl implements GasolinePlusService {
             }
         }
         return gasolineRecordDtos;
+    }
+
+    /**
+     * 加油管理
+     *
+     * @param param
+     * @return
+     */
+    @Override
+    public PageInfo<CreateGasolineRecordDto> gasolineManagement(GasolineRecordParam param) {
+        PageHelper.startPage(param.getPageNum(), param.getPageSize());
+        GasolineRecordCondition gasolineRecordCondition = new GasolineRecordCondition();
+        gasolineRecordCondition.setTruckNumber(param.getTruckNumber() == null ? null : param.getTruckNumber());
+        List<CreateGasolineRecordDto> gasolineRecordDtos = gasolineRecordMapper.listGasolineRecordByCondition(gasolineRecordCondition);
+        for (CreateGasolineRecordDto gasolineRecordDto : gasolineRecordDtos) {
+            if (null != gasolineRecordDto.getGasolineCompany()) {
+                gasolineRecordDto
+                        .setGasolineCompany(GasolineCompanyNameEnum.getTypeByDesc(gasolineRecordDto.getGasolineCompany()));
+            }
+        }
+        return new PageInfo<>(gasolineRecordDtos);
     }
 }

@@ -35,6 +35,13 @@ public class ListWashTruckRecordCriteria implements Serializable{
     private String truckNumber;
 
     /**
+     * 请求来源 1-app 2-运力后台
+     */
+    @NotNull(message = "{requestSource.NotNull}")
+    @Min(value = 1,message = "{requestSource.Min}")
+    private Integer requestSource;
+
+    /**
      * 司机id
      */
     private Integer driverId;

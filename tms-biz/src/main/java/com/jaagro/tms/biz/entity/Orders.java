@@ -5,6 +5,10 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+
+/**
+ * @Author gavin
+ */
 @Data
 @Accessors(chain = true)
 public class Orders  implements Serializable {
@@ -74,8 +78,17 @@ public class Orders  implements Serializable {
     private Integer modifyUserId;
 
     /**
-     * 部门id
+     * 订单创建人的部门id
      */
     private Integer departmentId;
 
+    /**
+     * 是否是牧源之类的直接订单
+     */
+    private String directOrderFlag;
+
+    /**
+     * 客户网点
+     */
+    private Integer networkId;
 }

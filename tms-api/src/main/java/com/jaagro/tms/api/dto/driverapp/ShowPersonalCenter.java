@@ -33,6 +33,6 @@ public class ShowPersonalCenter implements Serializable {
     /**
      * 车辆信息
      */
-    private ShowTruckDto truckInfo;
+    private ShowTruckInfoDto truckInfo;
 
 }

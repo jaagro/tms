@@ -5,15 +5,17 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
- * 洗车记录
+ * 洗车详情
+ *
  * @author yj
  * @since 2018/12/11
  */
 @Data
 @Accessors(chain = true)
-public class WashTruckRecordVo implements Serializable{
+public class WashTruckRecordDetailVo implements Serializable {
     /**
      * 洗车记录表id
      */
@@ -48,4 +50,9 @@ public class WashTruckRecordVo implements Serializable{
      * 创建时间
      */
     private Date createTime;
+
+    /**
+     * 洗车图片
+     */
+    private List<WashTruckImageVo> imageList;
 }
