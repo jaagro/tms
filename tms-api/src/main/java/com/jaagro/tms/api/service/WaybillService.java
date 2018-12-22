@@ -7,6 +7,7 @@ import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.ChangeTruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -240,4 +241,13 @@ public interface WaybillService {
      * @return
      */
     Map<String, Object> changeTruck(TransferTruckDto truckDto);
+
+    /**
+     * @Author gavin
+     * 20181222
+     * 客户结算
+     * @param waybillIds
+     * @return
+     */
+    List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(List<Integer> waybillIds);
 }

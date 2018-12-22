@@ -205,4 +205,17 @@ public class WaybillController {
         }
         return BaseResponse.successInstance("成功");
     }
+
+    /**
+     * @Author gavin
+     * 20181222
+     * 与客户结算的计算
+     * @param waybillIds
+     * @return 运单对应的结算金额
+     */
+    @ApiOperation("客户结算")
+    @PostMapping("calculatePaymentFromCustomer")
+    public BaseResponse calculatePaymentFromCustomer(@RequestBody List<Integer> waybillIds) {
+        return BaseResponse.successInstance(waybillService.calculatePaymentFromCustomer(waybillIds));
+    }
 }

@@ -9,6 +9,7 @@ import com.jaagro.tms.api.dto.Message.MessageReturnDto;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
+import com.jaagro.tms.api.dto.customer.CalculatePaymentDto;
 import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
@@ -1228,7 +1229,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-            ) {
+                    ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1884,4 +1885,56 @@ public class WaybillServiceImpl implements WaybillService {
         return true;
     }
 
+    /**
+     * @param waybillIds
+     * @return
+     * @Author gavin
+     * 20181222
+     * 客户结算
+     */
+    @Override
+    public List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(List<Integer> waybillIds) {
+        List<CalculatePaymentDto> paymentDtos = new ArrayList<>();
+        for (Integer waybillId : waybillIds) {
+            BigDecimal unloadWeight = new BigDecimal(0.00);
+            Integer unloadQuantity = 0;
+            Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+            if (waybill.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH)) {
+                CalculatePaymentDto calculatePaymentDto = new CalculatePaymentDto();
+                Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
+                if (orders != null) {
+                    calculatePaymentDto.setWaybillId(waybillId);
+                    calculatePaymentDto.setDoneDate(waybill.getModifyTime());
+                    calculatePaymentDto.setTruckTypeId(waybill.getNeedTruckType());
+                    calculatePaymentDto.setProductType(orders.getGoodsType());
+                    calculatePaymentDto.setLoadSiteId(orders.getLoadSiteId());
+                    calculatePaymentDto.setContractId(orders.getCustomerContractId());
+                    List<WaybillItems> itemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
+                    for (WaybillItems waybillItems : itemsList) {
+
+                        calculatePaymentDto.setUnloadSiteId(waybillItems.getUnloadSiteId());
+                        break;
+
+                    }
+                    List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
+                    for (GetWaybillGoodsDto waybillGoodsDto : waybillGoodsDtos) {
+                        if (orders.getGoodsType().equals(GoodsType.CHICKEN) || orders.getGoodsType().equals(GoodsType.FODDER)) {
+                            unloadWeight = unloadWeight.add(waybillGoodsDto.getUnloadWeight());
+                        } else {
+                            unloadQuantity = unloadQuantity + waybillGoodsDto.getUnloadQuantity();
+                        }
+                    }
+                    if (orders.getGoodsType().equals(GoodsType.CHICKEN) || orders.getGoodsType().equals(GoodsType.FODDER)) {
+
+                        calculatePaymentDto.setUnloadWeight(unloadWeight);
+
+                    } else {
+                        calculatePaymentDto.setUnloadQuantity(unloadQuantity);
+                    }
+                }
+                paymentDtos.add(calculatePaymentDto);
+            }
+        }
+        return customerService.calculatePaymentFromCustomer(paymentDtos);
+    }
 }

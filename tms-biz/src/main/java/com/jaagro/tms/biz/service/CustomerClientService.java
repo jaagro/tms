@@ -1,16 +1,15 @@
 package com.jaagro.tms.biz.service;
 
-import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
-import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
-import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
-import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.customer.*;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tony
@@ -79,5 +78,13 @@ public interface CustomerClientService {
      */
     @PostMapping("/listSiteNameByIds")
     List<String> listSiteNameByIds(@RequestBody List<Integer> siteIds);
+
+    /**
+     * 与客户结算的计算
+     * @param dtoList
+     * @return 结算金额
+     */
+    @PostMapping("/calculatePaymentFromCustomer")
+    List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(@RequestBody  List<CalculatePaymentDto> dtoList);
 
 }
