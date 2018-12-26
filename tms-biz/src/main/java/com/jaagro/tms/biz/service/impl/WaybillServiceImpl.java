@@ -1893,6 +1893,7 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(List<Integer> waybillIds) {
+        UserInfo currentUser = currentUserService.getCurrentUser();
         List<CalculatePaymentDto> paymentDtos = new ArrayList<>();
         for (Integer waybillId : waybillIds) {
             BigDecimal unloadWeight = new BigDecimal(0.00);
@@ -1943,6 +1944,8 @@ public class WaybillServiceImpl implements WaybillService {
                 Entry<Integer, BigDecimal> entry = it.next();
                 waybillCustomerFee.setWaybillId(entry.getKey());
                 waybillCustomerFee.setMoney(entry.getValue());
+                waybillCustomerFee.setEarningType(CostType.FREIGHT);
+                waybillCustomerFee.setCreatedUserId(currentUser.getId());
             }
 
             waybillCustomerFeeMapper.insertSelective(waybillCustomerFee);
