@@ -2,11 +2,13 @@ package com.jaagro.tms.api.dto.customer;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author gavin
@@ -16,6 +18,7 @@ import java.util.Date;
 @Accessors(chain = true)
 public class CalculatePaymentDto implements Serializable {
 
+    private static final long serialVersionUID = 5575206791439395639L;
     /**
      * 运单Id
      */
@@ -25,11 +28,18 @@ public class CalculatePaymentDto implements Serializable {
      * 运单完成时间，必须完成的运单才能有结算金额
      */
     private Date doneDate;
+
     /**
-     * 合同id
+     * 客户合同id
      */
-    @NotNull(message = "{contractId.NotNull}")
-    private Integer contractId;
+    @NotNull(message = "{customerContractId.NotNull}")
+    private Integer customerContractId;
+
+    /**
+     * 车队合同id
+     */
+    @NotNull(message = "{truckTeamContractId.NotNull}")
+    private Integer truckTeamContractId;
 
     /**
      * 货物类型
@@ -38,17 +48,14 @@ public class CalculatePaymentDto implements Serializable {
     @NotNull(message = "{goodsType.NotNull}")
     private Integer productType;
 
-    /**
-     * 装货地址id
-     */
-    @NotNull(message = "{loadSiteId.NotNull}")
-    private Integer loadSiteId;
 
     /**
-     * 卸货地址id
+     * 运单装卸货地ID列表对象
      */
-    @NotNull(message = "{unloadSiteId.NotNull}")
-    private Integer unloadSiteId;
+    @NotEmpty(message = "{siteDtoList.NotEmpty}")
+    private List<SiteDto> siteDtoList;
+
+
 
     /**
      * 车辆类型

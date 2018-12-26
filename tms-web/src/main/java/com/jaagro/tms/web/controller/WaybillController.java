@@ -218,4 +218,17 @@ public class WaybillController {
     public BaseResponse calculatePaymentFromCustomer(@RequestBody List<Integer> waybillIds) {
         return BaseResponse.successInstance(waybillService.calculatePaymentFromCustomer(waybillIds));
     }
+
+    /**
+     * @author yj
+     * @since 20181226
+     * 与司机结算的计算
+     * @param waybillIds
+     * @return 运单对应的结算金额
+     */
+    @ApiOperation("司机结算")
+    @PostMapping("calculatePaymentFromDriver")
+    public BaseResponse calculatePaymentFromDriver(@RequestBody List<Integer> waybillIds) {
+        return BaseResponse.successInstance(waybillService.calculatePaymentFromDriver(waybillIds));
+    }
 }

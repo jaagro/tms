@@ -9,10 +9,7 @@ import com.jaagro.tms.api.dto.Message.MessageReturnDto;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
-import com.jaagro.tms.api.dto.customer.CalculatePaymentDto;
-import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
-import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
-import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
@@ -96,8 +93,6 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     private AccountService accountService;
     @Autowired
-    private CustomerClientService customerService;
-    @Autowired
     private RedisLock redisLock;
 
     /**
@@ -128,7 +123,7 @@ public class WaybillServiceImpl implements WaybillService {
             if (StringUtils.isEmpty(createWaybillDto.getLoadSiteId())) {
                 throw new NullPointerException("装货地id为空");
             }
-            ShowSiteDto showSiteDto = customerService.getShowSiteById(createWaybillDto.getLoadSiteId());
+            ShowSiteDto showSiteDto = customerClientService.getShowSiteById(createWaybillDto.getLoadSiteId());
             if (showSiteDto == null) {
                 throw new RuntimeException("装货地不存在");
             }
@@ -690,7 +685,7 @@ public class WaybillServiceImpl implements WaybillService {
                         .setWaybillStatus(WaybillStatus.ACCOMPLISH)
                         .setModifyTime(new Date());
                 waybillMapper.updateByPrimaryKeySelective(waybill);
-                ShowCustomerDto customerDto = customerService.getShowCustomerById(orders.getCustomerId());
+                ShowCustomerDto customerDto = customerClientService.getShowCustomerById(orders.getCustomerId());
                 //磅单超过千分之二 进行于预警判断
                 boolean flag = !StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder());
                 //牧原客户手机提交 不做磅差判断
@@ -1894,47 +1889,79 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(List<Integer> waybillIds) {
-        List<CalculatePaymentDto> paymentDtos = new ArrayList<>();
-        for (Integer waybillId : waybillIds) {
-            BigDecimal unloadWeight = new BigDecimal(0.00);
-            Integer unloadQuantity = 0;
-            Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
-            if (waybill.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH)) {
-                CalculatePaymentDto calculatePaymentDto = new CalculatePaymentDto();
-                Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
-                if (orders != null) {
-                    calculatePaymentDto.setWaybillId(waybillId);
-                    calculatePaymentDto.setDoneDate(waybill.getModifyTime());
-                    calculatePaymentDto.setTruckTypeId(waybill.getNeedTruckType());
-                    calculatePaymentDto.setProductType(orders.getGoodsType());
-                    calculatePaymentDto.setLoadSiteId(orders.getLoadSiteId());
-                    calculatePaymentDto.setContractId(orders.getCustomerContractId());
-                    List<WaybillItems> itemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
-                    for (WaybillItems waybillItems : itemsList) {
+        List<CalculatePaymentDto> paymentDtos = getCalculatePaymentDtoList(waybillIds);
+        return customerClientService.calculatePaymentFromCustomer(paymentDtos);
+    }
 
-                        calculatePaymentDto.setUnloadSiteId(waybillItems.getUnloadSiteId());
-                        break;
+    /**
+     * 司机结算计算价格
+     *
+     * @param waybillIds
+     * @return
+     * @author yj
+     * @since 20181226
+     */
+    @Override
+    public List<Map<Integer, BigDecimal>> calculatePaymentFromDriver(List<Integer> waybillIds) {
+        // 拼装计价参数
+        List<CalculatePaymentDto> paymentDtoList = getCalculatePaymentDtoList(waybillIds);
+        // 获取计算后的价格
+        List<Map<Integer, BigDecimal>> paymentList = customerClientService.calculatePaymentFromDriver(paymentDtoList);
 
-                    }
-                    List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
-                    for (GetWaybillGoodsDto waybillGoodsDto : waybillGoodsDtos) {
+        return null;
+    }
+
+    private List<CalculatePaymentDto> getCalculatePaymentDtoList(List<Integer> waybillIds) {
+        if (!CollectionUtils.isEmpty(waybillIds)){
+            List<CalculatePaymentDto> paymentDtoList = new ArrayList<>();
+            for (Integer waybillId : waybillIds) {
+                BigDecimal unloadWeight = new BigDecimal(0.00);
+                Integer unloadQuantity = 0;
+                Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+                if (waybill != null && waybill.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH)) {
+                    CalculatePaymentDto calculatePaymentDto = new CalculatePaymentDto();
+                    Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
+                    if (orders != null) {
+                        calculatePaymentDto.setWaybillId(waybillId);
+                        calculatePaymentDto.setDoneDate(waybill.getModifyTime());
+                        calculatePaymentDto.setTruckTypeId(waybill.getNeedTruckType());
+                        calculatePaymentDto.setProductType(orders.getGoodsType());
+                        calculatePaymentDto.setCustomerContractId(orders.getCustomerContractId());
+                        calculatePaymentDto.setTruckTeamContractId(waybill.getTruckTeamContractId());
+                        List<WaybillItems> itemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
+                        if (!CollectionUtils.isEmpty(itemsList)){
+                            List<SiteDto> siteDtoList = new ArrayList<>();
+                            for (WaybillItems waybillItems : itemsList){
+                                SiteDto siteDto = new SiteDto();
+                                siteDto.setLoadSiteId(orders.getLoadSiteId())
+                                        .setUnloadSiteId(waybillItems.getUnloadSiteId());
+                                siteDtoList.add(siteDto);
+                            }
+                            calculatePaymentDto.setSiteDtoList(siteDtoList);
+                        }
+                        List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
+                        if (!CollectionUtils.isEmpty(waybillGoodsDtos)){
+                            for (GetWaybillGoodsDto waybillGoodsDto : waybillGoodsDtos) {
+                                if (orders.getGoodsType().equals(GoodsType.CHICKEN) || orders.getGoodsType().equals(GoodsType.FODDER)) {
+                                    unloadWeight = unloadWeight.add(waybillGoodsDto.getUnloadWeight());
+                                } else {
+                                    unloadQuantity = unloadQuantity + waybillGoodsDto.getUnloadQuantity();
+                                }
+                            }
+                        }
                         if (orders.getGoodsType().equals(GoodsType.CHICKEN) || orders.getGoodsType().equals(GoodsType.FODDER)) {
-                            unloadWeight = unloadWeight.add(waybillGoodsDto.getUnloadWeight());
+
+                            calculatePaymentDto.setUnloadWeight(unloadWeight);
+
                         } else {
-                            unloadQuantity = unloadQuantity + waybillGoodsDto.getUnloadQuantity();
+                            calculatePaymentDto.setUnloadQuantity(unloadQuantity);
                         }
                     }
-                    if (orders.getGoodsType().equals(GoodsType.CHICKEN) || orders.getGoodsType().equals(GoodsType.FODDER)) {
-
-                        calculatePaymentDto.setUnloadWeight(unloadWeight);
-
-                    } else {
-                        calculatePaymentDto.setUnloadQuantity(unloadQuantity);
-                    }
+                    paymentDtoList.add(calculatePaymentDto);
                 }
-                paymentDtos.add(calculatePaymentDto);
             }
+            return paymentDtoList;
         }
-        return customerService.calculatePaymentFromCustomer(paymentDtos);
+        return null;
     }
 }

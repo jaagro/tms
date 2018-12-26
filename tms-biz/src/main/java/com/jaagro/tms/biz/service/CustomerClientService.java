@@ -2,6 +2,7 @@ package com.jaagro.tms.biz.service;
 
 import com.jaagro.tms.api.dto.customer.*;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -86,5 +87,13 @@ public interface CustomerClientService {
      */
     @PostMapping("/calculatePaymentFromCustomer")
     List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(@RequestBody  List<CalculatePaymentDto> dtoList);
+
+    /**
+     * 与司机结算的计价
+     * @param dtoList
+     * @return
+     */
+    @PostMapping("/calculatePaymentFromDriver")
+    List<Map<Integer, BigDecimal>> calculatePaymentFromDriver(@RequestBody List<CalculatePaymentDto> dtoList);
 
 }

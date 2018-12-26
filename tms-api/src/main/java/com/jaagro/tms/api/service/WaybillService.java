@@ -250,4 +250,13 @@ public interface WaybillService {
      * @return
      */
     List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(List<Integer> waybillIds);
+
+    /**
+     * 司机结算计算价格
+     * @author yj
+     * @since 20181226
+     * @param waybillIds
+     * @return
+     */
+    List<Map<Integer, BigDecimal>> calculatePaymentFromDriver(List<Integer> waybillIds);
 }
