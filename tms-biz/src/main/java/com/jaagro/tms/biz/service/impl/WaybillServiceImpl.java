@@ -94,6 +94,10 @@ public class WaybillServiceImpl implements WaybillService {
     private AccountService accountService;
     @Autowired
     private RedisLock redisLock;
+    @Autowired
+    private WaybillCustomerFeeMapperExt waybillCustomerFeeMapperExt;
+    @Autowired
+    private WaybillTruckFeeMapperExt waybillTruckFeeMapperExt;
 
     /**
      * @param waybillDtoList
