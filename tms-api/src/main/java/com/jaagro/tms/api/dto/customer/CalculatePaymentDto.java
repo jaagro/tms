@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author gavin
@@ -16,6 +17,7 @@ import java.util.Date;
 @Accessors(chain = true)
 public class CalculatePaymentDto implements Serializable {
 
+    private static final long serialVersionUID = 6213506945138061463L;
     /**
      * 运单Id
      */
@@ -39,16 +41,10 @@ public class CalculatePaymentDto implements Serializable {
     private Integer productType;
 
     /**
-     * 装货地址id
+     * 运单装卸货地ID列表对象
      */
-    @NotNull(message = "{loadSiteId.NotNull}")
-    private Integer loadSiteId;
+    private List<SiteDto> siteDtoList;
 
-    /**
-     * 卸货地址id
-     */
-    @NotNull(message = "{unloadSiteId.NotNull}")
-    private Integer unloadSiteId;
 
     /**
      * 车辆类型

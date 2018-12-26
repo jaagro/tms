@@ -9,10 +9,7 @@ import com.jaagro.tms.api.dto.Message.MessageReturnDto;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
-import com.jaagro.tms.api.dto.customer.CalculatePaymentDto;
-import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
-import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
-import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
@@ -39,7 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
+import java.util.Map.Entry;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.text.ParseException;
@@ -99,6 +96,8 @@ public class WaybillServiceImpl implements WaybillService {
     private CustomerClientService customerService;
     @Autowired
     private RedisLock redisLock;
+    @Autowired
+    private WaybillCustomerFeeMapperExt waybillCustomerFeeMapper;
 
     /**
      * @param waybillDtoList
@@ -1899,7 +1898,7 @@ public class WaybillServiceImpl implements WaybillService {
             BigDecimal unloadWeight = new BigDecimal(0.00);
             Integer unloadQuantity = 0;
             Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
-            if (waybill.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH)) {
+            if (null!= waybill && waybill.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH)) {
                 CalculatePaymentDto calculatePaymentDto = new CalculatePaymentDto();
                 Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
                 if (orders != null) {
@@ -1907,15 +1906,16 @@ public class WaybillServiceImpl implements WaybillService {
                     calculatePaymentDto.setDoneDate(waybill.getModifyTime());
                     calculatePaymentDto.setTruckTypeId(waybill.getNeedTruckType());
                     calculatePaymentDto.setProductType(orders.getGoodsType());
-                    calculatePaymentDto.setLoadSiteId(orders.getLoadSiteId());
                     calculatePaymentDto.setContractId(orders.getCustomerContractId());
                     List<WaybillItems> itemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
+                    List<SiteDto> siteDtos = new ArrayList<>();
                     for (WaybillItems waybillItems : itemsList) {
-
-                        calculatePaymentDto.setUnloadSiteId(waybillItems.getUnloadSiteId());
-                        break;
-
+                        SiteDto siteDto= new SiteDto();
+                        siteDto.setLoadSiteId(orders.getLoadSiteId());
+                        siteDto.setUnloadSiteId(waybillItems.getUnloadSiteId());
+                        siteDtos.add(siteDto);
                     }
+                    calculatePaymentDto.setSiteDtoList(siteDtos);
                     List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
                     for (GetWaybillGoodsDto waybillGoodsDto : waybillGoodsDtos) {
                         if (orders.getGoodsType().equals(GoodsType.CHICKEN) || orders.getGoodsType().equals(GoodsType.FODDER)) {
@@ -1935,6 +1935,19 @@ public class WaybillServiceImpl implements WaybillService {
                 paymentDtos.add(calculatePaymentDto);
             }
         }
-        return customerService.calculatePaymentFromCustomer(paymentDtos);
+        List<Map<Integer, BigDecimal>> feeFromCustomerList = customerService.calculatePaymentFromCustomer(paymentDtos);
+        for (Map<Integer, BigDecimal> map : feeFromCustomerList) {
+            WaybillCustomerFee waybillCustomerFee = new WaybillCustomerFee();
+            Iterator<Entry<Integer, BigDecimal>> it = map.entrySet().iterator();
+            while(it.hasNext()){
+                Entry<Integer, BigDecimal> entry = it.next();
+                waybillCustomerFee.setWaybillId(entry.getKey());
+                waybillCustomerFee.setMoney(entry.getValue());
+            }
+
+            waybillCustomerFeeMapper.insertSelective(waybillCustomerFee);
+
+        }
+        return feeFromCustomerList;
     }
 }
