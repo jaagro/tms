@@ -33,7 +33,7 @@ public class WaybillCustomerFee implements Serializable {
     /**
      * 费用类型：1-运费 2-附加费
      */
-    private Integer feeType;
+    private Integer earningType;
 
     /**
      *

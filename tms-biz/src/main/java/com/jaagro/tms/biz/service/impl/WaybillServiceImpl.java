@@ -1907,8 +1907,8 @@ public class WaybillServiceImpl implements WaybillService {
                 Entry<Integer, BigDecimal> entry = it.next();
                 waybillCustomerFee.setWaybillId(entry.getKey());
                 waybillCustomerFee.setMoney(entry.getValue());
-                waybillCustomerFee.setFeeType(CostType.FREIGHT);
-                waybillCustomerFee.setDirection(CostType.DIRECTION_INCREASE);
+                waybillCustomerFee.setEarningType(CostType.FREIGHT);
+                waybillCustomerFee.setDirection(Direction.PLUS);
                 waybillCustomerFee.setCreatedUserId(currentUserId);
             }
 
@@ -1932,8 +1932,29 @@ public class WaybillServiceImpl implements WaybillService {
         List<CalculatePaymentDto> paymentDtoList = getCalculatePaymentDtoList(waybillIds);
         // 获取计算后的价格
         List<Map<Integer, BigDecimal>> paymentList = customerClientService.calculatePaymentFromDriver(paymentDtoList);
-
-        return null;
+        if (!CollectionUtils.isEmpty(paymentList)){
+            List<WaybillTruckFee> waybillTruckFeeList = new ArrayList<>();
+            UserInfo currentUser = currentUserService.getCurrentUser();
+            Integer currentUserId = currentUser == null ? null : currentUser.getId();
+            for (Map<Integer,BigDecimal> map : paymentList){
+                WaybillTruckFee waybillTruckFee = new WaybillTruckFee();
+                Iterator<Entry<Integer, BigDecimal>> it = map.entrySet().iterator();
+                while (it.hasNext()){
+                    Entry<Integer, BigDecimal> entry = it.next();
+                    waybillTruckFee.setCreatedUserId(currentUserId)
+                            .setCreateTime(new Date())
+                            .setDirection(Direction.SUBSTRACT)
+                            .setEnabled(Boolean.TRUE)
+                            .setCostType(CostType.FREIGHT)
+                            .setMoney(entry.getValue())
+                            .setWaybillId(entry.getKey())
+                            .setSettleStatus(SettleStatus.UN_SETTLE);
+                }
+                waybillTruckFeeList.add(waybillTruckFee);
+            }
+            waybillTruckFeeMapperExt.batchInsert(waybillTruckFeeList);
+        }
+        return paymentList;
     }
 
     private List<CalculatePaymentDto> getCalculatePaymentDtoList(List<Integer> waybillIds) {

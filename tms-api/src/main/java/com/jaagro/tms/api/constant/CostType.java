@@ -34,14 +34,4 @@ public final class CostType {
      *货损费
      */
     public final static Integer DAMAGE_FEE = 6;
-
-    /**
-     * 资金方向(1-增加,2-减少)
-     *
-     */
-    public final static Integer DIRECTION_INCREASE = 1;
-    /**
-     *资金方向(1-增加,2-减少)
-     */
-    public final static Integer DIRECTION_DECREASE = 2;
 }

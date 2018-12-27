@@ -2,9 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jaagro.tms.biz.mapper.WaybillTruckFeeMapperExt">
 
-    <select id="listWaybillTruckFeeByCondition" parameterType="com.jaagro.tms.api.dto.fee.WaybillFeeCondition" resultType="com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto">
+    <select id="listWaybillTruckFeeByCondition" parameterType="com.jaagro.tms.api.dto.fee.WaybillFeeCondition"
+            resultType="com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto">
         select
-        wtf.id, wtf.waybill_id, wtf.waybill_item_id,wtf.anomaly_id, wtf.cost_type, wtf.money,wtf.create_time, wtf.created_user_id,
+        wtf.id, wtf.waybill_id, wtf.waybill_item_id,wtf.anomaly_id, wtf.cost_type, wtf.money,wtf.create_time,
+        wtf.created_user_id,
         wfa.adjust_reason,wfa.adjust_type,wfa.customer_effect, wfa.truck_effect, wfa.notes
         from waybill_truck_fee wtf ,waybill_fee_adjustment wfa
         where wtf.id=wfa.relevance_id and wfa.relevance_type=2 and wtf.enabled=1 and wfa.enabled=1
@@ -12,11 +14,27 @@
             and anomaly_id=#{anomalyId}
         </if>
     </select>
-    <select id="selectByAnomalyId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    <select id="selectByAnomalyId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from waybill_truck_fee
         where anomaly_id = #{anomalyId,jdbcType=INTEGER}
         limit 1
     </select>
+    <insert id="batchInsert" parameterType="list">
+        insert into waybill_truck_fee (waybill_id, waybill_item_id,
+        cost_type, anomaly_id, direction,
+        settle_status, money, enabled,
+        create_time, created_user_id, modify_time,
+        modify_user_id)
+        values
+        <foreach collection="waybillTruckFeeList" item="item" separator=",">
+            (#{item.waybillId,jdbcType=INTEGER}, #{item.waybillItemId,jdbcType=INTEGER},
+            #{item.costType,jdbcType=INTEGER}, #{item.anomalyId,jdbcType=INTEGER}, #{item.direction,jdbcType=INTEGER},
+            #{item.settleStatus,jdbcType=INTEGER}, #{item.money,jdbcType=DECIMAL}, #{item.enabled,jdbcType=BIT},
+            #{item.createTime,jdbcType=TIMESTAMP}, #{item.createdUserId,jdbcType=INTEGER},
+            #{item.modifyTime,jdbcType=TIMESTAMP},
+            #{item.modifyUserId,jdbcType=INTEGER})
+        </foreach>
+    </insert>
 </mapper>

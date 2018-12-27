@@ -5,7 +5,7 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="waybill_id" jdbcType="INTEGER" property="waybillId" />
     <result column="waybill_item_id" jdbcType="INTEGER" property="waybillItemId" />
-    <result column="fee_type" jdbcType="INTEGER" property="feeType" />
+    <result column="cost_type" jdbcType="INTEGER" property="costType" />
     <result column="anomaly_id" jdbcType="INTEGER" property="anomalyId" />
     <result column="direction" jdbcType="INTEGER" property="direction" />
     <result column="settle_status" jdbcType="INTEGER" property="settleStatus" />
@@ -17,7 +17,7 @@
     <result column="modify_user_id" jdbcType="INTEGER" property="modifyUserId" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, waybill_id, waybill_item_id, fee_type, anomaly_id, direction, settle_status, 
+    id, waybill_id, waybill_item_id, cost_type, anomaly_id, direction, settle_status,
     money, enabled, create_time, created_user_id, modify_time, modify_user_id
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -33,12 +33,12 @@
   <insert id="insert" parameterType="com.jaagro.tms.biz.entity.WaybillTruckFee" useGeneratedKeys="true"
           keyProperty="id" keyColumn="id">
     insert into waybill_truck_fee (id, waybill_id, waybill_item_id, 
-      fee_type, anomaly_id, direction, 
+      cost_type, anomaly_id, direction,
       settle_status, money, enabled, 
       create_time, created_user_id, modify_time, 
       modify_user_id)
     values (#{id,jdbcType=INTEGER}, #{waybillId,jdbcType=INTEGER}, #{waybillItemId,jdbcType=INTEGER}, 
-      #{feeType,jdbcType=INTEGER}, #{anomalyId,jdbcType=INTEGER}, #{direction,jdbcType=INTEGER}, 
+      #{costType,jdbcType=INTEGER}, #{anomalyId,jdbcType=INTEGER}, #{direction,jdbcType=INTEGER},
       #{settleStatus,jdbcType=INTEGER}, #{money,jdbcType=DECIMAL}, #{enabled,jdbcType=BIT}, 
       #{createTime,jdbcType=TIMESTAMP}, #{createdUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, 
       #{modifyUserId,jdbcType=INTEGER})
@@ -56,8 +56,8 @@
       <if test="waybillItemId != null">
         waybill_item_id,
       </if>
-      <if test="feeType != null">
-        fee_type,
+      <if test="costType != null">
+        cost_type,
       </if>
       <if test="anomalyId != null">
         anomaly_id,
@@ -97,8 +97,8 @@
       <if test="waybillItemId != null">
         #{waybillItemId,jdbcType=INTEGER},
       </if>
-      <if test="feeType != null">
-        #{feeType,jdbcType=INTEGER},
+      <if test="costType != null">
+        #{costType,jdbcType=INTEGER},
       </if>
       <if test="anomalyId != null">
         #{anomalyId,jdbcType=INTEGER},
@@ -138,8 +138,8 @@
       <if test="waybillItemId != null">
         waybill_item_id = #{waybillItemId,jdbcType=INTEGER},
       </if>
-      <if test="feeType != null">
-        fee_type = #{feeType,jdbcType=INTEGER},
+      <if test="costType != null">
+        cost_type = #{costType,jdbcType=INTEGER},
       </if>
       <if test="anomalyId != null">
         anomaly_id = #{anomalyId,jdbcType=INTEGER},
@@ -175,7 +175,7 @@
     update waybill_truck_fee
     set waybill_id = #{waybillId,jdbcType=INTEGER},
       waybill_item_id = #{waybillItemId,jdbcType=INTEGER},
-      fee_type = #{feeType,jdbcType=INTEGER},
+      cost_type = #{costType,jdbcType=INTEGER},
       anomaly_id = #{anomalyId,jdbcType=INTEGER},
       direction = #{direction,jdbcType=INTEGER},
       settle_status = #{settleStatus,jdbcType=INTEGER},
