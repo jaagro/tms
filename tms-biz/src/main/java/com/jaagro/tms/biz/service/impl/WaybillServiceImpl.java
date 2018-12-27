@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
+import java.util.Map.Entry;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.text.ParseException;
@@ -1894,7 +1894,25 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(List<Integer> waybillIds) {
         List<CalculatePaymentDto> paymentDtos = getCalculatePaymentDtoList(waybillIds);
-        return customerClientService.calculatePaymentFromCustomer(paymentDtos);
+        List<Map<Integer, BigDecimal>> feeFromCustomerList = customerClientService.calculatePaymentFromCustomer(paymentDtos);
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        Integer currentUserId = currentUser == null ? null : currentUser.getId();
+        for (Map<Integer, BigDecimal> map : feeFromCustomerList) {
+            WaybillCustomerFee waybillCustomerFee = new WaybillCustomerFee();
+            Iterator<Entry<Integer, BigDecimal>> it = map.entrySet().iterator();
+            while(it.hasNext()){
+                Entry<Integer, BigDecimal> entry = it.next();
+                waybillCustomerFee.setWaybillId(entry.getKey());
+                waybillCustomerFee.setMoney(entry.getValue());
+                waybillCustomerFee.setFeeType(CostType.FREIGHT);
+                waybillCustomerFee.setDirection(CostType.DIRECTION_INCREASE);
+                waybillCustomerFee.setCreatedUserId(currentUserId);
+            }
+
+            waybillCustomerFeeMapperExt.insertSelective(waybillCustomerFee);
+
+        }
+        return feeFromCustomerList;
     }
 
     /**
