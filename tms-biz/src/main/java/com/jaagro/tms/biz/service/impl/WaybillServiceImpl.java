@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
 import java.util.Map.Entry;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -679,7 +680,9 @@ public class WaybillServiceImpl implements WaybillService {
                 WaybillItems waybillItems = new WaybillItems();
                 waybillItems
                         .setSignStatus(SignStatusConstant.SIGN)
-                        .setId(unLoadSiteConfirmProductDtos.get(0).getWaybillItemId());
+                        .setId(unLoadSiteConfirmProductDtos.get(0).getWaybillItemId())
+                        .setRequiredTime(new Date())
+                        .setModifyTime(new Date());
                 waybillItemsMapper.updateByPrimaryKeySelective(waybillItems);
             }
             //如果运单全部签收 运单状态
@@ -700,7 +703,7 @@ public class WaybillServiceImpl implements WaybillService {
                 List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
                 int count = 0;
                 for (Waybill w : waybills) {
-                    if ("已完成".equals(w.getWaybillStatus())) {
+                    if ("已完成".equals(w.getWaybillStatus()) || "已作废".equals(w.getWaybillStatus())) {
                         count++;
                     }
                 }
@@ -1228,7 +1231,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-                    ) {
+            ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1900,7 +1903,7 @@ public class WaybillServiceImpl implements WaybillService {
         for (Map<Integer, BigDecimal> map : feeFromCustomerList) {
             WaybillCustomerFee waybillCustomerFee = new WaybillCustomerFee();
             Iterator<Entry<Integer, BigDecimal>> it = map.entrySet().iterator();
-            while(it.hasNext()){
+            while (it.hasNext()) {
                 Entry<Integer, BigDecimal> entry = it.next();
                 waybillCustomerFee.setWaybillId(entry.getKey());
                 waybillCustomerFee.setMoney(entry.getValue());
@@ -1934,7 +1937,7 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     private List<CalculatePaymentDto> getCalculatePaymentDtoList(List<Integer> waybillIds) {
-        if (!CollectionUtils.isEmpty(waybillIds)){
+        if (!CollectionUtils.isEmpty(waybillIds)) {
             List<CalculatePaymentDto> paymentDtoList = new ArrayList<>();
             for (Integer waybillId : waybillIds) {
                 BigDecimal unloadWeight = new BigDecimal(0.00);
@@ -1951,9 +1954,9 @@ public class WaybillServiceImpl implements WaybillService {
                         calculatePaymentDto.setCustomerContractId(orders.getCustomerContractId());
                         calculatePaymentDto.setTruckTeamContractId(waybill.getTruckTeamContractId());
                         List<WaybillItems> itemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
-                        if (!CollectionUtils.isEmpty(itemsList)){
+                        if (!CollectionUtils.isEmpty(itemsList)) {
                             List<SiteDto> siteDtoList = new ArrayList<>();
-                            for (WaybillItems waybillItems : itemsList){
+                            for (WaybillItems waybillItems : itemsList) {
                                 SiteDto siteDto = new SiteDto();
                                 siteDto.setLoadSiteId(orders.getLoadSiteId())
                                         .setUnloadSiteId(waybillItems.getUnloadSiteId());
@@ -1962,7 +1965,7 @@ public class WaybillServiceImpl implements WaybillService {
                             calculatePaymentDto.setSiteDtoList(siteDtoList);
                         }
                         List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
-                        if (!CollectionUtils.isEmpty(waybillGoodsDtos)){
+                        if (!CollectionUtils.isEmpty(waybillGoodsDtos)) {
                             for (GetWaybillGoodsDto waybillGoodsDto : waybillGoodsDtos) {
                                 if (orders.getGoodsType().equals(GoodsType.CHICKEN) || orders.getGoodsType().equals(GoodsType.FODDER)) {
                                     unloadWeight = unloadWeight.add(waybillGoodsDto.getUnloadWeight());
