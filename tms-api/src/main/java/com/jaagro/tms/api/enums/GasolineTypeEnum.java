@@ -8,7 +8,7 @@ public enum GasolineTypeEnum {
      * 燃油类型
      */
     NINETY(1, "0#", "0号"),
-    NINETY_THREE(2, "-10#", "10号"),
+    NINETY_THREE(2, "-10#", "-10号"),
     NINETY_FIVE(3, "-35#", "-35号"),
     OTHER(4, "other", "其他");
     private int code;
