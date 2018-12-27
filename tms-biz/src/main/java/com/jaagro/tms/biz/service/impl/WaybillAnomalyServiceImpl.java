@@ -504,7 +504,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             waybillCustomerFee
                     .setAnomalyId(dto.getAnomalId())
                     .setMoney(anomalyDeductCompensationDto.getMoney())
-                    .setFeeType(CostType.ADDITIONAL)
+                    .setEarningType(CostType.ADDITIONAL)
                     .setWaybillId(dto.getWaybillId())
                     .setCreatedUserId(currentUserId);
             if (null == waybillCustomerFees) {
@@ -535,7 +535,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             WaybillTruckFee waybillTruckFee = new WaybillTruckFee();
             waybillTruckFee
                     .setAnomalyId(dto.getAnomalId())
-                    .setFeeType(CostType.ADDITIONAL)
+                    .setCostType(CostType.ADDITIONAL)
                     .setWaybillId(dto.getWaybillId())
                     .setMoney(anomalyDeductCompensationDto.getMoney())
                     .setCreatedUserId(currentUserId);
