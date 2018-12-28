@@ -34,4 +34,11 @@ public interface WaybillTruckFeeMapperExt extends WaybillTruckFeeMapper {
      * @return
      */
     Integer batchInsert(@Param("waybillTruckFeeList") List<WaybillTruckFee> waybillTruckFeeList);
+
+    /**
+     * 批量删除
+     * @param waybillTruckFeeList
+     * @return
+     */
+    Integer batchDelete(@Param("waybillTruckFeeList") List<WaybillTruckFee> waybillTruckFeeList);
 }

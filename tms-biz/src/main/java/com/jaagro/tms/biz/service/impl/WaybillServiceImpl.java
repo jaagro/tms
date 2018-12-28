@@ -1927,6 +1927,7 @@ public class WaybillServiceImpl implements WaybillService {
      * @since 20181226
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<Map<Integer, BigDecimal>> calculatePaymentFromDriver(List<Integer> waybillIds) {
         // 拼装计价参数
         List<CalculatePaymentDto> paymentDtoList = getCalculatePaymentDtoList(waybillIds);
@@ -1952,6 +1953,9 @@ public class WaybillServiceImpl implements WaybillService {
                 }
                 waybillTruckFeeList.add(waybillTruckFee);
             }
+            // 批量删除已创建的运单车辆费用
+            waybillTruckFeeMapperExt.batchDelete(waybillTruckFeeList);
+            // 批量新增运单车辆费用
             waybillTruckFeeMapperExt.batchInsert(waybillTruckFeeList);
         }
         return paymentList;

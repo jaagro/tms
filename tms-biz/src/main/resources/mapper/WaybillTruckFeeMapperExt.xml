@@ -37,4 +37,12 @@
             #{item.modifyUserId,jdbcType=INTEGER})
         </foreach>
     </insert>
+    <delete id="batchDelete" parameterType="list">
+        DELETE FROM waybill_truck_fee
+        WHERE
+        <foreach collection="waybillTruckFeeList" separator=" or " item="item">
+            (direction = #{item.direction,jdbcType=INTEGER} and cost_type = #{item.costType,jdbcType=INTEGER} and
+            waybill_id = #{item.waybillId,jdbcType=INTEGER} and settle_status = 0)
+        </foreach>
+    </delete>
 </mapper>
