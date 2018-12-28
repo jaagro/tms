@@ -26,4 +26,9 @@ public final class TrackingType {
      * 卸货单据补录
      */
     public static final Integer UNLOAD_BILLS_RECEIPT = 5;
+
+    /**
+     * 运单系统自动拒单
+     */
+    public static final Integer WAYBILL_SYSTEM_REJECT = 6;
 }
