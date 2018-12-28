@@ -1056,6 +1056,8 @@ public class WaybillServiceImpl implements WaybillService {
         //拒单
         if (WaybillConstant.REJECT.equals(dto.getReceiptStatus())) {
             waybill.setWaybillStatus(WaybillStatus.REJECT);
+            waybill.setModifyUserId(currentUser.getId());
+            waybill.setModifyTime(new Date());
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking
                     .setOldStatus(WaybillStatus.RECEIVE)
