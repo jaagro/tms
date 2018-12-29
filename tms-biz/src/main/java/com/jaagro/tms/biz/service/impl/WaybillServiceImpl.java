@@ -1896,6 +1896,7 @@ public class WaybillServiceImpl implements WaybillService {
      * 20181222
      * 客户结算
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(List<Integer> waybillIds) {
         List<CalculatePaymentDto> paymentDtos = getCalculatePaymentDtoList(waybillIds);
@@ -1912,8 +1913,9 @@ public class WaybillServiceImpl implements WaybillService {
                 waybillCustomerFee.setEarningType(CostType.FREIGHT);
                 waybillCustomerFee.setDirection(Direction.PLUS);
                 waybillCustomerFee.setCreatedUserId(currentUserId);
+                waybillCustomerFee.setSettleStatus(SettleStatus.UN_SETTLE);
             }
-
+            waybillCustomerFeeMapperExt.deleteRecordByCritera(waybillCustomerFee);
             waybillCustomerFeeMapperExt.insertSelective(waybillCustomerFee);
 
         }
