@@ -763,42 +763,50 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public ShowPersonalCenter personalCenter() {
-        ShowPersonalCenter showPersonalCenter = new ShowPersonalCenter();
-        UserInfo currentUser = currentUserService.getCurrentUser();
-        showPersonalCenter.setUserInfo(currentUser);
-        // 设置账户信息 add by yj 20181112
-        QueryAccountDto queryAccountDto = new QueryAccountDto();
-        queryAccountDto
-                .setAccountType(AccountType.CASH)
-                .setUserId(currentUser == null ? null : currentUser.getId())
-                .setUserType(AccountUserType.DRIVER);
-        showPersonalCenter.setAccountInfo(accountService.getByQueryAccountDto(queryAccountDto));
-        // 我的驾驶证信息 add by @Gao. 20181204
-        ListDriverLicenseDto listDriverLicenseDto = new ListDriverLicenseDto();
-        ShowDriverDto driver = driverClientService.getDriverReturnObject(currentUser == null ? null : currentUser.getId());
-        if (null != driver) {
-            listDriverLicenseDto
-                    .setStatus(expiryDrivingLicenseIsNormal(driver))
-                    .setIdentityCard(driver.getIdentityCard())
-                    .setDrivingLicense(driver.getDrivingLicense())
-                    .setValidityInspection(dateToString(stringToDate(driver.getExpiryDrivingLicense())))
-                    .setExpiryDrivingLicense(dateToString(stringToDate(driver.getExpiryDrivingLicense())))
-                    .setAllocationTime(allocationTime(driver.getExpiryDrivingLicense()));
-            showPersonalCenter.setDriverLicenseDto(listDriverLicenseDto);
+        try {
+            ShowPersonalCenter showPersonalCenter = new ShowPersonalCenter();
+            UserInfo currentUser = currentUserService.getCurrentUser();
+            showPersonalCenter.setUserInfo(currentUser);
+            // 设置账户信息 add by yj 20181112
+            QueryAccountDto queryAccountDto = new QueryAccountDto();
+            queryAccountDto
+                    .setAccountType(AccountType.CASH)
+                    .setUserId(currentUser == null ? null : currentUser.getId())
+                    .setUserType(AccountUserType.DRIVER);
+            showPersonalCenter.setAccountInfo(accountService.getByQueryAccountDto(queryAccountDto));
+            // 我的驾驶证信息 add by @Gao. 20181204
+            ListDriverLicenseDto listDriverLicenseDto = new ListDriverLicenseDto();
+            ShowDriverDto driver = driverClientService.getDriverReturnObject(currentUser == null ? null : currentUser.getId());
+            if (null != driver) {
+                listDriverLicenseDto
+                        .setStatus(expiryDrivingLicenseIsNormal(driver))
+                        .setIdentityCard(driver.getIdentityCard())
+                        .setDrivingLicense(driver.getDrivingLicense())
+                        .setValidityInspection(dateToString(stringToDate(driver.getExpiryDrivingLicense())))
+                        .setExpiryDrivingLicense(dateToString(stringToDate(driver.getExpiryDrivingLicense())))
+                        .setAllocationTime(allocationTime(driver.getExpiryDrivingLicense()));
+                showPersonalCenter.setDriverLicenseDto(listDriverLicenseDto);
+            }
+            // 我的车辆证照信息
+            ListTruckLicenseDto listTruckLicenseDto = new ListTruckLicenseDto();
+            ShowTruckDto truckByToken = truckClientService.getTruckByToken();
+            if (truckByToken != null){
+                listTruckLicenseDto
+                        .setTruckNumber(truckByToken.getTruckNumber())
+                        .setBuyTime(truckByToken.getBuyTime() == null ? null : dateFormat(truckByToken.getBuyTime()))
+                        .setExpiryDate(truckByToken.getExpiryDate() == null ? null : dateFormat(truckByToken.getExpiryDate()))
+                        .setExpiryAnnual(truckByToken.getExpiryAnnual() == null ? null :dateFormat(truckByToken.getExpiryAnnual()))
+                        .setTruckStatus(truckIsNormal(truckByToken));
+            }
+            showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
+            // 车辆信息 add by jia.yu
+            showPersonalCenter.setTruckInfo(getTruckInfo(truckByToken));
+            return showPersonalCenter;
+        }catch (Exception ex){
+            log.info("personalCenter",ex);
+            return new ShowPersonalCenter();
         }
-        // 我的车辆证照信息
-        ListTruckLicenseDto listTruckLicenseDto = new ListTruckLicenseDto();
-        ShowTruckDto truckByToken = truckClientService.getTruckByToken();
-        listTruckLicenseDto
-                .setTruckNumber(truckByToken.getTruckNumber())
-                .setBuyTime(dateFormat(truckByToken.getBuyTime()))
-                .setExpiryDate(dateFormat(truckByToken.getExpiryDate()))
-                .setExpiryAnnual(dateFormat(truckByToken.getExpiryAnnual()))
-                .setTruckStatus(truckIsNormal(truckByToken));
-        showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
-        // 车辆信息 add by jia.yu
-        showPersonalCenter.setTruckInfo(getTruckInfo(truckByToken));
-        return showPersonalCenter;
+
     }
 
     private ShowTruckInfoDto getTruckInfo(ShowTruckDto truckByToken) {
