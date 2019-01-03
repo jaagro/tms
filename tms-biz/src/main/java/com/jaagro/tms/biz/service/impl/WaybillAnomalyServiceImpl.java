@@ -480,9 +480,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 .setAuditTime(new Date());
         //审核通过
         if (AnomalyStatus.OK.equals(dto.getAuditStatus())) {
-            if (9 == waybillAnomaly.getAnomalyTypeId()) {
-
-            }
+//            if (9 == waybillAnomaly.getAnomalyTypeId()) {
+//
+//            }
             waybillAnomaly.setAuditStatus(AnomalyStatus.AUDIT_APPROVAL);
             waybillAnomaly.setProcessingStatus(AnomalyStatus.FINISH);
         }
