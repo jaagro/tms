@@ -81,6 +81,8 @@ public class WashTruckServiceImpl implements WashTruckService {
     @Override
     public PageInfo listWashTruckRecordByCriteria(ListWashTruckRecordCriteria criteria) {
         PageHelper.startPage(criteria.getPageNum(), criteria.getPageSize());
+        //去除车牌号中首尾空格
+        criteria.setTruckNumber(StringUtils.hasText(criteria.getTruckNumber()) ? criteria.getTruckNumber().trim() : criteria.getTruckNumber());
         if (RequestSource.APP.equals(criteria.getRequestSource())) {
             UserInfo currentUser = currentUserService.getCurrentUser();
             Integer currentUserId = currentUser == null ? null : currentUser.getId();
