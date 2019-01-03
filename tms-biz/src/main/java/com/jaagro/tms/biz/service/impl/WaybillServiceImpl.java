@@ -790,12 +790,14 @@ public class WaybillServiceImpl implements WaybillService {
             // 我的车辆证照信息
             ListTruckLicenseDto listTruckLicenseDto = new ListTruckLicenseDto();
             ShowTruckDto truckByToken = truckClientService.getTruckByToken();
-            listTruckLicenseDto
-                    .setTruckNumber(truckByToken.getTruckNumber())
-                    .setBuyTime(dateFormat(truckByToken.getBuyTime()))
-                    .setExpiryDate(dateFormat(truckByToken.getExpiryDate()))
-                    .setExpiryAnnual(dateFormat(truckByToken.getExpiryAnnual()))
-                    .setTruckStatus(truckIsNormal(truckByToken));
+            if (truckByToken != null){
+                listTruckLicenseDto
+                        .setTruckNumber(truckByToken.getTruckNumber())
+                        .setBuyTime(truckByToken.getBuyTime() == null ? null : dateFormat(truckByToken.getBuyTime()))
+                        .setExpiryDate(truckByToken.getExpiryDate() == null ? null : dateFormat(truckByToken.getExpiryDate()))
+                        .setExpiryAnnual(truckByToken.getExpiryAnnual() == null ? null :dateFormat(truckByToken.getExpiryAnnual()))
+                        .setTruckStatus(truckIsNormal(truckByToken));
+            }
             showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
             // 车辆信息 add by jia.yu
             showPersonalCenter.setTruckInfo(getTruckInfo(truckByToken));
