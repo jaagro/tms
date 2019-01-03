@@ -417,14 +417,14 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 case AnomalyStatus.DONE:
                     //判断是否需要审核
                     if (!waybillAnomaly.getAdjustStatus()) {
-//                        //当前异常为该类型 则可以撤派单并可以进入审核流程
-//                        if (9 == waybillAnomaly.getAnomalyTypeId()) {
+                        //当前异常为该类型 则可以撤派单并可以进入审核流程
+//                        if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
 //                            //更新状态为待审核
 //                            record.setAuditStatus(AnomalyStatus.TO_AUDIT);
 //                            record.setProcessingStatus(AnomalyStatus.AUDIT);
 //                            break;
 //                        }
-                        //更新状态为已结束
+                        // 更新状态为已结束
                         record.setProcessingStatus(AnomalyStatus.FINISH);
                     } else {
                         //更新状态为待审核
@@ -480,11 +480,11 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 .setAuditTime(new Date());
         //审核通过
         if (AnomalyStatus.OK.equals(dto.getAuditStatus())) {
-//            if (9 == waybillAnomaly.getAnomalyTypeId()) {
-//
-//            }
             waybillAnomaly.setAuditStatus(AnomalyStatus.AUDIT_APPROVAL);
             waybillAnomaly.setProcessingStatus(AnomalyStatus.FINISH);
+//            if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
+//                cancelWaybill(waybillAnomaly);
+//            }
         }
         //审核拒绝
         if (AnomalyStatus.NO.equals(dto.getAuditStatus())) {
@@ -500,11 +500,12 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      *
      * @param waybillAnomaly
      */
-    private void test2(WaybillAnomaly waybillAnomaly) {
+    private void cancelWaybill(WaybillAnomaly waybillAnomaly) {
         Map<String, Object> templateMap = new HashMap<>();
         if (waybillAnomaly.getWaybillId() != null) {
-            Waybill waybill = waybillMapper.selectByPrimaryKey(waybillAnomaly.getId());
-            waybill.setWaybillStatus("已拒绝");
+            Waybill waybill = new Waybill();
+            waybill.setId(waybillAnomaly.getWaybillId())
+                    .setWaybillStatus("已拒绝");
             waybillMapper.updateByPrimaryKeySelective(waybill);
             if (waybill.getDriverId() != null) {
                 BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(waybill.getDriverId());
