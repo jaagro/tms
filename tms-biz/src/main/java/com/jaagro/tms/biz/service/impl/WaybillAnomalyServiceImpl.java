@@ -418,12 +418,12 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     //判断是否需要审核
                     if (!waybillAnomaly.getAdjustStatus()) {
                         //当前异常为该类型 则可以撤派单并可以进入审核流程
-//                        if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
-//                            //更新状态为待审核
-//                            record.setAuditStatus(AnomalyStatus.TO_AUDIT);
-//                            record.setProcessingStatus(AnomalyStatus.AUDIT);
-//                            break;
-//                        }
+                        if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
+                            //更新状态为待审核
+                            record.setAuditStatus(AnomalyStatus.TO_AUDIT);
+                            record.setProcessingStatus(AnomalyStatus.AUDIT);
+                            break;
+                        }
                         // 更新状态为已结束
                         record.setProcessingStatus(AnomalyStatus.FINISH);
                     } else {
@@ -482,9 +482,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         if (AnomalyStatus.OK.equals(dto.getAuditStatus())) {
             waybillAnomaly.setAuditStatus(AnomalyStatus.AUDIT_APPROVAL);
             waybillAnomaly.setProcessingStatus(AnomalyStatus.FINISH);
-//            if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
-//                cancelWaybill(waybillAnomaly);
-//            }
+            if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
+                cancelWaybill(waybillAnomaly);
+            }
         }
         //审核拒绝
         if (AnomalyStatus.NO.equals(dto.getAuditStatus())) {
