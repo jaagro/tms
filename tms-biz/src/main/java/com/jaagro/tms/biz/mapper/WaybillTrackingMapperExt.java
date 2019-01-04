@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author tony
  */
-public interface WaybillTrackingMapperExt extends WaybillTrackingMapper{
+public interface WaybillTrackingMapperExt extends WaybillTrackingMapper {
 
     /**
      * 接单时间
@@ -21,6 +21,7 @@ public interface WaybillTrackingMapperExt extends WaybillTrackingMapper{
 
     /**
      * 根据运单查询运单轨迹
+     *
      * @param waybillId
      * @return
      */
@@ -29,6 +30,7 @@ public interface WaybillTrackingMapperExt extends WaybillTrackingMapper{
     /**
      * add by Gavin
      * 根据运单id获取运单轨迹按id倒序
+     *
      * @param waybillId
      * @return
      */
@@ -37,17 +39,34 @@ public interface WaybillTrackingMapperExt extends WaybillTrackingMapper{
 
     /**
      * 根据运单号轨迹类型物理删除运单轨迹
-     * @author yj
+     *
      * @param waybillId
      * @param trackingType
+     * @author yj
      */
-    void deleteByWaybillIdAndTrackingType(@Param("waybillId") Integer waybillId,@Param("trackingType") Integer trackingType);
+    void deleteByWaybillIdAndTrackingType(@Param("waybillId") Integer waybillId, @Param("trackingType") Integer trackingType);
 
     /**
      * 批量插入运单轨迹
-     * @author yj
+     *
      * @param trackingList
      * @return
+     * @author yj
      */
     Integer batchInsert(@Param("trackingList") List<WaybillTracking> trackingList);
+
+    /**
+     * 根据运单id 查询异常轨迹id
+     *
+     * @param waybillId
+     * @return
+     */
+    List<Integer> listWaybillTrackingIdByWaybillId(@Param("waybillId") Integer waybillId);
+
+    /**
+     * 批量逻辑删除运单轨迹
+     *
+     * @param ids
+     */
+    void deleteWaybillTrackingId(@Param("ids") List<Integer> ids);
 }

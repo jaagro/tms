@@ -30,10 +30,15 @@
         </if>
     </select>
     <delete id="deleteByWaybillIdAndImageType">
-    delete from waybill_tracking_images
-    where waybill_id = #{waybillId,jdbcType=INTEGER}
-    and image_type = #{imageType,jdbcType=INTEGER}
-  </delete>
+        delete from waybill_tracking_images
+        where 1=1
+        <if test="waybillId!=null">
+            and waybill_id = #{waybillId,jdbcType=INTEGER}
+        </if>
+        <if test="imageType!=null">
+            and image_type = #{imageType,jdbcType=INTEGER}
+        </if>
+    </delete>
     <insert id="batchInsert" parameterType="com.jaagro.tms.biz.entity.WaybillTrackingImages">
         insert into waybill_tracking_images (waybill_id, waybill_item_id,
         site_id, waybill_tracking_id, image_type,

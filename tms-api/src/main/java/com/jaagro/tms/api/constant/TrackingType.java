@@ -31,4 +31,11 @@ public final class TrackingType {
      * 运单系统自动拒单
      */
     public static final Integer WAYBILL_SYSTEM_REJECT = 6;
+
+    /**
+     * 运单异常重置派单
+     */
+    public static final Integer ANOMALY_WAYBILL_RESET = 7;
+
+
 }

@@ -6,6 +6,7 @@ import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.anomaly.*;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
+import com.jaagro.tms.api.dto.driverapp.ShowTrackingDto;
 import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
 import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
 import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
@@ -59,6 +60,10 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     private WaybillAnomalyLogMapperExt waybillAnomalyLogMapperExt;
     @Autowired
     private SmsClientService smsClientService;
+    @Autowired
+    private WaybillTrackingMapperExt waybillTrackingMapper;
+    @Autowired
+    private WaybillTrackingImagesMapperExt waybillTrackingImagesMapper;
 
 
     /**
@@ -221,6 +226,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             waybillAnomalyMapper.updateByPrimaryKeySelective(waybillAnomaly);
             return;
         }
+
         if (true == dto.getAdjustStatus() && true == dto.getVerifiedStatus()) {
             //是否涉及费用调整
             List<AnomalyDeductCompensationDto> feeAdjust = dto.getFeeAdjust();
@@ -419,10 +425,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     if (!waybillAnomaly.getAdjustStatus()) {
                         //当前异常为该类型 则可以撤派单并可以进入审核流程
                         if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
-                            //更新状态为待审核
-                            record.setAuditStatus(AnomalyStatus.TO_AUDIT);
-                            record.setProcessingStatus(AnomalyStatus.AUDIT);
-                            break;
+                            cancelWaybill(waybillAnomaly, currentUser);
                         }
                         // 更新状态为已结束
                         record.setProcessingStatus(AnomalyStatus.FINISH);
@@ -482,9 +485,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         if (AnomalyStatus.OK.equals(dto.getAuditStatus())) {
             waybillAnomaly.setAuditStatus(AnomalyStatus.AUDIT_APPROVAL);
             waybillAnomaly.setProcessingStatus(AnomalyStatus.FINISH);
-            if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
-                cancelWaybill(waybillAnomaly);
-            }
         }
         //审核拒绝
         if (AnomalyStatus.NO.equals(dto.getAuditStatus())) {
@@ -500,22 +500,41 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      *
      * @param waybillAnomaly
      */
-    private void cancelWaybill(WaybillAnomaly waybillAnomaly) {
+    private void cancelWaybill(WaybillAnomaly waybillAnomaly, UserInfo currentUser) {
         Map<String, Object> templateMap = new HashMap<>();
         if (waybillAnomaly.getWaybillId() != null) {
-            Waybill waybill = new Waybill();
-            waybill.setId(waybillAnomaly.getWaybillId())
-                    .setWaybillStatus("已拒绝");
-            waybillMapper.updateByPrimaryKeySelective(waybill);
+            Integer waybillId = waybillAnomaly.getWaybillId();
+            Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+            //发送短信
             if (waybill.getDriverId() != null) {
                 BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(waybill.getDriverId());
                 if (globalUser.getData() != null) {
                     UserInfo driver = globalUser.getData();
                     templateMap.put("driver", driver.getName());
                     templateMap.put("waybillId", waybill.getId());
-                    smsClientService.sendSMS(driver.getPhoneNumber(), "SMS_151690363", templateMap);
+                    smsClientService.sendSMS(driver.getPhoneNumber(), "SMS_154586744", templateMap);
                 }
             }
+            List<Integer> waybillTrackingIds = waybillTrackingMapper.listWaybillTrackingIdByWaybillId(waybillId);
+            //批量逻辑删除
+            waybillTrackingMapper.deleteWaybillTrackingId(waybillTrackingIds);
+            //删除运单轨迹关联图片
+            waybillTrackingImagesMapper.deleteByWaybillIdAndImageType(waybillId, null);
+            WaybillTracking waybillTracking = new WaybillTracking();
+            waybillTracking
+                    .setWaybillId(waybillId)
+                    .setTrackingType(TrackingType.ANOMALY_WAYBILL_RESET)
+                    .setReferUserId(currentUser.getId())
+                    .setNewStatus(WaybillStatus.SEND_TRUCK)
+                    .setOldStatus(waybill.getWaybillStatus())
+                    .setTrackingInfo("运单号" + waybillId + "出现运单异常已重置派单");
+            waybillTrackingMapper.insertSelective(waybillTracking);
+            Waybill wb = new Waybill();
+            wb.setId(waybillId)
+                    .setWaybillStatus(WaybillStatus.SEND_TRUCK)
+                    .setDriverId(null)
+                    .setTruckId(null);
+            waybillMapper.updateCancelWaybillById(wb);
         }
     }
 

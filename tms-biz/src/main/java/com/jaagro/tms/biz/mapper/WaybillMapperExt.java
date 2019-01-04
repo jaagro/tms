@@ -155,4 +155,11 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @return
      */
     Integer countUnDoneByDriverId(@Param("driverId") Integer driverId);
+
+    /**
+     * 异常运单重置派单
+     *
+     * @param waybill
+     */
+    void updateCancelWaybillById(Waybill waybill);
 }

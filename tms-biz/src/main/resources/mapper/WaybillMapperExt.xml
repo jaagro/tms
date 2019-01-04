@@ -295,4 +295,9 @@
       where driver_id = #{driverId}
       and waybill_status in ('待出发','待出发','待装货','待送达','待签收')
     </select>
+    <update id="updateCancelWaybillById" parameterType="com.jaagro.tms.biz.entity.Waybill">
+        update waybill set waybill_status =#{waybillStatus},
+        truck_id = #{truckId,jdbcType=INTEGER},
+        driver_id = #{driverId,jdbcType=INTEGER} where id = #{id};
+    </update>
 </mapper>
