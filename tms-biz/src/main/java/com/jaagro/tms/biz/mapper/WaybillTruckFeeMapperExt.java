@@ -3,6 +3,7 @@ package com.jaagro.tms.biz.mapper;
 import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
 import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
 import com.jaagro.tms.biz.entity.WaybillTruckFee;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -27,4 +28,17 @@ public interface WaybillTruckFeeMapperExt extends WaybillTruckFeeMapper {
      */
     WaybillTruckFee selectByAnomalyId(Integer anomalyId);
 
+    /**
+     * 批量插入
+     * @param waybillTruckFeeList
+     * @return
+     */
+    Integer batchInsert(@Param("waybillTruckFeeList") List<WaybillTruckFee> waybillTruckFeeList);
+
+    /**
+     * 批量删除
+     * @param waybillTruckFeeList
+     * @return
+     */
+    Integer batchDelete(@Param("waybillTruckFeeList") List<WaybillTruckFee> waybillTruckFeeList);
 }

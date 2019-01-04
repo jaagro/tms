@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 洗车记录
@@ -42,4 +43,9 @@ public class WashTruckRecordVo implements Serializable{
      * 备注
      */
     private String notes;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 }

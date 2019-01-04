@@ -4,8 +4,10 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
+import com.jaagro.tms.api.dto.truck.ChangeTruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -217,4 +219,44 @@ public interface WaybillService {
      * @return
      */
     Integer listWaitWaybillByOrderId(Integer id);
+
+    /**
+     * 获取当前登录司机的车辆信息
+     *
+     * @return
+     */
+    ShowTruckInfoDto getTruckInfo();
+
+    /**
+     * 我要换车列表
+     *
+     * @return
+     */
+    List<ChangeTruckDto> getChangeTruckList();
+
+    /**
+     * 换车提交
+     *
+     * @param truckDto
+     * @return
+     */
+    Map<String, Object> changeTruck(TransferTruckDto truckDto);
+
+    /**
+     * @Author gavin
+     * 20181222
+     * 客户结算
+     * @param waybillIds
+     * @return
+     */
+    List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(List<Integer> waybillIds);
+
+    /**
+     * 司机结算计算价格
+     * @author yj
+     * @since 20181226
+     * @param waybillIds
+     * @return
+     */
+    List<Map<Integer, BigDecimal>> calculatePaymentFromDriver(List<Integer> waybillIds);
 }

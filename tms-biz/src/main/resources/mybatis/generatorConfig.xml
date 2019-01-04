@@ -33,7 +33,7 @@
         targetProject：目标工程
         -->
         <javaModelGenerator targetPackage="com.jaagro.tms.biz.entity"
-                            targetProject="/Users/gaoxin/Downloads/JavaApp/jaagro-platform-tms/tms-biz/src/main/java">
+                            targetProject="/Users/gavinwang/Documents/workspace/jaagro-platform-tms/tms-biz/src/main/java">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
             <property name="" value=""/>
@@ -41,24 +41,22 @@
 
         <!-- 生成 mapper.xml文件路径 -->
         <sqlMapGenerator targetPackage="mapper"
-                         targetProject="/Users/gaoxin/Downloads/JavaApp/jaagro-platform-tms/tms-biz/src/main/resources">
+                         targetProject="/Users/gavinwang/Documents/workspace/jaagro-platform-tms/tms-biz/src/main/resources">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
 
         <!-- 生成 dao 接口的包路径 -->
         <javaClientGenerator type="XMLMAPPER" targetPackage="com.jaagro.tms.biz.mapper"
-                             targetProject="/Users/gaoxin/Downloads/JavaApp/jaagro-platform-tms/tms-biz/src/main/java">
+                             targetProject="/Users/gavinwang/Documents/workspace/jaagro-platform-tms/tms-biz/src/main/java">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
         <!--<table tableName="%" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
-        <table tableName="waybill_evaluate" domainObjectName="WaybillEvaluate" enableCountByExample="true"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"
-               selectByExampleQueryId="false"></table>
+
         <!--<table tableName="rpt_customer_order_monthly" domainObjectName="RptCustomerOrderMonthly" enableCountByExample="true"-->
-               <!--enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"-->
-               <!--selectByExampleQueryId="false"></table>-->
-        <!--<table tableName="waybill" domainObjectName="Waybill" enableCountByExample="false"-->
-        <!--enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"-->
+        <!--enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"-->
         <!--selectByExampleQueryId="false"></table>-->
+        <table tableName="waybill" domainObjectName="Waybill" enableCountByExample="false"
+        enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+        selectByExampleQueryId="false"></table>
     </context>
 </generatorConfiguration>

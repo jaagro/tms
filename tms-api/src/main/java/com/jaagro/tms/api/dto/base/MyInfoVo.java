@@ -1,4 +1,4 @@
-package com.jaagro.tms.web.vo.chat;
+package com.jaagro.tms.api.dto.base;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -14,9 +14,19 @@ import java.io.Serializable;
 public class MyInfoVo implements Serializable {
 
     /**
-     * 名称
+     * 客户id
      */
     private Integer customerId;
+
+    /**
+     * 地址id
+     */
+    private Integer siteId;
+
+    /**
+     * 用户类型
+     */
+    private Integer userType;
 
     /**
      * 名称

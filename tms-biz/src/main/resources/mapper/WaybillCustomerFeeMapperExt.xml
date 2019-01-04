@@ -20,4 +20,9 @@
         where anomaly_id = #{anomalyId,jdbcType=INTEGER}
         limit 1
     </select>
+
+    <delete id="deleteRecordByCritera">
+        delete from waybill_customer_fee
+        where waybill_id=#{waybillId} and earning_type=1 and direction=1 and settle_status=0 and enabled=1
+    </delete>
 </mapper>

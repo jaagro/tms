@@ -8,11 +8,13 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * @author tony
+ * @author yj
+ * @since 20181226
  */
 @Data
 @Accessors(chain = true)
-public class WaybillTruckFee implements Serializable {
+public class WaybillTruckFee implements Serializable{
+    private static final long serialVersionUID = -7387899290084094116L;
     /**
      * 
      */
@@ -29,15 +31,24 @@ public class WaybillTruckFee implements Serializable {
     private Integer waybillItemId;
 
     /**
-     *
-     */
-
-    private Integer anomalyId;
-
-    /**
      * 费用类型：1-运费 2-附加费
      */
     private Integer costType;
+
+    /**
+     * 
+     */
+    private Integer anomalyId;
+
+    /**
+     * 资金方向(1-增加,2减少)
+     */
+    private Integer direction;
+
+    /**
+     * 结算状态(0-未结算,1-已结算,2-已支付)
+     */
+    private Integer settleStatus;
 
     /**
      * 金额
@@ -68,4 +79,5 @@ public class WaybillTruckFee implements Serializable {
      * 修改人id
      */
     private Integer modifyUserId;
+
 }

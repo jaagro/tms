@@ -75,8 +75,9 @@ public class OrderServiceImpl implements OrderService {
         if (customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
             throw new RuntimeException("客户合同不存在");
         }
+        ShowSiteDto showSiteDto=null;
         if (orderDto.getLoadSiteId() != null) {
-            ShowSiteDto showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
+            showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
             if (showSiteDto == null) {
                 throw new RuntimeException("装货地不存在");
             }
@@ -85,6 +86,11 @@ public class OrderServiceImpl implements OrderService {
         BeanUtils.copyProperties(orderDto, order);
         order.setCreatedUserId(currentUserService.getShowUser().getId());
         order.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
+        if (!StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder())) {
+            order.setDirectOrderFlag("y");
+        }
+        //添加客户所在的网点by gavin 20181220
+        order.setNetworkId(showSiteDto.getDeptId());
         this.ordersMapper.insertSelective(order);
         //如果是牧源客户，那么设置默认的卸货地、卸货时间、货物，装货地前端选择
         if (!StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder())) {

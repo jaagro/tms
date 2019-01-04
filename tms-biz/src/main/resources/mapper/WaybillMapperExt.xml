@@ -73,7 +73,8 @@
     <select id="selectWaybillByCarrierStatus" resultMap="ResultMap" parameterType="com.jaagro.tms.biz.entity.Waybill">
 
         select distinct * from (
-        select wb.id, wb.order_id, wb.load_site_id, wb.truck_team_contract_id, wb.waybill_status, wb.receipt_status, wb.need_truck_type,
+        select wb.id, wb.order_id, wb.load_site_id, wb.truck_team_contract_id, wb.waybill_status, wb.receipt_status,
+        wb.need_truck_type,
         wb.truck_id, wb.driver_id, wb.send_time, wb.distance, wb.create_time, wb.created_user_id, wb.modify_time,
         wb.modify_user_id, wb.enabled, wb.load_time, wb.department_id, wt.create_time trackingDate
         from waybill wb
@@ -237,7 +238,7 @@
 
     <update id="batchUpdateWaybillStatus" parameterType="java.util.List">
         update waybill
-        set waybill_status='已拒单',modify_time=now(),modify_user_id=1 where id in
+        set waybill_status='已拒单',modify_time=now(),modify_user_id=1 where waybill_status = '待接单' and id in
         <foreach collection="list" item="waybill" index="index" separator="," open="(" close=")">
             #{waybill.id}
         </foreach>
@@ -247,5 +248,51 @@
         <include refid="Base_Column_List"/>
         from waybill
         where enabled=1 and waybill_status!='已作废' and id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="listWebChatWaybillByCriteria"
+            parameterType="com.jaagro.tms.api.dto.waybill.ListWebChatWaybillCriteriaDto" resultMap="ReturnMap">
+        SELECT
+        w.*
+        FROM
+        waybill w
+        LEFT JOIN waybill_items t ON w.id = t.waybill_id
+        WHERE
+        w.enabled = 1
+        <if test="waybillStatus != null">
+            <if test="waybillStatus == '运输中'">
+                AND w.waybill_status in ('待出发','前往装货地','待装货','待送达','待签收')
+            </if>
+            <if test="waybillStatus == '已完成'">
+                AND w.waybill_status = "已完成"
+            </if>
+            <if test="waybillStatus == '已取消'">
+                AND w.waybill_status = "已取消"
+            </if>
+        </if>
+        <if test="userType != null and userType == 2">
+            AND w.load_site_id = #{userId}
+        </if>
+        <if test="userType != null and userType == 3">
+            AND t.unload_site_id = #{userId}
+        </if>
+        GROUP BY
+        w.id
+        <if test="userType != null and userType == 3">
+            ,t.required_time
+        </if>
+        <if test="userType != null and userType == 2">
+            ORDER BY w.load_time DESC
+        </if>
+        <if test="userType != null and userType == 3">
+            ORDER BY t.required_time DESC
+        </if>
+    </select>
+    <select id="countUnDoneByDriverId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+      select
+      count(1)
+      from
+      waybill
+      where driver_id = #{driverId}
+      and waybill_status in ('待出发','待出发','待装货','待送达','待签收')
     </select>
 </mapper>

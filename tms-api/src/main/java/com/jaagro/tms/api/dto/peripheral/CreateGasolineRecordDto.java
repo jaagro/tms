@@ -15,9 +15,19 @@ import java.util.Date;
 public class CreateGasolineRecordDto implements Serializable {
 
     /**
+     *
+     */
+    private Integer id;
+
+    /**
      * 司机id
      */
     private Integer driverId;
+
+    /**
+     * 司机姓名
+     */
+    private String driverName;
 
     /**
      * 车辆id

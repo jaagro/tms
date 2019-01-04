@@ -2,8 +2,8 @@ package com.jaagro.tms.api.service;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
-import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsReceiptDto;
 import com.jaagro.tms.api.dto.waybill.GetWaybillDetailDto;
+import com.jaagro.tms.api.dto.waybill.ListWebChatWaybillCriteriaDto;
 
 import java.util.List;
 
@@ -39,4 +39,11 @@ public interface WaybillRefactorService {
      */
     GetWaybillDetailDto getWaybillDetailById(Integer waybillId);
 
+    /**
+     * 我的运单列表【装卸货端】
+     *
+     * @param criteriaDto
+     * @return
+     */
+    PageInfo listWebChatWaybillByCriteria(ListWebChatWaybillCriteriaDto criteriaDto);
 }

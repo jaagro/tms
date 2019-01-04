@@ -4,15 +4,14 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.peripheral.ListRepairRecordCriteriaDto;
-import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.entity.RepairRecord;
 import com.jaagro.tms.api.service.RepairRecordService;
 import com.jaagro.tms.biz.mapper.RepairRecordMapperExt;
-import com.jaagro.tms.biz.service.DriverClientService;
 import com.jaagro.tms.biz.service.TruckClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -29,8 +28,7 @@ public class RepairRecordServiceImpl implements RepairRecordService {
     private CurrentUserService currentUserService;
     @Autowired
     private TruckClientService truckClientService;
-    @Autowired
-    private DriverClientService driverClientService;
+
 
     /**
      * 新增维修记录
@@ -43,8 +41,6 @@ public class RepairRecordServiceImpl implements RepairRecordService {
 
         UserInfo userInfo = currentUserService.getCurrentUser();
         Integer userId = null == userInfo ? null : userInfo.getId();
-        //司机信息
-        ShowDriverDto driverDto = driverClientService.getDriverReturnObject(record.getDriverId());
         record.setCreateUserId(userId);
         //根据司机id获取该司机的车辆
         ShowTruckDto truckDto = truckClientService.getTruckByToken();
@@ -53,7 +49,7 @@ public class RepairRecordServiceImpl implements RepairRecordService {
             record.setTruckId(truckDto.getId())
                     .setTruckNumber(truckDto.getTruckNumber())
                     .setTruckTeamId(truckDto.getTruckTeamId())
-                    .setDriverName(driverDto.getName())
+                    .setDriverName(userInfo.getName())
                     .setDriverId(truckDto.getDrivers().get(0).getId());
 
         }
@@ -80,6 +76,8 @@ public class RepairRecordServiceImpl implements RepairRecordService {
     @Override
     public PageInfo<RepairRecord> listRepairRecordByCriteria(ListRepairRecordCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        //去除车牌号中首尾空格
+        criteriaDto.setTruckNumber(StringUtils.hasText(criteriaDto.getTruckNumber()) ? criteriaDto.getTruckNumber().trim() : criteriaDto.getTruckNumber());
         List<RepairRecord> repairRecordList  = repairRecordMapper.listRepairRecordByCondition(criteriaDto);
         return new PageInfo(repairRecordList);
     }

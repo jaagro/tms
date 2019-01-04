@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * @author tony
+ * @Author gavin
  */
 @Data
 @Accessors(chain = true)
@@ -34,12 +34,12 @@ public class Waybill implements Serializable {
     private Integer truckTeamContractId;
 
     /**
-     * 运单状态：待派车、待司机接单、已接单、司机已出发、司机到达装货地、运输中、卸货完成、已完成，取消
+     * 运单状态：待派车、待司机接单、已接单、司机已出发、司机到达装货地、运输中、卸货完成、已完成，取消、作废
      */
     private String waybillStatus;
 
     /**
-     * 回单状态 0-未回单,1-已补录实提,2-已补录实卸
+     * 回单补录状态 0-未回单,1-已补录实提,2-已补录实卸
      */
     private Integer receiptStatus;
 
@@ -99,8 +99,13 @@ public class Waybill implements Serializable {
     private Date loadTime;
 
     /**
-     * 
+     * 创建运单人的部门id
      */
     private Integer departmentId;
+
+    /**
+     * 客户网点
+     */
+    private Integer networkId;
 
 }
