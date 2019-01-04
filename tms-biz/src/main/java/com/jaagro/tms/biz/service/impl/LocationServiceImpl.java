@@ -20,6 +20,7 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -111,6 +112,7 @@ public class LocationServiceImpl implements LocationService {
     public List<ShowLocationDto> locationsByWaybillId(Integer waybillId, Integer interval) {
         List<ShowLocationDto> locationDtos;
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+        Assert.notNull(waybill, "运单不存在");
         Orders order = ordersMapperExt.selectByPrimaryKey(waybill.getOrderId());
         String key = "location:order:" + waybill.getOrderId() + ":" + waybill.getId();
 

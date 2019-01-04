@@ -11,6 +11,7 @@ import com.jaagro.tms.biz.mapper.RepairRecordMapperExt;
 import com.jaagro.tms.biz.service.TruckClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -75,6 +76,8 @@ public class RepairRecordServiceImpl implements RepairRecordService {
     @Override
     public PageInfo<RepairRecord> listRepairRecordByCriteria(ListRepairRecordCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
+        //去除车牌号中首尾空格
+        criteriaDto.setTruckNumber(StringUtils.hasText(criteriaDto.getTruckNumber()) ? criteriaDto.getTruckNumber().trim() : criteriaDto.getTruckNumber());
         List<RepairRecord> repairRecordList  = repairRecordMapper.listRepairRecordByCondition(criteriaDto);
         return new PageInfo(repairRecordList);
     }

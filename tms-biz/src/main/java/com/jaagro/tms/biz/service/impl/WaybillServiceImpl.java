@@ -9,9 +9,7 @@ import com.jaagro.tms.api.dto.Message.MessageReturnDto;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
-import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
-import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
-import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
@@ -39,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.Map.Entry;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.text.ParseException;
@@ -95,9 +94,11 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     private AccountService accountService;
     @Autowired
-    private CustomerClientService customerService;
-    @Autowired
     private RedisLock redisLock;
+    @Autowired
+    private WaybillCustomerFeeMapperExt waybillCustomerFeeMapperExt;
+    @Autowired
+    private WaybillTruckFeeMapperExt waybillTruckFeeMapperExt;
 
     /**
      * @param waybillDtoList
@@ -127,7 +128,7 @@ public class WaybillServiceImpl implements WaybillService {
             if (StringUtils.isEmpty(createWaybillDto.getLoadSiteId())) {
                 throw new NullPointerException("装货地id为空");
             }
-            ShowSiteDto showSiteDto = customerService.getShowSiteById(createWaybillDto.getLoadSiteId());
+            ShowSiteDto showSiteDto = customerClientService.getShowSiteById(createWaybillDto.getLoadSiteId());
             if (showSiteDto == null) {
                 throw new RuntimeException("装货地不存在");
             }
@@ -679,7 +680,9 @@ public class WaybillServiceImpl implements WaybillService {
                 WaybillItems waybillItems = new WaybillItems();
                 waybillItems
                         .setSignStatus(SignStatusConstant.SIGN)
-                        .setId(unLoadSiteConfirmProductDtos.get(0).getWaybillItemId());
+                        .setId(unLoadSiteConfirmProductDtos.get(0).getWaybillItemId())
+                        .setRequiredTime(new Date())
+                        .setModifyTime(new Date());
                 waybillItemsMapper.updateByPrimaryKeySelective(waybillItems);
             }
             //如果运单全部签收 运单状态
@@ -689,7 +692,7 @@ public class WaybillServiceImpl implements WaybillService {
                         .setWaybillStatus(WaybillStatus.ACCOMPLISH)
                         .setModifyTime(new Date());
                 waybillMapper.updateByPrimaryKeySelective(waybill);
-                ShowCustomerDto customerDto = customerService.getShowCustomerById(orders.getCustomerId());
+                ShowCustomerDto customerDto = customerClientService.getShowCustomerById(orders.getCustomerId());
                 //磅单超过千分之二 进行于预警判断
                 boolean flag = !StringUtils.isEmpty(customerDto.getEnableDirectOrder()) && "y".equals(customerDto.getEnableDirectOrder());
                 //牧原客户手机提交 不做磅差判断
@@ -700,7 +703,7 @@ public class WaybillServiceImpl implements WaybillService {
                 List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
                 int count = 0;
                 for (Waybill w : waybills) {
-                    if ("已完成".equals(w.getWaybillStatus())) {
+                    if ("已完成".equals(w.getWaybillStatus()) || "已作废".equals(w.getWaybillStatus())) {
                         count++;
                     }
                 }
@@ -760,42 +763,50 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public ShowPersonalCenter personalCenter() {
-        ShowPersonalCenter showPersonalCenter = new ShowPersonalCenter();
-        UserInfo currentUser = currentUserService.getCurrentUser();
-        showPersonalCenter.setUserInfo(currentUser);
-        // 设置账户信息 add by yj 20181112
-        QueryAccountDto queryAccountDto = new QueryAccountDto();
-        queryAccountDto
-                .setAccountType(AccountType.CASH)
-                .setUserId(currentUser == null ? null : currentUser.getId())
-                .setUserType(AccountUserType.DRIVER);
-        showPersonalCenter.setAccountInfo(accountService.getByQueryAccountDto(queryAccountDto));
-        // 我的驾驶证信息 add by @Gao. 20181204
-        ListDriverLicenseDto listDriverLicenseDto = new ListDriverLicenseDto();
-        ShowDriverDto driver = driverClientService.getDriverReturnObject(currentUser == null ? null : currentUser.getId());
-        if (null != driver) {
-            listDriverLicenseDto
-                    .setStatus(expiryDrivingLicenseIsNormal(driver))
-                    .setIdentityCard(driver.getIdentityCard())
-                    .setDrivingLicense(driver.getDrivingLicense())
-                    .setValidityInspection(dateToString(stringToDate(driver.getExpiryDrivingLicense())))
-                    .setExpiryDrivingLicense(dateToString(stringToDate(driver.getExpiryDrivingLicense())))
-                    .setAllocationTime(allocationTime(driver.getExpiryDrivingLicense()));
-            showPersonalCenter.setDriverLicenseDto(listDriverLicenseDto);
+        try {
+            ShowPersonalCenter showPersonalCenter = new ShowPersonalCenter();
+            UserInfo currentUser = currentUserService.getCurrentUser();
+            showPersonalCenter.setUserInfo(currentUser);
+            // 设置账户信息 add by yj 20181112
+            QueryAccountDto queryAccountDto = new QueryAccountDto();
+            queryAccountDto
+                    .setAccountType(AccountType.CASH)
+                    .setUserId(currentUser == null ? null : currentUser.getId())
+                    .setUserType(AccountUserType.DRIVER);
+            showPersonalCenter.setAccountInfo(accountService.getByQueryAccountDto(queryAccountDto));
+            // 我的驾驶证信息 add by @Gao. 20181204
+            ListDriverLicenseDto listDriverLicenseDto = new ListDriverLicenseDto();
+            ShowDriverDto driver = driverClientService.getDriverReturnObject(currentUser == null ? null : currentUser.getId());
+            if (null != driver) {
+                listDriverLicenseDto
+                        .setStatus(expiryDrivingLicenseIsNormal(driver))
+                        .setIdentityCard(driver.getIdentityCard())
+                        .setDrivingLicense(driver.getDrivingLicense())
+                        .setValidityInspection(dateToString(stringToDate(driver.getExpiryDrivingLicense())))
+                        .setExpiryDrivingLicense(dateToString(stringToDate(driver.getExpiryDrivingLicense())))
+                        .setAllocationTime(allocationTime(driver.getExpiryDrivingLicense()));
+                showPersonalCenter.setDriverLicenseDto(listDriverLicenseDto);
+            }
+            // 我的车辆证照信息
+            ListTruckLicenseDto listTruckLicenseDto = new ListTruckLicenseDto();
+            ShowTruckDto truckByToken = truckClientService.getTruckByToken();
+            if (truckByToken != null){
+                listTruckLicenseDto
+                        .setTruckNumber(truckByToken.getTruckNumber())
+                        .setBuyTime(truckByToken.getBuyTime() == null ? null : dateFormat(truckByToken.getBuyTime()))
+                        .setExpiryDate(truckByToken.getExpiryDate() == null ? null : dateFormat(truckByToken.getExpiryDate()))
+                        .setExpiryAnnual(truckByToken.getExpiryAnnual() == null ? null :dateFormat(truckByToken.getExpiryAnnual()))
+                        .setTruckStatus(truckIsNormal(truckByToken));
+            }
+            showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
+            // 车辆信息 add by jia.yu
+            showPersonalCenter.setTruckInfo(getTruckInfo(truckByToken));
+            return showPersonalCenter;
+        }catch (Exception ex){
+            log.info("personalCenter",ex);
+            return new ShowPersonalCenter();
         }
-        // 我的车辆证照信息
-        ListTruckLicenseDto listTruckLicenseDto = new ListTruckLicenseDto();
-        ShowTruckDto truckByToken = truckClientService.getTruckByToken();
-        listTruckLicenseDto
-                .setTruckNumber(truckByToken.getTruckNumber())
-                .setBuyTime(dateFormat(truckByToken.getBuyTime()))
-                .setExpiryDate(dateFormat(truckByToken.getExpiryDate()))
-                .setExpiryAnnual(dateFormat(truckByToken.getExpiryAnnual()))
-                .setTruckStatus(truckIsNormal(truckByToken));
-        showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
-        // 车辆信息 add by jia.yu
-        showPersonalCenter.setTruckInfo(getTruckInfo(truckByToken));
-        return showPersonalCenter;
+
     }
 
     private ShowTruckInfoDto getTruckInfo(ShowTruckDto truckByToken) {
@@ -1053,6 +1064,8 @@ public class WaybillServiceImpl implements WaybillService {
         //拒单
         if (WaybillConstant.REJECT.equals(dto.getReceiptStatus())) {
             waybill.setWaybillStatus(WaybillStatus.REJECT);
+            waybill.setModifyUserId(currentUser.getId());
+            waybill.setModifyTime(new Date());
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking
                     .setOldStatus(WaybillStatus.RECEIVE)
@@ -1884,4 +1897,133 @@ public class WaybillServiceImpl implements WaybillService {
         return true;
     }
 
+    /**
+     * @param waybillIds
+     * @return
+     * @Author gavin
+     * 20181222
+     * 客户结算
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(List<Integer> waybillIds) {
+        List<CalculatePaymentDto> paymentDtos = getCalculatePaymentDtoList(waybillIds);
+        List<Map<Integer, BigDecimal>> feeFromCustomerList = customerClientService.calculatePaymentFromCustomer(paymentDtos);
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        Integer currentUserId = currentUser == null ? null : currentUser.getId();
+        for (Map<Integer, BigDecimal> map : feeFromCustomerList) {
+            WaybillCustomerFee waybillCustomerFee = new WaybillCustomerFee();
+            Iterator<Entry<Integer, BigDecimal>> it = map.entrySet().iterator();
+            while (it.hasNext()) {
+                Entry<Integer, BigDecimal> entry = it.next();
+                waybillCustomerFee.setWaybillId(entry.getKey());
+                waybillCustomerFee.setMoney(entry.getValue());
+                waybillCustomerFee.setEarningType(CostType.FREIGHT);
+                waybillCustomerFee.setDirection(Direction.PLUS);
+                waybillCustomerFee.setCreatedUserId(currentUserId);
+                waybillCustomerFee.setSettleStatus(SettleStatus.UN_SETTLE);
+            }
+            waybillCustomerFeeMapperExt.deleteRecordByCritera(waybillCustomerFee);
+            waybillCustomerFeeMapperExt.insertSelective(waybillCustomerFee);
+
+        }
+        return feeFromCustomerList;
+    }
+
+    /**
+     * 司机结算计算价格
+     *
+     * @param waybillIds
+     * @return
+     * @author yj
+     * @since 20181226
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<Integer, BigDecimal>> calculatePaymentFromDriver(List<Integer> waybillIds) {
+        // 拼装计价参数
+        List<CalculatePaymentDto> paymentDtoList = getCalculatePaymentDtoList(waybillIds);
+        // 获取计算后的价格
+        List<Map<Integer, BigDecimal>> paymentList = customerClientService.calculatePaymentFromDriver(paymentDtoList);
+        if (!CollectionUtils.isEmpty(paymentList)){
+            List<WaybillTruckFee> waybillTruckFeeList = new ArrayList<>();
+            UserInfo currentUser = currentUserService.getCurrentUser();
+            Integer currentUserId = currentUser == null ? null : currentUser.getId();
+            for (Map<Integer,BigDecimal> map : paymentList){
+                WaybillTruckFee waybillTruckFee = new WaybillTruckFee();
+                Iterator<Entry<Integer, BigDecimal>> it = map.entrySet().iterator();
+                while (it.hasNext()){
+                    Entry<Integer, BigDecimal> entry = it.next();
+                    waybillTruckFee.setCreatedUserId(currentUserId)
+                            .setCreateTime(new Date())
+                            .setDirection(Direction.SUBSTRACT)
+                            .setEnabled(Boolean.TRUE)
+                            .setCostType(CostType.FREIGHT)
+                            .setMoney(entry.getValue())
+                            .setWaybillId(entry.getKey())
+                            .setSettleStatus(SettleStatus.UN_SETTLE);
+                }
+                waybillTruckFeeList.add(waybillTruckFee);
+            }
+            // 批量删除已创建的运单车辆费用
+            waybillTruckFeeMapperExt.batchDelete(waybillTruckFeeList);
+            // 批量新增运单车辆费用
+            waybillTruckFeeMapperExt.batchInsert(waybillTruckFeeList);
+        }
+        return paymentList;
+    }
+
+    private List<CalculatePaymentDto> getCalculatePaymentDtoList(List<Integer> waybillIds) {
+        if (!CollectionUtils.isEmpty(waybillIds)) {
+            List<CalculatePaymentDto> paymentDtoList = new ArrayList<>();
+            for (Integer waybillId : waybillIds) {
+                BigDecimal unloadWeight = new BigDecimal(0.00);
+                Integer unloadQuantity = 0;
+                Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+                if (waybill != null && waybill.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH)) {
+                    CalculatePaymentDto calculatePaymentDto = new CalculatePaymentDto();
+                    Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
+                    if (orders != null) {
+                        calculatePaymentDto.setWaybillId(waybillId);
+                        calculatePaymentDto.setDoneDate(waybill.getModifyTime());
+                        calculatePaymentDto.setTruckTypeId(waybill.getNeedTruckType());
+                        calculatePaymentDto.setProductType(orders.getGoodsType());
+                        calculatePaymentDto.setCustomerContractId(orders.getCustomerContractId());
+                        calculatePaymentDto.setTruckTeamContractId(waybill.getTruckTeamContractId());
+                        List<WaybillItems> itemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
+                        if (!CollectionUtils.isEmpty(itemsList)) {
+                            List<SiteDto> siteDtoList = new ArrayList<>();
+                            for (WaybillItems waybillItems : itemsList) {
+                                SiteDto siteDto = new SiteDto();
+                                siteDto.setLoadSiteId(orders.getLoadSiteId())
+                                        .setUnloadSiteId(waybillItems.getUnloadSiteId());
+                                siteDtoList.add(siteDto);
+                            }
+                            calculatePaymentDto.setSiteDtoList(siteDtoList);
+                        }
+                        List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
+                        if (!CollectionUtils.isEmpty(waybillGoodsDtos)) {
+                            for (GetWaybillGoodsDto waybillGoodsDto : waybillGoodsDtos) {
+                                if (orders.getGoodsType().equals(GoodsType.CHICKEN) || orders.getGoodsType().equals(GoodsType.FODDER)) {
+                                    unloadWeight = unloadWeight.add(waybillGoodsDto.getUnloadWeight());
+                                } else {
+                                    unloadQuantity = unloadQuantity + waybillGoodsDto.getUnloadQuantity();
+                                }
+                            }
+                        }
+                        if (orders.getGoodsType().equals(GoodsType.CHICKEN) || orders.getGoodsType().equals(GoodsType.FODDER)) {
+
+                            calculatePaymentDto.setUnloadWeight(unloadWeight);
+
+                        } else {
+                            calculatePaymentDto.setUnloadQuantity(unloadQuantity);
+                        }
+                    }
+                    paymentDtoList.add(calculatePaymentDto);
+                }
+            }
+            return paymentDtoList;
+        }
+        return null;
+    }
 }

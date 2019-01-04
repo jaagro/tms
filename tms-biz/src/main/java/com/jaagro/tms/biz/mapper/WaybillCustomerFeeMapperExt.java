@@ -27,4 +27,11 @@ public interface WaybillCustomerFeeMapperExt extends WaybillCustomerFeeMapper {
      * @return
      */
     WaybillCustomerFee selectByAnomalyId(Integer anomalyId);
+
+    /**
+     * 删除运单客户结算
+     * @param record
+     * @return
+     */
+    int deleteRecordByCritera(WaybillCustomerFee record);
 }

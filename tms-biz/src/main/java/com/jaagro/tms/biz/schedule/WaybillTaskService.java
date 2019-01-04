@@ -1,13 +1,18 @@
 package com.jaagro.tms.biz.schedule;
 
 
+import com.jaagro.tms.api.constant.TrackingType;
+import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.biz.entity.Waybill;
+import com.jaagro.tms.biz.entity.WaybillTracking;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
+import com.jaagro.tms.biz.mapper.WaybillTrackingMapperExt;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.text.DateFormat;
@@ -26,11 +31,14 @@ public class WaybillTaskService {
 
     @Autowired
     private WaybillMapperExt waybillMapperExt;
+    @Autowired
+    private WaybillTrackingMapperExt waybillTrackingMapper;
 
     /**
      * 超过30分钟未接的运单修改为被司机拒绝以便重新派单,10分钟跑一次
      */
     @Scheduled(cron = "0 0/10 * * * ?")
+    @Transactional(rollbackFor = Exception.class)
     public void waybillDefaultRejectBySystem() {
         try {
             String format = "HH:mm:ss";
@@ -46,6 +54,21 @@ public class WaybillTaskService {
 
                 if (!CollectionUtils.isEmpty(waybillList)) {
                     waybillMapperExt.batchUpdateWaybillStatus(waybillList);
+
+                    /******添加拒单追踪******/
+                    for (Waybill waybill : waybillList) {
+                        WaybillTracking waybillTracking = new WaybillTracking();
+                        waybillTracking
+                                .setWaybillId(waybill.getId())
+                                .setTrackingInfo("System auto Reject!")
+                                .setTrackingType(TrackingType.WAYBILL_SYSTEM_REJECT)
+                                .setNewStatus(WaybillStatus.REJECT)
+                                .setOldStatus(WaybillStatus.RECEIVE)
+                                .setReferUserId(1)
+                                .setCreateTime(new Date());
+                        waybillTrackingMapper.insertSelective(waybillTracking);
+                    }
+                    /**********************/
                 }
 
                 log.info("定时钟执行结束");

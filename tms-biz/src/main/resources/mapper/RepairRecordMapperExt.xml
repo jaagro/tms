@@ -9,6 +9,7 @@
         <where>
             <if test="truckNumber != null and truckNumber != ''">truck_number = #{truckNumber}</if>
         </where>
+        order by create_time desc
     </select>
 
 </mapper>
