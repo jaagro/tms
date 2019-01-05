@@ -495,7 +495,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     }
 
     /**
-     * 运单异常撤派单
+     * 特殊运单异常重置派单
      * Author @Gao.
      *
      * @param waybillAnomaly
