@@ -13,7 +13,9 @@ import com.jaagro.tms.api.service.WaybillAnomalyService;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.biz.service.SmsClientService;
 import com.jaagro.tms.biz.service.UserClientService;
+import com.jaagro.utils.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,8 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     private UserClientService userClientService;
     @Autowired
     private WaybillAnomalyLogMapperExt waybillAnomalyLogMapperExt;
+    @Autowired
+    private SmsClientService smsClientService;
 
 
     /**
@@ -413,7 +417,14 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 case AnomalyStatus.DONE:
                     //判断是否需要审核
                     if (!waybillAnomaly.getAdjustStatus()) {
-                        //更新状态为已结束
+                        //当前异常为该类型 则可以撤派单并可以进入审核流程
+//                        if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
+//                            //更新状态为待审核
+//                            record.setAuditStatus(AnomalyStatus.TO_AUDIT);
+//                            record.setProcessingStatus(AnomalyStatus.AUDIT);
+//                            break;
+//                        }
+                        // 更新状态为已结束
                         record.setProcessingStatus(AnomalyStatus.FINISH);
                     } else {
                         //更新状态为待审核
@@ -463,15 +474,17 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     @Override
     public void anomalyInformationAudit(AnomalyInformationAuditDto dto) {
         UserInfo currentUser = currentUserService.getCurrentUser();
-        WaybillAnomaly waybillAnomaly = new WaybillAnomaly();
+        WaybillAnomaly waybillAnomaly = waybillAnomalyMapper.selectByPrimaryKey(dto.getId());
         waybillAnomaly
                 .setAuditUserId(currentUser.getId())
-                .setAuditTime(new Date())
-                .setId(dto.getId());
+                .setAuditTime(new Date());
         //审核通过
         if (AnomalyStatus.OK.equals(dto.getAuditStatus())) {
             waybillAnomaly.setAuditStatus(AnomalyStatus.AUDIT_APPROVAL);
             waybillAnomaly.setProcessingStatus(AnomalyStatus.FINISH);
+//            if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
+//                cancelWaybill(waybillAnomaly);
+//            }
         }
         //审核拒绝
         if (AnomalyStatus.NO.equals(dto.getAuditStatus())) {
@@ -479,6 +492,31 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             waybillAnomaly.setProcessingStatus(AnomalyStatus.DONE);
         }
         waybillAnomalyMapper.updateByPrimaryKeySelective(waybillAnomaly);
+    }
+
+    /**
+     * 运单异常撤派单
+     * Author @Gao.
+     *
+     * @param waybillAnomaly
+     */
+    private void cancelWaybill(WaybillAnomaly waybillAnomaly) {
+        Map<String, Object> templateMap = new HashMap<>();
+        if (waybillAnomaly.getWaybillId() != null) {
+            Waybill waybill = new Waybill();
+            waybill.setId(waybillAnomaly.getWaybillId())
+                    .setWaybillStatus("已拒绝");
+            waybillMapper.updateByPrimaryKeySelective(waybill);
+            if (waybill.getDriverId() != null) {
+                BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(waybill.getDriverId());
+                if (globalUser.getData() != null) {
+                    UserInfo driver = globalUser.getData();
+                    templateMap.put("driver", driver.getName());
+                    templateMap.put("waybillId", waybill.getId());
+                    smsClientService.sendSMS(driver.getPhoneNumber(), "SMS_151690363", templateMap);
+                }
+            }
+        }
     }
 
     /**
