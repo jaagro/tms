@@ -75,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
         if (customerService.getShowCustomerContractById(orderDto.getCustomerContractId()) == null) {
             throw new RuntimeException("客户合同不存在");
         }
-        ShowSiteDto showSiteDto=null;
+        ShowSiteDto showSiteDto = null;
         if (orderDto.getLoadSiteId() != null) {
             showSiteDto = customerService.getShowSiteById(orderDto.getLoadSiteId());
             if (showSiteDto == null) {
@@ -275,7 +275,7 @@ public class OrderServiceImpl implements OrderService {
                 .setOrderStatus(OrderStatus.CANCEL)
                 .setModifyUserId(this.currentUserService.getCurrentUser().getId())
                 .setModifyTime(new Date());
-        log.info("O updateByPrimaryKeySelective orderId={},detailInfo={},orders={}",orderId,detailInfo,orders);
+        log.info("O updateByPrimaryKeySelective orderId={},detailInfo={},orders={}", orderId, detailInfo, orders);
         this.ordersMapper.updateByPrimaryKeySelective(orders);
         // 订单明细
         List<OrderItems> orderItems = this.orderItemsMapper.listByOrderId(orders.getId());

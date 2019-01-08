@@ -12,11 +12,14 @@ import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
+import com.jaagro.tms.api.dto.order.GetOrderGoodsDto;
+import com.jaagro.tms.api.dto.order.ListOrderItemsDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.AccountService;
+import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.*;
@@ -34,15 +37,16 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Map.Entry;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 
@@ -99,6 +103,152 @@ public class WaybillServiceImpl implements WaybillService {
     private WaybillCustomerFeeMapperExt waybillCustomerFeeMapperExt;
     @Autowired
     private WaybillTruckFeeMapperExt waybillTruckFeeMapperExt;
+    @Autowired
+    private OrderItemsService orderItemsService;
+
+    /**
+     * 毛鸡运单导入
+     * Author gavin
+     *
+     * @param orderId
+     * @param importDtos
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean importWaybills(Integer orderId, List<ImportWaybillDto> importDtos) {
+        log.info("o WaybillServiceImpl.importWaybills input size:{}",importDtos.size());
+        Orders orders =  ordersMapper.selectByPrimaryKey(orderId);
+        Assert.notNull(orders, "订单不存在");
+        if (!GoodsType.CHICKEN.equals(orders.getGoodsType())) {
+            throw new RuntimeException("只能导入毛鸡订单数据");
+        }
+        //1、更新订单状态为"运输中"
+        Integer userId = getUserId();
+        orders.setOrderStatus(OrderStatus.TRANSPORT);
+        orders.setModifyTime(new Date());
+        orders.setModifyUserId(userId);
+        ordersMapper.updateByPrimaryKeySelective(orders);
+        //
+        //循环生产运单
+        int successCount = 0;
+        for (ImportWaybillDto importWaybillDto : importDtos) {
+            //1、插入运单waybill
+            Waybill waybill = new Waybill();
+            waybill.setOrderId(orderId);
+            waybill.setLoadSiteId(orders.getLoadSiteId());
+            waybill.setLoadTime(importWaybillDto.getLoadTime());
+            waybill.setNeedTruckType(importWaybillDto.getTruckTypeId());
+            waybill.setTruckId(importWaybillDto.getTruckId());
+            waybill.setTruckTeamContractId(importWaybillDto.getTruckTeamContractId());
+            waybill.setWaybillStatus(WaybillStatus.RECEIVE);
+            waybill.setSendTime(new Date());
+            waybill.setCreateTime(new Date());
+            waybill.setCreatedUserId(userId);
+            waybill.setModifyTime(new Date());
+            waybill.setModifyUserId(userId);
+            waybill.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
+            waybill.setNetworkId(importWaybillDto.getLoadSiteDeptId());
+            waybillMapper.insertSelective(waybill);
+            int waybillId = waybill.getId();
+
+            List<ListOrderItemsDto> orderItemsList = orderItemsService.listItemsByOrderId(orderId);
+            //2、插入waybillItems、插入waybillGoods
+            if(!CollectionUtils.isEmpty(orderItemsList)){
+                Assert.notNull(orderItemsList.get(0).getUnloadId(), "卸货地id为空");
+                WaybillItems waybillItem = new WaybillItems();
+                waybillItem.setWaybillId(waybillId);
+                waybillItem.setUnloadSiteId(orderItemsList.get(0).getUnloadId());
+                waybillItem.setRequiredTime(importWaybillDto.getRequiredTime());
+                waybillItem.setModifyUserId(userId);
+                waybillItemsMapper.insertSelective(waybillItem);
+               int waybillItemsId = waybillItem.getId();
+
+               if(!CollectionUtils.isEmpty(orderItemsList.get(0).getOrderGoodsDtoList())){
+                   GetOrderGoodsDto GetOrderGoodsDto = orderItemsList.get(0).getOrderGoodsDtoList().get(0);
+                   WaybillGoods waybillGoods = new WaybillGoods();
+                   waybillGoods.setWaybillId(waybillId);
+                   waybillGoods.setWaybillItemId(waybillItemsId);
+                   waybillGoods.setOrderGoodsId(GetOrderGoodsDto.getId());
+                   waybillGoods.setGoodsName(GetOrderGoodsDto.getGoodsName());
+                   waybillGoods.setGoodsUnit(GetOrderGoodsDto.getGoodsUnit());
+                   waybillGoods.setJoinDrug(GetOrderGoodsDto.getJoinDrug());
+                   waybillGoods.setGoodsQuantity(importWaybillDto.getGoodsQuantity());
+                   waybillGoods.setModifyUserId(userId);
+                   waybillGoodsMapper.insertSelective(waybillGoods);
+
+                   //插入order_goods_margin
+                   OrderGoodsMargin orderGoodsMargin;
+                   orderGoodsMargin = orderGoodsMarginMapper.getMarginByGoodsId(GetOrderGoodsDto.getId());
+                   if (orderGoodsMargin == null) {
+                       orderGoodsMargin = new OrderGoodsMargin();
+                       orderGoodsMargin.setOrderId(orderId);
+                       orderGoodsMargin.setOrderItemId(orderItemsList.get(0).getId());
+                       orderGoodsMargin.setOrderGoodsId(GetOrderGoodsDto.getId());
+                       orderGoodsMargin.setMargin(BigDecimal.ZERO);
+                       orderGoodsMarginMapper.insertSelective(orderGoodsMargin);
+                   } else {
+                       orderGoodsMargin.setMargin(BigDecimal.ZERO);
+                       orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
+                   }
+               }
+
+            }
+
+            //4.插入waybill_tracking表插入一条记录
+            WaybillTracking waybillTracking = new WaybillTracking();
+            waybillTracking
+                    .setWaybillId(waybillId)
+                    .setCreateTime(new Date())
+                    .setOldStatus(WaybillStatus.SEND_TRUCK)
+                    .setNewStatus(WaybillStatus.RECEIVE)
+                    .setTrackingInfo("毛鸡导入自动派单 ，运单号为【" + waybillId + "】")
+                    .setReferUserId(userId);
+            waybillTrackingMapper.insertSelective(waybillTracking);
+            //5.掉用Jpush接口给司机推送消息
+            List<DriverReturnDto> drivers = driverClientService.listByTruckId(importWaybillDto.getTruckId());
+            //装货地
+            ShowSiteDto loadSite = customerClientService.getShowSiteById(importWaybillDto.getLoadSiteId());
+            String loadSiteName = loadSite.getSiteName();
+
+            //卸货地
+            ShowSiteDto unLoadSite = customerClientService.getShowSiteById(orderItemsList.get(0).getUnloadId());
+            String unloadSiteName =  unLoadSite.getSiteName();
+            String alias = "";
+            String msgTitle = "派单消息";
+            String msgContent;
+            String regId;
+            for (DriverReturnDto driver : drivers) {
+                Map<String, String> extraParam = new HashMap<>();
+                extraParam.put("driverId", driver.getId().toString());
+                extraParam.put("waybillId", waybillId+"");
+                //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
+                msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
+                regId = driver.getRegistrationId();
+                JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
+
+                Message appMessage = new Message();
+                appMessage.setReferId(waybillId);
+                // 消息类型：1-系统通知 2-运单相关 3-账务相关
+                appMessage.setMsgType(MsgType.WAYBILL);
+                //消息来源:1-APP,2-小程序,3-站内
+                appMessage.setMsgSource(MsgSource.APP);
+                appMessage.setMsgStatus(MsgStatusConstant.UNREAD);
+                appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
+                appMessage.setBody("您有新的运单信息待接单,从" + loadSiteName + "到" + unloadSiteName + "的运单。");
+                appMessage.setCreateTime(new Date());
+                appMessage.setCreateUserId(userId);
+                appMessage.setFromUserId(userId);
+                appMessage.setToUserId(driver.getId());
+                messageMapper.insertSelective(appMessage);
+            }
+            successCount++;
+        }
+
+        log.info("o WaybillServiceImpl.importWaybills output size:{}",successCount);
+
+        return true;
+    }
 
     /**
      * @param waybillDtoList
@@ -1065,11 +1215,15 @@ public class WaybillServiceImpl implements WaybillService {
                 .setLatitude(dto.getLongitude());
         //拒单
         if (WaybillConstant.REJECT.equals(dto.getReceiptStatus())) {
+            if (StringUtils.isEmpty(dto.getRefuseReasonId())) {
+                throw new RuntimeException("拒单理由不能为空");
+            }
             waybill.setWaybillStatus(WaybillStatus.REJECT);
             waybill.setModifyUserId(currentUser.getId());
             waybill.setModifyTime(new Date());
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking
+                    .setRefuseReasonId(dto.getRefuseReasonId())
                     .setOldStatus(WaybillStatus.RECEIVE)
                     .setNewStatus(WaybillStatus.REJECT).setTrackingInfo("运单已被【" + currentUser.getName() + "】取消");
             waybillTrackingMapper.insertSelective(waybillTracking);
