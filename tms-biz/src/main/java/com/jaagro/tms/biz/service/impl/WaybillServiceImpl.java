@@ -6,11 +6,13 @@ import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.MessageReturnDto;
+import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
+import com.jaagro.tms.api.dto.order.ChickenImportRecordDto;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
@@ -1973,6 +1975,34 @@ public class WaybillServiceImpl implements WaybillService {
         return paymentList;
     }
 
+    /**
+     * 毛鸡导入预览
+     *
+     * @param uploadUrl
+     * @return
+     */
+    @Override
+    public List<ChickenImportRecordDto> preImportChickenWaybill(String uploadUrl) {
+        // 获取oss绝对路径
+        String absoluteUrl = getAbsoluteUrl(uploadUrl);
+        if (!StringUtils.hasText(absoluteUrl)){
+            throw new RuntimeException("excel相对路径不正确");
+        }
+        // 获取oss文件流
+
+        return null;
+    }
+
+    /**
+     * 毛鸡导入记录入库并生成运单派单给车辆下所有司机
+     *
+     * @param chickenImportRecordDtoValidList
+     */
+    @Override
+    public void importChickenWaybill(ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList) {
+
+    }
+
     private List<CalculatePaymentDto> getCalculatePaymentDtoList(List<Integer> waybillIds) {
         if (!CollectionUtils.isEmpty(waybillIds)) {
             List<CalculatePaymentDto> paymentDtoList = new ArrayList<>();
@@ -2023,6 +2053,15 @@ public class WaybillServiceImpl implements WaybillService {
                 }
             }
             return paymentDtoList;
+        }
+        return null;
+    }
+
+    private String getAbsoluteUrl(String relativeUrl){
+        String[] relativeUrlArray = {relativeUrl};
+        List<URL> urlList = ossSignUrlClientService.listSignedUrl(relativeUrlArray);
+        if (!CollectionUtils.isEmpty(urlList)){
+            return urlList.get(0).toString();
         }
         return null;
     }

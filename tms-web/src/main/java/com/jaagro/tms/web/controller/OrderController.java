@@ -13,6 +13,7 @@ import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.AuthClientService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.UserClientService;
+import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.web.vo.chat.*;
 import com.jaagro.tms.web.vo.pc.*;
 import com.jaagro.tms.web.vo.pc.ListOrderItemsVo;
@@ -433,5 +434,22 @@ public class OrderController {
         }
         pageInfo.setList(orderVoList);
         return BaseResponse.successInstance(pageInfo);
+    }
+
+    @GetMapping("/preImportChickenWaybill")
+    @ApiOperation("预览毛鸡导入记录")
+    public BaseResponse<List<ChickenImportRecordDto>> preImportChickenWaybill(@RequestParam("uploadUrl") String uploadUrl){
+        List<ChickenImportRecordDto> chickenImportRecordDtoList = waybillService.preImportChickenWaybill(uploadUrl);
+        if (CollectionUtils.isEmpty(chickenImportRecordDtoList)){
+            return BaseResponse.queryDataEmpty();
+        }
+        return BaseResponse.successInstance(chickenImportRecordDtoList);
+    }
+
+    @PostMapping("importChickenWaybill")
+    @ApiOperation("导入毛鸡运单")
+    public BaseResponse importChickenWaybill(@RequestBody ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList){
+        waybillService.importChickenWaybill(chickenImportRecordDtoValidList);
+        return BaseResponse.successInstance("导入成功");
     }
 }
