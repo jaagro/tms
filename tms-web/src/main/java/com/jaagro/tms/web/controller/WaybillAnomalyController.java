@@ -78,12 +78,10 @@ public class WaybillAnomalyController {
             BeanUtils.copyProperties(waybillAnomalyDto, anomalyInformationVo);
             //客户名称
             AnomalyUserProfileDto anomalyUserProfile = waybillAnomalyService.getAnomalyUserProfileByWaybillId(waybillAnomalyDtos.get(0).getWaybillId());
-            if (anomalyUserProfile != null) {
-                anomalyInformationVo
-                        .setCustomerName(anomalyUserProfile.getCustomerName())
-                        .setDriverName(anomalyUserProfile.getDriverName())
-                        .setTruckNumber(anomalyUserProfile.getTruckNumber());
-            }
+            anomalyInformationVo
+                    .setCustomerName(anomalyUserProfile.getCustomerName() == null ? "--" : anomalyUserProfile.getCustomerName())
+                    .setDriverName(anomalyUserProfile.getDriverName() == null ? "--" : anomalyUserProfile.getDriverName())
+                    .setTruckNumber(anomalyUserProfile.getTruckNumber() == null ? "--" : anomalyUserProfile.getTruckNumber());
             //异常图片
             WaybillAnomalyImageCondition waybillAnomalyImageCondition = new WaybillAnomalyImageCondition();
             waybillAnomalyImageCondition

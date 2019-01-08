@@ -198,10 +198,10 @@ public class WebChatAppWaybillController {
         for (GetWaybillDto waybillDto : getWaybillDtos) {
 
             ListWaybillVo waybillVo = new ListWaybillVo();
-//            ListEvaluateTypeDto waybillEvaluate = waybillEvaluateService.getWaybillEvaluateByWaybillId(waybillDto.getId());
-//            if (waybillEvaluate != null) {
-//                waybillVo.setWaybillEvaluate(true);
-//            }
+            ListEvaluateTypeDto waybillEvaluate = waybillEvaluateService.getWaybillEvaluateByWaybillId(waybillDto.getId());
+            if (waybillEvaluate != null) {
+                waybillVo.setWaybillEvaluate(true);
+            }
             BeanUtils.copyProperties(waybillDto, waybillVo);
             //运单装货地
             if (waybillDto.getLoadSite() != null) {

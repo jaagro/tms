@@ -445,9 +445,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     //判断是否需要审核
                     if (!waybillAnomaly.getAdjustStatus()) {
                         //当前异常为该类型 则可以撤派单并可以进入审核流程
-//                        if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
-//                            cancelWaybill(waybillAnomaly, currentUser);
-//                        }
+                        if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
+                            cancelWaybill(waybillAnomaly, currentUser);
+                        }
                         // 更新状态为已结束
                         record.setProcessingStatus(AnomalyStatus.FINISH);
                     } else {
