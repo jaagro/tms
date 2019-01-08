@@ -517,6 +517,7 @@ public class WaybillServiceImpl implements WaybillService {
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
+        waybill.setModifyTime(new Date());
         WaybillTracking waybillTracking = new WaybillTracking();
         waybillTracking
                 .setWaybillId(waybillId)
@@ -712,6 +713,7 @@ public class WaybillServiceImpl implements WaybillService {
                     //更改订单状态
                     orderUpdate
                             .setId(orders.getId())
+                            .setModifyTime(new Date())
                             .setOrderStatus(OrderStatus.ACCOMPLISH);
                     ordersMapper.updateByPrimaryKeySelective(orderUpdate);
                 } else {
@@ -790,20 +792,20 @@ public class WaybillServiceImpl implements WaybillService {
             // 我的车辆证照信息
             ListTruckLicenseDto listTruckLicenseDto = new ListTruckLicenseDto();
             ShowTruckDto truckByToken = truckClientService.getTruckByToken();
-            if (truckByToken != null){
+            if (truckByToken != null) {
                 listTruckLicenseDto
                         .setTruckNumber(truckByToken.getTruckNumber())
                         .setBuyTime(truckByToken.getBuyTime() == null ? null : dateFormat(truckByToken.getBuyTime()))
                         .setExpiryDate(truckByToken.getExpiryDate() == null ? null : dateFormat(truckByToken.getExpiryDate()))
-                        .setExpiryAnnual(truckByToken.getExpiryAnnual() == null ? null :dateFormat(truckByToken.getExpiryAnnual()))
+                        .setExpiryAnnual(truckByToken.getExpiryAnnual() == null ? null : dateFormat(truckByToken.getExpiryAnnual()))
                         .setTruckStatus(truckIsNormal(truckByToken));
             }
             showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
             // 车辆信息 add by jia.yu
             showPersonalCenter.setTruckInfo(getTruckInfo(truckByToken));
             return showPersonalCenter;
-        }catch (Exception ex){
-            log.info("personalCenter",ex);
+        } catch (Exception ex) {
+            log.info("personalCenter", ex);
             return new ShowPersonalCenter();
         }
 
@@ -1075,6 +1077,7 @@ public class WaybillServiceImpl implements WaybillService {
             //接单
         } else if (WaybillConstant.RECEIPT.equals(dto.getReceiptStatus())) {
             waybill.setId(waybillId);
+            waybill.setModifyTime(new Date());
             waybill.setDriverId(currentUser.getId());
             waybill.setWaybillStatus(WaybillStatus.DEPART);
             waybillMapper.updateByPrimaryKey(waybill);
@@ -1945,14 +1948,14 @@ public class WaybillServiceImpl implements WaybillService {
         List<CalculatePaymentDto> paymentDtoList = getCalculatePaymentDtoList(waybillIds);
         // 获取计算后的价格
         List<Map<Integer, BigDecimal>> paymentList = customerClientService.calculatePaymentFromDriver(paymentDtoList);
-        if (!CollectionUtils.isEmpty(paymentList)){
+        if (!CollectionUtils.isEmpty(paymentList)) {
             List<WaybillTruckFee> waybillTruckFeeList = new ArrayList<>();
             UserInfo currentUser = currentUserService.getCurrentUser();
             Integer currentUserId = currentUser == null ? null : currentUser.getId();
-            for (Map<Integer,BigDecimal> map : paymentList){
+            for (Map<Integer, BigDecimal> map : paymentList) {
                 WaybillTruckFee waybillTruckFee = new WaybillTruckFee();
                 Iterator<Entry<Integer, BigDecimal>> it = map.entrySet().iterator();
-                while (it.hasNext()){
+                while (it.hasNext()) {
                     Entry<Integer, BigDecimal> entry = it.next();
                     waybillTruckFee.setCreatedUserId(currentUserId)
                             .setCreateTime(new Date())
