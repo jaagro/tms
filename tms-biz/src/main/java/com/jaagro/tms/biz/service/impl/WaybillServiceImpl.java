@@ -1063,11 +1063,15 @@ public class WaybillServiceImpl implements WaybillService {
                 .setLatitude(dto.getLongitude());
         //拒单
         if (WaybillConstant.REJECT.equals(dto.getReceiptStatus())) {
+            if (StringUtils.isEmpty(dto.getRefuseReasonId())) {
+                throw new RuntimeException("拒单理由不能为空");
+            }
             waybill.setWaybillStatus(WaybillStatus.REJECT);
             waybill.setModifyUserId(currentUser.getId());
             waybill.setModifyTime(new Date());
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking
+                    .setRefuseReasonId(dto.getRefuseReasonId())
                     .setOldStatus(WaybillStatus.RECEIVE)
                     .setNewStatus(WaybillStatus.REJECT).setTrackingInfo("运单已被【" + currentUser.getName() + "】取消");
             waybillTrackingMapper.insertSelective(waybillTracking);

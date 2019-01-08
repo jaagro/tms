@@ -55,4 +55,9 @@ public class GetReceiptParamDto implements Serializable {
      * 货车id
      */
     private Integer truckId;
+
+    /**
+     * 拒单理由类型id
+     */
+    private Integer refuseReasonId;
 }
