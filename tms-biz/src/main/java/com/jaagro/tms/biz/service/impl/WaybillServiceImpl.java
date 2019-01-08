@@ -12,12 +12,14 @@ import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
+import com.jaagro.tms.api.dto.order.GetOrderGoodsDto;
 import com.jaagro.tms.api.dto.order.ListOrderItemsDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.service.AccountService;
+import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.*;
@@ -39,12 +41,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Map.Entry;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 
@@ -101,22 +103,26 @@ public class WaybillServiceImpl implements WaybillService {
     private WaybillCustomerFeeMapperExt waybillCustomerFeeMapperExt;
     @Autowired
     private WaybillTruckFeeMapperExt waybillTruckFeeMapperExt;
-
+    @Autowired
+    private OrderItemsService orderItemsService;
 
     /**
      * 毛鸡运单导入
      * Author gavin
      *
      * @param orderId
-     * @param waybillDto
+     * @param importDtos
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean importWaybills(Integer orderId, List<ImportWaybillDto> waybillDto) {
-        log.info("o WaybillServiceImpl.importWaybills input size:{}",waybillDto.size());
+    public Boolean importWaybills(Integer orderId, List<ImportWaybillDto> importDtos) {
+        log.info("o WaybillServiceImpl.importWaybills input size:{}",importDtos.size());
         Orders orders =  ordersMapper.selectByPrimaryKey(orderId);
         Assert.notNull(orders, "订单不存在");
+        if (!GoodsType.CHICKEN.equals(orders.getGoodsType())) {
+            throw new RuntimeException("只能导入毛鸡订单数据");
+        }
         //1、更新订单状态为"运输中"
         Integer userId = getUserId();
         orders.setOrderStatus(OrderStatus.TRANSPORT);
@@ -126,26 +132,68 @@ public class WaybillServiceImpl implements WaybillService {
         //
         //循环生产运单
         int successCount = 0;
-        for (ImportWaybillDto importWaybillDto : waybillDto) {
+        for (ImportWaybillDto importWaybillDto : importDtos) {
             //1、插入运单waybill
             Waybill waybill = new Waybill();
             waybill.setOrderId(orderId);
             waybill.setLoadSiteId(orders.getLoadSiteId());
             waybill.setLoadTime(importWaybillDto.getLoadTime());
-//            waybill.setNeedTruckType(createWaybillDto.getNeedTruckTypeId());
-//            waybill.setTruckTeamContractId(orders.getTruckTeamContractId());
+            waybill.setNeedTruckType(importWaybillDto.getTruckTypeId());
+            waybill.setTruckId(importWaybillDto.getTruckId());
+            waybill.setTruckTeamContractId(importWaybillDto.getTruckTeamContractId());
             waybill.setWaybillStatus(WaybillStatus.RECEIVE);
+            waybill.setSendTime(new Date());
             waybill.setCreateTime(new Date());
             waybill.setCreatedUserId(userId);
+            waybill.setModifyTime(new Date());
+            waybill.setModifyUserId(userId);
             waybill.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
-//            waybill.setNetworkId(showSiteDto.getDeptId());
+            waybill.setNetworkId(importWaybillDto.getLoadSiteDeptId());
             waybillMapper.insertSelective(waybill);
             int waybillId = waybill.getId();
 
-            //2、插入waybillItems
-            List<ListOrderItemsDto> listItemsByOrderId
-            OrderItems orderItems =
-            //3、插入waybillGoods
+            List<ListOrderItemsDto> orderItemsList = orderItemsService.listItemsByOrderId(orderId);
+            //2、插入waybillItems、插入waybillGoods
+            if(!CollectionUtils.isEmpty(orderItemsList)){
+                Assert.notNull(orderItemsList.get(0).getUnloadId(), "卸货地id为空");
+                WaybillItems waybillItem = new WaybillItems();
+                waybillItem.setWaybillId(waybillId);
+                waybillItem.setUnloadSiteId(orderItemsList.get(0).getUnloadId());
+                waybillItem.setRequiredTime(importWaybillDto.getRequiredTime());
+                waybillItem.setModifyUserId(userId);
+                waybillItemsMapper.insertSelective(waybillItem);
+               int waybillItemsId = waybillItem.getId();
+
+               if(!CollectionUtils.isEmpty(orderItemsList.get(0).getOrderGoodsDtoList())){
+                   GetOrderGoodsDto GetOrderGoodsDto = orderItemsList.get(0).getOrderGoodsDtoList().get(0);
+                   WaybillGoods waybillGoods = new WaybillGoods();
+                   waybillGoods.setWaybillId(waybillId);
+                   waybillGoods.setWaybillItemId(waybillItemsId);
+                   waybillGoods.setOrderGoodsId(GetOrderGoodsDto.getId());
+                   waybillGoods.setGoodsName(GetOrderGoodsDto.getGoodsName());
+                   waybillGoods.setGoodsUnit(GetOrderGoodsDto.getGoodsUnit());
+                   waybillGoods.setJoinDrug(GetOrderGoodsDto.getJoinDrug());
+                   waybillGoods.setGoodsQuantity(importWaybillDto.getGoodsQuantity());
+                   waybillGoods.setModifyUserId(userId);
+                   waybillGoodsMapper.insertSelective(waybillGoods);
+
+                   //插入order_goods_margin
+                   OrderGoodsMargin orderGoodsMargin;
+                   orderGoodsMargin = orderGoodsMarginMapper.getMarginByGoodsId(GetOrderGoodsDto.getId());
+                   if (orderGoodsMargin == null) {
+                       orderGoodsMargin = new OrderGoodsMargin();
+                       orderGoodsMargin.setOrderId(orderId);
+                       orderGoodsMargin.setOrderItemId(orderItemsList.get(0).getId());
+                       orderGoodsMargin.setOrderGoodsId(GetOrderGoodsDto.getId());
+                       orderGoodsMargin.setMargin(BigDecimal.ZERO);
+                       orderGoodsMarginMapper.insertSelective(orderGoodsMargin);
+                   } else {
+                       orderGoodsMargin.setMargin(BigDecimal.ZERO);
+                       orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
+                   }
+               }
+
+            }
 
             //4.插入waybill_tracking表插入一条记录
             WaybillTracking waybillTracking = new WaybillTracking();
@@ -154,23 +202,18 @@ public class WaybillServiceImpl implements WaybillService {
                     .setCreateTime(new Date())
                     .setOldStatus(WaybillStatus.SEND_TRUCK)
                     .setNewStatus(WaybillStatus.RECEIVE)
-                    .setTrackingInfo("已派单 ，运单号为【" + waybillId + "】")
+                    .setTrackingInfo("毛鸡导入自动派单 ，运单号为【" + waybillId + "】")
                     .setReferUserId(userId);
             waybillTrackingMapper.insertSelective(waybillTracking);
             //5.掉用Jpush接口给司机推送消息
-            List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
-            orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
+            List<DriverReturnDto> drivers = driverClientService.listByTruckId(importWaybillDto.getTruckId());
             //装货地
-            ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
+            ShowSiteDto loadSite = customerClientService.getShowSiteById(importWaybillDto.getLoadSiteId());
             String loadSiteName = loadSite.getSiteName();
-            List<WaybillItems> waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
-            StringBuffer unLoadSiteNames = new StringBuffer();
-            for (WaybillItems waybillItem : waybillItems) {
-                //卸货地
-                ShowSiteDto unLoadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
-                unLoadSiteNames.append(unLoadSite.getSiteName() + "、");
-            }
-            String unloadSiteName = unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1);
+
+            //卸货地
+            ShowSiteDto unLoadSite = customerClientService.getShowSiteById(orderItemsList.get(0).getUnloadId());
+            String unloadSiteName =  unLoadSite.getSiteName();
             String alias = "";
             String msgTitle = "派单消息";
             String msgContent;
