@@ -222,6 +222,7 @@ public class WaybillServiceImpl implements WaybillService {
                 Map<String, String> extraParam = new HashMap<>();
                 extraParam.put("driverId", driver.getId().toString());
                 extraParam.put("waybillId", waybillId+"");
+                extraParam.put("needVoice", "y");
                 //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
                 msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
                 regId = driver.getRegistrationId();
@@ -1282,14 +1283,26 @@ public class WaybillServiceImpl implements WaybillService {
             return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), truckId + " ：id不正确");
         }
         //1.更新订单状态：从已配载(STOWAGE)改为运输中(TRANSPORT)
-        Orders orders = new Orders();
+        Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         orders.setId(waybill.getOrderId());
         orders.setOrderStatus(OrderStatus.TRANSPORT);
         orders.setModifyTime(new Date());
         orders.setModifyUserId(userId);
         ordersMapper.updateByPrimaryKeySelective(orders);
         //2.更新waybill
+        List<TruckTeamContractReturnDto> truckTeamContracts= truckClientService.getTruckTeamContractByTruckTeamId(truckId);
+        int TruckTeamContractId = 0;
+        for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
+            if(orders.getGoodsType().equals(truckTeamContractReturnDto.getBussinessType())){
+                TruckTeamContractId = truckTeamContractReturnDto.getId();
+            }else if(orders.getGoodsType()==3 && truckTeamContractReturnDto.getBussinessType()==4){
+                TruckTeamContractId = truckTeamContractReturnDto.getId();
+            }else if(orders.getGoodsType()==6 && truckTeamContractReturnDto.getBussinessType()==4){
+                TruckTeamContractId = truckTeamContractReturnDto.getId();
+            }
+        }
         waybill.setTruckId(truckId);
+        waybill.setTruckTeamContractId(TruckTeamContractId);
         waybill.setWaybillStatus(waybillNewStatus);
         waybill.setSendTime(new Date());
         waybill.setModifyTime(new Date());
@@ -1328,6 +1341,7 @@ public class WaybillServiceImpl implements WaybillService {
             Map<String, String> extraParam = new HashMap<>();
             extraParam.put("driverId", driver.getId().toString());
             extraParam.put("waybillId", waybillId.toString());
+            extraParam.put("needVoice", "y");
             //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
             msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
             regId = driver.getRegistrationId();
