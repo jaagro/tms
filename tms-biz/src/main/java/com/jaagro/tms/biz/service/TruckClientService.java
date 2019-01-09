@@ -55,6 +55,9 @@ public interface TruckClientService {
     @PutMapping("/truckQualificationToFeign")
     BaseResponse truckQualificationToFeign(@RequestBody TruckQualification qualification);
 
+    @PostMapping("/getTruckTeamContractByTruckTeamId/truckTeamId")
+    List<TruckTeamContractReturnDto> getTruckTeamContractByTruckTeamId(@PathVariable("truckTeamId") Integer truckTeamId);
+
     /**
      * 根据车牌号查询车辆
      * @param truckNumber
