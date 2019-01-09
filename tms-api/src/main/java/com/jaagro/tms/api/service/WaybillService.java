@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.ChickenImportRecordDto;
+import com.jaagro.tms.api.dto.order.PreImportChickenRecordDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.ChangeTruckDto;
@@ -264,14 +265,25 @@ public interface WaybillService {
 
     /**
      * 毛鸡导入预览
-     * @param uploadUrl
+     * @author yj
+     * @param preImportChickenRecordDto
      * @return
      */
-    List<ChickenImportRecordDto> preImportChickenWaybill(String uploadUrl);
+    List<ChickenImportRecordDto> preImportChickenWaybill(PreImportChickenRecordDto preImportChickenRecordDto);
 
     /**
      * 毛鸡导入记录入库并生成运单派单给车辆下所有司机
+     * @author yj
      * @param chickenImportRecordDtoValidList
      */
     void importChickenWaybill(ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList);
+
+    /**
+     * 毛鸡运单导入
+     * Author gavin
+     *
+     * @param waybillDto
+     * @return
+     */
+    Boolean importWaybills(Integer orderId,List<ImportWaybillDto> waybillDto);
 }

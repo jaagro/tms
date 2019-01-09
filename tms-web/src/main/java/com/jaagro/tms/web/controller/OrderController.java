@@ -436,17 +436,30 @@ public class OrderController {
         return BaseResponse.successInstance(pageInfo);
     }
 
+    /**
+     * @author yj
+     * @date 2019-01-08
+     * @param preImportChickenRecordDto
+     * @return
+     */
     @GetMapping("/preImportChickenWaybill")
     @ApiOperation("预览毛鸡导入记录")
-    public BaseResponse<List<ChickenImportRecordDto>> preImportChickenWaybill(@RequestParam("uploadUrl") String uploadUrl){
-        List<ChickenImportRecordDto> chickenImportRecordDtoList = waybillService.preImportChickenWaybill(uploadUrl);
+    public BaseResponse<List<ChickenImportRecordDto>> preImportChickenWaybill(@RequestBody PreImportChickenRecordDto preImportChickenRecordDto){
+        log.info("O preImportChickenWaybill preImportChickenRecordDto={}",preImportChickenRecordDto);
+        List<ChickenImportRecordDto> chickenImportRecordDtoList = waybillService.preImportChickenWaybill(preImportChickenRecordDto);
         if (CollectionUtils.isEmpty(chickenImportRecordDtoList)){
             return BaseResponse.queryDataEmpty();
         }
         return BaseResponse.successInstance(chickenImportRecordDtoList);
     }
 
-    @PostMapping("importChickenWaybill")
+    /**
+     * @author yj
+     * @date 2019-01-08
+     * @param chickenImportRecordDtoValidList
+     * @return
+     */
+    @PostMapping("/importChickenWaybill")
     @ApiOperation("导入毛鸡运单")
     public BaseResponse importChickenWaybill(@RequestBody ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList){
         waybillService.importChickenWaybill(chickenImportRecordDtoValidList);

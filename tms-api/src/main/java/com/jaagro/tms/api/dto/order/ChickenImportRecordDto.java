@@ -99,6 +99,10 @@ public class ChickenImportRecordDto implements Serializable{
     private Integer goodsQuantity;
 
     /**
+     * 货物名称固定为"毛鸡"
+     */
+    private String goodsName = "毛鸡";
+    /**
      * 要求装货时间
      */
     @NotNull(message = "{loadTime.NotNull}")
@@ -109,4 +113,9 @@ public class ChickenImportRecordDto implements Serializable{
      */
     @NotNull(message = "{requiredTime.NotNull}")
     private Date requiredTime;
+
+    /**
+     * 数据校验是否通过
+     */
+    private Boolean verifyPass;
 }

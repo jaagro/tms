@@ -1,5 +1,6 @@
 package com.jaagro.tms.biz.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
@@ -12,10 +13,7 @@ import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
-import com.jaagro.tms.api.dto.order.ChickenImportRecordDto;
-import com.jaagro.tms.api.dto.order.GetOrderDto;
-import com.jaagro.tms.api.dto.order.GetOrderGoodsDto;
-import com.jaagro.tms.api.dto.order.ListOrderItemsDto;
+import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.*;
@@ -28,10 +26,12 @@ import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
+import com.jaagro.tms.biz.utils.PoiUtil;
 import com.jaagro.tms.biz.utils.RedisLock;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +43,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.net.URLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -2132,19 +2134,25 @@ public class WaybillServiceImpl implements WaybillService {
     /**
      * 毛鸡导入预览
      *
-     * @param uploadUrl
+     * @param preImportChickenRecordDto
      * @return
      */
     @Override
-    public List<ChickenImportRecordDto> preImportChickenWaybill(String uploadUrl) {
-        // 获取oss绝对路径
-        String absoluteUrl = getAbsoluteUrl(uploadUrl);
-        if (!StringUtils.hasText(absoluteUrl)){
-            throw new RuntimeException("excel相对路径不正确");
+    public List<ChickenImportRecordDto> preImportChickenWaybill(PreImportChickenRecordDto preImportChickenRecordDto) {
+        try {
+            // 读取excel内容
+            List<List<String[]>> lists = PoiUtil.readExcel(preImportChickenRecordDto.getUploadUrl());
+            if (CollectionUtils.isEmpty(lists) || CollectionUtils.isEmpty(lists.get(0))){
+                return new ArrayList<>();
+            }
+            log.info("uploadUrl={},excelContent={}",preImportChickenRecordDto.getUploadUrl(),JSON.toJSONString(lists.get(0)));
+            // 将excel内容解析为dto
+            List<ChickenImportRecordDto> chickenImportRecordDtoList = parsingExcel(lists.get(0),preImportChickenRecordDto);
+            return chickenImportRecordDtoList;
+        }catch (Exception e){
+            log.error("preImportChickenWaybill error preImportChickenRecordDto="+preImportChickenRecordDto,e);
         }
-        // 获取oss文件流
-
-        return null;
+        return new ArrayList<>();
     }
 
     /**
@@ -2211,12 +2219,62 @@ public class WaybillServiceImpl implements WaybillService {
         return null;
     }
 
-    private String getAbsoluteUrl(String relativeUrl){
-        String[] relativeUrlArray = {relativeUrl};
-        List<URL> urlList = ossSignUrlClientService.listSignedUrl(relativeUrlArray);
-        if (!CollectionUtils.isEmpty(urlList)){
-            return urlList.get(0).toString();
+    private List<ChickenImportRecordDto> parsingExcel(List<String[]> list,PreImportChickenRecordDto preImportChickenRecordDto) throws ParseException {
+        if(!CollectionUtils.isEmpty(list)){
+            List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
+            String [] dayCells = list.get(1);
+            // 获取屠宰日期
+            String day = "";
+            if (dayCells != null && dayCells.length > 19){
+                day = dayCells[18];
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+            // 数据从第四行开始
+            for (int i = 3;i<list.size();i++){
+                ChickenImportRecordDto dto = new ChickenImportRecordDto();
+                dto.setCustomerId(preImportChickenRecordDto.getCustomerId())
+                        .setCustomerName(preImportChickenRecordDto.getCustomerName())
+                        .setLoadSiteId(preImportChickenRecordDto.getLoadSiteId())
+                        .setLoadSiteName(preImportChickenRecordDto.getLoadSiteName());
+                String[] cells = list.get(i);
+                // 装货时间(车入鸡场时间)
+                Date loadTime = sdf.parse(day+cells[10]);
+                dto.setLoadTime(loadTime);
+                // 要求送达时间(入屠宰场时间)
+                Date requiredTime = sdf.parse(day+cells[16]);
+                dto.setRequiredTime(requiredTime);
+                // 货物数量(单车筐数)
+                dto.setGoodsQuantity(Integer.parseInt(cells[20]));
+                // 装货地对应网点id
+                ShowSiteDto showSiteById = customerClientService.getShowSiteById(preImportChickenRecordDto.getLoadSiteId());
+                if (showSiteById != null){
+                    dto.setLoadSiteDeptId(showSiteById.getDeptId());
+                }
+                // 去除车牌号中"大","中","小"
+                String truckNumber = cells[8];
+                if (truckNumber.endsWith("大") || truckNumber.endsWith("中") || truckNumber.endsWith("小")){
+                    truckNumber = truckNumber.substring(0,truckNumber.length()-1);
+                }
+                // 校验车牌号合法性
+                BaseResponse<GetTruckDto> res = truckClientService.getByTruckNumber(truckNumber);
+                if (res != null && res.getData() != null){
+                    GetTruckDto truckDto = res.getData();
+                    dto.setVerifyPass(true);
+                    dto.setTruckId(truckDto.getId());
+                    dto.setTruckNumber(truckNumber);
+                    ListTruckTypeDto truckType = truckDto.getTruckTypeId();
+                    dto.setTruckTypeId(truckType == null ? null : truckType.getId());
+                    dto.setTruckTypeName(truckType == null ? null : truckType.getTypeName());
+                }else {
+                    dto.setVerifyPass(false);
+                    continue;
+                }
+                // 获取车队合同id TODO
+                chickenImportRecordDtoList.add(dto);
+            }
+            return chickenImportRecordDtoList;
         }
-        return null;
+        return new ArrayList<>();
     }
+
 }
