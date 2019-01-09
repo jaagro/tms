@@ -1,19 +1,19 @@
 package com.jaagro.tms.biz.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.MessageReturnDto;
+import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
-import com.jaagro.tms.api.dto.order.GetOrderDto;
-import com.jaagro.tms.api.dto.order.GetOrderGoodsDto;
-import com.jaagro.tms.api.dto.order.ListOrderItemsDto;
+import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.*;
@@ -26,6 +26,7 @@ import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
+import com.jaagro.tms.biz.utils.PoiUtil;
 import com.jaagro.tms.biz.utils.RedisLock;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
@@ -269,7 +270,6 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-
     public Map<String, Object> createWaybill(List<CreateWaybillDto> waybillDtoList) {
         String departmentId = currentUserService.getCurrentUser().getDepartmentId().toString();
         if (StringUtils.isEmpty(departmentId)) {
@@ -301,7 +301,6 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setLoadSiteId(createWaybillDto.getLoadSiteId());
             waybill.setLoadTime(createWaybillDto.getLoadTime());
             waybill.setNeedTruckType(createWaybillDto.getNeedTruckTypeId());
-            waybill.setTruckTeamContractId(createWaybillDto.getTruckTeamContractId());
             waybill.setWaybillStatus(WaybillStatus.SEND_TRUCK);
             waybill.setCreateTime(new Date());
             waybill.setCreatedUserId(userId);
@@ -1302,19 +1301,9 @@ public class WaybillServiceImpl implements WaybillService {
         orders.setModifyUserId(userId);
         ordersMapper.updateByPrimaryKeySelective(orders);
         //2.更新waybill
-        List<TruckTeamContractReturnDto> truckTeamContracts = truckClientService.getTruckTeamContractByTruckTeamId(truckId);
-        int TruckTeamContractId = 0;
-        for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
-            if (orders.getGoodsType().equals(truckTeamContractReturnDto.getBussinessType())) {
-                TruckTeamContractId = truckTeamContractReturnDto.getId();
-            } else if (orders.getGoodsType() == 3 && truckTeamContractReturnDto.getBussinessType() == 4) {
-                TruckTeamContractId = truckTeamContractReturnDto.getId();
-            } else if (orders.getGoodsType() == 6 && truckTeamContractReturnDto.getBussinessType() == 4) {
-                TruckTeamContractId = truckTeamContractReturnDto.getId();
-            }
-        }
+        int truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckId);
         waybill.setTruckId(truckId);
-        waybill.setTruckTeamContractId(TruckTeamContractId);
+        waybill.setTruckTeamContractId(truckTeamContractId);
         waybill.setWaybillStatus(waybillNewStatus);
         waybill.setSendTime(new Date());
         waybill.setModifyTime(new Date());
@@ -1421,7 +1410,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-            ) {
+                    ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -2153,6 +2142,40 @@ public class WaybillServiceImpl implements WaybillService {
         return paymentList;
     }
 
+    /**
+     * 毛鸡导入预览
+     *
+     * @param preImportChickenRecordDto
+     * @return
+     */
+    @Override
+    public List<ChickenImportRecordDto> preImportChickenWaybill(PreImportChickenRecordDto preImportChickenRecordDto) {
+        try {
+            // 读取excel内容
+            List<List<String[]>> lists = PoiUtil.readExcel(preImportChickenRecordDto.getUploadUrl());
+            if (CollectionUtils.isEmpty(lists) || CollectionUtils.isEmpty(lists.get(0))) {
+                return new ArrayList<>();
+            }
+            log.info("uploadUrl={},excelContent={}", preImportChickenRecordDto.getUploadUrl(), JSON.toJSONString(lists.get(0)));
+            // 将excel内容解析为dto
+            List<ChickenImportRecordDto> chickenImportRecordDtoList = parsingExcel(lists.get(0), preImportChickenRecordDto);
+            return chickenImportRecordDtoList;
+        } catch (Exception e) {
+            log.error("preImportChickenWaybill error preImportChickenRecordDto=" + preImportChickenRecordDto, e);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 毛鸡导入记录入库并生成运单派单给车辆下所有司机
+     *
+     * @param chickenImportRecordDtoValidList
+     */
+    @Override
+    public void importChickenWaybill(ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList) {
+
+    }
+
     private List<CalculatePaymentDto> getCalculatePaymentDtoList(List<Integer> waybillIds) {
         if (!CollectionUtils.isEmpty(waybillIds)) {
             List<CalculatePaymentDto> paymentDtoList = new ArrayList<>();
@@ -2206,4 +2229,78 @@ public class WaybillServiceImpl implements WaybillService {
         }
         return null;
     }
+
+    private Integer getTruckTeamContractId(Integer goodsType, Integer truckId) {
+        int truckTeamContractId = 0;
+        List<TruckTeamContractReturnDto> truckTeamContracts = truckClientService.getTruckTeamContractByTruckTeamId(truckId);
+        for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
+            if (goodsType.equals(truckTeamContractReturnDto.getBussinessType())) {
+                truckTeamContractId = truckTeamContractReturnDto.getId();
+            } else if (goodsType == 3 && truckTeamContractReturnDto.getBussinessType() == 4) {
+                truckTeamContractId = truckTeamContractReturnDto.getId();
+            } else if (goodsType == 6 && truckTeamContractReturnDto.getBussinessType() == 4) {
+                truckTeamContractId = truckTeamContractReturnDto.getId();
+            }
+        }
+        return truckTeamContractId;
+    }
+
+    private List<ChickenImportRecordDto> parsingExcel(List<String[]> list, PreImportChickenRecordDto preImportChickenRecordDto) throws ParseException {
+        if (!CollectionUtils.isEmpty(list)) {
+            List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
+            String[] dayCells = list.get(1);
+            // 获取屠宰日期
+            String day = "";
+            if (dayCells != null && dayCells.length > 19) {
+                day = dayCells[18];
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+            // 数据从第四行开始
+            for (int i = 3; i < list.size(); i++) {
+                ChickenImportRecordDto dto = new ChickenImportRecordDto();
+                dto.setCustomerId(preImportChickenRecordDto.getCustomerId())
+                        .setCustomerName(preImportChickenRecordDto.getCustomerName())
+                        .setLoadSiteId(preImportChickenRecordDto.getLoadSiteId())
+                        .setLoadSiteName(preImportChickenRecordDto.getLoadSiteName());
+                String[] cells = list.get(i);
+                // 装货时间(车入鸡场时间)
+                Date loadTime = sdf.parse(day + cells[10]);
+                dto.setLoadTime(loadTime);
+                // 要求送达时间(入屠宰场时间)
+                Date requiredTime = sdf.parse(day + cells[16]);
+                dto.setRequiredTime(requiredTime);
+                // 货物数量(单车筐数)
+                dto.setGoodsQuantity(Integer.parseInt(cells[20]));
+                // 装货地对应网点id
+                ShowSiteDto showSiteById = customerClientService.getShowSiteById(preImportChickenRecordDto.getLoadSiteId());
+                if (showSiteById != null) {
+                    dto.setLoadSiteDeptId(showSiteById.getDeptId());
+                }
+                // 去除车牌号中"大","中","小"
+                String truckNumber = cells[8];
+                if (truckNumber.endsWith("大") || truckNumber.endsWith("中") || truckNumber.endsWith("小")) {
+                    truckNumber = truckNumber.substring(0, truckNumber.length() - 1);
+                }
+                // 校验车牌号合法性
+                BaseResponse<GetTruckDto> res = truckClientService.getByTruckNumber(truckNumber);
+                if (res != null && res.getData() != null) {
+                    GetTruckDto truckDto = res.getData();
+                    dto.setVerifyPass(true);
+                    dto.setTruckId(truckDto.getId());
+                    dto.setTruckNumber(truckNumber);
+                    ListTruckTypeDto truckType = truckDto.getTruckTypeId();
+                    dto.setTruckTypeId(truckType == null ? null : truckType.getId());
+                    dto.setTruckTypeName(truckType == null ? null : truckType.getTypeName());
+                } else {
+                    dto.setVerifyPass(false);
+                    continue;
+                }
+                // 获取车队合同id TODO
+                chickenImportRecordDtoList.add(dto);
+            }
+            return chickenImportRecordDtoList;
+        }
+        return new ArrayList<>();
+    }
+
 }
