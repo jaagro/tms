@@ -117,8 +117,8 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean importWaybills(Integer orderId, List<ImportWaybillDto> importDtos) {
-        log.info("o WaybillServiceImpl.importWaybills input size:{}",importDtos.size());
-        Orders orders =  ordersMapper.selectByPrimaryKey(orderId);
+        log.info("o WaybillServiceImpl.importWaybills input size:{}", importDtos.size());
+        Orders orders = ordersMapper.selectByPrimaryKey(orderId);
         Assert.notNull(orders, "订单不存在");
         if (!GoodsType.CHICKEN.equals(orders.getGoodsType())) {
             throw new RuntimeException("只能导入毛鸡订单数据");
@@ -154,7 +154,7 @@ public class WaybillServiceImpl implements WaybillService {
 
             List<ListOrderItemsDto> orderItemsList = orderItemsService.listItemsByOrderId(orderId);
             //2、插入waybillItems、插入waybillGoods
-            if(!CollectionUtils.isEmpty(orderItemsList)){
+            if (!CollectionUtils.isEmpty(orderItemsList)) {
                 Assert.notNull(orderItemsList.get(0).getUnloadId(), "卸货地id为空");
                 WaybillItems waybillItem = new WaybillItems();
                 waybillItem.setWaybillId(waybillId);
@@ -162,36 +162,36 @@ public class WaybillServiceImpl implements WaybillService {
                 waybillItem.setRequiredTime(importWaybillDto.getRequiredTime());
                 waybillItem.setModifyUserId(userId);
                 waybillItemsMapper.insertSelective(waybillItem);
-               int waybillItemsId = waybillItem.getId();
+                int waybillItemsId = waybillItem.getId();
 
-               if(!CollectionUtils.isEmpty(orderItemsList.get(0).getOrderGoodsDtoList())){
-                   GetOrderGoodsDto GetOrderGoodsDto = orderItemsList.get(0).getOrderGoodsDtoList().get(0);
-                   WaybillGoods waybillGoods = new WaybillGoods();
-                   waybillGoods.setWaybillId(waybillId);
-                   waybillGoods.setWaybillItemId(waybillItemsId);
-                   waybillGoods.setOrderGoodsId(GetOrderGoodsDto.getId());
-                   waybillGoods.setGoodsName(GetOrderGoodsDto.getGoodsName());
-                   waybillGoods.setGoodsUnit(GetOrderGoodsDto.getGoodsUnit());
-                   waybillGoods.setJoinDrug(GetOrderGoodsDto.getJoinDrug());
-                   waybillGoods.setGoodsQuantity(importWaybillDto.getGoodsQuantity());
-                   waybillGoods.setModifyUserId(userId);
-                   waybillGoodsMapper.insertSelective(waybillGoods);
+                if (!CollectionUtils.isEmpty(orderItemsList.get(0).getOrderGoodsDtoList())) {
+                    GetOrderGoodsDto GetOrderGoodsDto = orderItemsList.get(0).getOrderGoodsDtoList().get(0);
+                    WaybillGoods waybillGoods = new WaybillGoods();
+                    waybillGoods.setWaybillId(waybillId);
+                    waybillGoods.setWaybillItemId(waybillItemsId);
+                    waybillGoods.setOrderGoodsId(GetOrderGoodsDto.getId());
+                    waybillGoods.setGoodsName(GetOrderGoodsDto.getGoodsName());
+                    waybillGoods.setGoodsUnit(GetOrderGoodsDto.getGoodsUnit());
+                    waybillGoods.setJoinDrug(GetOrderGoodsDto.getJoinDrug());
+                    waybillGoods.setGoodsQuantity(importWaybillDto.getGoodsQuantity());
+                    waybillGoods.setModifyUserId(userId);
+                    waybillGoodsMapper.insertSelective(waybillGoods);
 
-                   //插入order_goods_margin
-                   OrderGoodsMargin orderGoodsMargin;
-                   orderGoodsMargin = orderGoodsMarginMapper.getMarginByGoodsId(GetOrderGoodsDto.getId());
-                   if (orderGoodsMargin == null) {
-                       orderGoodsMargin = new OrderGoodsMargin();
-                       orderGoodsMargin.setOrderId(orderId);
-                       orderGoodsMargin.setOrderItemId(orderItemsList.get(0).getId());
-                       orderGoodsMargin.setOrderGoodsId(GetOrderGoodsDto.getId());
-                       orderGoodsMargin.setMargin(BigDecimal.ZERO);
-                       orderGoodsMarginMapper.insertSelective(orderGoodsMargin);
-                   } else {
-                       orderGoodsMargin.setMargin(BigDecimal.ZERO);
-                       orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
-                   }
-               }
+                    //插入order_goods_margin
+                    OrderGoodsMargin orderGoodsMargin;
+                    orderGoodsMargin = orderGoodsMarginMapper.getMarginByGoodsId(GetOrderGoodsDto.getId());
+                    if (orderGoodsMargin == null) {
+                        orderGoodsMargin = new OrderGoodsMargin();
+                        orderGoodsMargin.setOrderId(orderId);
+                        orderGoodsMargin.setOrderItemId(orderItemsList.get(0).getId());
+                        orderGoodsMargin.setOrderGoodsId(GetOrderGoodsDto.getId());
+                        orderGoodsMargin.setMargin(BigDecimal.ZERO);
+                        orderGoodsMarginMapper.insertSelective(orderGoodsMargin);
+                    } else {
+                        orderGoodsMargin.setMargin(BigDecimal.ZERO);
+                        orderGoodsMarginMapper.updateByPrimaryKeySelective(orderGoodsMargin);
+                    }
+                }
 
             }
 
@@ -213,7 +213,7 @@ public class WaybillServiceImpl implements WaybillService {
 
             //卸货地
             ShowSiteDto unLoadSite = customerClientService.getShowSiteById(orderItemsList.get(0).getUnloadId());
-            String unloadSiteName =  unLoadSite.getSiteName();
+            String unloadSiteName = unLoadSite.getSiteName();
             String alias = "";
             String msgTitle = "派单消息";
             String msgContent;
@@ -221,7 +221,7 @@ public class WaybillServiceImpl implements WaybillService {
             for (DriverReturnDto driver : drivers) {
                 Map<String, String> extraParam = new HashMap<>();
                 extraParam.put("driverId", driver.getId().toString());
-                extraParam.put("waybillId", waybillId+"");
+                extraParam.put("waybillId", waybillId + "");
                 extraParam.put("needVoice", "y");
                 //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
                 msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
@@ -246,7 +246,7 @@ public class WaybillServiceImpl implements WaybillService {
             successCount++;
         }
 
-        log.info("o WaybillServiceImpl.importWaybills output size:{}",successCount);
+        log.info("o WaybillServiceImpl.importWaybills output size:{}", successCount);
 
         return true;
     }
@@ -941,20 +941,20 @@ public class WaybillServiceImpl implements WaybillService {
             // 我的车辆证照信息
             ListTruckLicenseDto listTruckLicenseDto = new ListTruckLicenseDto();
             ShowTruckDto truckByToken = truckClientService.getTruckByToken();
-            if (truckByToken != null){
+            if (truckByToken != null) {
                 listTruckLicenseDto
                         .setTruckNumber(truckByToken.getTruckNumber())
                         .setBuyTime(truckByToken.getBuyTime() == null ? null : dateFormat(truckByToken.getBuyTime()))
                         .setExpiryDate(truckByToken.getExpiryDate() == null ? null : dateFormat(truckByToken.getExpiryDate()))
-                        .setExpiryAnnual(truckByToken.getExpiryAnnual() == null ? null :dateFormat(truckByToken.getExpiryAnnual()))
+                        .setExpiryAnnual(truckByToken.getExpiryAnnual() == null ? null : dateFormat(truckByToken.getExpiryAnnual()))
                         .setTruckStatus(truckIsNormal(truckByToken));
             }
             showPersonalCenter.setTruckLicenseDto(listTruckLicenseDto);
             // 车辆信息 add by jia.yu
             showPersonalCenter.setTruckInfo(getTruckInfo(truckByToken));
             return showPersonalCenter;
-        }catch (Exception ex){
-            log.info("personalCenter",ex);
+        } catch (Exception ex) {
+            log.info("personalCenter", ex);
             return new ShowPersonalCenter();
         }
 
@@ -1290,19 +1290,9 @@ public class WaybillServiceImpl implements WaybillService {
         orders.setModifyUserId(userId);
         ordersMapper.updateByPrimaryKeySelective(orders);
         //2.更新waybill
-        List<TruckTeamContractReturnDto> truckTeamContracts= truckClientService.getTruckTeamContractByTruckTeamId(truckId);
-        int TruckTeamContractId = 0;
-        for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
-            if(orders.getGoodsType().equals(truckTeamContractReturnDto.getBussinessType())){
-                TruckTeamContractId = truckTeamContractReturnDto.getId();
-            }else if(orders.getGoodsType()==3 && truckTeamContractReturnDto.getBussinessType()==4){
-                TruckTeamContractId = truckTeamContractReturnDto.getId();
-            }else if(orders.getGoodsType()==6 && truckTeamContractReturnDto.getBussinessType()==4){
-                TruckTeamContractId = truckTeamContractReturnDto.getId();
-            }
-        }
+       int truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(),truckId);
         waybill.setTruckId(truckId);
-        waybill.setTruckTeamContractId(TruckTeamContractId);
+        waybill.setTruckTeamContractId(truckTeamContractId);
         waybill.setWaybillStatus(waybillNewStatus);
         waybill.setSendTime(new Date());
         waybill.setModifyTime(new Date());
@@ -1409,7 +1399,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-            ) {
+                    ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -2113,14 +2103,14 @@ public class WaybillServiceImpl implements WaybillService {
         List<CalculatePaymentDto> paymentDtoList = getCalculatePaymentDtoList(waybillIds);
         // 获取计算后的价格
         List<Map<Integer, BigDecimal>> paymentList = customerClientService.calculatePaymentFromDriver(paymentDtoList);
-        if (!CollectionUtils.isEmpty(paymentList)){
+        if (!CollectionUtils.isEmpty(paymentList)) {
             List<WaybillTruckFee> waybillTruckFeeList = new ArrayList<>();
             UserInfo currentUser = currentUserService.getCurrentUser();
             Integer currentUserId = currentUser == null ? null : currentUser.getId();
-            for (Map<Integer,BigDecimal> map : paymentList){
+            for (Map<Integer, BigDecimal> map : paymentList) {
                 WaybillTruckFee waybillTruckFee = new WaybillTruckFee();
                 Iterator<Entry<Integer, BigDecimal>> it = map.entrySet().iterator();
-                while (it.hasNext()){
+                while (it.hasNext()) {
                     Entry<Integer, BigDecimal> entry = it.next();
                     waybillTruckFee.setCreatedUserId(currentUserId)
                             .setCreateTime(new Date())
@@ -2193,5 +2183,20 @@ public class WaybillServiceImpl implements WaybillService {
             return paymentDtoList;
         }
         return null;
+    }
+
+    private Integer getTruckTeamContractId(Integer goodsType, Integer truckId) {
+        int truckTeamContractId = 0;
+        List<TruckTeamContractReturnDto> truckTeamContracts = truckClientService.getTruckTeamContractByTruckTeamId(truckId);
+        for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
+            if (goodsType.equals(truckTeamContractReturnDto.getBussinessType())) {
+                truckTeamContractId = truckTeamContractReturnDto.getId();
+            } else if (goodsType == 3 && truckTeamContractReturnDto.getBussinessType() == 4) {
+                truckTeamContractId = truckTeamContractReturnDto.getId();
+            } else if (goodsType == 6 && truckTeamContractReturnDto.getBussinessType() == 4) {
+                truckTeamContractId = truckTeamContractReturnDto.getId();
+            }
+        }
+        return truckTeamContractId;
     }
 }
