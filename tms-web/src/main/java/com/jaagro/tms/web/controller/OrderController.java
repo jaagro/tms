@@ -13,6 +13,7 @@ import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.AuthClientService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.UserClientService;
+import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.web.vo.chat.*;
 import com.jaagro.tms.web.vo.pc.*;
 import com.jaagro.tms.web.vo.pc.ListOrderItemsVo;
@@ -433,5 +434,35 @@ public class OrderController {
         }
         pageInfo.setList(orderVoList);
         return BaseResponse.successInstance(pageInfo);
+    }
+
+    /**
+     * @author yj
+     * @date 2019-01-08
+     * @param preImportChickenRecordDto
+     * @return
+     */
+    @GetMapping("/preImportChickenWaybill")
+    @ApiOperation("预览毛鸡导入记录")
+    public BaseResponse<List<ChickenImportRecordDto>> preImportChickenWaybill(@RequestBody PreImportChickenRecordDto preImportChickenRecordDto){
+        log.info("O preImportChickenWaybill preImportChickenRecordDto={}",preImportChickenRecordDto);
+        List<ChickenImportRecordDto> chickenImportRecordDtoList = waybillService.preImportChickenWaybill(preImportChickenRecordDto);
+        if (CollectionUtils.isEmpty(chickenImportRecordDtoList)){
+            return BaseResponse.queryDataEmpty();
+        }
+        return BaseResponse.successInstance(chickenImportRecordDtoList);
+    }
+
+    /**
+     * @author yj
+     * @date 2019-01-08
+     * @param chickenImportRecordDtoValidList
+     * @return
+     */
+    @PostMapping("/importChickenWaybill")
+    @ApiOperation("导入毛鸡运单")
+    public BaseResponse importChickenWaybill(@RequestBody ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList){
+        waybillService.importChickenWaybill(chickenImportRecordDtoValidList);
+        return BaseResponse.successInstance("导入成功");
     }
 }

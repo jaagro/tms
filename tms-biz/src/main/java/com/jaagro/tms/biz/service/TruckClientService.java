@@ -63,4 +63,11 @@ public interface TruckClientService {
     @PostMapping("/getTruckTeamContractByTruckTeamId/{truckTeamId}")
     List<TruckTeamContractReturnDto> getTruckTeamContractByTruckTeamId(@PathVariable("truckTeamId") Integer truckTeamId);
 
+    /**
+     * 根据车牌号查询车辆
+     * @param truckNumber
+     * @return
+     */
+    @GetMapping("/getByTruckNumber")
+    BaseResponse<GetTruckDto> getByTruckNumber(@RequestParam("truckNumber") String truckNumber);
 }
