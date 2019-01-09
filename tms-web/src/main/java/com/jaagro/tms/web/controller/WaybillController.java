@@ -12,6 +12,7 @@ import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
@@ -48,7 +49,7 @@ public class WaybillController {
     public BaseResponse createWaybillPlan(@RequestBody CreateWaybillPlanDto waybillDto) {
         Integer orderId = waybillDto.getOrderId();
         GetOrderDto orderDto = orderService.getOrderById(orderId);
-        if(null==orderDto.getOrderStatus()|| OrderStatus.CANCEL.equals(orderDto.getOrderStatus())){
+        if (null == orderDto.getOrderStatus() || OrderStatus.CANCEL.equals(orderDto.getOrderStatus())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单已取消，不能配载");
         }
         if (StringUtils.isEmpty(orderId)) {
@@ -130,7 +131,7 @@ public class WaybillController {
 
         Integer orderId = waybillDtoList.get(0).getOrderId();
         GetOrderDto orderDto = orderService.getOrderById(orderId);
-        if(null==orderDto.getOrderStatus()|| OrderStatus.CANCEL.equals(orderDto.getOrderStatus())){
+        if (null == orderDto.getOrderStatus() || OrderStatus.CANCEL.equals(orderDto.getOrderStatus())) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "订单已取消，不能配载");
         }
 
@@ -176,42 +177,43 @@ public class WaybillController {
 
     /**
      * 撤回待接单的运单
-     * @Author gavin
+     *
      * @param waybillId
      * @return
+     * @Author gavin
      */
     @ApiOperation("撤回等待接单的运单")
     @PostMapping("/withdrawWaybill/{waybillId}")
-    public BaseResponse withdrawWaybill(@PathVariable Integer waybillId){
+    public BaseResponse withdrawWaybill(@PathVariable Integer waybillId) {
         boolean result = waybillService.withdrawWaybill(waybillId);
-        if(!result){
-         return BaseResponse.errorInstance("撤回失败");
+        if (!result) {
+            return BaseResponse.errorInstance("撤回失败");
         }
         return BaseResponse.successInstance("撤回成功");
     }
 
     /**
-     * @Author gavin
-     * 20181116
      * @param waybillId
      * @return
+     * @Author gavin
+     * 20181116
      */
     @ApiOperation("运单作废")
     @PostMapping("/abandonWaybill/{waybillId}")
     public BaseResponse abandonWaybill(@PathVariable("waybillId") Integer waybillId) {
         boolean result = waybillService.abandonWaybill(waybillId);
-        if(!result){
+        if (!result) {
             return BaseResponse.errorInstance("失败");
         }
         return BaseResponse.successInstance("成功");
     }
 
     /**
+     * @param waybillIds
+     * @return 运单对应的结算金额
      * @Author gavin
      * 20181222
      * 与客户结算的计算
-     * @param waybillIds
-     * @return 运单对应的结算金额
      */
     @ApiOperation("客户结算")
     @PostMapping("calculatePaymentFromCustomer")
@@ -220,15 +222,26 @@ public class WaybillController {
     }
 
     /**
+     * @param waybillIds
+     * @return 运单对应的结算金额
      * @author yj
      * @since 20181226
      * 与司机结算的计算
-     * @param waybillIds
-     * @return 运单对应的结算金额
      */
     @ApiOperation("司机结算")
     @PostMapping("calculatePaymentFromDriver")
     public BaseResponse calculatePaymentFromDriver(@RequestBody List<Integer> waybillIds) {
         return BaseResponse.successInstance(waybillService.calculatePaymentFromDriver(waybillIds));
+    }
+
+    /**
+     * 根据司机id统计未完成的运单
+     *
+     * @return
+     */
+    @Ignore
+    @GetMapping("/countUnFinishWaybillByDriver/{driverId}")
+    public BaseResponse<Integer> countUnFinishWaybillByDriver(@PathVariable("driverId") Integer driverId) {
+        return BaseResponse.successInstance(waybillService.countUnFinishWaybillByDriver(driverId));
     }
 }

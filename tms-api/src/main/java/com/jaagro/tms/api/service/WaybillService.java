@@ -268,4 +268,12 @@ public interface WaybillService {
      * @return
      */
     Boolean importWaybills(Integer orderId,List<ImportWaybillDto> waybillDto);
+
+    /**
+     * 根据司机id统计未完成的运单
+     *
+     * @param driverId
+     * @return
+     */
+    Integer countUnFinishWaybillByDriver(Integer driverId);
 }
