@@ -1,9 +1,6 @@
 package com.jaagro.tms.biz.service;
 
-import com.jaagro.tms.api.dto.truck.ChangeTruckDto;
-import com.jaagro.tms.api.dto.truck.ListTruckQualificationDto;
-import com.jaagro.tms.api.dto.truck.ShowTruckDto;
-import com.jaagro.tms.api.dto.truck.TruckQualification;
+import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.utils.BaseResponse;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -57,5 +54,8 @@ public interface TruckClientService {
      */
     @PutMapping("/truckQualificationToFeign")
     BaseResponse truckQualificationToFeign(@RequestBody TruckQualification qualification);
+
+    @PostMapping("/getTruckTeamContractByTruckTeamId/truckTeamId")
+    List<TruckTeamContractReturnDto> getTruckTeamContractByTruckTeamId(@PathVariable("truckTeamId") Integer truckTeamId);
 
 }

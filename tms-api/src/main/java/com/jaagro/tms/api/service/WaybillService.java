@@ -260,4 +260,13 @@ public interface WaybillService {
      * @since 20181226
      */
     List<Map<Integer, BigDecimal>> calculatePaymentFromDriver(List<Integer> waybillIds);
+
+    /**
+     * 毛鸡运单导入
+     * Author gavin
+     *
+     * @param waybillDto
+     * @return
+     */
+    Boolean importWaybills(Integer orderId,List<ImportWaybillDto> waybillDto);
 }
