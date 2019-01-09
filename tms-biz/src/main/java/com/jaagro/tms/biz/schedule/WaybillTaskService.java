@@ -4,7 +4,6 @@ package com.jaagro.tms.biz.schedule;
 import com.jaagro.tms.api.constant.TrackingType;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.truck.DriverReturnDto;
-import com.jaagro.tms.api.dto.waybill.ListWaybillDto;
 import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.Message.CreateMessageDto;
 import com.jaagro.tms.api.service.MessageService;
