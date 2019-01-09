@@ -293,6 +293,6 @@
       from
       waybill
       where driver_id = #{driverId}
-      and waybill_status in ('待出发','待出发','待装货','待送达','待签收')
+      and waybill_status in ('待出发','前往装货地','待装货','待送达','待签收')
     </select>
 </mapper>

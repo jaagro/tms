@@ -75,6 +75,11 @@ public class WaybillTracking implements Serializable{
     private Date createTime;
 
     /**
+     * 逻辑删除
+     */
+    private Boolean enabled;
+
+    /**
      * 拒单理由类型id(关联字典表:refuseReason)
      */
     private Integer refuseReasonId;
