@@ -300,4 +300,14 @@
         truck_id = #{truckId,jdbcType=INTEGER},
         driver_id = #{driverId,jdbcType=INTEGER} where id = #{id};
     </update>
+    <select id="listWaybillTimeOut" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill
+        where
+        <![CDATA[
+        waybill_status=#{waybillStatus} and send_time< DATE_SUB(now(),INTERVAL 60 MINUTE)
+        ]]>
+    </select>
+
 </mapper>

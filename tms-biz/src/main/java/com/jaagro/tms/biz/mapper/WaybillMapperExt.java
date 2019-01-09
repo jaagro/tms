@@ -162,4 +162,12 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @param waybill
      */
     void updateCancelWaybillById(Waybill waybill);
+
+    /**
+     * 查询接单超时的运单，便于短信提醒
+     *
+     * @param waybillStatus
+     * @return
+     */
+    List<Waybill> listWaybillTimeOut(@Param("waybillStatus") String waybillStatus);
 }
