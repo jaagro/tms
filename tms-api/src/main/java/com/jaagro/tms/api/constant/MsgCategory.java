@@ -8,11 +8,13 @@ package com.jaagro.tms.api.constant;
  */
 public class MsgCategory {
     /**
-     * 通知
+     * 通知公告
      */
     public static final Integer INFORM = 1;
     /**
-     * 公告
+     * 提醒
      */
-    public static final Integer PUBLIC = 2;
+    public static final Integer WARNING = 2;
+
+
 }
