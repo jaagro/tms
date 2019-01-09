@@ -12,7 +12,7 @@ import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
-import com.jaagro.tms.web.vo.ValidList;
+import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.web.vo.receipt.WayBillReceiptsVo;
 import com.jaagro.tms.web.vo.receipt.WayBillTrackingVo;
 import com.jaagro.tms.web.vo.receipt.WaybillGoodsVo;
@@ -28,7 +28,6 @@ import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import sun.applet.Main;
 
 import java.util.ArrayList;
 import java.util.Collections;
