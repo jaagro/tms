@@ -290,7 +290,6 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setLoadSiteId(createWaybillDto.getLoadSiteId());
             waybill.setLoadTime(createWaybillDto.getLoadTime());
             waybill.setNeedTruckType(createWaybillDto.getNeedTruckTypeId());
-            waybill.setTruckTeamContractId(createWaybillDto.getTruckTeamContractId());
             waybill.setWaybillStatus(WaybillStatus.SEND_TRUCK);
             waybill.setCreateTime(new Date());
             waybill.setCreatedUserId(userId);
@@ -1291,7 +1290,7 @@ public class WaybillServiceImpl implements WaybillService {
         orders.setModifyUserId(userId);
         ordersMapper.updateByPrimaryKeySelective(orders);
         //2.更新waybill
-        int truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(),truckId);
+        int truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckId);
         waybill.setTruckId(truckId);
         waybill.setTruckTeamContractId(truckTeamContractId);
         waybill.setWaybillStatus(waybillNewStatus);
@@ -2143,15 +2142,15 @@ public class WaybillServiceImpl implements WaybillService {
         try {
             // 读取excel内容
             List<List<String[]>> lists = PoiUtil.readExcel(preImportChickenRecordDto.getUploadUrl());
-            if (CollectionUtils.isEmpty(lists) || CollectionUtils.isEmpty(lists.get(0))){
+            if (CollectionUtils.isEmpty(lists) || CollectionUtils.isEmpty(lists.get(0))) {
                 return new ArrayList<>();
             }
-            log.info("uploadUrl={},excelContent={}",preImportChickenRecordDto.getUploadUrl(),JSON.toJSONString(lists.get(0)));
+            log.info("uploadUrl={},excelContent={}", preImportChickenRecordDto.getUploadUrl(), JSON.toJSONString(lists.get(0)));
             // 将excel内容解析为dto
-            List<ChickenImportRecordDto> chickenImportRecordDtoList = parsingExcel(lists.get(0),preImportChickenRecordDto);
+            List<ChickenImportRecordDto> chickenImportRecordDtoList = parsingExcel(lists.get(0), preImportChickenRecordDto);
             return chickenImportRecordDtoList;
-        }catch (Exception e){
-            log.error("preImportChickenWaybill error preImportChickenRecordDto="+preImportChickenRecordDto,e);
+        } catch (Exception e) {
+            log.error("preImportChickenWaybill error preImportChickenRecordDto=" + preImportChickenRecordDto, e);
         }
         return new ArrayList<>();
     }
@@ -2235,18 +2234,18 @@ public class WaybillServiceImpl implements WaybillService {
         return truckTeamContractId;
     }
 
-    private List<ChickenImportRecordDto> parsingExcel(List<String[]> list,PreImportChickenRecordDto preImportChickenRecordDto) throws ParseException {
-        if(!CollectionUtils.isEmpty(list)){
+    private List<ChickenImportRecordDto> parsingExcel(List<String[]> list, PreImportChickenRecordDto preImportChickenRecordDto) throws ParseException {
+        if (!CollectionUtils.isEmpty(list)) {
             List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
-            String [] dayCells = list.get(1);
+            String[] dayCells = list.get(1);
             // 获取屠宰日期
             String day = "";
-            if (dayCells != null && dayCells.length > 19){
+            if (dayCells != null && dayCells.length > 19) {
                 day = dayCells[18];
             }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
             // 数据从第四行开始
-            for (int i = 3;i<list.size();i++){
+            for (int i = 3; i < list.size(); i++) {
                 ChickenImportRecordDto dto = new ChickenImportRecordDto();
                 dto.setCustomerId(preImportChickenRecordDto.getCustomerId())
                         .setCustomerName(preImportChickenRecordDto.getCustomerName())
@@ -2254,26 +2253,26 @@ public class WaybillServiceImpl implements WaybillService {
                         .setLoadSiteName(preImportChickenRecordDto.getLoadSiteName());
                 String[] cells = list.get(i);
                 // 装货时间(车入鸡场时间)
-                Date loadTime = sdf.parse(day+cells[10]);
+                Date loadTime = sdf.parse(day + cells[10]);
                 dto.setLoadTime(loadTime);
                 // 要求送达时间(入屠宰场时间)
-                Date requiredTime = sdf.parse(day+cells[16]);
+                Date requiredTime = sdf.parse(day + cells[16]);
                 dto.setRequiredTime(requiredTime);
                 // 货物数量(单车筐数)
                 dto.setGoodsQuantity(Integer.parseInt(cells[20]));
                 // 装货地对应网点id
                 ShowSiteDto showSiteById = customerClientService.getShowSiteById(preImportChickenRecordDto.getLoadSiteId());
-                if (showSiteById != null){
+                if (showSiteById != null) {
                     dto.setLoadSiteDeptId(showSiteById.getDeptId());
                 }
                 // 去除车牌号中"大","中","小"
                 String truckNumber = cells[8];
-                if (truckNumber.endsWith("大") || truckNumber.endsWith("中") || truckNumber.endsWith("小")){
-                    truckNumber = truckNumber.substring(0,truckNumber.length()-1);
+                if (truckNumber.endsWith("大") || truckNumber.endsWith("中") || truckNumber.endsWith("小")) {
+                    truckNumber = truckNumber.substring(0, truckNumber.length() - 1);
                 }
                 // 校验车牌号合法性
                 BaseResponse<GetTruckDto> res = truckClientService.getByTruckNumber(truckNumber);
-                if (res != null && res.getData() != null){
+                if (res != null && res.getData() != null) {
                     GetTruckDto truckDto = res.getData();
                     dto.setVerifyPass(true);
                     dto.setTruckId(truckDto.getId());
@@ -2281,7 +2280,7 @@ public class WaybillServiceImpl implements WaybillService {
                     ListTruckTypeDto truckType = truckDto.getTruckTypeId();
                     dto.setTruckTypeId(truckType == null ? null : truckType.getId());
                     dto.setTruckTypeName(truckType == null ? null : truckType.getTypeName());
-                }else {
+                } else {
                     dto.setVerifyPass(false);
                     continue;
                 }
