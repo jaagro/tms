@@ -12,6 +12,7 @@ import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
@@ -231,5 +232,16 @@ public class WaybillController {
     @PostMapping("calculatePaymentFromDriver")
     public BaseResponse calculatePaymentFromDriver(@RequestBody List<Integer> waybillIds) {
         return BaseResponse.successInstance(waybillService.calculatePaymentFromDriver(waybillIds));
+    }
+
+    /**
+     * 根据司机id统计未完成的运单
+     *
+     * @return
+     */
+    @Ignore
+    @GetMapping("/countUnFinishWaybillByDriver/{driverId}")
+    public BaseResponse<Integer> countUnFinishWaybillByDriver(@PathVariable("driverId") Integer driverId) {
+        return BaseResponse.successInstance(waybillService.countUnFinishWaybillByDriver(driverId));
     }
 }
