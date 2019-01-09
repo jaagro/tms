@@ -739,26 +739,28 @@ public class WaybillServiceImpl implements WaybillService {
                 waybillGoodsMapper.updateByPrimaryKeySelective(waybillGoods);
             }
             //批量插入提货单
-            List<String> imagesUrls = dto.getImagesUrl();
+            List<WaybillImagesUrlDto> imagesUrls = dto.getImagesUrl();
 
             if (!CollectionUtils.isEmpty(imagesUrls)) {
                 for (int i = 0; i < imagesUrls.size(); i++) {
+                    WaybillImagesUrlDto waybillImagesUrl = imagesUrls.get(i);
                     WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
                     waybillTrackingImages
                             .setWaybillId(waybillId)
                             .setSiteId(loadSite.getId())
                             .setCreateTime(new Date())
                             .setCreateUserId(currentUser.getId())
-                            .setImageUrl(imagesUrls.get(i))
+                            .setImageUrl(waybillImagesUrl.getImagesUrl())
                             .setWaybillTrackingId(waybillTracking.getId());
                     //出库单
-                    if (i == 0) {
+                    if (ImagesTypeConstant.OUTBOUND_BILL.equals(waybillImagesUrl.getImagesType())) {
                         waybillTrackingImages.setImageType(ImagesTypeConstant.OUTBOUND_BILL);
-                    } else if (i == 1) {
+                    }
+                    if (ImagesTypeConstant.POUND_BILL.equals(waybillImagesUrl.getImagesType())) {
                         //磅单
                         waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
                     }
-                    if (!"invalidPicUrl".equalsIgnoreCase(imagesUrls.get(i))) {
+                    if (!"invalidPicUrl".equalsIgnoreCase(waybillImagesUrl.getImagesUrl())) {
                         waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
                     }
                 }
@@ -816,25 +818,27 @@ public class WaybillServiceImpl implements WaybillService {
                     waybillGoodsMapper.updateByPrimaryKeySelective(waybillGoods);
                 }
                 //批量插入卸货单
-                List<String> imagesUrls = dto.getImagesUrl();
+                List<WaybillImagesUrlDto> imagesUrls = dto.getImagesUrl();
                 if (!CollectionUtils.isEmpty(imagesUrls)) {
                     for (int i = 0; i < imagesUrls.size(); i++) {
+                        WaybillImagesUrlDto waybillImagesUrl = imagesUrls.get(i);
                         WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
                         waybillTrackingImages
                                 .setWaybillId(waybillId)
                                 .setSiteId(unLoadSiteConfirmProductDtos.get(0).getUnLoadSiteId())
                                 .setCreateTime(new Date())
                                 .setCreateUserId(currentUser.getId())
-                                .setImageUrl(imagesUrls.get(i))
+                                .setImageUrl(waybillImagesUrl.getImagesUrl())
                                 .setWaybillTrackingId(waybillTracking.getId());
                         //签收单
-                        if (i == 0) {
+                        if (ImagesTypeConstant.SIGN_BILL.equals(waybillImagesUrl.getImagesType())) {
                             waybillTrackingImages.setImageType(ImagesTypeConstant.SIGN_BILL);
-                        } else if (i == 1) {
+                        }
+                        if (ImagesTypeConstant.POUND_BILL.equals(waybillImagesUrl.getImagesType())) {
                             //磅单
                             waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
                         }
-                        if (!"invalidPicUrl".equalsIgnoreCase(imagesUrls.get(i))) {
+                        if (!"invalidPicUrl".equalsIgnoreCase(waybillImagesUrl.getImagesUrl())) {
                             waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
                         }
                     }
@@ -1413,7 +1417,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-                    ) {
+            ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
