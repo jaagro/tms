@@ -5,12 +5,16 @@ import com.jaagro.tms.api.constant.TrackingType;
 import com.jaagro.tms.api.constant.WaybillStatus;
 import com.jaagro.tms.api.dto.truck.DriverReturnDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillDto;
+import com.jaagro.tms.api.constant.*;
+import com.jaagro.tms.api.dto.Message.CreateMessageDto;
+import com.jaagro.tms.api.service.MessageService;
 import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.entity.WaybillTracking;
 import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillTrackingMapperExt;
 import com.jaagro.tms.biz.service.DriverClientService;
+import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +46,10 @@ public class WaybillTaskService {
     private DriverClientService driverClientService;
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private MessageService messageService;
+    @Autowired
+    private CurrentUserService userService;
 
     /**
      * 超过30分钟未接的运单修改为被司机拒绝以便重新派单,10分钟跑一次
@@ -76,6 +84,24 @@ public class WaybillTaskService {
                                 .setReferUserId(1)
                                 .setCreateTime(new Date());
                         waybillTrackingMapper.insertSelective(waybillTracking);
+
+                        /**-------添加自动拒单消息----addBy白弋冉**/
+                        CreateMessageDto createMessageDto = new CreateMessageDto();
+                        createMessageDto
+                                .setCreateUserId(userService.getCurrentUser().getId())
+                                .setBody("运单号为（" + waybill.getId() + "）的运单，系统已超时拒单，请及时处理！")
+                                .setFromUserId(FromUserType.SYSTEM)
+                                .setFromUserType(FromUserType.SYSTEM)
+                                .setHeader("你有一个拒单待处理")
+                                .setMsgSource(MsgSource.WEB)
+                                .setMsgType(MsgType.WAYBILL)
+                                .setReferId(waybill.getId())
+                                .setToUserId(waybill.getModifyUserId())
+                                .setToUserType(ToUserType.EMPLOYEE)
+                                .setCategory(MsgCategory.WARNING)
+                                .setRefuseType(RefuseType.AUTO);
+                        messageService.createMessage(createMessageDto);
+                        /**------------------**/
                     }
                     /**********************/
                 }

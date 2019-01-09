@@ -13,6 +13,7 @@ import com.jaagro.tms.api.dto.Message.MessageReturnDto;
 import com.jaagro.tms.api.service.MessageService;
 import com.jaagro.tms.biz.entity.Message;
 import com.jaagro.tms.biz.mapper.MessageMapperExt;
+import com.jaagro.tms.biz.mapper.WaybillTrackingMapperExt;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +39,8 @@ public class MessageServiceImpl implements MessageService {
     private MessageMapperExt messageMapperExt;
     @Autowired
     private CurrentUserService currentUserService;
+    @Autowired
+    private WaybillTrackingMapperExt trackingMapperExt;
 
     /**
      * 分页查询消息
@@ -50,8 +54,11 @@ public class MessageServiceImpl implements MessageService {
         criteriaDto.setToUserId(currentUserService.getCurrentUser() == null ? null : currentUserService.getCurrentUser().getId());
         List<MessageReturnDto> messageList = messageMapperExt.listMessageByCriteriaDto(criteriaDto);
         for (MessageReturnDto messageReturnDto : messageList) {
+            if (StringUtils.isEmpty(messageReturnDto.getMsgCategory())) {
+
+            }
             if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)) {
-                messageReturnDto.setMsgCategory(MsgCategory.PUBLIC);
+                messageReturnDto.setMsgCategory(MsgCategory.WARNING);
             } else {
                 messageReturnDto.setMsgCategory(MsgCategory.INFORM);
             }
@@ -95,7 +102,7 @@ public class MessageServiceImpl implements MessageService {
         List<MessageReturnDto> messageReturnDtos = messageMapperExt.listMessageByCriteriaDto(dto);
         for (MessageReturnDto messageReturnDto : messageReturnDtos) {
             if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)) {
-                messageReturnDto.setMsgCategory(MsgCategory.PUBLIC);
+                messageReturnDto.setMsgCategory(MsgCategory.WARNING);
             } else {
                 messageReturnDto.setMsgCategory(MsgCategory.INFORM);
             }
@@ -120,6 +127,10 @@ public class MessageServiceImpl implements MessageService {
             message.setCreateUserId(currentUserId);
         }
         message.setEnabled(true);
+        //运单相关的消息
+        if (!StringUtils.isEmpty(createMessageDto.getMsgType()) && MsgType.WAYBILL.equals(createMessageDto.getMsgType())) {
+            trackingMapperExt.getWaybillTrackingByWaybillId(createMessageDto.getReferId());
+        }
         messageMapperExt.insertSelective(message);
         if (message.getId() != null && message.getId() > 0) {
             return true;
