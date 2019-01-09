@@ -2,18 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jaagro.tms.biz.mapper.WaybillTrackingMapperExt">
     <resultMap id="DetailInfo" type="com.jaagro.tms.api.dto.driverapp.ShowTrackingDto">
-        <id column="id" jdbcType="INTEGER" property="id" />
-        <result column="waybill_id" jdbcType="INTEGER" property="waybillId" />
-        <result column="tracking_type" jdbcType="INTEGER" property="trackingType" />
-        <result column="old_status" jdbcType="VARCHAR" property="oldStatus" />
-        <result column="new_status" jdbcType="VARCHAR" property="newStatus" />
-        <result column="driver_id" jdbcType="INTEGER" property="driverId" />
-        <result column="latitude" jdbcType="DECIMAL" property="latitude" />
-        <result column="longitude" jdbcType="DECIMAL" property="longitude" />
-        <result column="tracking_info" jdbcType="VARCHAR" property="trackingInfo" />
-        <result column="device" jdbcType="VARCHAR" property="device" />
-        <result column="refer_user_id" jdbcType="INTEGER" property="referUserId" />
-        <result column="create_time" property="createTime" />
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="waybill_id" jdbcType="INTEGER" property="waybillId"/>
+        <result column="tracking_type" jdbcType="INTEGER" property="trackingType"/>
+        <result column="old_status" jdbcType="VARCHAR" property="oldStatus"/>
+        <result column="new_status" jdbcType="VARCHAR" property="newStatus"/>
+        <result column="driver_id" jdbcType="INTEGER" property="driverId"/>
+        <result column="latitude" jdbcType="DECIMAL" property="latitude"/>
+        <result column="longitude" jdbcType="DECIMAL" property="longitude"/>
+        <result column="tracking_info" jdbcType="VARCHAR" property="trackingInfo"/>
+        <result column="device" jdbcType="VARCHAR" property="device"/>
+        <result column="refer_user_id" jdbcType="INTEGER" property="referUserId"/>
+        <result column="create_time" property="createTime"/>
     </resultMap>
     <select id="selectSingleTime" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
@@ -61,10 +61,28 @@
         values
         <foreach collection="trackingList" item="tracking" separator=",">
             (#{tracking.waybillId,jdbcType=INTEGER}, #{tracking.trackingType,jdbcType=INTEGER},
-            #{tracking.oldStatus,jdbcType=VARCHAR}, #{tracking.newStatus,jdbcType=VARCHAR}, #{tracking.driverId,jdbcType=INTEGER},
-            #{tracking.latitude,jdbcType=DECIMAL}, #{tracking.longitude,jdbcType=DECIMAL}, #{tracking.trackingInfo,jdbcType=VARCHAR},
-            #{tracking.device,jdbcType=VARCHAR}, #{tracking.referUserId,jdbcType=INTEGER}, #{tracking.createTime,jdbcType=TIMESTAMP}
+            #{tracking.oldStatus,jdbcType=VARCHAR}, #{tracking.newStatus,jdbcType=VARCHAR},
+            #{tracking.driverId,jdbcType=INTEGER},
+            #{tracking.latitude,jdbcType=DECIMAL}, #{tracking.longitude,jdbcType=DECIMAL},
+            #{tracking.trackingInfo,jdbcType=VARCHAR},
+            #{tracking.device,jdbcType=VARCHAR}, #{tracking.referUserId,jdbcType=INTEGER},
+            #{tracking.createTime,jdbcType=TIMESTAMP}
             )
         </foreach>
     </insert>
+    <select id="getCreateUserByWaybillId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT
+            refer_user_id
+        FROM
+            waybill_tracking
+        WHERE
+            waybill_id = #{waybillId}
+            AND old_status = '待派单'
+            AND new_status = '待接单'
+            AND enabled = 1
+            AND tracking_type = 1
+        ORDER BY
+            create_time DESC
+            LIMIT 1
+    </select>
 </mapper>

@@ -1248,7 +1248,7 @@ public class WaybillServiceImpl implements WaybillService {
                     .setMsgSource(MsgSource.WEB)
                     .setMsgType(MsgType.WAYBILL)
                     .setReferId(waybill.getId())
-                    .setToUserId(waybill.getModifyUserId())
+                    .setToUserId(waybillTrackingMapper.getCreateUserByWaybillId(waybill.getId()))
                     .setToUserType(ToUserType.EMPLOYEE)
                     .setCategory(MsgCategory.WARNING)
                     .setRefuseType(RefuseType.MANUAL);

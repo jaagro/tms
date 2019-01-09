@@ -54,13 +54,14 @@ public class MessageServiceImpl implements MessageService {
         criteriaDto.setToUserId(currentUserService.getCurrentUser() == null ? null : currentUserService.getCurrentUser().getId());
         List<MessageReturnDto> messageList = messageMapperExt.listMessageByCriteriaDto(criteriaDto);
         for (MessageReturnDto messageReturnDto : messageList) {
-            if (StringUtils.isEmpty(messageReturnDto.getMsgCategory())) {
-
-            }
-            if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)) {
-                messageReturnDto.setMsgCategory(MsgCategory.WARNING);
-            } else {
-                messageReturnDto.setMsgCategory(MsgCategory.INFORM);
+            if (StringUtils.isEmpty(messageReturnDto.getCategory())) {
+                if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)) {
+                    messageReturnDto.setCategory(MsgCategory.WARNING);
+                    messageReturnDto.setMsgCategory(MsgCategory.WARNING);
+                } else {
+                    messageReturnDto.setCategory(MsgCategory.INFORM);
+                    messageReturnDto.setMsgCategory(MsgCategory.INFORM);
+                }
             }
         }
         return new PageInfo<>(messageList);
