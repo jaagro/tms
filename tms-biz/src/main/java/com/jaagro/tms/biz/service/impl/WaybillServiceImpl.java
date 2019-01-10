@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
+import com.jaagro.tms.api.dto.Message.CreateMessageDto;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.MessageReturnDto;
 import com.jaagro.tms.api.dto.ValidList;
@@ -18,10 +19,7 @@ import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.service.AccountService;
-import com.jaagro.tms.api.service.OrderItemsService;
-import com.jaagro.tms.api.service.OrderService;
-import com.jaagro.tms.api.service.WaybillService;
+import com.jaagro.tms.api.service.*;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.*;
@@ -106,6 +104,8 @@ public class WaybillServiceImpl implements WaybillService {
     private WaybillTruckFeeMapperExt waybillTruckFeeMapperExt;
     @Autowired
     private OrderItemsService orderItemsService;
+    @Autowired
+    private MessageService messageService;
 
     /**
      * 毛鸡运单导入
@@ -1237,6 +1237,23 @@ public class WaybillServiceImpl implements WaybillService {
                     .setOldStatus(WaybillStatus.RECEIVE)
                     .setNewStatus(WaybillStatus.REJECT).setTrackingInfo("运单已被【" + currentUser.getName() + "】取消");
             waybillTrackingMapper.insertSelective(waybillTracking);
+            /**-------添加自动拒单消息----addBy白弋冉**/
+            CreateMessageDto createMessageDto = new CreateMessageDto();
+            createMessageDto
+                    .setCreateUserId(currentUser.getId())
+                    .setBody("运单号为（" + waybill.getId() + "）的运单，司机已手动拒单，请及时处理！")
+                    .setFromUserId(FromUserType.SYSTEM)
+                    .setFromUserType(FromUserType.SYSTEM)
+                    .setHeader("你有一个拒单待处理")
+                    .setMsgSource(MsgSource.WEB)
+                    .setMsgType(MsgType.WAYBILL)
+                    .setReferId(waybill.getId())
+                    .setToUserId(waybillTrackingMapper.getCreateUserByWaybillId(waybill.getId()))
+                    .setToUserType(ToUserType.EMPLOYEE)
+                    .setCategory(MsgCategory.WARNING)
+                    .setRefuseType(RefuseType.MANUAL);
+            messageService.createMessage(createMessageDto);
+            /**------------------**/
             return ServiceResult.toResult(ReceiptConstant.OPERATION_SUCCESS);
             //接单
         } else if (WaybillConstant.RECEIPT.equals(dto.getReceiptStatus())) {
@@ -1410,7 +1427,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-                    ) {
+            ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
