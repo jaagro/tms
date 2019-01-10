@@ -2209,6 +2209,10 @@ public class WaybillServiceImpl implements WaybillService {
             Integer currentUserId = currentUser == null ? null : currentUser.getId();
             List<ImportWaybillDto> importWaybillDtoList = new ArrayList<>();
             for (ChickenImportRecordDto dto : chickenImportRecordDtoValidList){
+                if (dto.getVerifyPass() == null || !dto.getVerifyPass()){
+                    throw new RuntimeException("有未校验通过的行不允许提交");
+                }
+
                 ChickenImportRecord record = new ChickenImportRecord();
                 ImportWaybillDto importWaybillDto = new ImportWaybillDto();
                 BeanUtils.copyProperties(dto,importWaybillDto);

@@ -443,7 +443,7 @@ public class OrderController {
      * @param preImportChickenRecordDto
      * @return
      */
-    @GetMapping("/preImportChickenWaybill")
+    @PostMapping("/preImportChickenWaybill")
     @ApiOperation("预览毛鸡导入记录")
     public BaseResponse<List<ChickenImportRecordDto>> preImportChickenWaybill(@RequestBody PreImportChickenRecordDto preImportChickenRecordDto){
         log.info("O preImportChickenWaybill preImportChickenRecordDto={}",JSON.toJSONString(preImportChickenRecordDto));
