@@ -65,7 +65,8 @@ public class PoiUtil {
             } else {
                 formulaEvaluator = new HSSFFormulaEvaluator((HSSFWorkbook) workbook);
             }
-            for(int sheetNum = 0;sheetNum < workbook.getNumberOfSheets();sheetNum++){
+//            for(int sheetNum = 0;sheetNum < workbook.getNumberOfSheets();sheetNum++){
+            for(int sheetNum = 0;sheetNum < 1;sheetNum++){
                 List<String[]> sheetList = new ArrayList<>();
                 //获得当前sheet工作表
                 Sheet sheet = workbook.getSheetAt(sheetNum);
