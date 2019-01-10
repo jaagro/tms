@@ -37,6 +37,17 @@ public class AnomalyInformationVo implements Serializable {
     private String customerName;
 
     /**
+     * 司机姓名
+     */
+    private String driverName;
+
+    /**
+     * 车牌号
+     */
+
+    private String truckNumber;
+
+    /**
      * 异常图片
      */
     private List<AnomalyImageUrlDto> createAnomalyImageUrlDtos;

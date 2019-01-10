@@ -295,4 +295,19 @@
       where driver_id = #{driverId}
       and waybill_status in ('待出发','前往装货地','待装货','待送达','待签收')
     </select>
+    <update id="updateCancelWaybillById" parameterType="com.jaagro.tms.biz.entity.Waybill">
+        update waybill set waybill_status =#{waybillStatus},
+        truck_id = #{truckId,jdbcType=INTEGER},
+        driver_id = #{driverId,jdbcType=INTEGER} where id = #{id};
+    </update>
+    <select id="listWaybillTimeOut" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill
+        where
+        <![CDATA[
+        waybill_status=#{waybillStatus} and send_time< DATE_SUB(now(),INTERVAL 60 MINUTE)
+        ]]>
+    </select>
+
 </mapper>

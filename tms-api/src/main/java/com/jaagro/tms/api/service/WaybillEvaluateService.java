@@ -23,4 +23,12 @@ public interface WaybillEvaluateService {
      * @param dto
      */
     void createWaybillEvaluate(CreateWaybillEvaluateDto dto);
+
+    /**
+     * 根据运单id查询评价信息
+     *
+     * @param waybillId
+     * @return
+     */
+    ListEvaluateTypeDto getWaybillEvaluateByWaybillId(Integer waybillId);
 }

@@ -61,11 +61,11 @@ public class WaybillAnomalyController {
     @ApiOperation("根据运单Id显示客户信息")
     @GetMapping("getCustomerByWaybillId/{waybillId}")
     public BaseResponse getCustomerByWaybillId(@PathVariable Integer waybillId) {
-        ShowCustomerDto customer = waybillAnomalyService.getCustomerByWaybillId(waybillId);
-        if (null == customer) {
+        AnomalyUserProfileDto anomalyUserProfile = waybillAnomalyService.getAnomalyUserProfileByWaybillId(waybillId);
+        if (null == anomalyUserProfile) {
             return BaseResponse.successInstance(ResponseStatusCode.QUERY_DATA_ERROR);
         }
-        return BaseResponse.successInstance(customer);
+        return BaseResponse.successInstance(anomalyUserProfile);
     }
 
     @ApiOperation("异常信息显示")
@@ -77,8 +77,11 @@ public class WaybillAnomalyController {
             WaybillAnomalyDto waybillAnomalyDto = waybillAnomalyDtos.get(0);
             BeanUtils.copyProperties(waybillAnomalyDto, anomalyInformationVo);
             //客户名称
-            ShowCustomerDto customer = waybillAnomalyService.getCustomerByWaybillId(waybillAnomalyDtos.get(0).getWaybillId());
-            anomalyInformationVo.setCustomerName(customer.getCustomerName());
+            AnomalyUserProfileDto anomalyUserProfile = waybillAnomalyService.getAnomalyUserProfileByWaybillId(waybillAnomalyDtos.get(0).getWaybillId());
+            anomalyInformationVo
+                    .setCustomerName(anomalyUserProfile.getCustomerName() == null ? "--" : anomalyUserProfile.getCustomerName())
+                    .setDriverName(anomalyUserProfile.getDriverName() == null ? "--" : anomalyUserProfile.getDriverName())
+                    .setTruckNumber(anomalyUserProfile.getTruckNumber() == null ? "--" : anomalyUserProfile.getTruckNumber());
             //异常图片
             WaybillAnomalyImageCondition waybillAnomalyImageCondition = new WaybillAnomalyImageCondition();
             waybillAnomalyImageCondition

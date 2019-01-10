@@ -36,6 +36,11 @@ public class ListWaybillVo {
     private String waybillStatus;
 
     /**
+     * 用于判断当前运单是否评价
+     */
+    private boolean waybillEvaluate;
+
+    /**
      * 运单明细list\
      */
     private List<ListWaybillItemsVo> waybillItemsVoList;
