@@ -14,7 +14,7 @@
     <result column="device" property="device" jdbcType="VARCHAR" />
     <result column="refer_user_id" property="referUserId" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="enabled" property="enabled" jdbcType="TINYINT" />
     <result column="refuse_reason_id" property="refuseReasonId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
@@ -41,7 +41,7 @@
       #{oldStatus,jdbcType=VARCHAR}, #{newStatus,jdbcType=VARCHAR}, #{driverId,jdbcType=INTEGER}, 
       #{latitude,jdbcType=DECIMAL}, #{longitude,jdbcType=DECIMAL}, #{trackingInfo,jdbcType=VARCHAR}, 
       #{device,jdbcType=VARCHAR}, #{referUserId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{enabled,jdbcType=BIT}, #{refuseReasonId,jdbcType=INTEGER})
+      #{enabled,jdbcType=TINYINT}, #{refuseReasonId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillTracking" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
     insert into waybill_tracking
@@ -127,7 +127,7 @@
         #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="enabled != null" >
-        #{enabled,jdbcType=BIT},
+        #{enabled,jdbcType=TINYINT},
       </if>
       <if test="refuseReasonId != null" >
         #{refuseReasonId,jdbcType=INTEGER},
@@ -171,7 +171,7 @@
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="enabled != null" >
-        enabled = #{enabled,jdbcType=BIT},
+        enabled = #{enabled,jdbcType=TINYINT},
       </if>
       <if test="refuseReasonId != null" >
         refuse_reason_id = #{refuseReasonId,jdbcType=INTEGER},
@@ -192,7 +192,7 @@
       device = #{device,jdbcType=VARCHAR},
       refer_user_id = #{referUserId,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      enabled = #{enabled,jdbcType=BIT},
+      enabled = #{enabled,jdbcType=TINYINT},
       refuse_reason_id = #{refuseReasonId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
