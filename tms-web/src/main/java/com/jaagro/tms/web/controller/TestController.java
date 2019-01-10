@@ -57,7 +57,7 @@ public class TestController {
             importDto1.setTruckNumber("8899");
             importDto1.setTruckTypeId(8);
             importDto1.setTruckTeamContractId(11);
-
+            importDtos.add(importDto1);
             String loadtime2 = "2019-01-11 05:30:00";
             String requiredtime2 = "2019-01-11 07:15:00\n";
             ImportWaybillDto importDto2 = new ImportWaybillDto();
