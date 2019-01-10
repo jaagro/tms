@@ -1,5 +1,6 @@
 package com.jaagro.tms.biz.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.jaagro.tms.biz.service.OssSignUrlClientService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
@@ -75,8 +76,8 @@ public class PoiUtil {
                 int firstRowNum  = sheet.getFirstRowNum();
                 //获得当前sheet的结束行
                 int lastRowNum = sheet.getLastRowNum();
-                //循环除了第一行的所有行
-                for(int rowNum = firstRowNum+1;rowNum <= lastRowNum;rowNum++){
+                //循环所有行
+                for(int rowNum = firstRowNum;rowNum <= lastRowNum;rowNum++){
                     //获得当前行
                     Row row = sheet.getRow(rowNum);
                     if(row == null){
@@ -143,10 +144,11 @@ public class PoiUtil {
         if(cell == null){
             return cellValue;
         }
+        log.info(JSON.toJSONString(cell));
         //把数字当成String来读，避免出现1读成1.0的情况
-        if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
-            cell.setCellType(Cell.CELL_TYPE_STRING);
-        }
+//        if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
+//            cell.setCellType(Cell.CELL_TYPE_STRING);
+//        }
         //判断数据的类型
         switch (cell.getCellType()){
             //数字
