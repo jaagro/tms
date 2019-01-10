@@ -1,5 +1,6 @@
 package com.jaagro.tms.web.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
@@ -445,7 +446,7 @@ public class OrderController {
     @GetMapping("/preImportChickenWaybill")
     @ApiOperation("预览毛鸡导入记录")
     public BaseResponse<List<ChickenImportRecordDto>> preImportChickenWaybill(@RequestBody PreImportChickenRecordDto preImportChickenRecordDto){
-        log.info("O preImportChickenWaybill preImportChickenRecordDto={}",preImportChickenRecordDto);
+        log.info("O preImportChickenWaybill preImportChickenRecordDto={}",JSON.toJSONString(preImportChickenRecordDto));
         List<ChickenImportRecordDto> chickenImportRecordDtoList = waybillService.preImportChickenWaybill(preImportChickenRecordDto);
         if (CollectionUtils.isEmpty(chickenImportRecordDtoList)){
             return BaseResponse.queryDataEmpty();
@@ -462,6 +463,7 @@ public class OrderController {
     @PostMapping("/importChickenWaybill")
     @ApiOperation("导入毛鸡运单")
     public BaseResponse importChickenWaybill(@RequestBody ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList){
+        log.info("O importChickenWaybill chickenImportRecordDtoValidList={}", JSON.toJSONString(chickenImportRecordDtoValidList));
         waybillService.importChickenWaybill(chickenImportRecordDtoValidList);
         return BaseResponse.successInstance("导入成功");
     }
