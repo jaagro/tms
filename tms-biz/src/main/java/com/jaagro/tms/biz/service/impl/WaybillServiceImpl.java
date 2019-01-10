@@ -2302,7 +2302,7 @@ public class WaybillServiceImpl implements WaybillService {
     private List<ChickenImportRecordDto> parsingExcel(List<String[]> list, PreImportChickenRecordDto preImportChickenRecordDto) throws ParseException {
         if (!CollectionUtils.isEmpty(list)) {
             List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
-            String[] dayCells = list.get(1);
+            String[] dayCells = list.get(0);
             // 获取屠宰日期
             String day = "";
             if (dayCells != null && dayCells.length > TRANSPORT_DAY_INDEX) {
@@ -2312,7 +2312,7 @@ public class WaybillServiceImpl implements WaybillService {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
             Orders orders = ordersMapper.selectByPrimaryKey(preImportChickenRecordDto.getOrderId());
             // 数据从第四行开始
-            for (int i = 3; i < list.size(); i++) {
+            for (int i = 2; i < list.size(); i++) {
                 ChickenImportRecordDto dto = new ChickenImportRecordDto();
                 dto.setCustomerId(preImportChickenRecordDto.getCustomerId())
                         .setCustomerName(preImportChickenRecordDto.getCustomerName())

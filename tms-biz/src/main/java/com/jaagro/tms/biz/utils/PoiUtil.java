@@ -89,7 +89,7 @@ public class PoiUtil {
                     int lastCellNum = row.getPhysicalNumberOfCells();
                     String[] cells = new String[row.getPhysicalNumberOfCells()];
                     //循环当前行
-                    for(int cellNum = firstCellNum; cellNum < lastCellNum;cellNum++){
+                    for(int cellNum = firstCellNum + 1; cellNum < lastCellNum;cellNum++){
                         Cell cell = row.getCell(cellNum);
                         cells[cellNum] = getCellValue(cell,formulaEvaluator);
                     }
