@@ -89,4 +89,19 @@
             </if>
         </where>
     </update>
+    <select id="getCreateUserByWaybillId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT
+            refer_user_id
+        FROM
+            waybill_tracking
+        WHERE
+            waybill_id = #{waybillId}
+            AND old_status = '待派单'
+            AND new_status = '待接单'
+            AND enabled = 1
+            AND tracking_type = 1
+        ORDER BY
+            create_time DESC
+            LIMIT 1
+    </select>
 </mapper>

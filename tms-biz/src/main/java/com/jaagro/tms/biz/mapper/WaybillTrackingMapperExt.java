@@ -69,4 +69,12 @@ public interface WaybillTrackingMapperExt extends WaybillTrackingMapper {
      * @param ids
      */
     void deleteWaybillTrackingId(@Param("ids") List<Integer> ids);
+
+    /**
+     * 根据运单获取派单调度id
+     *
+     * @param waybillId
+     * @return
+     */
+    Integer getCreateUserByWaybillId(@Param("waybillId") Integer waybillId);
 }
