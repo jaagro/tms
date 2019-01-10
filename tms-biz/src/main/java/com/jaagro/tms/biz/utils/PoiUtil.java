@@ -89,7 +89,7 @@ public class PoiUtil {
                     int lastCellNum = row.getPhysicalNumberOfCells();
                     String[] cells = new String[row.getPhysicalNumberOfCells()];
                     //循环当前行
-                    for(int cellNum = firstCellNum + 1; cellNum < lastCellNum;cellNum++){
+                    for(int cellNum = firstCellNum; cellNum < lastCellNum;cellNum++){
                         Cell cell = row.getCell(cellNum);
                         cells[cellNum] = getCellValue(cell,formulaEvaluator);
                     }
@@ -144,7 +144,7 @@ public class PoiUtil {
         if(cell == null){
             return cellValue;
         }
-        log.info(JSON.toJSONString(cell));
+        log.info("columnIndex="+cell.getColumnIndex()+"rowIndex="+cell.getRowIndex()+"cellType="+cell.getCellType());
         //把数字当成String来读，避免出现1读成1.0的情况
 //        if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC){
 //            cell.setCellType(Cell.CELL_TYPE_STRING);
