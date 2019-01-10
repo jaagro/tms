@@ -2,9 +2,11 @@ package com.jaagro.tms.biz.utils;
 
 import com.jaagro.tms.biz.service.OssSignUrlClientService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.NumberToTextConverter;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,7 +38,6 @@ public class PoiUtil {
      * EXCEL2007版本文件扩展名
      */
     private static final String xlsx = "xlsx";
-    private static FormulaEvaluator evaluator;
 
     private static OssSignUrlClientService ossSignUrlClientService;
 
@@ -56,8 +57,13 @@ public class PoiUtil {
         Workbook workbook = getWorkBook(relativeUrl);
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
         List<List<String[]>> list = new ArrayList<>();
+        FormulaEvaluator formulaEvaluator = null;
         if(workbook != null){
-            evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+            if (relativeUrl.endsWith(xlsx)) {
+                formulaEvaluator = new XSSFFormulaEvaluator((XSSFWorkbook) workbook);
+            } else {
+                formulaEvaluator = new HSSFFormulaEvaluator((HSSFWorkbook) workbook);
+            }
             for(int sheetNum = 0;sheetNum < workbook.getNumberOfSheets();sheetNum++){
                 List<String[]> sheetList = new ArrayList<>();
                 //获得当前sheet工作表
@@ -84,7 +90,7 @@ public class PoiUtil {
                     //循环当前行
                     for(int cellNum = firstCellNum; cellNum < lastCellNum;cellNum++){
                         Cell cell = row.getCell(cellNum);
-                        cells[cellNum] = getCellValue(cell);
+                        cells[cellNum] = getCellValue(cell,formulaEvaluator);
                     }
                     sheetList.add(cells);
                 }
@@ -132,7 +138,7 @@ public class PoiUtil {
         }
         return workbook;
     }
-    public static String getCellValue(Cell cell){
+    public static String getCellValue(Cell cell,FormulaEvaluator formulaEvaluator){
         String cellValue = "";
         if(cell == null){
             return cellValue;
@@ -168,7 +174,7 @@ public class PoiUtil {
                 break;
             //公式
             case Cell.CELL_TYPE_FORMULA:
-                cellValue=getByCellValue(evaluator.evaluate(cell));
+                cellValue=getByCellValue(formulaEvaluator.evaluate(cell));
                 break;
             //空值
             case Cell.CELL_TYPE_BLANK:
