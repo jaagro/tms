@@ -57,7 +57,7 @@ public class PoiUtil {
         Workbook workbook = getWorkBook(relativeUrl);
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
         List<List<String[]>> list = new ArrayList<>();
-        FormulaEvaluator formulaEvaluator = null;
+        FormulaEvaluator formulaEvaluator;
         if(workbook != null){
             if (relativeUrl.endsWith(xlsx)) {
                 formulaEvaluator = new XSSFFormulaEvaluator((XSSFWorkbook) workbook);
@@ -174,6 +174,7 @@ public class PoiUtil {
                 break;
             //公式
             case Cell.CELL_TYPE_FORMULA:
+                formulaEvaluator.clearAllCachedResultValues();
                 cellValue=getByCellValue(formulaEvaluator.evaluate(cell));
                 break;
             //空值
