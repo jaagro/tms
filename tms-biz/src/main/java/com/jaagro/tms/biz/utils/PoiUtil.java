@@ -3,10 +3,8 @@ package com.jaagro.tms.biz.utils;
 import com.jaagro.tms.biz.service.OssSignUrlClientService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,7 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,6 +36,7 @@ public class PoiUtil {
      * EXCEL2007版本文件扩展名
      */
     private static final String xlsx = "xlsx";
+    private static FormulaEvaluator evaluator;
 
     private static OssSignUrlClientService ossSignUrlClientService;
 
@@ -56,6 +57,7 @@ public class PoiUtil {
         //创建返回对象，把每行中的值作为一个数组，所有行作为一个集合返回
         List<List<String[]>> list = new ArrayList<>();
         if(workbook != null){
+            evaluator = workbook.getCreationHelper().createFormulaEvaluator();
             for(int sheetNum = 0;sheetNum < workbook.getNumberOfSheets();sheetNum++){
                 List<String[]> sheetList = new ArrayList<>();
                 //获得当前sheet工作表
@@ -143,7 +145,18 @@ public class PoiUtil {
         switch (cell.getCellType()){
             //数字
             case Cell.CELL_TYPE_NUMERIC:
-                cellValue = String.valueOf(cell.getNumericCellValue());
+                short format = cell.getCellStyle().getDataFormat();
+                if(format == 14 || format == 31 || format == 57 || format == 58){
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+                    double value = cell.getNumericCellValue();
+                    Date date = DateUtil.getJavaDate(value);
+                    cellValue = sdf.format(date);
+                }else if (org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(cell)) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+                    cellValue = sdf.format(org.apache.poi.ss.usermodel.DateUtil.getJavaDate(cell.getNumericCellValue())).toString();
+                } else {
+                    cellValue = NumberToTextConverter.toText(cell.getNumericCellValue());
+                }
                 break;
             //字符串
             case Cell.CELL_TYPE_STRING:
@@ -155,7 +168,7 @@ public class PoiUtil {
                 break;
             //公式
             case Cell.CELL_TYPE_FORMULA:
-                cellValue = String.valueOf(cell.getCellFormula());
+                cellValue=getByCellValue(evaluator.evaluate(cell));
                 break;
             //空值
             case Cell.CELL_TYPE_BLANK:
@@ -185,5 +198,28 @@ public class PoiUtil {
         }
         return null;
     }
+
+    private static String getByCellValue(CellValue cell) {
+        String cellValue = null;
+        switch (cell.getCellType()) {
+            case Cell.CELL_TYPE_STRING:
+                System.out.print("String :");
+                cellValue=cell.getStringValue();
+                break;
+
+            case Cell.CELL_TYPE_NUMERIC:
+                System.out.print("NUMERIC:");
+                cellValue=String.valueOf(cell.getNumberValue());
+                break;
+            case Cell.CELL_TYPE_FORMULA:
+                System.out.print("FORMULA:");
+                break;
+            default:
+                break;
+        }
+
+        return cellValue;
+    }
+
 }
 

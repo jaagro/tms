@@ -2308,6 +2308,7 @@ public class WaybillServiceImpl implements WaybillService {
             if (dayCells != null && dayCells.length > TRANSPORT_DAY_INDEX) {
                 day = dayCells[18];
             }
+            log.info("屠宰日期="+day);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
             Orders orders = ordersMapper.selectByPrimaryKey(preImportChickenRecordDto.getOrderId());
             // 数据从第四行开始
