@@ -118,7 +118,10 @@ public class WaybillTaskService {
      *
      * @Author: @Gao.
      */
+    
+    @Scheduled(cron = "0 0/5 0 * * ?")
     public void listWaybillTimeOut() {
+        log.info("start**************");
         List<Waybill> waybills = waybillMapperExt.listWaybillTimeOut(WaybillStatus.RECEIVE);
         for (Waybill waybill : waybills) {
             if (waybill.getTruckId() != null) {
@@ -134,6 +137,7 @@ public class WaybillTaskService {
                 }
             }
         }
+        log.info("end**************");
     }
 
     /**
