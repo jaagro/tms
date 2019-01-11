@@ -56,6 +56,21 @@ public interface WaybillTrackingMapperExt extends WaybillTrackingMapper {
     Integer batchInsert(@Param("trackingList") List<WaybillTracking> trackingList);
 
     /**
+     * 根据运单id 查询异常轨迹id
+     *
+     * @param waybillId
+     * @return
+     */
+    List<Integer> listWaybillTrackingIdByWaybillId(@Param("waybillId") Integer waybillId);
+
+    /**
+     * 批量逻辑删除运单轨迹
+     *
+     * @param ids
+     */
+    void deleteWaybillTrackingId(@Param("ids") List<Integer> ids);
+
+    /**
      * 根据运单获取派单调度id
      *
      * @param waybillId

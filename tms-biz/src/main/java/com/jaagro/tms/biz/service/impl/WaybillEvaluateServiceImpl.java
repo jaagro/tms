@@ -12,6 +12,7 @@ import com.jaagro.tms.biz.mapper.EvaluateTypeMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillEvaluateMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -67,5 +68,19 @@ public class WaybillEvaluateServiceImpl implements WaybillEvaluateService {
                     .setSatisfactionLever(createEvaluateType.get(0).getSatisfactionLever());
         }
         waybillEvaluateMapper.insertSelective(waybillEvaluate);
+    }
+
+    /**
+     * 根据运单id查询评价信息
+     *
+     * @param waybillId
+     * @return
+     */
+    @Override
+    public ListEvaluateTypeDto getWaybillEvaluateByWaybillId(Integer waybillId) {
+        ListEvaluateTypeDto listEvaluateTypeDto = new ListEvaluateTypeDto();
+        WaybillEvaluate waybillEvaluate = waybillEvaluateMapper.getWaybillEvaluateByWaybillId(waybillId);
+        BeanUtils.copyProperties(waybillEvaluate, listEvaluateTypeDto);
+        return listEvaluateTypeDto;
     }
 }

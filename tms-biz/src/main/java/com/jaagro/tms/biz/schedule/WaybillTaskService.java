@@ -2,27 +2,30 @@ package com.jaagro.tms.biz.schedule;
 
 
 import com.jaagro.tms.api.constant.*;
-import com.jaagro.tms.api.dto.Message.CreateMessageDto;
-import com.jaagro.tms.api.service.MessageService;
+import com.jaagro.tms.api.dto.truck.DriverReturnDto;
+import com.jaagro.tms.biz.entity.Message;
 import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.entity.WaybillTracking;
+import com.jaagro.tms.biz.jpush.JpushClientUtil;
+import com.jaagro.tms.biz.mapper.MessageMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillTrackingMapperExt;
-import com.jaagro.tms.biz.service.impl.CurrentUserService;
+import com.jaagro.tms.biz.service.DriverClientService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: Gavin
@@ -36,9 +39,12 @@ public class WaybillTaskService {
     @Autowired
     private WaybillTrackingMapperExt waybillTrackingMapper;
     @Autowired
-    private MessageService messageService;
+    private DriverClientService driverClientService;
     @Autowired
-    private CurrentUserService userService;
+    private StringRedisTemplate redisTemplate;
+    @Autowired
+    private MessageMapperExt messageMapper;
+
 
     /**
      * 超过30分钟未接的运单修改为被司机拒绝以便重新派单,10分钟跑一次
@@ -74,22 +80,26 @@ public class WaybillTaskService {
                                 .setCreateTime(new Date());
                         waybillTrackingMapper.insertSelective(waybillTracking);
 
-                        /**-------添加自动拒单消息----addBy白弋冉**/
-                        CreateMessageDto createMessageDto = new CreateMessageDto();
-                        createMessageDto
-                                .setCreateUserId(userService.getCurrentUser().getId())
-                                .setBody("运单号为（" + waybill.getId() + "）的运单，系统已超时拒单，请及时处理！")
-                                .setFromUserId(FromUserType.SYSTEM)
-                                .setFromUserType(FromUserType.SYSTEM)
-                                .setHeader("你有一个拒单待处理")
-                                .setMsgSource(MsgSource.WEB)
-                                .setMsgType(MsgType.WAYBILL)
-                                .setReferId(waybill.getId())
-                                .setToUserId(waybillTrackingMapper.getCreateUserByWaybillId(waybill.getId()))
-                                .setToUserType(ToUserType.EMPLOYEE)
-                                .setCategory(MsgCategory.WARNING)
-                                .setRefuseType(RefuseType.AUTO);
-                        messageService.createMessage(createMessageDto);
+                        /**-------添加自动拒单消息---**/
+                        Message appMessage = new Message();
+                        appMessage.setReferId(waybill.getId());
+                        // 消息类型：1-系统通知 2-运单相关 3-账务相关
+                        appMessage.setMsgType(MsgType.WAYBILL);
+                        //消息来源:1-APP,2-小程序,3-站内
+                        appMessage.setMsgSource(MsgSource.WEB);
+                        appMessage.setMsgStatus(MsgStatusConstant.UNREAD);
+                        appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
+                        appMessage.setBody("运单号为（" + waybill.getId() + "）的运单，系统已超时拒单，请及时处理！");
+                        appMessage.setCreateTime(new Date());
+                        appMessage.setCreateUserId(1);
+                        appMessage.setFromUserId(FromUserType.SYSTEM);
+                        appMessage.setToUserId(waybillTrackingMapper.getCreateUserByWaybillId(waybill.getId()));
+                        appMessage.setHeader("你有一个拒单待处理");
+                        appMessage.setFromUserType(FromUserType.SYSTEM);
+                        appMessage.setToUserType(ToUserType.EMPLOYEE);
+                        appMessage.setCategory(MsgCategory.WARNING);
+                        appMessage.setRefuseType(RefuseType.AUTO);
+                        messageMapper.insertSelective(appMessage);
                         /**------------------**/
                     }
                     /**********************/
@@ -102,6 +112,62 @@ public class WaybillTaskService {
             log.error("定时钟waybillDefaultRejectBySystem执行异常:", ex);
         }
     }
+
+    /**
+     * 运单接单超时 进行短信提醒
+     *
+     * @Author: @Gao.
+     */
+
+    @Scheduled(cron = "0 0/5 0 * * ?")
+    public void listWaybillTimeOut() {
+        log.info("start**************");
+        List<Waybill> waybills = waybillMapperExt.listWaybillTimeOut(WaybillStatus.RECEIVE);
+        for (Waybill waybill : waybills) {
+            if (waybill.getTruckId() != null) {
+                String wb = redisTemplate.opsForValue().get("TIMEOUT" + waybill.getId());
+                if (StringUtils.isEmpty(wb)) {
+                    setRefIdToRedis("TIMEOUT" + waybill.getId(), waybill.getId().toString());
+                    List<DriverReturnDto> driverReturnDtos = driverClientService.listByTruckId(waybill.getTruckId());
+                    for (DriverReturnDto driver : driverReturnDtos) {
+                        if (driver != null) {
+                            sendMessage(driver);
+                        }
+                    }
+                }
+            }
+        }
+        log.info("end**************");
+    }
+
+    /**
+     * 发送jPush短信
+     */
+    private void sendMessage(DriverReturnDto driver) {
+        String alias = "";
+        String msgTitle = "运单接单超时提醒消息";
+        String msgContent;
+        String regId;
+        Map<String, String> extraParam = new HashMap<>();
+        extraParam.put("driverId", driver.getId().toString());
+        extraParam.put("needVoice", "n");
+        regId = driver.getRegistrationId() == null ? null : driver.getRegistrationId();
+        msgContent = driver.getName() + "师傅，您有一个运单已超时，请尽快接单！";
+        if (null != driver.getRegistrationId()) {
+            JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
+        }
+    }
+
+    /**
+     * 将wyabillId 存入到redis中
+     *
+     * @param key
+     * @param value
+     */
+    private void setRefIdToRedis(String key, String value) {
+        redisTemplate.opsForValue().set(key, value, 1, TimeUnit.DAYS);
+    }
+
 
     public static void main(String[] args) {
 

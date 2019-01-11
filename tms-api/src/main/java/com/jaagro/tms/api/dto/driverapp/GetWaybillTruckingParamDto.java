@@ -1,5 +1,6 @@
 package com.jaagro.tms.api.dto.driverapp;
 
+import com.jaagro.tms.api.dto.waybill.WaybillImagesUrlDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -52,10 +53,12 @@ public class GetWaybillTruckingParamDto implements Serializable {
     /**
      * 提货单  卸货地URL
      */
-    private List<String> imagesUrl;
+//    private List<String> imagesUrl;
+    private List<WaybillImagesUrlDto> imagesUrl;
     /**
      * 运单详情
      */
     private Integer waybillItemId;
+
 
 }
