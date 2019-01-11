@@ -98,7 +98,6 @@
             waybill_id = #{waybillId}
             AND old_status = '待派单'
             AND new_status = '待接单'
-            AND enabled = 1
             AND tracking_type = 1
         ORDER BY
             create_time DESC

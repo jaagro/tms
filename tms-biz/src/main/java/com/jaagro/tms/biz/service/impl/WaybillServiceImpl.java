@@ -19,6 +19,7 @@ import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.tms.api.dto.waybill.*;
+import com.jaagro.tms.api.entity.ChickenImportRecord;
 import com.jaagro.tms.api.service.*;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.jpush.JpushClientUtil;
@@ -57,6 +58,10 @@ public class WaybillServiceImpl implements WaybillService {
 
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
     private static final int TIMEOUT = 10 * 1000;
+    /**
+     * 毛鸡导入屠宰日期所在列数
+     */
+    private static final int TRANSPORT_DAY_INDEX = 19;
 
     @Autowired
     private CurrentUserService currentUserService;
@@ -106,6 +111,8 @@ public class WaybillServiceImpl implements WaybillService {
     private OrderItemsService orderItemsService;
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private ChickenImportRecordMapperExt chickenImportRecordMapperExt;
 
     /**
      * 毛鸡运单导入
@@ -2175,6 +2182,8 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public List<ChickenImportRecordDto> preImportChickenWaybill(PreImportChickenRecordDto preImportChickenRecordDto) {
         try {
+            // 判断运单状态,只有已下单的运单才能做毛鸡导入
+            judgeOrderForChickenImport(preImportChickenRecordDto.getOrderId());
             // 读取excel内容
             List<List<String[]>> lists = PoiUtil.readExcel(preImportChickenRecordDto.getUploadUrl());
             if (CollectionUtils.isEmpty(lists) || CollectionUtils.isEmpty(lists.get(0))) {
@@ -2196,8 +2205,36 @@ public class WaybillServiceImpl implements WaybillService {
      * @param chickenImportRecordDtoValidList
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void importChickenWaybill(ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList) {
+        if (CollectionUtils.isEmpty(chickenImportRecordDtoValidList)){
+            Integer orderId = chickenImportRecordDtoValidList.get(0).getOrderId();
+            // 判断运单状态,只有已下单的运单才能做毛鸡导入
+            judgeOrderForChickenImport(orderId);
+            List<ChickenImportRecord> chickenImportRecordList = new ArrayList<>();
+            UserInfo currentUser = currentUserService.getCurrentUser();
+            Integer currentUserId = currentUser == null ? null : currentUser.getId();
+            List<ImportWaybillDto> importWaybillDtoList = new ArrayList<>();
+            for (ChickenImportRecordDto dto : chickenImportRecordDtoValidList){
+                if (dto.getVerifyPass() == null || !dto.getVerifyPass()){
+                    throw new RuntimeException("有未校验通过的行不允许提交");
+                }
 
+                ChickenImportRecord record = new ChickenImportRecord();
+                ImportWaybillDto importWaybillDto = new ImportWaybillDto();
+                BeanUtils.copyProperties(dto,importWaybillDto);
+                BeanUtils.copyProperties(dto,record);
+                record.setCreateTime(new Date())
+                        .setCreateUserId(currentUserId)
+                        .setEnable(true);
+                chickenImportRecordList.add(record);
+                importWaybillDtoList.add(importWaybillDto);
+            }
+            // 毛鸡导入原始记录入库
+            chickenImportRecordMapperExt.batchInsert(chickenImportRecordList);
+            // 生成运单并派给车辆,如果表格数量过多需要起任务处理,防止处理时间过长事务不释放一直占用数据库链接
+            importWaybills(orderId,importWaybillDtoList);
+        }
     }
 
     private List<CalculatePaymentDto> getCalculatePaymentDtoList(List<Integer> waybillIds) {
@@ -2272,20 +2309,23 @@ public class WaybillServiceImpl implements WaybillService {
     private List<ChickenImportRecordDto> parsingExcel(List<String[]> list, PreImportChickenRecordDto preImportChickenRecordDto) throws ParseException {
         if (!CollectionUtils.isEmpty(list)) {
             List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
-            String[] dayCells = list.get(1);
+            String[] dayCells = list.get(0);
             // 获取屠宰日期
             String day = "";
-            if (dayCells != null && dayCells.length > 19) {
+            if (dayCells != null && dayCells.length > TRANSPORT_DAY_INDEX) {
                 day = dayCells[18];
             }
+            log.info("屠宰日期="+day);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+            Orders orders = ordersMapper.selectByPrimaryKey(preImportChickenRecordDto.getOrderId());
             // 数据从第四行开始
-            for (int i = 3; i < list.size(); i++) {
+            for (int i = 2; i < list.size(); i++) {
                 ChickenImportRecordDto dto = new ChickenImportRecordDto();
                 dto.setCustomerId(preImportChickenRecordDto.getCustomerId())
                         .setCustomerName(preImportChickenRecordDto.getCustomerName())
                         .setLoadSiteId(preImportChickenRecordDto.getLoadSiteId())
-                        .setLoadSiteName(preImportChickenRecordDto.getLoadSiteName());
+                        .setLoadSiteName(preImportChickenRecordDto.getLoadSiteName())
+                        .setOrderId(preImportChickenRecordDto.getOrderId());
                 String[] cells = list.get(i);
                 // 装货时间(车入鸡场时间)
                 Date loadTime = sdf.parse(day + cells[10]);
@@ -2315,11 +2355,12 @@ public class WaybillServiceImpl implements WaybillService {
                     ListTruckTypeDto truckType = truckDto.getTruckTypeId();
                     dto.setTruckTypeId(truckType == null ? null : truckType.getId());
                     dto.setTruckTypeName(truckType == null ? null : truckType.getTypeName());
+                    dto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getId()));
                 } else {
                     dto.setVerifyPass(false);
                     continue;
                 }
-                // 获取车队合同id TODO
+                // 获取车队合同id
                 chickenImportRecordDtoList.add(dto);
             }
             return chickenImportRecordDtoList;
@@ -2327,4 +2368,17 @@ public class WaybillServiceImpl implements WaybillService {
         return new ArrayList<>();
     }
 
+    private void judgeOrderForChickenImport(Integer orderId){
+        // 判断订单状态
+        Orders orders = ordersMapper.selectByPrimaryKey(orderId);
+        if (orders == null){
+            throw new RuntimeException("订单id="+orderId+"不存在");
+        }
+        if (!OrderStatus.PLACE_ORDER.equals(orders.getOrderStatus())){
+            throw new RuntimeException("只有已下单状态的订单才可以导入");
+        }
+        if (!GoodsType.CHICKEN.equals(orders.getGoodsType())){
+            throw new RuntimeException("只有毛鸡订单才可以导入");
+        }
+    }
 }
