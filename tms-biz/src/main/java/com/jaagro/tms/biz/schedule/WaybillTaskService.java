@@ -8,7 +8,6 @@ import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.entity.WaybillTracking;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillTrackingMapperExt;
-import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +36,7 @@ public class WaybillTaskService {
     private WaybillTrackingMapperExt waybillTrackingMapper;
     @Autowired
     private MessageService messageService;
-    @Autowired
-    private CurrentUserService userService;
+
 
     /**
      * 超过30分钟未接的运单修改为被司机拒绝以便重新派单,10分钟跑一次
@@ -77,7 +75,7 @@ public class WaybillTaskService {
                         /**-------添加自动拒单消息----addBy白弋冉**/
                         CreateMessageDto createMessageDto = new CreateMessageDto();
                         createMessageDto
-                                .setCreateUserId(userService.getCurrentUser().getId())
+                                .setCreateUserId(1)
                                 .setBody("运单号为（" + waybill.getId() + "）的运单，系统已超时拒单，请及时处理！")
                                 .setFromUserId(FromUserType.SYSTEM)
                                 .setFromUserType(FromUserType.SYSTEM)
