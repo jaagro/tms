@@ -155,4 +155,19 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @return
      */
     Integer countUnDoneByDriverId(@Param("driverId") Integer driverId);
+
+    /**
+     * 异常运单重置派单
+     *
+     * @param waybill
+     */
+    void updateCancelWaybillById(Waybill waybill);
+
+    /**
+     * 查询接单超时的运单，便于短信提醒
+     *
+     * @param waybillStatus
+     * @return
+     */
+    List<Waybill> listWaybillTimeOut(@Param("waybillStatus") String waybillStatus);
 }

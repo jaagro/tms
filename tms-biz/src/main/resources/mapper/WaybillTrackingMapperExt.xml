@@ -19,7 +19,7 @@
         select
         <include refid="Base_Column_List"/>
         from waybill_tracking
-        where 1=1
+        where enabled=1
         <if test="waybillId != null">
             and waybill_id=#{waybillId}
         </if>
@@ -37,14 +37,15 @@
         select
         <include refid="Base_Column_List"/>
         from waybill_tracking
-        where waybill_id=#{waybillId} and new_status in ('待出发','前往装货地','待装货','待送达','待签收','已完成')
+        where enabled=1 and waybill_id=#{waybillId} and new_status in ('待出发','前往装货地','待装货','待送达','待签收','已完成')
     </select>
 
     <select id="getWaybillTrackingByWaybillId" resultMap="DetailInfo" parameterType="java.lang.Integer">
         select
         <include refid="Base_Column_List"/>
         from waybill_tracking
-        where waybill_id=#{waybillId} and new_status in ('待出发','前往装货地','待装货','待送达','待签收','已完成') order by id desc
+        where enabled=1 and waybill_id=#{waybillId} and new_status in ('待出发','前往装货地','待装货','待送达','待签收','已完成') order by
+        id desc
     </select>
 
     <delete id="deleteByWaybillIdAndTrackingType">
@@ -70,6 +71,24 @@
             )
         </foreach>
     </insert>
+    <select id="listWaybillTrackingIdByWaybillId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        select id from waybill_tracking
+        where  waybill_id=#{waybillId}
+    </select>
+    <update id="deleteWaybillTrackingId" parameterType="java.util.List">
+        update waybill_tracking
+        <set>
+            enabled = 0
+        </set>
+        <where>
+            <if test="ids!=null">
+                id in
+                <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </update>
     <select id="getCreateUserByWaybillId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
         SELECT
             refer_user_id
@@ -79,7 +98,6 @@
             waybill_id = #{waybillId}
             AND old_status = '待派单'
             AND new_status = '待接单'
-            AND enabled = 1
             AND tracking_type = 1
         ORDER BY
             create_time DESC

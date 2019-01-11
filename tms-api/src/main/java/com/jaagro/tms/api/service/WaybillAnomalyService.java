@@ -27,12 +27,12 @@ public interface WaybillAnomalyService {
     List<WaybillAnomalyTypeDto> displayAnomalyType();
 
     /**
-     * 根据运单Id查询客户信息
+     * 根据运单Id查询客户信息 司机信息
      *
      * @param waybillId Author @Gao.
      * @return
      */
-    ShowCustomerDto getCustomerByWaybillId(Integer waybillId);
+    AnomalyUserProfileDto getAnomalyUserProfileByWaybillId(Integer waybillId);
 
     /**
      * 根据运单号id 查询异常信息
