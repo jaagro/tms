@@ -14,12 +14,12 @@
     <result column="device" property="device" jdbcType="VARCHAR" />
     <result column="refer_user_id" property="referUserId" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-    <result column="enable" property="enable"/>
+    <result column="enabled" property="enabled"/>
     <result column="refuse_reason_id" property="refuseReasonId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, waybill_id, tracking_type, old_status, new_status, driver_id, latitude, longitude, 
-    tracking_info, device, refer_user_id, create_time, enable, refuse_reason_id
+    tracking_info, device, refer_user_id, create_time, enabled, refuse_reason_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
@@ -36,12 +36,12 @@
       old_status, new_status, driver_id, 
       latitude, longitude, tracking_info, 
       device, refer_user_id, create_time, 
-      enable, refuse_reason_id)
+      enabled, refuse_reason_id)
     values (#{id,jdbcType=INTEGER}, #{waybillId,jdbcType=INTEGER}, #{trackingType,jdbcType=INTEGER}, 
       #{oldStatus,jdbcType=VARCHAR}, #{newStatus,jdbcType=VARCHAR}, #{driverId,jdbcType=INTEGER}, 
       #{latitude,jdbcType=DECIMAL}, #{longitude,jdbcType=DECIMAL}, #{trackingInfo,jdbcType=VARCHAR}, 
       #{device,jdbcType=VARCHAR}, #{referUserId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{enable}, #{refuseReasonId,jdbcType=INTEGER})
+      #{enabled}, #{refuseReasonId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.WaybillTracking" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
     insert into waybill_tracking
@@ -82,8 +82,8 @@
       <if test="createTime != null" >
         create_time,
       </if>
-      <if test="enable != null" >
-        enable,
+      <if test="enabled != null" >
+        enabled,
       </if>
       <if test="refuseReasonId != null" >
         refuse_reason_id,
@@ -126,8 +126,8 @@
       <if test="createTime != null" >
         #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="enable != null" >
-        #{enable},
+      <if test="enabled != null" >
+        #{enabled},
       </if>
       <if test="refuseReasonId != null" >
         #{refuseReasonId,jdbcType=INTEGER},
@@ -170,8 +170,8 @@
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="enable != null" >
-        enable = #{enable},
+      <if test="enabled != null" >
+        enabled = #{enabled},
       </if>
       <if test="refuseReasonId != null" >
         refuse_reason_id = #{refuseReasonId,jdbcType=INTEGER},
@@ -192,7 +192,7 @@
       device = #{device,jdbcType=VARCHAR},
       refer_user_id = #{referUserId,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      enable = #{enable},
+      enabled = #{enabled},
       refuse_reason_id = #{refuseReasonId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>

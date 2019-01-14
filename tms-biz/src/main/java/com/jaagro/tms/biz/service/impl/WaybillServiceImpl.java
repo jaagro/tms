@@ -206,6 +206,7 @@ public class WaybillServiceImpl implements WaybillService {
             //4.插入waybill_tracking表插入一条记录
             WaybillTracking waybillTracking = new WaybillTracking();
             waybillTracking
+                    .setEnabled(true)
                     .setWaybillId(waybillId)
                     .setCreateTime(new Date())
                     .setOldStatus(WaybillStatus.SEND_TRUCK)
@@ -696,7 +697,7 @@ public class WaybillServiceImpl implements WaybillService {
                 .setLatitude(dto.getLatitude())
                 .setLatitude(dto.getLongitude())
                 .setCreateTime(new Date())
-                .setEnable(true);
+                .setEnabled(true);
         //司机出发
         if (WaybillStatus.DEPART.equals(dto.getWaybillStatus())) {
             Waybill wb = new Waybill();
@@ -1231,7 +1232,7 @@ public class WaybillServiceImpl implements WaybillService {
         }
         WaybillTracking waybillTracking = new WaybillTracking();
         waybillTracking
-                .setEnable(true)
+                .setEnabled(true)
                 .setWaybillId(waybillId)
                 .setCreateTime(new Date())
                 .setDriverId(currentUser.getId())
@@ -1345,7 +1346,7 @@ public class WaybillServiceImpl implements WaybillService {
         //3.在waybill_tracking表插入一条记录
         WaybillTracking waybillTracking = new WaybillTracking();
         waybillTracking
-                .setEnable(true)
+                .setEnabled(true)
                 .setWaybillId(waybillId)
                 .setCreateTime(new Date())
                 .setOldStatus(waybillOldStatus)
@@ -1615,7 +1616,7 @@ public class WaybillServiceImpl implements WaybillService {
                         .setNewStatus(showTrackingDto.getNewStatus());
             }
             waybillTracking
-                    .setEnable(true)
+                    .setEnabled(true)
                     .setCreateTime(new Date())
                     .setWaybillId(waybillId)
                     .setTrackingInfo("补录实提")
@@ -1709,6 +1710,7 @@ public class WaybillServiceImpl implements WaybillService {
             }
             // 插入卸货补录轨迹
             WaybillTracking waybillTracking = new WaybillTracking();
+            waybillTracking.setEnabled(true);
             List<ShowTrackingDto> showTrackingDtos = waybillTrackingMapper.getWaybillTrackingByWaybillId(waybillId);
             boolean hasLoadTracking = false;
             if (!CollectionUtils.isEmpty(showTrackingDtos)) {
@@ -1722,7 +1724,6 @@ public class WaybillServiceImpl implements WaybillService {
                 }
                 ShowTrackingDto showTrackingDto = showTrackingDtos.get(0);
                 waybillTracking
-                        .setEnable(true)
                         .setOldStatus(showTrackingDto.getOldStatus())
                         .setNewStatus(showTrackingDto.getNewStatus());
             }
@@ -1797,7 +1798,7 @@ public class WaybillServiceImpl implements WaybillService {
             for (GetTrackingImagesDto imagesDto : uploadImages) {
                 WaybillTracking waybillTracking = new WaybillTracking();
                 waybillTracking
-                        .setEnable(true)
+                        .setEnabled(true)
                         .setOldStatus(showTrackingDto.getOldStatus())
                         .setNewStatus(showTrackingDto.getNewStatus())
                         .setTrackingType(TrackingType.LOAD_BILLS_RECEIPT)
@@ -2213,7 +2214,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void importChickenWaybill(ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList) {
-        if (CollectionUtils.isEmpty(chickenImportRecordDtoValidList)){
+        if (CollectionUtils.isEmpty(chickenImportRecordDtoValidList)) {
             Integer orderId = chickenImportRecordDtoValidList.get(0).getOrderId();
             // 判断运单状态,只有已下单的运单才能做毛鸡导入
             judgeOrderForChickenImport(orderId);
@@ -2221,15 +2222,15 @@ public class WaybillServiceImpl implements WaybillService {
             UserInfo currentUser = currentUserService.getCurrentUser();
             Integer currentUserId = currentUser == null ? null : currentUser.getId();
             List<ImportWaybillDto> importWaybillDtoList = new ArrayList<>();
-            for (ChickenImportRecordDto dto : chickenImportRecordDtoValidList){
-                if (dto.getVerifyPass() == null || !dto.getVerifyPass()){
+            for (ChickenImportRecordDto dto : chickenImportRecordDtoValidList) {
+                if (dto.getVerifyPass() == null || !dto.getVerifyPass()) {
                     throw new RuntimeException("有未校验通过的行不允许提交");
                 }
 
                 ChickenImportRecord record = new ChickenImportRecord();
                 ImportWaybillDto importWaybillDto = new ImportWaybillDto();
-                BeanUtils.copyProperties(dto,importWaybillDto);
-                BeanUtils.copyProperties(dto,record);
+                BeanUtils.copyProperties(dto, importWaybillDto);
+                BeanUtils.copyProperties(dto, record);
                 record.setCreateTime(new Date())
                         .setCreateUserId(currentUserId)
                         .setEnable(true);
@@ -2239,7 +2240,7 @@ public class WaybillServiceImpl implements WaybillService {
             // 毛鸡导入原始记录入库
             chickenImportRecordMapperExt.batchInsert(chickenImportRecordList);
             // 生成运单并派给车辆,如果表格数量过多需要起任务处理,防止处理时间过长事务不释放一直占用数据库链接
-            importWaybills(orderId,importWaybillDtoList);
+            importWaybills(orderId, importWaybillDtoList);
         }
     }
 
@@ -2321,7 +2322,7 @@ public class WaybillServiceImpl implements WaybillService {
             if (dayCells != null && dayCells.length > TRANSPORT_DAY_INDEX) {
                 day = dayCells[18];
             }
-            log.info("屠宰日期="+day);
+            log.info("屠宰日期=" + day);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
             Orders orders = ordersMapper.selectByPrimaryKey(preImportChickenRecordDto.getOrderId());
             // 数据从第四行开始
@@ -2374,16 +2375,16 @@ public class WaybillServiceImpl implements WaybillService {
         return new ArrayList<>();
     }
 
-    private void judgeOrderForChickenImport(Integer orderId){
+    private void judgeOrderForChickenImport(Integer orderId) {
         // 判断订单状态
         Orders orders = ordersMapper.selectByPrimaryKey(orderId);
-        if (orders == null){
-            throw new RuntimeException("订单id="+orderId+"不存在");
+        if (orders == null) {
+            throw new RuntimeException("订单id=" + orderId + "不存在");
         }
-        if (!OrderStatus.PLACE_ORDER.equals(orders.getOrderStatus())){
+        if (!OrderStatus.PLACE_ORDER.equals(orders.getOrderStatus())) {
             throw new RuntimeException("只有已下单状态的订单才可以导入");
         }
-        if (!GoodsType.CHICKEN.equals(orders.getGoodsType())){
+        if (!GoodsType.CHICKEN.equals(orders.getGoodsType())) {
             throw new RuntimeException("只有毛鸡订单才可以导入");
         }
     }
