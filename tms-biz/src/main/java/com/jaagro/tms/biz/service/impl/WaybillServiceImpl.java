@@ -1335,7 +1335,7 @@ public class WaybillServiceImpl implements WaybillService {
         orders.setModifyUserId(userId);
         ordersMapper.updateByPrimaryKeySelective(orders);
         //2.更新waybill
-        int truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckId);
+        Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckId);
         waybill.setTruckId(truckId);
         waybill.setTruckTeamContractId(truckTeamContractId);
         waybill.setWaybillStatus(waybillNewStatus);
@@ -2299,15 +2299,17 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     private Integer getTruckTeamContractId(Integer goodsType, Integer truckId) {
-        int truckTeamContractId = 0;
+        Integer truckTeamContractId = 0;
         List<TruckTeamContractReturnDto> truckTeamContracts = truckClientService.getTruckTeamContractByTruckTeamId(truckId);
-        for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
-            if (goodsType.equals(truckTeamContractReturnDto.getBussinessType())) {
-                truckTeamContractId = truckTeamContractReturnDto.getId();
-            } else if (goodsType == 3 && truckTeamContractReturnDto.getBussinessType() == 4) {
-                truckTeamContractId = truckTeamContractReturnDto.getId();
-            } else if (goodsType == 6 && truckTeamContractReturnDto.getBussinessType() == 4) {
-                truckTeamContractId = truckTeamContractReturnDto.getId();
+        if (!CollectionUtils.isEmpty(truckTeamContracts)){
+            for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
+                if (goodsType.equals(truckTeamContractReturnDto.getBussinessType())) {
+                    truckTeamContractId = truckTeamContractReturnDto.getId();
+                } else if (goodsType == 3 && truckTeamContractReturnDto.getBussinessType() == 4) {
+                    truckTeamContractId = truckTeamContractReturnDto.getId();
+                } else if (goodsType == 6 && truckTeamContractReturnDto.getBussinessType() == 4) {
+                    truckTeamContractId = truckTeamContractReturnDto.getId();
+                }
             }
         }
         return truckTeamContractId;
@@ -2316,7 +2318,7 @@ public class WaybillServiceImpl implements WaybillService {
     private List<ChickenImportRecordDto> parsingExcel(List<String[]> list, PreImportChickenRecordDto preImportChickenRecordDto) throws ParseException {
         if (!CollectionUtils.isEmpty(list)) {
             List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
-            String[] dayCells = list.get(0);
+            String[] dayCells = list.get(1);
             // 获取屠宰日期
             String day = "";
             if (dayCells != null && dayCells.length > TRANSPORT_DAY_INDEX) {
@@ -2327,18 +2329,23 @@ public class WaybillServiceImpl implements WaybillService {
             Orders orders = ordersMapper.selectByPrimaryKey(preImportChickenRecordDto.getOrderId());
             // 数据从第四行开始
             for (int i = 3; i < list.size(); i++) {
+                String[] cells = list.get(i);
+                // 数据列结束跳出循环
+                if ("合计".equals(cells[1])){
+                    break;
+                }
                 ChickenImportRecordDto dto = new ChickenImportRecordDto();
                 dto.setCustomerId(preImportChickenRecordDto.getCustomerId())
                         .setCustomerName(preImportChickenRecordDto.getCustomerName())
                         .setLoadSiteId(preImportChickenRecordDto.getLoadSiteId())
                         .setLoadSiteName(preImportChickenRecordDto.getLoadSiteName())
                         .setOrderId(preImportChickenRecordDto.getOrderId());
-                String[] cells = list.get(i);
+
                 // 装货时间(车入鸡场时间)
-                Date loadTime = sdf.parse(day + cells[10]);
+                Date loadTime = sdf.parse(day +" "+ cells[10]);
                 dto.setLoadTime(loadTime);
                 // 要求送达时间(入屠宰场时间)
-                Date requiredTime = sdf.parse(day + cells[16]);
+                Date requiredTime = sdf.parse(day +" "+ cells[16]);
                 dto.setRequiredTime(requiredTime);
                 // 货物数量(单车筐数)
                 dto.setGoodsQuantity(Integer.parseInt(cells[20]));
