@@ -2325,7 +2325,7 @@ public class WaybillServiceImpl implements WaybillService {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
             Orders orders = ordersMapper.selectByPrimaryKey(preImportChickenRecordDto.getOrderId());
             // 数据从第四行开始
-            for (int i = 2; i < list.size(); i++) {
+            for (int i = 3; i < list.size(); i++) {
                 ChickenImportRecordDto dto = new ChickenImportRecordDto();
                 dto.setCustomerId(preImportChickenRecordDto.getCustomerId())
                         .setCustomerName(preImportChickenRecordDto.getCustomerName())
