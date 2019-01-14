@@ -145,7 +145,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             boolean flag = (WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus()) || !CollectionUtils.isEmpty(waybillAnomalyDtos))
                     && CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomalyType.getId());
             if (flag) {
-                iterator.remove();
+                continue;
             }
             WaybillAnomalyTypeDto dto = new WaybillAnomalyTypeDto();
             BeanUtils.copyProperties(waybillAnomalyType, dto);
