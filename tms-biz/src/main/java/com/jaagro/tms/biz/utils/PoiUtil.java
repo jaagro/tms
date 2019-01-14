@@ -297,8 +297,8 @@ public class PoiUtil {
                     //获得当前行的开始列
                     int firstCellNum = row.getFirstCellNum();
                     //获得当前行的列数
-                    int lastCellNum = row.getPhysicalNumberOfCells();
-                    String[] cells = new String[row.getPhysicalNumberOfCells()];
+                    int lastCellNum = row.getLastCellNum();
+                    String[] cells = new String[row.getLastCellNum()];
                     //循环当前行
                     for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
                         Cell cell = row.getCell(cellNum);
