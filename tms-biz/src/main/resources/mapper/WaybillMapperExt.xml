@@ -80,7 +80,7 @@
         from waybill wb
         inner join waybill_tracking wt
         on (wb.id=wt.waybill_id)
-        where wb.enabled = 1
+        where wb.enabled = 1 and wt.enabled = 1
         and wb.waybill_status
         in ('待出发','前往装货地','待装货','待送达','待签收')
         <if test="driverId != null">

@@ -8,6 +8,7 @@ import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
 import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author @Gao.
@@ -24,7 +25,7 @@ public interface WaybillAnomalyService {
      * 运单异常类型显示
      * Author @Gao.
      */
-    List<WaybillAnomalyTypeDto> displayAnomalyType();
+    List<WaybillAnomalyTypeDto> displayAnomalyType(Integer waybillId);
 
     /**
      * 根据运单Id查询客户信息 司机信息

@@ -22,10 +22,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author @Gao.
@@ -46,9 +43,9 @@ public class WaybillAnomalyController {
     }
 
     @ApiOperation("运单异常类型显示")
-    @GetMapping("displayAnomalyType")
-    public BaseResponse displayAnomalyType() {
-        List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = waybillAnomalyService.displayAnomalyType();
+    @GetMapping("displayAnomalyType/{waybillId}")
+    public BaseResponse displayAnomalyType(@PathVariable Integer waybillId) {
+        List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = waybillAnomalyService.displayAnomalyType(waybillId);
         List<AnomalyTypeVo> anomalyTypeVos = new ArrayList<>();
         for (WaybillAnomalyTypeDto waybillAnomalyTypeDto : waybillAnomalyTypeDtos) {
             AnomalyTypeVo anomalyTypeVo = new AnomalyTypeVo();
