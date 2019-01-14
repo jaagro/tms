@@ -15,4 +15,11 @@ public interface GrabWaybillRecordMapperExt extends GrabWaybillRecordMapper {
      * @param grabWaybillRecords
      */
     void batchInsert(@Param("grabWaybillRecords") List<GrabWaybillRecord> grabWaybillRecords);
+
+    /**
+     * 根据司机id查询抢单记录
+     * @param driverId
+     * @return
+     */
+    List<GrabWaybillRecord> listGrabWaybillByDriverId(@Param("driverId") Integer driverId);
 }

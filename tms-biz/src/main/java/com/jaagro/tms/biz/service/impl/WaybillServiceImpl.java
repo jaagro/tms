@@ -113,6 +113,8 @@ public class WaybillServiceImpl implements WaybillService {
     private MessageService messageService;
     @Autowired
     private ChickenImportRecordMapperExt chickenImportRecordMapperExt;
+    @Autowired
+    private GrabWaybillRecordMapperExt grabWaybillRecordMapper;
 
     /**
      * 毛鸡运单导入
@@ -1165,13 +1167,20 @@ public class WaybillServiceImpl implements WaybillService {
             }
         }
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-        Waybill waybill = new Waybill();
+        List<Integer> waybillIds = new ArrayList<>();
+        List<GrabWaybillRecord> grabWaybillRecords = grabWaybillRecordMapper.listGrabWaybillByDriverId(getUserId());
+        if (!CollectionUtils.isEmpty(grabWaybillRecords)) {
+            for (GrabWaybillRecord grabWaybillRecord : grabWaybillRecords) {
+                waybillIds.add(grabWaybillRecord.getId());
+            }
+        }
         List<GetReceiptListAppDto> receiptList = new ArrayList<>();
-        waybill
+        ReceiptListParamDto receiptListParamDto = new ReceiptListParamDto();
+        receiptListParamDto
                 .setWaybillStatus(WaybillStatus.RECEIVE)
                 .setTruckId(truckByToken.getId())
-                .setId(dto.getWaybillId());
-        List<GetWaybillAppDto> waybillAppDtos = waybillMapper.selectWaybillByStatus(waybill);
+                .setWaybillIds(waybillIds);
+        List<GetWaybillAppDto> waybillAppDtos = waybillMapper.listWaybillByStatus(receiptListParamDto);
         for (GetWaybillAppDto waybillAppDto : waybillAppDtos) {
             GetReceiptListAppDto receiptListAppDto = new GetReceiptListAppDto();
             receiptListAppDto.setWaybillId(waybillAppDto.getId());
@@ -2207,7 +2216,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void importChickenWaybill(ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList) {
-        if (CollectionUtils.isEmpty(chickenImportRecordDtoValidList)){
+        if (CollectionUtils.isEmpty(chickenImportRecordDtoValidList)) {
             Integer orderId = chickenImportRecordDtoValidList.get(0).getOrderId();
             // 判断运单状态,只有已下单的运单才能做毛鸡导入
             judgeOrderForChickenImport(orderId);
@@ -2215,15 +2224,15 @@ public class WaybillServiceImpl implements WaybillService {
             UserInfo currentUser = currentUserService.getCurrentUser();
             Integer currentUserId = currentUser == null ? null : currentUser.getId();
             List<ImportWaybillDto> importWaybillDtoList = new ArrayList<>();
-            for (ChickenImportRecordDto dto : chickenImportRecordDtoValidList){
-                if (dto.getVerifyPass() == null || !dto.getVerifyPass()){
+            for (ChickenImportRecordDto dto : chickenImportRecordDtoValidList) {
+                if (dto.getVerifyPass() == null || !dto.getVerifyPass()) {
                     throw new RuntimeException("有未校验通过的行不允许提交");
                 }
 
                 ChickenImportRecord record = new ChickenImportRecord();
                 ImportWaybillDto importWaybillDto = new ImportWaybillDto();
-                BeanUtils.copyProperties(dto,importWaybillDto);
-                BeanUtils.copyProperties(dto,record);
+                BeanUtils.copyProperties(dto, importWaybillDto);
+                BeanUtils.copyProperties(dto, record);
                 record.setCreateTime(new Date())
                         .setCreateUserId(currentUserId)
                         .setEnable(true);
@@ -2233,7 +2242,7 @@ public class WaybillServiceImpl implements WaybillService {
             // 毛鸡导入原始记录入库
             chickenImportRecordMapperExt.batchInsert(chickenImportRecordList);
             // 生成运单并派给车辆,如果表格数量过多需要起任务处理,防止处理时间过长事务不释放一直占用数据库链接
-            importWaybills(orderId,importWaybillDtoList);
+            importWaybills(orderId, importWaybillDtoList);
         }
     }
 
@@ -2315,7 +2324,7 @@ public class WaybillServiceImpl implements WaybillService {
             if (dayCells != null && dayCells.length > TRANSPORT_DAY_INDEX) {
                 day = dayCells[18];
             }
-            log.info("屠宰日期="+day);
+            log.info("屠宰日期=" + day);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
             Orders orders = ordersMapper.selectByPrimaryKey(preImportChickenRecordDto.getOrderId());
             // 数据从第四行开始
@@ -2368,16 +2377,16 @@ public class WaybillServiceImpl implements WaybillService {
         return new ArrayList<>();
     }
 
-    private void judgeOrderForChickenImport(Integer orderId){
+    private void judgeOrderForChickenImport(Integer orderId) {
         // 判断订单状态
         Orders orders = ordersMapper.selectByPrimaryKey(orderId);
-        if (orders == null){
-            throw new RuntimeException("订单id="+orderId+"不存在");
+        if (orders == null) {
+            throw new RuntimeException("订单id=" + orderId + "不存在");
         }
-        if (!OrderStatus.PLACE_ORDER.equals(orders.getOrderStatus())){
+        if (!OrderStatus.PLACE_ORDER.equals(orders.getOrderStatus())) {
             throw new RuntimeException("只有已下单状态的订单才可以导入");
         }
-        if (!GoodsType.CHICKEN.equals(orders.getGoodsType())){
+        if (!GoodsType.CHICKEN.equals(orders.getGoodsType())) {
             throw new RuntimeException("只有毛鸡订单才可以导入");
         }
     }

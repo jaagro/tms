@@ -11,4 +11,10 @@
             #{item.modifyUserId})
         </foreach>
     </insert>
+    <select id="listGrabWaybillByDriverId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from grab_waybill_record
+        where driver_id = #{driverId,jdbcType=INTEGER}
+    </select>
 </mapper>

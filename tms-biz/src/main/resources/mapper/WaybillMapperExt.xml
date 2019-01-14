@@ -309,5 +309,33 @@
         waybill_status=#{waybillStatus} and send_time< DATE_SUB(now(),INTERVAL 60 MINUTE)
         ]]>
     </select>
+    <select id="listWaybillByStatus" resultMap="DetailInfo" parameterType="com.jaagro.tms.api.dto.waybill.ReceiptListParamDto">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill
+        <where>
+            enabled = 1 and driverId is null
+            <if test="waybillStatus != null">
+                and waybill_status=#{waybillStatus,jdbcType=VARCHAR}
+            </if>
+            <if test="truckId != null">
+                and truck_Id = #{truckId,jdbcType=INTEGER}
+            </if>
+        </where>
+        union
+        select
+        <include refid="Base_Column_List"/>
+        from waybill
+        <where>
+            enabled = 1 and driverId is null
+            <if test="waybillIds!=null">
+                id in
+                <foreach item="id" index="index" collection="waybillIds" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
 
 </mapper>
