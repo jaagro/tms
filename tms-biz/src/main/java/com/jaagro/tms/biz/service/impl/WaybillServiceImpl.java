@@ -1445,7 +1445,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-            ) {
+                    ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -2301,7 +2301,7 @@ public class WaybillServiceImpl implements WaybillService {
     private Integer getTruckTeamContractId(Integer goodsType, Integer truckTeamId) {
         Integer truckTeamContractId = null;
         List<TruckTeamContractReturnDto> truckTeamContracts = truckClientService.getTruckTeamContractByTruckTeamId(truckTeamId);
-        if (!CollectionUtils.isEmpty(truckTeamContracts)){
+        if (!CollectionUtils.isEmpty(truckTeamContracts)) {
             for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
                 if (goodsType.equals(truckTeamContractReturnDto.getBussinessType())) {
                     truckTeamContractId = truckTeamContractReturnDto.getId();
@@ -2331,7 +2331,7 @@ public class WaybillServiceImpl implements WaybillService {
             for (int i = 3; i < list.size(); i++) {
                 String[] cells = list.get(i);
                 // 数据列结束跳出循环
-                if ("合计".equals(cells[1])){
+                if ("合计".equals(cells[1])) {
                     break;
                 }
                 ChickenImportRecordDto dto = new ChickenImportRecordDto();
@@ -2339,15 +2339,20 @@ public class WaybillServiceImpl implements WaybillService {
                         .setCustomerName(preImportChickenRecordDto.getCustomerName())
                         .setLoadSiteId(preImportChickenRecordDto.getLoadSiteId())
                         .setLoadSiteName(preImportChickenRecordDto.getLoadSiteName())
-                        .setOrderId(preImportChickenRecordDto.getOrderId());
+                        .setOrderId(preImportChickenRecordDto.getOrderId())
+                        .setVerifyPass(false);
                 // 装货时间(车入鸡场时间)
-                Date loadTime = sdf.parse(day +" "+ cells[10]);
+                Date loadTime = sdf.parse(day + " " + cells[10]);
                 dto.setLoadTime(loadTime);
                 // 要求送达时间(入屠宰场时间)
-                Date requiredTime = sdf.parse(day +" "+ cells[16]);
+                Date requiredTime = sdf.parse(day + " " + cells[16]);
                 dto.setRequiredTime(requiredTime);
                 // 货物数量(单车筐数)
-                dto.setGoodsQuantity(Integer.parseInt(cells[20]));
+                String quantity = cells[20];
+                if (!StringUtils.hasText(quantity)) {
+                    Integer goodsQuantity = Integer.parseInt(cells[20]);
+                    dto.setGoodsQuantity(goodsQuantity);
+                }
                 // 装货地对应网点id
                 ShowSiteDto showSiteById = customerClientService.getShowSiteById(preImportChickenRecordDto.getLoadSiteId());
                 if (showSiteById != null) {
@@ -2363,7 +2368,14 @@ public class WaybillServiceImpl implements WaybillService {
                 BaseResponse<GetTruckDto> res = truckClientService.getByTruckNumber(truckNumber);
                 if (res != null && res.getData() != null) {
                     GetTruckDto truckDto = res.getData();
-                    dto.setVerifyPass(true);
+                    ListTruckTypeDto truckTypeDto = truckDto.getTruckTypeId();
+                    if (truckTypeDto == null) {
+                        continue;
+                    }
+                    boolean checkTruckType = ProductName.CHICKEN.equals(truckTypeDto.getProductName()) && (dto.getGoodsQuantity() != null && dto.getGoodsQuantity().equals(truckTypeDto.getTruckAmount()));
+                    if (checkTruckType) {
+                        dto.setVerifyPass(true);
+                    }
                     dto.setTruckId(truckDto.getId());
                     ListTruckTypeDto truckType = truckDto.getTruckTypeId();
                     dto.setTruckTypeId(truckType == null ? null : truckType.getId());
@@ -2371,7 +2383,15 @@ public class WaybillServiceImpl implements WaybillService {
                     // 获取车队合同id
                     dto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId()));
                 } else {
-                    dto.setVerifyPass(false);
+                    BaseResponse<List<ListTruckTypeDto>> response = truckClientService.listTruckTypeByProductName(ProductName.CHICKEN.toString());
+                    if (response != null && response.getData() != null) {
+                        response.getData().forEach(listTruckTypeDto -> {
+                            if (listTruckTypeDto.getTruckAmount().equals(dto.getGoodsQuantity() == null ? null : dto.getGoodsQuantity().toString())) {
+                                dto.setTruckTypeId(listTruckTypeDto.getId());
+                                dto.setTruckTypeName(listTruckTypeDto.getTypeName());
+                            }
+                        });
+                    }
                 }
                 chickenImportRecordDtoList.add(dto);
             }
