@@ -38,13 +38,14 @@ public class WaybillAnomalyController {
     @ApiOperation("司机运单异常提交")
     @PostMapping("waybillAnomalySubmit")
     public BaseResponse waybillAnomalySubmit(@RequestBody WaybillAnomalyReportDto dto) {
-        return BaseResponse.successInstance(waybillAnomalyService.waybillAnomalySubmit(dto));
+        waybillAnomalyService.waybillAnomalySubmit(dto);
+        return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
     }
 
     @ApiOperation("运单异常类型显示")
-    @GetMapping("displayAnomalyType")
-    public BaseResponse displayAnomalyType() {
-        List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = waybillAnomalyService.displayAnomalyType();
+    @GetMapping("displayAnomalyType/{waybillId}")
+    public BaseResponse displayAnomalyType(@PathVariable Integer waybillId) {
+        List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = waybillAnomalyService.displayAnomalyType(waybillId);
         List<AnomalyTypeVo> anomalyTypeVos = new ArrayList<>();
         for (WaybillAnomalyTypeDto waybillAnomalyTypeDto : waybillAnomalyTypeDtos) {
             AnomalyTypeVo anomalyTypeVo = new AnomalyTypeVo();

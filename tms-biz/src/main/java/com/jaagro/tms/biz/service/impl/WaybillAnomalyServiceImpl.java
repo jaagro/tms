@@ -79,7 +79,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> waybillAnomalySubmit(WaybillAnomalyReportDto dto) {
+    public void waybillAnomalySubmit(WaybillAnomalyReportDto dto) {
         if (null == dto.getWaybillId()) {
             throw new RuntimeException("运单号不能为空！");
         }
@@ -89,7 +89,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         }
         if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(dto.getAnomalyTypeId())) {
             if (WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
-                return ServiceResult.toResult(AnomalyResponseType.WAYBILL_ACCOMPLISH);
+
             }
         }
         WaybillAnomalyCondition waybillAnomalyCondition = new WaybillAnomalyCondition();
@@ -98,7 +98,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 .setAnomalyTypeId(dto.getAnomalyTypeId());
         List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(waybillAnomalyCondition);
         if (!CollectionUtils.isEmpty(waybillAnomalyDtos)) {
-              return ServiceResult.toResult(AnomalyResponseType.CANCEL_WAYBILL_EXIST);
         }
         //插入异常表
         WaybillAnomaly waybillAnomaly = new WaybillAnomaly();
@@ -122,7 +121,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 waybillAnomalyImageMapper.insertSelective(waybillAnomalyImage);
             }
         }
-        return ServiceResult.toResult(ResponseStatusCode.OPERATION_SUCCESS);
     }
 
     /**
@@ -130,10 +128,25 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      * Author @Gao.
      */
     @Override
-    public List<WaybillAnomalyTypeDto> displayAnomalyType() {
+    public List<WaybillAnomalyTypeDto> displayAnomalyType(Integer waybillId) {
+
         List<WaybillAnomalyType> waybillAnomalyTypes = waybillAnomalyTypeMapper.listAnomalyType();
+        Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+        WaybillAnomalyCondition waybillAnomalyCondition = new WaybillAnomalyCondition();
+        waybillAnomalyCondition
+                .setWaybillId(waybillId)
+                .setAnomalyTypeId(CancelAnomalyWaybillType.CANCEL_WAYBILL);
+        List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(waybillAnomalyCondition);
+
+        Iterator<WaybillAnomalyType> iterator = waybillAnomalyTypes.iterator();
         List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = new ArrayList<>();
-        for (WaybillAnomalyType waybillAnomalyType : waybillAnomalyTypes) {
+        while (iterator.hasNext()) {
+            WaybillAnomalyType waybillAnomalyType = iterator.next();
+            boolean flag = (WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus()) || !CollectionUtils.isEmpty(waybillAnomalyDtos))
+                    && CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomalyType.getId());
+            if (flag) {
+                iterator.remove();
+            }
             WaybillAnomalyTypeDto dto = new WaybillAnomalyTypeDto();
             BeanUtils.copyProperties(waybillAnomalyType, dto);
             waybillAnomalyTypeDtos.add(dto);

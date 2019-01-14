@@ -19,13 +19,13 @@ public interface WaybillAnomalyService {
      * 司机运单异常申报
      * Author @Gao.
      */
-    Map<String, Object> waybillAnomalySubmit(WaybillAnomalyReportDto dto);
+    void waybillAnomalySubmit(WaybillAnomalyReportDto dto);
 
     /**
      * 运单异常类型显示
      * Author @Gao.
      */
-    List<WaybillAnomalyTypeDto> displayAnomalyType();
+    List<WaybillAnomalyTypeDto> displayAnomalyType(Integer waybillId);
 
     /**
      * 根据运单Id查询客户信息 司机信息
