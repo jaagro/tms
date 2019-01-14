@@ -36,7 +36,7 @@ public class WaybillTimeOutTaskService {
      * @Author: @Gao.
      */
 
-   //@Scheduled(cron = "0 0/5 * * * ?")
+   @Scheduled(cron = "0 0/5 * * * ?")
     public void listWaybillTimeOut() {
         log.info("start**************");
         List<Waybill> waybills = waybillMapperExt.listWaybillTimeOut(WaybillStatus.RECEIVE);
