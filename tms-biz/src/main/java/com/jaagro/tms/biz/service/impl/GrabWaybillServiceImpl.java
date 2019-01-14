@@ -91,6 +91,7 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
         //更新运单轨迹
         WaybillTracking waybillTracking = new WaybillTracking();
         waybillTracking
+                .setEnabled(true)
                 .setWaybillId(waybill.getId())
                 .setCreateTime(new Date())
                 .setOldStatus(waybillOldStatus)

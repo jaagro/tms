@@ -1,5 +1,6 @@
 package com.jaagro.tms.biz.service;
 
+import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.utils.BaseResponse;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -70,4 +71,12 @@ public interface TruckClientService {
      */
     @GetMapping("/getByTruckNumber")
     BaseResponse<GetTruckDto> getByTruckNumber(@RequestParam("truckNumber") String truckNumber);
+
+    /**
+     * 根据拉货类型查询车型列表
+     * @param productName
+     * @return
+     */
+    @GetMapping("/listTruckType/{productName}")
+    BaseResponse<List<ListTruckTypeDto>> listTruckTypeByProductName(@PathVariable(value = "productName") String productName);
 }

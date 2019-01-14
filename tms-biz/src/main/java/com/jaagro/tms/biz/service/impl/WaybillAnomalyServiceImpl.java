@@ -6,18 +6,18 @@ import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.anomaly.*;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
-import com.jaagro.tms.api.dto.driverapp.ShowTrackingDto;
 import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
 import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
 import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
 import com.jaagro.tms.api.dto.truck.DriverReturnDto;
-import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.service.WaybillAnomalyService;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
 import com.jaagro.utils.BaseResponse;
+import com.jaagro.utils.ResponseStatusCode;
+import com.jaagro.utils.ServiceResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +87,18 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         if (null == waybill) {
             throw new RuntimeException("该运单号删除或不存在！");
         }
+        if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(dto.getAnomalyTypeId())) {
+            if (WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
+
+            }
+        }
+        WaybillAnomalyCondition waybillAnomalyCondition = new WaybillAnomalyCondition();
+        waybillAnomalyCondition
+                .setWaybillId(dto.getWaybillId())
+                .setAnomalyTypeId(dto.getAnomalyTypeId());
+        List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(waybillAnomalyCondition);
+        if (!CollectionUtils.isEmpty(waybillAnomalyDtos)) {
+        }
         //插入异常表
         WaybillAnomaly waybillAnomaly = new WaybillAnomaly();
         BeanUtils.copyProperties(dto, waybillAnomaly);
@@ -116,10 +128,25 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      * Author @Gao.
      */
     @Override
-    public List<WaybillAnomalyTypeDto> displayAnomalyType() {
+    public List<WaybillAnomalyTypeDto> displayAnomalyType(Integer waybillId) {
+
         List<WaybillAnomalyType> waybillAnomalyTypes = waybillAnomalyTypeMapper.listAnomalyType();
+        Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+        WaybillAnomalyCondition waybillAnomalyCondition = new WaybillAnomalyCondition();
+        waybillAnomalyCondition
+                .setWaybillId(waybillId)
+                .setAnomalyTypeId(CancelAnomalyWaybillType.CANCEL_WAYBILL);
+        List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(waybillAnomalyCondition);
+
+        Iterator<WaybillAnomalyType> iterator = waybillAnomalyTypes.iterator();
         List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = new ArrayList<>();
-        for (WaybillAnomalyType waybillAnomalyType : waybillAnomalyTypes) {
+        while (iterator.hasNext()) {
+            WaybillAnomalyType waybillAnomalyType = iterator.next();
+            boolean flag = (WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus()) || !CollectionUtils.isEmpty(waybillAnomalyDtos))
+                    && CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomalyType.getId());
+            if (flag) {
+                continue;
+            }
             WaybillAnomalyTypeDto dto = new WaybillAnomalyTypeDto();
             BeanUtils.copyProperties(waybillAnomalyType, dto);
             waybillAnomalyTypeDtos.add(dto);
@@ -543,6 +570,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             waybillTrackingImagesMapper.deleteByWaybillIdAndImageType(waybillId, null);
             WaybillTracking waybillTracking = new WaybillTracking();
             waybillTracking
+                    .setEnabled(true)
                     .setWaybillId(waybillId)
                     .setTrackingType(TrackingType.ANOMALY_WAYBILL_RESET)
                     .setReferUserId(currentUser.getId())
@@ -550,12 +578,40 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     .setOldStatus(waybill.getWaybillStatus())
                     .setTrackingInfo("异常运单" + waybillId + "申请重置派单已通过审核");
             waybillTrackingMapper.insertSelective(waybillTracking);
+            //更改运单状态
             Waybill wb = new Waybill();
             wb.setId(waybillId)
                     .setWaybillStatus(WaybillStatus.SEND_TRUCK)
                     .setDriverId(null)
                     .setTruckId(null);
             waybillMapper.updateCancelWaybillById(wb);
+            //更改订单状态
+            Orders orderUpdate = new Orders();
+            orderUpdate
+                    .setId(waybill.getOrderId())
+                    .setModifyTime(new Date());
+            List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
+            int count = 0;
+            if (!CollectionUtils.isEmpty(waybills)) {
+                for (Waybill w : waybills) {
+                    boolean flag = WaybillStatus.DEPART.equals(w.getWaybillStatus()) || WaybillStatus.ARRIVE_LOAD_SITE.equals(w.getWaybillStatus())
+                            || WaybillStatus.LOAD_PRODUCT.equals(w.getWaybillStatus()) || WaybillStatus.DELIVERY.equals(w.getWaybillStatus())
+                            || WaybillStatus.RECEIVE.equals(w.getWaybillStatus());
+                    if (flag) {
+                        orderUpdate
+                                .setOrderStatus(OrderStatus.TRANSPORT);
+                        ordersMapper.updateByPrimaryKeySelective(orderUpdate);
+                    }
+                    if (WaybillStatus.SEND_TRUCK.equals(w.getWaybillStatus())) {
+                        count++;
+                        if (waybills.size() == count) {
+                            orderUpdate
+                                    .setOrderStatus(OrderStatus.STOWAGE);
+                            ordersMapper.updateByPrimaryKeySelective(orderUpdate);
+                        }
+                    }
+                }
+            }
         }
     }
 
