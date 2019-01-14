@@ -1332,7 +1332,7 @@ public class WaybillServiceImpl implements WaybillService {
         orders.setModifyUserId(userId);
         ordersMapper.updateByPrimaryKeySelective(orders);
         //2.更新waybill
-        int truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckId);
+        Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckId);
         waybill.setTruckId(truckId);
         waybill.setTruckTeamContractId(truckTeamContractId);
         waybill.setWaybillStatus(waybillNewStatus);
@@ -2292,15 +2292,17 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     private Integer getTruckTeamContractId(Integer goodsType, Integer truckId) {
-        int truckTeamContractId = 0;
+        Integer truckTeamContractId = 0;
         List<TruckTeamContractReturnDto> truckTeamContracts = truckClientService.getTruckTeamContractByTruckTeamId(truckId);
-        for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
-            if (goodsType.equals(truckTeamContractReturnDto.getBussinessType())) {
-                truckTeamContractId = truckTeamContractReturnDto.getId();
-            } else if (goodsType == 3 && truckTeamContractReturnDto.getBussinessType() == 4) {
-                truckTeamContractId = truckTeamContractReturnDto.getId();
-            } else if (goodsType == 6 && truckTeamContractReturnDto.getBussinessType() == 4) {
-                truckTeamContractId = truckTeamContractReturnDto.getId();
+        if (!CollectionUtils.isEmpty(truckTeamContracts)){
+            for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
+                if (goodsType.equals(truckTeamContractReturnDto.getBussinessType())) {
+                    truckTeamContractId = truckTeamContractReturnDto.getId();
+                } else if (goodsType == 3 && truckTeamContractReturnDto.getBussinessType() == 4) {
+                    truckTeamContractId = truckTeamContractReturnDto.getId();
+                } else if (goodsType == 6 && truckTeamContractReturnDto.getBussinessType() == 4) {
+                    truckTeamContractId = truckTeamContractReturnDto.getId();
+                }
             }
         }
         return truckTeamContractId;
@@ -2309,7 +2311,7 @@ public class WaybillServiceImpl implements WaybillService {
     private List<ChickenImportRecordDto> parsingExcel(List<String[]> list, PreImportChickenRecordDto preImportChickenRecordDto) throws ParseException {
         if (!CollectionUtils.isEmpty(list)) {
             List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
-            String[] dayCells = list.get(0);
+            String[] dayCells = list.get(1);
             // 获取屠宰日期
             String day = "";
             if (dayCells != null && dayCells.length > TRANSPORT_DAY_INDEX) {
