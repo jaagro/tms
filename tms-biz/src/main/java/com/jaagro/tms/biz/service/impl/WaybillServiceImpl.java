@@ -2214,7 +2214,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void importChickenWaybill(ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList) {
-        if (CollectionUtils.isEmpty(chickenImportRecordDtoValidList)) {
+        if (!CollectionUtils.isEmpty(chickenImportRecordDtoValidList)) {
             Integer orderId = chickenImportRecordDtoValidList.get(0).getOrderId();
             // 判断运单状态,只有已下单的运单才能做毛鸡导入
             judgeOrderForChickenImport(orderId);
@@ -2340,7 +2340,6 @@ public class WaybillServiceImpl implements WaybillService {
                         .setLoadSiteId(preImportChickenRecordDto.getLoadSiteId())
                         .setLoadSiteName(preImportChickenRecordDto.getLoadSiteName())
                         .setOrderId(preImportChickenRecordDto.getOrderId());
-
                 // 装货时间(车入鸡场时间)
                 Date loadTime = sdf.parse(day +" "+ cells[10]);
                 dto.setLoadTime(loadTime);
@@ -2359,22 +2358,21 @@ public class WaybillServiceImpl implements WaybillService {
                 if (truckNumber.endsWith("大") || truckNumber.endsWith("中") || truckNumber.endsWith("小")) {
                     truckNumber = truckNumber.substring(0, truckNumber.length() - 1);
                 }
+                dto.setTruckNumber(truckNumber);
                 // 校验车牌号合法性
                 BaseResponse<GetTruckDto> res = truckClientService.getByTruckNumber(truckNumber);
                 if (res != null && res.getData() != null) {
                     GetTruckDto truckDto = res.getData();
                     dto.setVerifyPass(true);
                     dto.setTruckId(truckDto.getId());
-                    dto.setTruckNumber(truckNumber);
                     ListTruckTypeDto truckType = truckDto.getTruckTypeId();
                     dto.setTruckTypeId(truckType == null ? null : truckType.getId());
                     dto.setTruckTypeName(truckType == null ? null : truckType.getTypeName());
+                    // 获取车队合同id
                     dto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getId()));
                 } else {
                     dto.setVerifyPass(false);
-                    continue;
                 }
-                // 获取车队合同id
                 chickenImportRecordDtoList.add(dto);
             }
             return chickenImportRecordDtoList;
