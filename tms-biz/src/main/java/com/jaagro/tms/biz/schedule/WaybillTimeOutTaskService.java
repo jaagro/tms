@@ -69,7 +69,7 @@ public class WaybillTimeOutTaskService {
         extraParam.put("driverId", driver.getId().toString());
         extraParam.put("needVoice", "y");
         regId = driver.getRegistrationId() == null ? null : driver.getRegistrationId();
-        msgContent = driver.getName() + "师傅，您有一个运单已超时，请尽快接单！";
+        msgContent = driver.getName() + "师傅，您有一个健安运单已超时，请尽快接单！";
         if (null != driver.getRegistrationId()) {
             JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
         }
