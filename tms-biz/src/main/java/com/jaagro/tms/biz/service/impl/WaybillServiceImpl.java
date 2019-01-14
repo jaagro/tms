@@ -2328,13 +2328,18 @@ public class WaybillServiceImpl implements WaybillService {
             Orders orders = ordersMapper.selectByPrimaryKey(preImportChickenRecordDto.getOrderId());
             // 数据从第四行开始
             for (int i = 3; i < list.size(); i++) {
+                String[] cells = list.get(i);
+                // 数据列结束跳出循环
+                if ("合计".equals(cells[1])){
+                    break;
+                }
                 ChickenImportRecordDto dto = new ChickenImportRecordDto();
                 dto.setCustomerId(preImportChickenRecordDto.getCustomerId())
                         .setCustomerName(preImportChickenRecordDto.getCustomerName())
                         .setLoadSiteId(preImportChickenRecordDto.getLoadSiteId())
                         .setLoadSiteName(preImportChickenRecordDto.getLoadSiteName())
                         .setOrderId(preImportChickenRecordDto.getOrderId());
-                String[] cells = list.get(i);
+
                 // 装货时间(车入鸡场时间)
                 Date loadTime = sdf.parse(day +" "+ cells[10]);
                 dto.setLoadTime(loadTime);
