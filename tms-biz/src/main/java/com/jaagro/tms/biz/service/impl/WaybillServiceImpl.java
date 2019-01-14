@@ -2349,7 +2349,7 @@ public class WaybillServiceImpl implements WaybillService {
                 dto.setRequiredTime(requiredTime);
                 // 货物数量(单车筐数)
                 String quantity = cells[20];
-                if (!StringUtils.hasText(quantity)) {
+                if (StringUtils.hasText(quantity)) {
                     Integer goodsQuantity = Integer.parseInt(cells[20]);
                     dto.setGoodsQuantity(goodsQuantity);
                 }
