@@ -113,61 +113,6 @@ public class WaybillTaskService {
         }
     }
 
-    /**
-     * 运单接单超时 进行短信提醒
-     *
-     * @Author: @Gao.
-     */
-
-    @Scheduled(cron = "0 0/5 0 * * ?")
-    public void listWaybillTimeOut() {
-        log.info("start**************");
-        List<Waybill> waybills = waybillMapperExt.listWaybillTimeOut(WaybillStatus.RECEIVE);
-        for (Waybill waybill : waybills) {
-            if (waybill.getTruckId() != null) {
-                String wb = redisTemplate.opsForValue().get("TIMEOUT" + waybill.getId());
-                if (StringUtils.isEmpty(wb)) {
-                    setRefIdToRedis("TIMEOUT" + waybill.getId(), waybill.getId().toString());
-                    List<DriverReturnDto> driverReturnDtos = driverClientService.listByTruckId(waybill.getTruckId());
-                    for (DriverReturnDto driver : driverReturnDtos) {
-                        if (driver != null) {
-                            sendMessage(driver);
-                        }
-                    }
-                }
-            }
-        }
-        log.info("end**************");
-    }
-
-    /**
-     * 发送jPush短信
-     */
-    private void sendMessage(DriverReturnDto driver) {
-        String alias = "";
-        String msgTitle = "运单接单超时提醒消息";
-        String msgContent;
-        String regId;
-        Map<String, String> extraParam = new HashMap<>();
-        extraParam.put("driverId", driver.getId().toString());
-        extraParam.put("needVoice", "n");
-        regId = driver.getRegistrationId() == null ? null : driver.getRegistrationId();
-        msgContent = driver.getName() + "师傅，您有一个运单已超时，请尽快接单！";
-        if (null != driver.getRegistrationId()) {
-            JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
-        }
-    }
-
-    /**
-     * 将wyabillId 存入到redis中
-     *
-     * @param key
-     * @param value
-     */
-    private void setRefIdToRedis(String key, String value) {
-        redisTemplate.opsForValue().set(key, value, 1, TimeUnit.DAYS);
-    }
-
 
     public static void main(String[] args) {
 

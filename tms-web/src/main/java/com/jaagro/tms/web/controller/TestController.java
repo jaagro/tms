@@ -3,6 +3,7 @@ package com.jaagro.tms.web.controller;
 import com.jaagro.tms.api.dto.waybill.LocationDto;
 import com.jaagro.tms.biz.mapper.LocationMapperExt;
 import com.jaagro.tms.biz.schedule.WaybillTaskService;
+import com.jaagro.tms.biz.schedule.WaybillTimeOutTaskService;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import com.jaagro.tms.biz.service.impl.GpsLocationAsync;
 import com.jaagro.utils.BaseResponse;
@@ -30,6 +31,8 @@ public class TestController {
 
     @Autowired
     LocationMapperExt locationMapper;
+    @Autowired
+    WaybillTimeOutTaskService waybillTimeOutTaskService;
 
 
     @Autowired
@@ -108,7 +111,7 @@ public class TestController {
     @ApiOperation("测试")
     @PutMapping("/test11")
     public BaseResponse test11() {
-        waybillTaskService.listWaybillTimeOut();
+        //waybillTimeOutTaskService.listWaybillTimeOut();
         return BaseResponse.successInstance(null);
     }
 
