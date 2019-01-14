@@ -2298,9 +2298,9 @@ public class WaybillServiceImpl implements WaybillService {
         return null;
     }
 
-    private Integer getTruckTeamContractId(Integer goodsType, Integer truckId) {
-        Integer truckTeamContractId = 0;
-        List<TruckTeamContractReturnDto> truckTeamContracts = truckClientService.getTruckTeamContractByTruckTeamId(truckId);
+    private Integer getTruckTeamContractId(Integer goodsType, Integer truckTeamId) {
+        Integer truckTeamContractId = null;
+        List<TruckTeamContractReturnDto> truckTeamContracts = truckClientService.getTruckTeamContractByTruckTeamId(truckTeamId);
         if (!CollectionUtils.isEmpty(truckTeamContracts)){
             for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
                 if (goodsType.equals(truckTeamContractReturnDto.getBussinessType())) {
@@ -2369,7 +2369,7 @@ public class WaybillServiceImpl implements WaybillService {
                     dto.setTruckTypeId(truckType == null ? null : truckType.getId());
                     dto.setTruckTypeName(truckType == null ? null : truckType.getTypeName());
                     // 获取车队合同id
-                    dto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getId()));
+                    dto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId()));
                 } else {
                     dto.setVerifyPass(false);
                 }
