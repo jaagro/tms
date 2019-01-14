@@ -2369,12 +2369,11 @@ public class WaybillServiceImpl implements WaybillService {
                     ListTruckTypeDto truckType = truckDto.getTruckTypeId();
                     dto.setTruckTypeId(truckType == null ? null : truckType.getId());
                     dto.setTruckTypeName(truckType == null ? null : truckType.getTypeName());
+                    // 获取车队合同id
                     dto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getId()));
                 } else {
                     dto.setVerifyPass(false);
-                    continue;
                 }
-                // 获取车队合同id
                 chickenImportRecordDtoList.add(dto);
             }
             return chickenImportRecordDtoList;
