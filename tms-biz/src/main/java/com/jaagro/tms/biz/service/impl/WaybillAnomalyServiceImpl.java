@@ -89,7 +89,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         }
         if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(dto.getAnomalyTypeId())) {
             if (WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
-              throw new RuntimeException("当前运单已经完成,不能运单改派！");
+                throw new RuntimeException("当前运单已经完成,不能运单改派！");
             }
         }
         //插入异常表
@@ -548,6 +548,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             waybillTrackingImagesMapper.deleteByWaybillIdAndImageType(waybillId, null);
             WaybillTracking waybillTracking = new WaybillTracking();
             waybillTracking
+                    .setEnabled(true)
                     .setWaybillId(waybillId)
                     .setTrackingType(TrackingType.ANOMALY_WAYBILL_RESET)
                     .setReferUserId(currentUser.getId())
@@ -568,21 +569,22 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     .setId(waybill.getOrderId())
                     .setModifyTime(new Date());
             List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
+            int count = 0;
             if (!CollectionUtils.isEmpty(waybills)) {
-                if (waybills.size() == 1) {
-                    if (WaybillStatus.SEND_TRUCK.equals(waybills.get(0).getWaybillStatus())) {
+                for (Waybill w : waybills) {
+                    boolean flag = WaybillStatus.DEPART.equals(w.getWaybillStatus()) || WaybillStatus.ARRIVE_LOAD_SITE.equals(w.getWaybillStatus())
+                            || WaybillStatus.LOAD_PRODUCT.equals(w.getWaybillStatus()) || WaybillStatus.DELIVERY.equals(w.getWaybillStatus())
+                            || WaybillStatus.RECEIVE.equals(w.getWaybillStatus());
+                    if (flag) {
                         orderUpdate
-                                .setOrderStatus(OrderStatus.STOWAGE);
+                                .setOrderStatus(OrderStatus.TRANSPORT);
                         ordersMapper.updateByPrimaryKeySelective(orderUpdate);
                     }
-                } else {
-                    for (Waybill w : waybills) {
-                        boolean flag = WaybillStatus.DEPART.equals(w.getWaybillStatus()) || WaybillStatus.ARRIVE_LOAD_SITE.equals(w.getWaybillStatus())
-                                || WaybillStatus.LOAD_PRODUCT.equals(w.getWaybillStatus()) || WaybillStatus.DELIVERY.equals(w.getWaybillStatus())
-                                || WaybillStatus.RECEIVE.equals(w.getWaybillStatus());
-                        if (flag) {
+                    if (WaybillStatus.SEND_TRUCK.equals(w.getWaybillStatus())) {
+                        count++;
+                        if (waybills.size() == count) {
                             orderUpdate
-                                    .setOrderStatus(OrderStatus.TRANSPORT);
+                                    .setOrderStatus(OrderStatus.STOWAGE);
                             ordersMapper.updateByPrimaryKeySelective(orderUpdate);
                         }
                     }
