@@ -83,6 +83,6 @@ public class WaybillTracking implements Serializable {
     /**
      * 是否有效
      */
-    private boolean enable;
+    private boolean enabled;
 
 }
