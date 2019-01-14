@@ -2336,10 +2336,10 @@ public class WaybillServiceImpl implements WaybillService {
                         .setOrderId(preImportChickenRecordDto.getOrderId());
                 String[] cells = list.get(i);
                 // 装货时间(车入鸡场时间)
-                Date loadTime = sdf.parse(day + cells[10]);
+                Date loadTime = sdf.parse(day +" "+ cells[10]);
                 dto.setLoadTime(loadTime);
                 // 要求送达时间(入屠宰场时间)
-                Date requiredTime = sdf.parse(day + cells[16]);
+                Date requiredTime = sdf.parse(day +" "+ cells[16]);
                 dto.setRequiredTime(requiredTime);
                 // 货物数量(单车筐数)
                 dto.setGoodsQuantity(Integer.parseInt(cells[20]));
