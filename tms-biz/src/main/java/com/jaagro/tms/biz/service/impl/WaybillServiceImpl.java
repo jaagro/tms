@@ -695,7 +695,8 @@ public class WaybillServiceImpl implements WaybillService {
                 .setTrackingInfo(dto.getTrackingInfo())
                 .setLatitude(dto.getLatitude())
                 .setLatitude(dto.getLongitude())
-                .setCreateTime(new Date());
+                .setCreateTime(new Date())
+                .setEnable(true);
         //司机出发
         if (WaybillStatus.DEPART.equals(dto.getWaybillStatus())) {
             Waybill wb = new Waybill();
@@ -1230,6 +1231,7 @@ public class WaybillServiceImpl implements WaybillService {
         }
         WaybillTracking waybillTracking = new WaybillTracking();
         waybillTracking
+                .setEnable(true)
                 .setWaybillId(waybillId)
                 .setCreateTime(new Date())
                 .setDriverId(currentUser.getId())
@@ -1343,6 +1345,7 @@ public class WaybillServiceImpl implements WaybillService {
         //3.在waybill_tracking表插入一条记录
         WaybillTracking waybillTracking = new WaybillTracking();
         waybillTracking
+                .setEnable(true)
                 .setWaybillId(waybillId)
                 .setCreateTime(new Date())
                 .setOldStatus(waybillOldStatus)
@@ -1612,6 +1615,7 @@ public class WaybillServiceImpl implements WaybillService {
                         .setNewStatus(showTrackingDto.getNewStatus());
             }
             waybillTracking
+                    .setEnable(true)
                     .setCreateTime(new Date())
                     .setWaybillId(waybillId)
                     .setTrackingInfo("补录实提")
@@ -1718,6 +1722,7 @@ public class WaybillServiceImpl implements WaybillService {
                 }
                 ShowTrackingDto showTrackingDto = showTrackingDtos.get(0);
                 waybillTracking
+                        .setEnable(true)
                         .setOldStatus(showTrackingDto.getOldStatus())
                         .setNewStatus(showTrackingDto.getNewStatus());
             }
@@ -1792,6 +1797,7 @@ public class WaybillServiceImpl implements WaybillService {
             for (GetTrackingImagesDto imagesDto : uploadImages) {
                 WaybillTracking waybillTracking = new WaybillTracking();
                 waybillTracking
+                        .setEnable(true)
                         .setOldStatus(showTrackingDto.getOldStatus())
                         .setNewStatus(showTrackingDto.getNewStatus())
                         .setTrackingType(TrackingType.LOAD_BILLS_RECEIPT)
