@@ -185,6 +185,7 @@ public class PoiUtil {
             }
         } catch (Exception ex) {
             System.out.println(ex);
+            cellValue = String.valueOf(cell.getRichStringCellValue());
         }
         return cellValue;
     }
@@ -312,7 +313,7 @@ public class PoiUtil {
     }
 
     public static void main(String[] args) {
-        File file = new File("E:模板.xlsx");
+        File file = new File("E:\\1月6日毛鸡出栏时间排程(3).xlsx");
         try {
             List<List<String[]>> lists = readExcel(file);
             System.out.println(JSON.toJSONString(lists.get(0)));
