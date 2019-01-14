@@ -22,10 +22,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author @Gao.
@@ -41,8 +38,7 @@ public class WaybillAnomalyController {
     @ApiOperation("司机运单异常提交")
     @PostMapping("waybillAnomalySubmit")
     public BaseResponse waybillAnomalySubmit(@RequestBody WaybillAnomalyReportDto dto) {
-        waybillAnomalyService.waybillAnomalySubmit(dto);
-        return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
+        return BaseResponse.successInstance(waybillAnomalyService.waybillAnomalySubmit(dto));
     }
 
     @ApiOperation("运单异常类型显示")

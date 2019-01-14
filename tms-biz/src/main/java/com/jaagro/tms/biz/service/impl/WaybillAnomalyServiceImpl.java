@@ -6,18 +6,18 @@ import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.anomaly.*;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
-import com.jaagro.tms.api.dto.driverapp.ShowTrackingDto;
 import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
 import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
 import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
 import com.jaagro.tms.api.dto.truck.DriverReturnDto;
-import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.service.WaybillAnomalyService;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
 import com.jaagro.utils.BaseResponse;
+import com.jaagro.utils.ResponseStatusCode;
+import com.jaagro.utils.ServiceResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +79,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void waybillAnomalySubmit(WaybillAnomalyReportDto dto) {
+    public Map<String, Object> waybillAnomalySubmit(WaybillAnomalyReportDto dto) {
         if (null == dto.getWaybillId()) {
             throw new RuntimeException("运单号不能为空！");
         }
@@ -89,8 +89,16 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         }
         if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(dto.getAnomalyTypeId())) {
             if (WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
-                throw new RuntimeException("当前运单已经完成,不能运单改派！");
+                return ServiceResult.toResult(AnomalyResponseType.WAYBILL_ACCOMPLISH);
             }
+        }
+        WaybillAnomalyCondition waybillAnomalyCondition = new WaybillAnomalyCondition();
+        waybillAnomalyCondition
+                .setWaybillId(dto.getWaybillId())
+                .setAnomalyTypeId(dto.getAnomalyTypeId());
+        List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(waybillAnomalyCondition);
+        if (!CollectionUtils.isEmpty(waybillAnomalyDtos)) {
+              return ServiceResult.toResult(AnomalyResponseType.CANCEL_WAYBILL_EXIST);
         }
         //插入异常表
         WaybillAnomaly waybillAnomaly = new WaybillAnomaly();
@@ -114,6 +122,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 waybillAnomalyImageMapper.insertSelective(waybillAnomalyImage);
             }
         }
+        return ServiceResult.toResult(ResponseStatusCode.OPERATION_SUCCESS);
     }
 
     /**
