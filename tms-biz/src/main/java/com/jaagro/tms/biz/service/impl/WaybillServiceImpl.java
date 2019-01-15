@@ -118,7 +118,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     private ChickenImportRecordMapperExt chickenImportRecordMapperExt;
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     /**
      * 毛鸡运单导入
