@@ -787,10 +787,10 @@ public class WaybillServiceImpl implements WaybillService {
                 }
                 waybillGoodsMapper.updateByPrimaryKeySelective(waybillGoods);
             }
-            //批量插入提货单
-            List<WaybillImagesUrlDto> imagesUrls = dto.getWaybillImagesUrl();
 
-            if (!CollectionUtils.isEmpty(imagesUrls)) {
+            if (!CollectionUtils.isEmpty(dto.getWaybillImagesUrl())) {
+                //批量插入提货单
+                List<WaybillImagesUrlDto> imagesUrls = dto.getWaybillImagesUrl();
                 for (int i = 0; i < imagesUrls.size(); i++) {
                     WaybillImagesUrlDto waybillImagesUrl = imagesUrls.get(i);
                     WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
@@ -818,10 +818,9 @@ public class WaybillServiceImpl implements WaybillService {
              * 兼容老版本*******************************************************
              *
              */
-            List<String> imagesUrl = dto.getImagesUrl();
-
-            if (!CollectionUtils.isEmpty(imagesUrl)) {
-                for (int i = 0; i < imagesUrls.size(); i++) {
+            if (!CollectionUtils.isEmpty( dto.getImagesUrl())) {
+                List<String> imagesUrl = dto.getImagesUrl();
+                for (int i = 0; i < imagesUrl.size(); i++) {
                     WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
                     waybillTrackingImages
                             .setWaybillId(waybillId)
