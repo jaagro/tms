@@ -6,6 +6,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * @author @Gao.
@@ -26,6 +28,7 @@ public class RedisLock {
      */
     public boolean lock(String key, String value) {
         if (redisTemplate.opsForValue().setIfAbsent(key, value)) {
+            redisTemplate.expire(key, 10, TimeUnit.MINUTES);
             return true;
         }
         String currentValue = redisTemplate.opsForValue().get(key);
