@@ -128,7 +128,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      * Author @Gao.
      */
     @Override
-    public List<WaybillAnomalyTypeDto> displayAnomalyType(Integer waybillId) {
+    public List<WaybillAnomalyTypeDto> displayWaybillAnomalyType(Integer waybillId) {
 
         List<WaybillAnomalyType> waybillAnomalyTypes = waybillAnomalyTypeMapper.listAnomalyType();
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
@@ -153,6 +153,30 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         }
         return waybillAnomalyTypeDtos;
     }
+
+    /**
+     * *************************************************************
+     * @param
+     * @return
+     */
+    @Override
+    public List<WaybillAnomalyTypeDto> displayAnomalyType() {
+
+        List<WaybillAnomalyType> waybillAnomalyTypes = waybillAnomalyTypeMapper.listAnomalyType();
+        Iterator<WaybillAnomalyType> iterator = waybillAnomalyTypes.iterator();
+        List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = new ArrayList<>();
+        while (iterator.hasNext()) {
+            WaybillAnomalyType waybillAnomalyType = iterator.next();
+            WaybillAnomalyTypeDto dto = new WaybillAnomalyTypeDto();
+            BeanUtils.copyProperties(waybillAnomalyType, dto);
+            waybillAnomalyTypeDtos.add(dto);
+            waybillAnomalyTypeDtos.add(dto);
+        }
+        return waybillAnomalyTypeDtos;
+    }
+    /**
+     * *********************************************************************
+     */
 
     /**
      * 根据运单Id查询客户信息 司机信息
