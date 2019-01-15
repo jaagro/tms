@@ -289,8 +289,8 @@ public class WaybillServiceImpl implements WaybillService {
         HashOperations<String, Object, Object> opsForHash = redisTemplate.opsForHash();
         String key = CHICKEN_IMPORT + dto.getOrderId();
         Object object = opsForHash.get(key, dto.getSerialNumber());
-        if (object != null){
-           ChickenImportRecordDto chickenImportRecordDto = (ChickenImportRecordDto) object;
+        if (object != null) {
+            ChickenImportRecordDto chickenImportRecordDto = (ChickenImportRecordDto) object;
             BaseResponse<GetTruckDto> res = truckClientService.getByTruckNumber(dto.getTruckNumber());
             GetTruckDto truckDto = res.getData();
             if (res != null && truckDto != null) {
@@ -304,7 +304,7 @@ public class WaybillServiceImpl implements WaybillService {
                 chickenImportRecordDto.setTruckTypeName(truckTypeDto == null ? null : truckTypeDto.getTypeName());
                 // 获取车队合同id
                 chickenImportRecordDto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId()));
-                opsForHash.put(key,dto.getSerialNumber(),dto);
+                opsForHash.put(key, dto.getSerialNumber(), dto);
             }
         }
         Map<Object, Object> entries = opsForHash.entries(key);
@@ -818,7 +818,7 @@ public class WaybillServiceImpl implements WaybillService {
              * 兼容老版本*******************************************************
              *
              */
-            if (!CollectionUtils.isEmpty( dto.getImagesUrl())) {
+            if (!CollectionUtils.isEmpty(dto.getImagesUrl())) {
                 List<String> imagesUrl = dto.getImagesUrl();
                 for (int i = 0; i < imagesUrl.size(); i++) {
                     WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
@@ -2321,7 +2321,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void importChickenWaybill(Integer orderId) {
-        String key = CHICKEN_IMPORT+orderId;
+        String key = CHICKEN_IMPORT + orderId;
         HashOperations<String, Object, Object> opsForHash = redisTemplate.opsForHash();
         Map<Object, Object> entries = opsForHash.entries(key);
         List<ChickenImportRecordDto> chickenImportRecordDtoValidList = getChickenImportRecordDtoListFromMap(entries);
@@ -2353,7 +2353,7 @@ public class WaybillServiceImpl implements WaybillService {
             importWaybills(orderId, importWaybillDtoList);
             // 清空缓存
             redisTemplate.delete(key);
-        }else {
+        } else {
             throw new RuntimeException("导入失败");
         }
     }
@@ -2533,18 +2533,18 @@ public class WaybillServiceImpl implements WaybillService {
         if (!CollectionUtils.isEmpty(chickenImportRecordDtoList)) {
             HashOperations<String, Object, Object> opsForHash = redisTemplate.opsForHash();
             Integer orderId = chickenImportRecordDtoList.get(0).getOrderId();
-            String key = CHICKEN_IMPORT+orderId;
-            Map<Integer,ChickenImportRecordDto> map = new LinkedHashMap<>();
-            chickenImportRecordDtoList.forEach(dto->map.put(dto.getSerialNumber(),dto));
-            opsForHash.putAll(key,map);
+            String key = CHICKEN_IMPORT + orderId;
+            Map<Integer, ChickenImportRecordDto> map = new LinkedHashMap<>();
+            chickenImportRecordDtoList.forEach(dto -> map.put(dto.getSerialNumber(), dto));
+            opsForHash.putAll(key, map);
         }
     }
 
-    private List<ChickenImportRecordDto> getChickenImportRecordDtoListFromMap(Map<Object,Object> map){
+    private List<ChickenImportRecordDto> getChickenImportRecordDtoListFromMap(Map<Object, Object> map) {
         List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
         Set<Object> ketSet = map.keySet();
         Iterator<Object> iterator = ketSet.iterator();
-        iterator.forEachRemaining(element->chickenImportRecordDtoList.add((ChickenImportRecordDto)map.get(element)));
+        iterator.forEachRemaining(element -> chickenImportRecordDtoList.add((ChickenImportRecordDto) map.get(element)));
         return chickenImportRecordDtoList;
     }
 }
