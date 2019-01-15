@@ -8,7 +8,6 @@ import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.Message.CreateMessageDto;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.MessageReturnDto;
-import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
@@ -30,7 +29,6 @@ import com.jaagro.tms.biz.utils.RedisLock;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
-import com.netflix.discovery.converters.Auto;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -231,7 +229,7 @@ public class WaybillServiceImpl implements WaybillService {
             //卸货地
             ShowSiteDto unLoadSite = customerClientService.getShowSiteById(orderItemsList.get(0).getUnloadId());
             String unloadSiteName = unLoadSite.getSiteName();
-            String alias = "";
+            String alias;
             String msgTitle = "派单消息";
             String msgContent;
             String regId;
@@ -242,6 +240,7 @@ public class WaybillServiceImpl implements WaybillService {
                 extraParam.put("needVoice", "y");
                 //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
                 msgContent = "您有新的健安运单待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
+                alias = driver.getPhoneNumber();
                 regId = driver.getRegistrationId();
                 JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
 
@@ -1477,7 +1476,7 @@ public class WaybillServiceImpl implements WaybillService {
             unLoadSiteNames.append(unLoadSite.getSiteName() + "、");
         }
         String unloadSiteName = unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1);
-        String alias = "";
+        String alias;
         String msgTitle = "派单消息";
         String msgContent;
         String regId;
@@ -1488,6 +1487,7 @@ public class WaybillServiceImpl implements WaybillService {
             extraParam.put("needVoice", "y");
             //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
             msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
+            alias = driver.getPhoneNumber();
             regId = driver.getRegistrationId();
             JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
         }

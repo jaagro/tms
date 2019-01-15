@@ -36,7 +36,7 @@ public class WaybillTimeOutTaskService {
      * @Author: @Gao.
      */
 
-   @Scheduled(cron = "0 0/5 * * * ?")
+   @Scheduled(cron = "0 0/10 * * * ?")
     public void listWaybillTimeOut() {
         log.info("start**************");
         List<Waybill> waybills = waybillMapperExt.listWaybillTimeOut(WaybillStatus.RECEIVE);
@@ -61,13 +61,14 @@ public class WaybillTimeOutTaskService {
      * 发送jPush短信
      */
     private void sendMessage(DriverReturnDto driver) {
-        String alias = "";
+        String alias;
         String msgTitle = "运单接单超时提醒消息";
         String msgContent;
         String regId;
         Map<String, String> extraParam = new HashMap<>();
         extraParam.put("driverId", driver.getId().toString());
         extraParam.put("needVoice", "y");
+        alias = driver.getPhoneNumber();
         regId = driver.getRegistrationId() == null ? null : driver.getRegistrationId();
         msgContent = driver.getName() + "师傅，您有一个健安运单已超时，请尽快接单！";
         if (null != driver.getRegistrationId()) {
