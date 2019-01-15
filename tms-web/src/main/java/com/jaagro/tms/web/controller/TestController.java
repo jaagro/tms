@@ -1,6 +1,7 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.waybill.LocationDto;
+import com.jaagro.tms.api.service.OcrService;
 import com.jaagro.tms.biz.mapper.LocationMapperExt;
 import com.jaagro.tms.biz.schedule.WaybillTaskService;
 import com.jaagro.tms.biz.schedule.WaybillTimeOutTaskService;
@@ -138,5 +139,4 @@ public class TestController {
         long end = System.currentTimeMillis();
         System.out.println("-----耗时----------" + (start - end) + "---------------");
     }
-
 }
