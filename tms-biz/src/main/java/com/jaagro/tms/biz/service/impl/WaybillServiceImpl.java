@@ -1167,13 +1167,18 @@ public class WaybillServiceImpl implements WaybillService {
             }
         }
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-        Waybill waybill = new Waybill();
         List<GetReceiptListAppDto> receiptList = new ArrayList<>();
-        waybill
-                .setWaybillStatus(WaybillStatus.RECEIVE)
+        List<Integer> waybillIds = new ArrayList<>();
+        List<GrabWaybillRecord> grabWaybillRecords = grabWaybillRecordMapper.listGrabWaybillByDriverId(getUserId());
+        for (GrabWaybillRecord grabWaybillRecord : grabWaybillRecords) {
+            waybillIds.add(grabWaybillRecord.getId());
+        }
+        ReceiptListParamDto receiptListParamDto = new ReceiptListParamDto();
+        receiptListParamDto
                 .setTruckId(truckByToken.getId())
-                .setId(dto.getWaybillId());
-        List<GetWaybillAppDto> waybillAppDtos = waybillMapper.selectWaybillByStatus(waybill);
+                .setWaybillStatus(WaybillStatus.RECEIVE)
+                .setWaybillIds(waybillIds);
+        List<GetWaybillAppDto> waybillAppDtos = waybillMapper.listWaybillByStatus(receiptListParamDto);
         for (GetWaybillAppDto waybillAppDto : waybillAppDtos) {
             GetReceiptListAppDto receiptListAppDto = new GetReceiptListAppDto();
             receiptListAppDto.setWaybillId(waybillAppDto.getId());
@@ -1444,7 +1449,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto
-                    ) {
+            ) {
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -2213,7 +2218,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void importChickenWaybill(ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList) {
-        if (CollectionUtils.isEmpty(chickenImportRecordDtoValidList)){
+        if (CollectionUtils.isEmpty(chickenImportRecordDtoValidList)) {
             Integer orderId = chickenImportRecordDtoValidList.get(0).getOrderId();
             // 判断运单状态,只有已下单的运单才能做毛鸡导入
             judgeOrderForChickenImport(orderId);
@@ -2221,15 +2226,15 @@ public class WaybillServiceImpl implements WaybillService {
             UserInfo currentUser = currentUserService.getCurrentUser();
             Integer currentUserId = currentUser == null ? null : currentUser.getId();
             List<ImportWaybillDto> importWaybillDtoList = new ArrayList<>();
-            for (ChickenImportRecordDto dto : chickenImportRecordDtoValidList){
-                if (dto.getVerifyPass() == null || !dto.getVerifyPass()){
+            for (ChickenImportRecordDto dto : chickenImportRecordDtoValidList) {
+                if (dto.getVerifyPass() == null || !dto.getVerifyPass()) {
                     throw new RuntimeException("有未校验通过的行不允许提交");
                 }
 
                 ChickenImportRecord record = new ChickenImportRecord();
                 ImportWaybillDto importWaybillDto = new ImportWaybillDto();
-                BeanUtils.copyProperties(dto,importWaybillDto);
-                BeanUtils.copyProperties(dto,record);
+                BeanUtils.copyProperties(dto, importWaybillDto);
+                BeanUtils.copyProperties(dto, record);
                 record.setCreateTime(new Date())
                         .setCreateUserId(currentUserId)
                         .setEnable(true);

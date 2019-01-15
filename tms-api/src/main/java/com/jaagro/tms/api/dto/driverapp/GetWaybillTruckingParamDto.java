@@ -54,6 +54,7 @@ public class GetWaybillTruckingParamDto implements Serializable {
      * 提货单  卸货地URL
      */
 //    private List<String> imagesUrl;
+
     private List<WaybillImagesUrlDto> imagesUrl;
     /**
      * 运单详情

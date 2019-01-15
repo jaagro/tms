@@ -15,6 +15,6 @@
         select
         <include refid="Base_Column_List"/>
         from grab_waybill_record
-        where driver_id = #{driverId,jdbcType=INTEGER}
+        where enabled=1 and driver_id = #{driverId,jdbcType=INTEGER} and status='未抢单'
     </select>
 </mapper>
