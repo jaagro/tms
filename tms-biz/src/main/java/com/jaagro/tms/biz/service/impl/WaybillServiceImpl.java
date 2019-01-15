@@ -748,7 +748,7 @@ public class WaybillServiceImpl implements WaybillService {
                 waybillGoodsMapper.updateByPrimaryKeySelective(waybillGoods);
             }
             //批量插入提货单
-            List<WaybillImagesUrlDto> imagesUrls = dto.getImagesUrl();
+            List<WaybillImagesUrlDto> imagesUrls = dto.getWaybillImagesUrl();
 
             if (!CollectionUtils.isEmpty(imagesUrls)) {
                 for (int i = 0; i < imagesUrls.size(); i++) {
@@ -774,6 +774,39 @@ public class WaybillServiceImpl implements WaybillService {
                     }
                 }
             }
+            /**
+             * 兼容老版本*******************************************************
+             *
+             */
+            List<String> imagesUrl = dto.getImagesUrl();
+
+            if (!CollectionUtils.isEmpty(imagesUrl)) {
+                for (int i = 0; i < imagesUrls.size(); i++) {
+                    WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
+                    waybillTrackingImages
+                            .setWaybillId(waybillId)
+                            .setSiteId(loadSite.getId())
+                            .setCreateTime(new Date())
+                            .setCreateUserId(currentUser.getId())
+                            .setImageUrl(imagesUrl.get(i))
+                            .setWaybillTrackingId(waybillTracking.getId());
+                    //出库单
+                    if (i == 0) {
+                        waybillTrackingImages.setImageType(ImagesTypeConstant.OUTBOUND_BILL);
+                    } else if (i == 1) {
+                        //磅单
+                        waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
+                    }
+                    if (!"invalidPicUrl".equalsIgnoreCase(imagesUrl.get(i))) {
+                        waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
+                    }
+                }
+            }
+
+            /**
+             * ****************************************************************
+             */
+
             waybill.setWaybillStatus(WaybillStatus.DELIVERY);
             waybillMapper.updateByPrimaryKey(waybill);
             return ServiceResult.toResult("操作成功");
@@ -827,7 +860,7 @@ public class WaybillServiceImpl implements WaybillService {
                     waybillGoodsMapper.updateByPrimaryKeySelective(waybillGoods);
                 }
                 //批量插入卸货单
-                List<WaybillImagesUrlDto> imagesUrls = dto.getImagesUrl();
+                List<WaybillImagesUrlDto> imagesUrls = dto.getWaybillImagesUrl();
                 if (!CollectionUtils.isEmpty(imagesUrls)) {
                     for (int i = 0; i < imagesUrls.size(); i++) {
                         WaybillImagesUrlDto waybillImagesUrl = imagesUrls.get(i);
@@ -852,6 +885,38 @@ public class WaybillServiceImpl implements WaybillService {
                         }
                     }
                 }
+                /**
+                 *  兼容老版本************************************************
+                 *
+                 */
+                //批量插入卸货单
+                List<String> imagesUrl = dto.getImagesUrl();
+                if (!CollectionUtils.isEmpty(imagesUrls)) {
+                    for (int i = 0; i < imagesUrls.size(); i++) {
+                        WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
+                        waybillTrackingImages
+                                .setWaybillId(waybillId)
+                                .setSiteId(unLoadSiteConfirmProductDtos.get(0).getUnLoadSiteId())
+                                .setCreateTime(new Date())
+                                .setCreateUserId(currentUser.getId())
+                                .setImageUrl(imagesUrl.get(i))
+                                .setWaybillTrackingId(waybillTracking.getId());
+                        //签收单
+                        if (i == 0) {
+                            waybillTrackingImages.setImageType(ImagesTypeConstant.SIGN_BILL);
+                        } else if (i == 1) {
+                            //磅单
+                            waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
+                        }
+                        if (!"invalidPicUrl".equalsIgnoreCase(imagesUrl.get(i))) {
+                            waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
+                        }
+                    }
+                }
+                /**
+                 * **************************************************************
+                 */
+
                 //更新该运单签收
                 WaybillItems waybillItems = new WaybillItems();
                 waybillItems
