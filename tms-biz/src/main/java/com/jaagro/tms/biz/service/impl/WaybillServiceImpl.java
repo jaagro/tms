@@ -8,6 +8,7 @@ import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.Message.CreateMessageDto;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.MessageReturnDto;
+import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
@@ -29,11 +30,13 @@ import com.jaagro.tms.biz.utils.RedisLock;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
+import com.netflix.discovery.converters.Auto;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -119,6 +122,8 @@ public class WaybillServiceImpl implements WaybillService {
     private RedisTemplate<String, String> redisTemplate;
     @Autowired
     private GrabWaybillRecordMapperExt grabWaybillRecordMapper;
+    @Qualifier(value = "objectRedisTemplate")
+    private RedisTemplate<String, Object> objectRedisTemplate;
 
     /**
      * 毛鸡运单导入
@@ -229,7 +234,7 @@ public class WaybillServiceImpl implements WaybillService {
             //卸货地
             ShowSiteDto unLoadSite = customerClientService.getShowSiteById(orderItemsList.get(0).getUnloadId());
             String unloadSiteName = unLoadSite.getSiteName();
-            String alias = "";
+            String alias;
             String msgTitle = "派单消息";
             String msgContent;
             String regId;
@@ -240,6 +245,7 @@ public class WaybillServiceImpl implements WaybillService {
                 extraParam.put("needVoice", "y");
                 //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
                 msgContent = "您有新的健安运单待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
+                alias = driver.getPhoneNumber();
                 regId = driver.getRegistrationId();
                 JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
 
@@ -286,25 +292,26 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public List<ChickenImportRecordDto> changeImportChickenRecord(UpdateChickenImportRecordDto dto) {
         Orders orders = ordersMapper.selectByPrimaryKey(dto.getOrderId());
-        HashOperations<String, Object, Object> opsForHash = redisTemplate.opsForHash();
+        HashOperations<String, Object, Object> opsForHash = objectRedisTemplate.opsForHash();
         String key = CHICKEN_IMPORT + dto.getOrderId();
-        Object object = opsForHash.get(key, dto.getSerialNumber());
-        if (object != null) {
-            ChickenImportRecordDto chickenImportRecordDto = (ChickenImportRecordDto) object;
+        Object object = opsForHash.get(key, dto.getSerialNumber().toString());
+        if (object != null){
+           ChickenImportRecordDto chickenImportRecordDto = (ChickenImportRecordDto) object;
             BaseResponse<GetTruckDto> res = truckClientService.getByTruckNumber(dto.getTruckNumber());
             GetTruckDto truckDto = res.getData();
             if (res != null && truckDto != null) {
                 ListTruckTypeDto truckTypeDto = truckDto.getTruckTypeId();
-                boolean checkTruckType = truckTypeDto != null && ProductName.CHICKEN.equals(truckTypeDto.getProductName()) && (chickenImportRecordDto.getGoodsQuantity() != null && chickenImportRecordDto.getGoodsQuantity().equals(truckTypeDto.getTruckAmount()));
+                boolean checkTruckType = truckTypeDto != null && ProductName.CHICKEN.toString().equals(truckTypeDto.getProductName()) && chickenImportRecordDto.getGoodsQuantity() != null && chickenImportRecordDto.getGoodsQuantity().toString().equals(truckTypeDto.getTruckAmount());
                 if (checkTruckType) {
                     chickenImportRecordDto.setVerifyPass(true);
                 }
+                chickenImportRecordDto.setTruckNumber(dto.getTruckNumber());
                 chickenImportRecordDto.setTruckId(truckDto.getId());
                 chickenImportRecordDto.setTruckTypeId(truckTypeDto == null ? null : truckTypeDto.getId());
                 chickenImportRecordDto.setTruckTypeName(truckTypeDto == null ? null : truckTypeDto.getTypeName());
                 // 获取车队合同id
                 chickenImportRecordDto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId()));
-                opsForHash.put(key, dto.getSerialNumber(), dto);
+                opsForHash.put(key,dto.getSerialNumber().toString(),chickenImportRecordDto);
             }
         }
         Map<Object, Object> entries = opsForHash.entries(key);
@@ -1476,7 +1483,7 @@ public class WaybillServiceImpl implements WaybillService {
             unLoadSiteNames.append(unLoadSite.getSiteName() + "、");
         }
         String unloadSiteName = unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1);
-        String alias = "";
+        String alias;
         String msgTitle = "派单消息";
         String msgContent;
         String regId;
@@ -1487,6 +1494,7 @@ public class WaybillServiceImpl implements WaybillService {
             extraParam.put("needVoice", "y");
             //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
             msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
+            alias = driver.getPhoneNumber();
             regId = driver.getRegistrationId();
             JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
         }
@@ -2306,8 +2314,10 @@ public class WaybillServiceImpl implements WaybillService {
             log.info("uploadUrl={},excelContent={}", preImportChickenRecordDto.getUploadUrl(), JSON.toJSONString(lists.get(0)));
             // 将excel内容解析为dto
             List<ChickenImportRecordDto> chickenImportRecordDtoList = parsingExcel(lists.get(0), preImportChickenRecordDto);
+            log.info("parsingExcel end chickenImportRecordDtoList={}",JSON.toJSONString(chickenImportRecordDtoList));
             // 数据存入redis 批量插入存入hash保证原子性
             putChickenImportRecordToRedis(chickenImportRecordDtoList);
+            log.info("putChickenImportRecordToRedis success");
             return chickenImportRecordDtoList;
         } catch (Exception e) {
             log.error("preImportChickenWaybill error preImportChickenRecordDto=" + preImportChickenRecordDto, e);
@@ -2323,10 +2333,11 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void importChickenWaybill(Integer orderId) {
-        String key = CHICKEN_IMPORT + orderId;
-        HashOperations<String, Object, Object> opsForHash = redisTemplate.opsForHash();
+        String key = CHICKEN_IMPORT+orderId;
+        HashOperations<String, Object, Object> opsForHash = objectRedisTemplate.opsForHash();
         Map<Object, Object> entries = opsForHash.entries(key);
         List<ChickenImportRecordDto> chickenImportRecordDtoValidList = getChickenImportRecordDtoListFromMap(entries);
+        log.info("importChickenWaybill orderId={},chickenImportRecordDtoValidList={}",orderId,JSON.toJSONString(chickenImportRecordDtoValidList));
         if (!CollectionUtils.isEmpty(chickenImportRecordDtoValidList)) {
             // 判断运单状态,只有已下单的运单才能做毛鸡导入
             judgeOrderForChickenImport(orderId);
@@ -2354,8 +2365,8 @@ public class WaybillServiceImpl implements WaybillService {
             // 生成运单并派给车辆,如果表格数量过多需要起任务处理,防止处理时间过长事务不释放一直占用数据库链接
             importWaybills(orderId, importWaybillDtoList);
             // 清空缓存
-            redisTemplate.delete(key);
-        } else {
+            objectRedisTemplate.delete(key);
+        }else {
             throw new RuntimeException("导入失败");
         }
     }
@@ -2370,6 +2381,7 @@ public class WaybillServiceImpl implements WaybillService {
                 if (waybill != null && waybill.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH)) {
                     CalculatePaymentDto calculatePaymentDto = new CalculatePaymentDto();
                     Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
+                    // 合同未审核通过不算报价
                     if (orders != null) {
                         calculatePaymentDto.setWaybillId(waybillId);
                         calculatePaymentDto.setDoneDate(waybill.getModifyTime());
@@ -2533,20 +2545,21 @@ public class WaybillServiceImpl implements WaybillService {
 
     private void putChickenImportRecordToRedis(List<ChickenImportRecordDto> chickenImportRecordDtoList) {
         if (!CollectionUtils.isEmpty(chickenImportRecordDtoList)) {
-            HashOperations<String, Object, Object> opsForHash = redisTemplate.opsForHash();
+            HashOperations<String, Object, Object> opsForHash = objectRedisTemplate.opsForHash();
             Integer orderId = chickenImportRecordDtoList.get(0).getOrderId();
-            String key = CHICKEN_IMPORT + orderId;
-            Map<Integer, ChickenImportRecordDto> map = new LinkedHashMap<>();
-            chickenImportRecordDtoList.forEach(dto -> map.put(dto.getSerialNumber(), dto));
-            opsForHash.putAll(key, map);
+            String key = CHICKEN_IMPORT+orderId;
+            Map<String,ChickenImportRecordDto> map = new LinkedHashMap<>();
+            chickenImportRecordDtoList.forEach(dto->map.put(dto.getSerialNumber() == null ? null : dto.getSerialNumber().toString(),dto));
+            opsForHash.putAll(key,map);
         }
     }
 
-    private List<ChickenImportRecordDto> getChickenImportRecordDtoListFromMap(Map<Object, Object> map) {
+    private List<ChickenImportRecordDto> getChickenImportRecordDtoListFromMap(Map<Object,Object> map){
         List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
         Set<Object> ketSet = map.keySet();
         Iterator<Object> iterator = ketSet.iterator();
-        iterator.forEachRemaining(element -> chickenImportRecordDtoList.add((ChickenImportRecordDto) map.get(element)));
+        iterator.forEachRemaining(element->chickenImportRecordDtoList.add((ChickenImportRecordDto)map.get(element.toString())));
+        Collections.sort(chickenImportRecordDtoList,Comparator.comparingInt(ChickenImportRecordDto :: getSerialNumber));
         return chickenImportRecordDtoList;
     }
 }
