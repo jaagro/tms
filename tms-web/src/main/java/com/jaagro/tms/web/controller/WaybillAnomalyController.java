@@ -56,7 +56,7 @@ public class WaybillAnomalyController {
     }
 
     @ApiOperation("运单异常类型显示")
-    @GetMapping("displayAnomalyType}")
+    @GetMapping("displayAnomalyType")
     public BaseResponse displayAnomalyType() {
         List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = waybillAnomalyService.displayAnomalyType();
         List<AnomalyTypeVo> anomalyTypeVos = new ArrayList<>();
