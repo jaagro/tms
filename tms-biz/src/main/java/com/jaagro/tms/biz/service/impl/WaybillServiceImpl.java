@@ -2310,8 +2310,10 @@ public class WaybillServiceImpl implements WaybillService {
             log.info("uploadUrl={},excelContent={}", preImportChickenRecordDto.getUploadUrl(), JSON.toJSONString(lists.get(0)));
             // 将excel内容解析为dto
             List<ChickenImportRecordDto> chickenImportRecordDtoList = parsingExcel(lists.get(0), preImportChickenRecordDto);
+            log.info("parsingExcel end chickenImportRecordDtoList={}",JSON.toJSONString(chickenImportRecordDtoList));
             // 数据存入redis 批量插入存入hash保证原子性
             putChickenImportRecordToRedis(chickenImportRecordDtoList);
+            log.info("putChickenImportRecordToRedis success");
             return chickenImportRecordDtoList;
         } catch (Exception e) {
             log.error("preImportChickenWaybill error preImportChickenRecordDto=" + preImportChickenRecordDto, e);
