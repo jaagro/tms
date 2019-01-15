@@ -2,30 +2,28 @@ package com.jaagro.tms.biz.schedule;
 
 
 import com.jaagro.tms.api.constant.*;
-import com.jaagro.tms.api.dto.truck.DriverReturnDto;
+import com.jaagro.tms.biz.common.RedisOperator;
 import com.jaagro.tms.biz.entity.Message;
 import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.entity.WaybillTracking;
-import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.MessageMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillTrackingMapperExt;
-import com.jaagro.tms.biz.service.DriverClientService;
+import com.jaagro.tms.biz.utils.RedisLock;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @Author: Gavin
@@ -39,13 +37,11 @@ public class WaybillTaskService {
     @Autowired
     private WaybillTrackingMapperExt waybillTrackingMapper;
     @Autowired
-    private DriverClientService driverClientService;
-    @Autowired
-    private StringRedisTemplate redisTemplate;
-    @Autowired
     private MessageMapperExt messageMapper;
-
-
+    @Autowired
+    private RedisLock redisLock;
+    @Autowired
+    private RedisOperator redisOperator;
     /**
      * 超过30分钟未接的运单修改为被司机拒绝以便重新派单,10分钟跑一次
      */
@@ -61,6 +57,12 @@ public class WaybillTaskService {
             Date endTime = new SimpleDateFormat(format).parse("09:00:00");
 
             if (!isEffectiveDate(nowTime, startTime, endTime)) {
+                //加锁
+                long time = System.currentTimeMillis() + 10*1000;
+                boolean success = redisLock.lock("Scheduled:redisLock:waybillDefaultRejectBySystem" , String.valueOf(time));
+                if (!success) {
+                    throw new RuntimeException("请求正在处理中");
+                }
 
                 List<Waybill> waybillList = waybillMapperExt.listOverTimeWaybills();
 
@@ -104,7 +106,7 @@ public class WaybillTaskService {
                     }
                     /**********************/
                 }
-
+                redisOperator.del("Scheduled:redisLock:waybillDefaultRejectBySystem");
                 log.info("定时钟执行结束");
             }
         } catch (ParseException ex) {
