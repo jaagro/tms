@@ -903,8 +903,8 @@ public class WaybillServiceImpl implements WaybillService {
                     waybillGoodsMapper.updateByPrimaryKeySelective(waybillGoods);
                 }
                 //批量插入卸货单
-                List<WaybillImagesUrlDto> imagesUrls = dto.getWaybillImagesUrl();
-                if (!CollectionUtils.isEmpty(imagesUrls)) {
+                if (!CollectionUtils.isEmpty(dto.getWaybillImagesUrl())) {
+                    List<WaybillImagesUrlDto> imagesUrls = dto.getWaybillImagesUrl();
                     for (int i = 0; i < imagesUrls.size(); i++) {
                         WaybillImagesUrlDto waybillImagesUrl = imagesUrls.get(i);
                         WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
@@ -933,16 +933,18 @@ public class WaybillServiceImpl implements WaybillService {
                  *
                  */
                 //批量插入卸货单
-                List<String> imagesUrl = dto.getImagesUrl();
-                if (!CollectionUtils.isEmpty(imagesUrls)) {
+
+                if (!CollectionUtils.isEmpty(dto.getImagesUrl())) {
+                    List<String> imagesUrls = dto.getImagesUrl();
                     for (int i = 0; i < imagesUrls.size(); i++) {
+                        String waybillImagesUrl = imagesUrls.get(i);
                         WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
                         waybillTrackingImages
                                 .setWaybillId(waybillId)
                                 .setSiteId(unLoadSiteConfirmProductDtos.get(0).getUnLoadSiteId())
                                 .setCreateTime(new Date())
                                 .setCreateUserId(currentUser.getId())
-                                .setImageUrl(imagesUrl.get(i))
+                                .setImageUrl(waybillImagesUrl)
                                 .setWaybillTrackingId(waybillTracking.getId());
                         //签收单
                         if (i == 0) {
@@ -951,7 +953,7 @@ public class WaybillServiceImpl implements WaybillService {
                             //磅单
                             waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
                         }
-                        if (!"invalidPicUrl".equalsIgnoreCase(imagesUrl.get(i))) {
+                        if (!"invalidPicUrl".equalsIgnoreCase(waybillImagesUrl)) {
                             waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
                         }
                     }
