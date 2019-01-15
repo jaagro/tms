@@ -19,6 +19,10 @@ import java.util.Date;
 public class ChickenImportRecordDto implements Serializable{
     private static final long serialVersionUID = 4778566167547116437L;
     /**
+     * 序列号
+     */
+    private Integer  serialNumber;
+    /**
      * 订单编号
      */
     @NotNull(message = "{orderId.NotNull}")

@@ -454,17 +454,23 @@ public class OrderController {
         return BaseResponse.successInstance(chickenImportRecordDtoList);
     }
 
+    @PostMapping("/changeImportChickenRecord")
+    @ApiOperation("修改毛鸡导入单条记录")
+    public BaseResponse<List<ChickenImportRecordDto>> changeImportChickenRecord(@RequestBody UpdateChickenImportRecordDto dto){
+        return BaseResponse.successInstance(waybillService.changeImportChickenRecord(dto));
+    }
+
     /**
      * @author yj
      * @date 2019-01-08
-     * @param chickenImportRecordDtoValidList
+     * @param orderId
      * @return
      */
-    @PostMapping("/importChickenWaybill")
+    @PostMapping("/importChickenWaybill/{orderId}")
     @ApiOperation("导入毛鸡运单")
-    public BaseResponse importChickenWaybill(@RequestBody ValidList<ChickenImportRecordDto> chickenImportRecordDtoValidList){
-        log.info("O importChickenWaybill chickenImportRecordDtoValidList={}", JSON.toJSONString(chickenImportRecordDtoValidList));
-        waybillService.importChickenWaybill(chickenImportRecordDtoValidList);
+    public BaseResponse importChickenWaybill(@PathVariable("orderId") Integer orderId){
+        log.info("O importChickenWaybill orderId={}", orderId);
+        waybillService.importChickenWaybill(orderId);
         return BaseResponse.successInstance("导入成功");
     }
 }
