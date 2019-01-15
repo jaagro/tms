@@ -8,7 +8,6 @@ import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.Message.CreateMessageDto;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.MessageReturnDto;
-import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
@@ -30,7 +29,6 @@ import com.jaagro.tms.biz.utils.RedisLock;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import com.jaagro.utils.ServiceResult;
-import com.netflix.discovery.converters.Auto;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,9 +117,8 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     private ChickenImportRecordMapperExt chickenImportRecordMapperExt;
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
-    @Autowired
     private GrabWaybillRecordMapperExt grabWaybillRecordMapper;
+    @Autowired
     @Qualifier(value = "objectRedisTemplate")
     private RedisTemplate<String, Object> objectRedisTemplate;
 
