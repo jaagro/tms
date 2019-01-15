@@ -457,6 +457,7 @@ public class OrderController {
     @PostMapping("/changeImportChickenRecord")
     @ApiOperation("修改毛鸡导入单条记录")
     public BaseResponse<List<ChickenImportRecordDto>> changeImportChickenRecord(@RequestBody UpdateChickenImportRecordDto dto){
+        log.info("O changeImportChickenRecord dto={}",dto);
         return BaseResponse.successInstance(waybillService.changeImportChickenRecord(dto));
     }
 
