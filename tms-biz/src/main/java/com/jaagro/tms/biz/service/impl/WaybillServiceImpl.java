@@ -1335,7 +1335,8 @@ public class WaybillServiceImpl implements WaybillService {
         orders.setModifyUserId(userId);
         ordersMapper.updateByPrimaryKeySelective(orders);
         //2.更新waybill
-        Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckId);
+        ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(truckId);
+        Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId());
         waybill.setTruckId(truckId);
         waybill.setTruckTeamContractId(truckTeamContractId);
         waybill.setWaybillStatus(waybillNewStatus);
