@@ -14,6 +14,10 @@ public final class GrabWaybillStatusType {
      */
     public static final String ROB = "已抢单";
     /**
+     * 已拒单
+     */
+    public static final String REJECT_ROB = "已拒单";
+    /**
      * 已结束
      */
     public static final String ROB_END = "已结束";
