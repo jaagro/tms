@@ -1277,24 +1277,13 @@ public class WaybillServiceImpl implements WaybillService {
             }
         }
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
-        List<Integer> waybillIds = new ArrayList<>();
-        GraWaybillConditionDto graWaybillConditionDto = new GraWaybillConditionDto();
-        graWaybillConditionDto
-                .setDriverId(getUserId())
-                .setStatus(GrabWaybillStatusType.NOT_ROB);
-        List<GrabWaybillRecord> grabWaybillRecords = grabWaybillRecordMapper.listGrabWaybillByCondition(graWaybillConditionDto);
-        if (!CollectionUtils.isEmpty(grabWaybillRecords)) {
-            for (GrabWaybillRecord grabWaybillRecord : grabWaybillRecords) {
-                waybillIds.add(grabWaybillRecord.getWaybillId());
-            }
-        }
+        Waybill waybill = new Waybill();
         List<GetReceiptListAppDto> receiptList = new ArrayList<>();
-        ReceiptListParamDto receiptListParamDto = new ReceiptListParamDto();
-        receiptListParamDto
+        waybill
                 .setWaybillStatus(WaybillStatus.RECEIVE)
                 .setTruckId(truckByToken.getId())
-                .setWaybillIds(waybillIds);
-        List<GetWaybillAppDto> waybillAppDtos = waybillMapper.listWaybillByStatus(receiptListParamDto);
+                .setId(dto.getWaybillId());
+        List<GetWaybillAppDto> waybillAppDtos = waybillMapper.selectWaybillByStatus(waybill);
         for (GetWaybillAppDto waybillAppDto : waybillAppDtos) {
             GetReceiptListAppDto receiptListAppDto = new GetReceiptListAppDto();
             receiptListAppDto.setWaybillId(waybillAppDto.getId());
@@ -2377,11 +2366,11 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void importChickenWaybill(Integer orderId) {
-        String key = CHICKEN_IMPORT + orderId;
+        String key = CHICKEN_IMPORT+orderId;
         HashOperations<String, Object, Object> opsForHash = objectRedisTemplate.opsForHash();
         Map<Object, Object> entries = opsForHash.entries(key);
         List<ChickenImportRecordDto> chickenImportRecordDtoValidList = getChickenImportRecordDtoListFromMap(entries);
-        log.info("importChickenWaybill orderId={},chickenImportRecordDtoValidList={}", orderId, JSON.toJSONString(chickenImportRecordDtoValidList));
+        log.info("importChickenWaybill orderId={},chickenImportRecordDtoValidList={}",orderId,JSON.toJSONString(chickenImportRecordDtoValidList));
         if (!CollectionUtils.isEmpty(chickenImportRecordDtoValidList)) {
             // 判断运单状态,只有已下单的运单才能做毛鸡导入
             judgeOrderForChickenImport(orderId);
@@ -2410,7 +2399,7 @@ public class WaybillServiceImpl implements WaybillService {
             importWaybills(orderId, importWaybillDtoList);
             // 清空缓存
             objectRedisTemplate.delete(key);
-        } else {
+        }else {
             throw new RuntimeException("导入失败");
         }
     }
@@ -2600,12 +2589,12 @@ public class WaybillServiceImpl implements WaybillService {
         }
     }
 
-    private List<ChickenImportRecordDto> getChickenImportRecordDtoListFromMap(Map<Object, Object> map) {
+    private List<ChickenImportRecordDto> getChickenImportRecordDtoListFromMap(Map<Object,Object> map){
         List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
         Set<Object> ketSet = map.keySet();
         Iterator<Object> iterator = ketSet.iterator();
-        iterator.forEachRemaining(element -> chickenImportRecordDtoList.add((ChickenImportRecordDto) map.get(element.toString())));
-        Collections.sort(chickenImportRecordDtoList, Comparator.comparingInt(ChickenImportRecordDto::getSerialNumber));
+        iterator.forEachRemaining(element->chickenImportRecordDtoList.add((ChickenImportRecordDto)map.get(element.toString())));
+        Collections.sort(chickenImportRecordDtoList,Comparator.comparingInt(ChickenImportRecordDto :: getSerialNumber));
         return chickenImportRecordDtoList;
     }
 }
