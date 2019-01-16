@@ -2358,7 +2358,7 @@ public class WaybillServiceImpl implements WaybillService {
             log.info("uploadUrl={},excelContent={}", preImportChickenRecordDto.getUploadUrl(), JSON.toJSONString(lists.get(0)));
             // 将excel内容解析为dto
             List<ChickenImportRecordDto> chickenImportRecordDtoList = parsingExcel(lists.get(0), preImportChickenRecordDto);
-            log.info("parsingExcel end chickenImportRecordDtoList={}", JSON.toJSONString(chickenImportRecordDtoList));
+            log.info("parsingExcel end chickenImportRecordDtoList={}",JSON.toJSONString(chickenImportRecordDtoList));
             // 数据存入redis 批量插入存入hash保证原子性
             putChickenImportRecordToRedis(chickenImportRecordDtoList);
             log.info("putChickenImportRecordToRedis success");
@@ -2591,10 +2591,12 @@ public class WaybillServiceImpl implements WaybillService {
         if (!CollectionUtils.isEmpty(chickenImportRecordDtoList)) {
             HashOperations<String, Object, Object> opsForHash = objectRedisTemplate.opsForHash();
             Integer orderId = chickenImportRecordDtoList.get(0).getOrderId();
-            String key = CHICKEN_IMPORT + orderId;
-            Map<String, ChickenImportRecordDto> map = new LinkedHashMap<>();
-            chickenImportRecordDtoList.forEach(dto -> map.put(dto.getSerialNumber() == null ? null : dto.getSerialNumber().toString(), dto));
-            opsForHash.putAll(key, map);
+            String key = CHICKEN_IMPORT+orderId;
+            // 先清空原缓存
+            objectRedisTemplate.delete(key);
+            Map<String,ChickenImportRecordDto> map = new LinkedHashMap<>();
+            chickenImportRecordDtoList.forEach(dto->map.put(dto.getSerialNumber() == null ? null : dto.getSerialNumber().toString(),dto));
+            opsForHash.putAll(key,map);
         }
     }
 
