@@ -1,5 +1,6 @@
 package com.jaagro.tms.biz.mapper;
 
+import com.jaagro.tms.api.dto.waybill.GraWaybillConditionDto;
 import com.jaagro.tms.biz.entity.GrabWaybillRecord;
 import org.apache.ibatis.annotations.Param;
 
@@ -18,8 +19,8 @@ public interface GrabWaybillRecordMapperExt extends GrabWaybillRecordMapper {
 
     /**
      * 根据司机id查询抢单记录
-     * @param driverId
+     * @param dto
      * @return
      */
-    List<GrabWaybillRecord> listGrabWaybillByDriverId(@Param("driverId") Integer driverId);
+    List<GrabWaybillRecord> listGrabWaybillByDriverId(GraWaybillConditionDto dto);
 }
