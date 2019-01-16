@@ -19,8 +19,35 @@ public interface GrabWaybillRecordMapperExt extends GrabWaybillRecordMapper {
 
     /**
      * 根据司机id查询抢单记录
+     *
      * @param dto
      * @return
      */
-    List<GrabWaybillRecord> listGrabWaybillByDriverId(GraWaybillConditionDto dto);
+    List<GrabWaybillRecord> listGrabWaybillByCondition(GraWaybillConditionDto dto);
+
+    /**
+     * 更新当前接单人抢单记录
+     *
+     * @param dto
+     */
+    void updateGrabWaybillRecordByReceipt(GraWaybillConditionDto dto);
+
+    /**
+     * 更新当前拒单人记录
+     * @param dto
+     */
+    void updateGrabWaybillRecordByReject(GraWaybillConditionDto dto);
+
+    /**
+     * 批量更新
+     * @param ids
+     */
+    void batchUpdate(@Param("ids") List<Integer> ids);
+
+    /**
+     * 判断当前运单是否已经全部拒单
+     * @param dto
+     * @return
+     */
+    List<GrabWaybillRecord> listNotRobGrabWaybill(GraWaybillConditionDto dto);
 }
