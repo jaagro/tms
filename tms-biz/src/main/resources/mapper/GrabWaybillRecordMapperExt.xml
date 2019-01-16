@@ -11,10 +11,19 @@
             #{item.modifyUserId})
         </foreach>
     </insert>
-    <select id="listGrabWaybillByDriverId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    <select id="listGrabWaybillByDriverId" resultMap="BaseResultMap" parameterType="com.jaagro.tms.api.dto.waybill.GraWaybillConditionDto">
         select
         <include refid="Base_Column_List"/>
         from grab_waybill_record
-        where enabled=1 and driver_id = #{driverId,jdbcType=INTEGER} and status='未抢单'
+        where enabled=1
+        <if test="driverId!=null">
+            and driver_id = #{driverId,jdbcType=INTEGER}
+        </if>
+        <if test="status!=null">
+            and status=#{status}
+        </if>
+        <if test="waybillId!=null">
+            and waybill_Id=#{waybillId}
+        </if>
     </select>
 </mapper>

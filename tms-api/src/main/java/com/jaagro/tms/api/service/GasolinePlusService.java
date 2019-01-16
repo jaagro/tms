@@ -32,7 +32,7 @@ public interface GasolinePlusService {
      * @param gasolineId
      * @return
      */
-    List<CreateGasolineRecordDto> gasolineDetails(Integer gasolineId);
+    //List<CreateGasolineRecordDto> gasolineDetails(Integer gasolineId);
 
     /**
      * 加油管理
