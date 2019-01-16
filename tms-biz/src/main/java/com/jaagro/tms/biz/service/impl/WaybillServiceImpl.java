@@ -2498,7 +2498,7 @@ public class WaybillServiceImpl implements WaybillService {
                     if (truckTypeDto == null) {
                         continue;
                     }
-                    boolean checkTruckType = ProductName.CHICKEN.equals(truckTypeDto.getProductName()) && (dto.getGoodsQuantity() != null && dto.getGoodsQuantity().equals(truckTypeDto.getTruckAmount()));
+                    boolean checkTruckType = ProductName.CHICKEN.toString().equals(truckTypeDto.getProductName()) && (dto.getGoodsQuantity() != null && dto.getGoodsQuantity().toString().equals(truckTypeDto.getTruckAmount()));
                     if (checkTruckType) {
                         dto.setVerifyPass(true);
                     }
