@@ -812,6 +812,11 @@ public class WaybillServiceImpl implements WaybillService {
                     if (ImagesTypeConstant.POUND_BILL.equals(waybillImagesUrl.getImagesType())) {
                         //磅单
                         waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
+                        //****************gavin *牧源绿色磅单图片识别begin
+                        if(orders.getCustomerId()==248){
+
+                        }
+                        //****************gavin *牧源绿色磅单图片识别end
                     }
                     if (!"invalidPicUrl".equalsIgnoreCase(waybillImagesUrl.getImagesUrl())) {
                         waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
@@ -1328,18 +1333,20 @@ public class WaybillServiceImpl implements WaybillService {
     public Map<String, Object> upDateReceiptStatus(GetReceiptParamDto dto) {
         log.info("O upDateReceiptStatus:{}", dto);
         Integer waybillId = dto.getWaybillId();
+        Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+        if (null != waybill.getDriverId()) {
+            return ServiceResult.toResult(ReceiptConstant.ALREADY_RECEIVED);
+        }
         //加锁
         long time = System.currentTimeMillis() + TIMEOUT;
         boolean success = redisLock.lock("redisLock" + waybillId + dto.getReceiptStatus(), String.valueOf(time));
         if (!success) {
             throw new RuntimeException("请求正在处理中");
         }
-        Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+
         UserInfo currentUser = currentUserService.getCurrentUser();
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
-        if (null != waybill.getDriverId()) {
-            return ServiceResult.toResult(ReceiptConstant.ALREADY_RECEIVED);
-        }
+
         WaybillTracking waybillTracking = new WaybillTracking();
         waybillTracking
                 .setEnabled(true)
