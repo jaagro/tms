@@ -74,34 +74,33 @@ public class GasolinePlusServiceImpl implements GasolinePlusService {
         List<CreateGasolineRecordDto> gasolineRecordDtos = gasolineRecordMapper.listGasolineRecordByCondition(gasolineRecordCondition);
         return new PageInfo(gasolineRecordDtos);
     }
-
     /**
      * 加油记录详情
      *
      * @param gasolineId
      * @return
      */
-//    @Override
-//    public List<CreateGasolineRecordDto> gasolineDetails(Integer gasolineId) {
-//        GasolineRecordCondition gasolineRecordCondition = new GasolineRecordCondition();
-//        gasolineRecordCondition.setId(gasolineId);
-//        List<CreateGasolineRecordDto> gasolineRecordDtos = gasolineRecordMapper.listGasolineRecordByCondition(gasolineRecordCondition);
-//        for (CreateGasolineRecordDto gasolineRecordDto : gasolineRecordDtos) {
-//            if (null != gasolineRecordDto.getGasolineCompany()) {
-//                gasolineRecordDto
-//                        .setGasolineCompany(GasolineCompanyNameEnum.getTypeByDesc(gasolineRecordDto.getGasolineCompany()));
-//            }
-//            if (null != gasolineRecordDto.getGasolineType()) {
-//                gasolineRecordDto
-//                        .setGasolineType(GasolineTypeEnum.getTypeByDesc(gasolineRecordDto.getGasolineType()));
-//            }
-//            if (null != gasolineRecordDto.getPaymentMethod()) {
-//                gasolineRecordDto.setPaymentMethod(PaymentMethodEnum.getTypeByDesc(gasolineRecordDto.getPaymentMethod()));
-//            }
-//        }
-//        return gasolineRecordDtos;
-//    }
+    @Override
+    public List<CreateGasolineRecordDto> gasolineDetails(Integer gasolineId) {
+        GasolineRecordCondition gasolineRecordCondition = new GasolineRecordCondition();
+        gasolineRecordCondition.setId(gasolineId);
+        List<CreateGasolineRecordDto> gasolineRecordDtos = gasolineRecordMapper.listGasolineRecordByCondition(gasolineRecordCondition);
+        for (CreateGasolineRecordDto gasolineRecordDto : gasolineRecordDtos) {
 
+            if (null != gasolineRecordDto.getGasolineType()) {
+                gasolineRecordDto
+                        .setGasolineType(GasolineTypeEnum.getTypeByDesc(gasolineRecordDto.getGasolineType()));
+            }
+            if (null != gasolineRecordDto.getPaymentMethod()) {
+                gasolineRecordDto.setPaymentMethod(PaymentMethodEnum.getTypeByDesc(gasolineRecordDto.getPaymentMethod()));
+            }
+            if (null != gasolineRecordDto.getGasolineCompany()) {
+                gasolineRecordDto
+                        .setGasolineCompany(GasolineCompanyNameEnum.getTypeByDesc(gasolineRecordDto.getGasolineCompany()));
+            }
+        }
+        return gasolineRecordDtos;
+    }
     /**
      * 加油管理
      *
