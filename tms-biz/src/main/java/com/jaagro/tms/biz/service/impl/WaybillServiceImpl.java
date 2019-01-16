@@ -1395,7 +1395,7 @@ public class WaybillServiceImpl implements WaybillService {
             return ServiceResult.toResult(ReceiptConstant.OPERATION_SUCCESS);
         }
         //解锁
-        redisLock.unLock("redisLock" + waybillId + dto.getReceiptStatus(), String.valueOf(time));
+        redisLock.unLock("redisLock" + waybillId + dto.getReceiptStatus());
         return ServiceResult.toResult(ReceiptConstant.OPERATION_FAILED);
     }
 
