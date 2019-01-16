@@ -2545,6 +2545,8 @@ public class WaybillServiceImpl implements WaybillService {
             HashOperations<String, Object, Object> opsForHash = objectRedisTemplate.opsForHash();
             Integer orderId = chickenImportRecordDtoList.get(0).getOrderId();
             String key = CHICKEN_IMPORT+orderId;
+            // 先清空原缓存
+            objectRedisTemplate.delete(key);
             Map<String,ChickenImportRecordDto> map = new LinkedHashMap<>();
             chickenImportRecordDtoList.forEach(dto->map.put(dto.getSerialNumber() == null ? null : dto.getSerialNumber().toString(),dto));
             opsForHash.putAll(key,map);
