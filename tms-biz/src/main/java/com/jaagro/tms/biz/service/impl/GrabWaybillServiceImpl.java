@@ -128,7 +128,7 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
                             .setCreateUserId(getUserId())
                             .setTruckId(truckDto.getId())
                             .setDriverId(driver.getId())
-                            .setStatus(waybillNewStatus);
+                            .setStatus(GrabWaybillStatusType.NOT_ROB);
                     grabWaybillRecords.add(grabWaybillRecord);
                     //推送jpush消息
                     Map<String, String> extraParam = new HashMap<>();

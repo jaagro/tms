@@ -16,8 +16,6 @@ import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
 import com.jaagro.utils.BaseResponse;
-import com.jaagro.utils.ResponseStatusCode;
-import com.jaagro.utils.ServiceResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,14 +134,14 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         waybillAnomalyCondition
                 .setWaybillId(waybillId)
                 .setAnomalyTypeId(CancelAnomalyWaybillType.CANCEL_WAYBILL);
-        List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(waybillAnomalyCondition);
+        List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByWaybillId(waybillAnomalyCondition);
 
         Iterator<WaybillAnomalyType> iterator = waybillAnomalyTypes.iterator();
         List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = new ArrayList<>();
         while (iterator.hasNext()) {
             WaybillAnomalyType waybillAnomalyType = iterator.next();
-            boolean flag = (WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus()) || !CollectionUtils.isEmpty(waybillAnomalyDtos))
-                    && CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomalyType.getId());
+            boolean flag = ((WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus()) && CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomalyType.getId()))
+                           || (!CollectionUtils.isEmpty(waybillAnomalyDtos) && CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomalyType.getId())));
             if (flag) {
                 continue;
             }
@@ -155,7 +153,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     }
 
     /**
+     * 兼容老版本
      * *************************************************************
+     *
      * @param
      * @return
      */
