@@ -254,7 +254,7 @@ public class WaybillServiceImpl implements WaybillService {
                 appMessage.setMsgSource(MsgSource.APP);
                 appMessage.setMsgStatus(MsgStatusConstant.UNREAD);
                 appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
-                appMessage.setBody("您有新的健安运单信息待接单,从" + loadSiteName + "到" + unloadSiteName + "的运单。");
+                appMessage.setBody("您有新的健安运单待接单,从" + loadSiteName + "到" + unloadSiteName + "的运单。");
                 appMessage.setCreateTime(new Date());
                 appMessage.setCreateUserId(userId);
                 appMessage.setFromUserId(userId);
@@ -1490,7 +1490,7 @@ public class WaybillServiceImpl implements WaybillService {
             extraParam.put("waybillId", waybillId.toString());
             extraParam.put("needVoice", "y");
             //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
-            msgContent = "您有新的运单信息待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
+            msgContent = "您有新的建安运单待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
             alias = driver.getPhoneNumber();
             regId = driver.getRegistrationId();
             JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
@@ -1513,7 +1513,7 @@ public class WaybillServiceImpl implements WaybillService {
             appMessage.setMsgSource(MsgSource.APP);
             appMessage.setMsgStatus(MsgStatusConstant.UNREAD);
             appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
-            appMessage.setBody("您有新的运单信息待接单,从" + loadSiteName + "到" + unloadSiteName + "的运单。");
+            appMessage.setBody("您有新的建安运单待接单,从" + loadSiteName + "到" + unloadSiteName + "的运单。");
             appMessage.setCreateTime(new Date());
             appMessage.setCreateUserId(userId);
             appMessage.setFromUserId(userId);
