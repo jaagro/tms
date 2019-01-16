@@ -73,6 +73,7 @@ public class WaybillTaskService {
                     for (Waybill waybill : waybillList) {
                         WaybillTracking waybillTracking = new WaybillTracking();
                         waybillTracking
+                                .setEnabled(true)
                                 .setWaybillId(waybill.getId())
                                 .setTrackingInfo("System auto Reject!")
                                 .setTrackingType(TrackingType.WAYBILL_SYSTEM_REJECT)
