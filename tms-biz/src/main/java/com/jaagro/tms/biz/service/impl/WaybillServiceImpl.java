@@ -49,6 +49,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -317,6 +318,9 @@ public class WaybillServiceImpl implements WaybillService {
             }
         }
         Map<Object, Object> entries = opsForHash.entries(key);
+        if (CollectionUtils.isEmpty(entries)){
+            throw new RuntimeException("操作超时了,请重新导入");
+        }
         return getChickenImportRecordDtoListFromMap(entries);
     }
 
@@ -2346,6 +2350,9 @@ public class WaybillServiceImpl implements WaybillService {
         String key = CHICKEN_IMPORT+orderId;
         HashOperations<String, Object, Object> opsForHash = objectRedisTemplate.opsForHash();
         Map<Object, Object> entries = opsForHash.entries(key);
+        if (CollectionUtils.isEmpty(entries)){
+            throw new RuntimeException("操作超时了,请重新导入");
+        }
         List<ChickenImportRecordDto> chickenImportRecordDtoValidList = getChickenImportRecordDtoListFromMap(entries);
         log.info("importChickenWaybill orderId={},chickenImportRecordDtoValidList={}",orderId,JSON.toJSONString(chickenImportRecordDtoValidList));
         if (!CollectionUtils.isEmpty(chickenImportRecordDtoValidList)) {
@@ -2559,6 +2566,7 @@ public class WaybillServiceImpl implements WaybillService {
             Map<String,ChickenImportRecordDto> map = new LinkedHashMap<>();
             chickenImportRecordDtoList.forEach(dto->map.put(dto.getSerialNumber() == null ? null : dto.getSerialNumber().toString(),dto));
             opsForHash.putAll(key,map);
+            objectRedisTemplate.expire(key,1, TimeUnit.HOURS);
         }
     }
 
