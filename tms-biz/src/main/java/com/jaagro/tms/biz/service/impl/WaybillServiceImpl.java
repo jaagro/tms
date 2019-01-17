@@ -49,6 +49,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -316,6 +317,9 @@ public class WaybillServiceImpl implements WaybillService {
             }
         }
         Map<Object, Object> entries = opsForHash.entries(key);
+        if (CollectionUtils.isEmpty(entries)){
+            throw new RuntimeException("操作超时了,请重新导入");
+        }
         return getChickenImportRecordDtoListFromMap(entries);
     }
 
@@ -2596,18 +2600,19 @@ public class WaybillServiceImpl implements WaybillService {
             String key = CHICKEN_IMPORT + orderId;
             // 先清空原缓存
             objectRedisTemplate.delete(key);
-            Map<String, ChickenImportRecordDto> map = new LinkedHashMap<>();
-            chickenImportRecordDtoList.forEach(dto -> map.put(dto.getSerialNumber() == null ? null : dto.getSerialNumber().toString(), dto));
-            opsForHash.putAll(key, map);
+            Map<String,ChickenImportRecordDto> map = new LinkedHashMap<>();
+            chickenImportRecordDtoList.forEach(dto->map.put(dto.getSerialNumber() == null ? null : dto.getSerialNumber().toString(),dto));
+            opsForHash.putAll(key,map);
+            objectRedisTemplate.expire(key,1, TimeUnit.HOURS);
         }
     }
 
-    private List<ChickenImportRecordDto> getChickenImportRecordDtoListFromMap(Map<Object, Object> map) {
+    private List<ChickenImportRecordDto> getChickenImportRecordDtoListFromMap(Map<Object,Object> map){
         List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
         Set<Object> ketSet = map.keySet();
         Iterator<Object> iterator = ketSet.iterator();
-        iterator.forEachRemaining(element -> chickenImportRecordDtoList.add((ChickenImportRecordDto) map.get(element.toString())));
-        Collections.sort(chickenImportRecordDtoList, Comparator.comparingInt(ChickenImportRecordDto::getSerialNumber));
+        iterator.forEachRemaining(element->chickenImportRecordDtoList.add((ChickenImportRecordDto)map.get(element.toString())));
+        Collections.sort(chickenImportRecordDtoList,Comparator.comparingInt(ChickenImportRecordDto :: getSerialNumber));
         return chickenImportRecordDtoList;
     }
 }
