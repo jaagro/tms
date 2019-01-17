@@ -1333,15 +1333,17 @@ public class WaybillServiceImpl implements WaybillService {
     public Map<String, Object> upDateReceiptStatus(GetReceiptParamDto dto) {
         log.info("O upDateReceiptStatus:{}", dto);
         Integer waybillId = dto.getWaybillId();
-        Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
-        if (null != waybill.getDriverId()) {
-            return ServiceResult.toResult(ReceiptConstant.ALREADY_RECEIVED);
-        }
         //加锁
         long time = System.currentTimeMillis() + TIMEOUT;
         boolean success = redisLock.lock("redisLock" + waybillId + dto.getReceiptStatus(), String.valueOf(time));
         if (!success) {
             throw new RuntimeException("请求正在处理中");
+        }
+
+        Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+        if (null != waybill.getDriverId()) {
+            redisLock.unLock("redisLock" + waybillId + dto.getReceiptStatus());
+            return ServiceResult.toResult(ReceiptConstant.ALREADY_RECEIVED);
         }
 
         UserInfo currentUser = currentUserService.getCurrentUser();
@@ -2505,7 +2507,7 @@ public class WaybillServiceImpl implements WaybillService {
                     if (truckTypeDto == null) {
                         continue;
                     }
-                    boolean checkTruckType = ProductName.CHICKEN.equals(truckTypeDto.getProductName()) && (dto.getGoodsQuantity() != null && dto.getGoodsQuantity().equals(truckTypeDto.getTruckAmount()));
+                    boolean checkTruckType = ProductName.CHICKEN.toString().equals(truckTypeDto.getProductName()) && (dto.getGoodsQuantity() != null && dto.getGoodsQuantity().toString().equals(truckTypeDto.getTruckAmount()));
                     if (checkTruckType) {
                         dto.setVerifyPass(true);
                     }
