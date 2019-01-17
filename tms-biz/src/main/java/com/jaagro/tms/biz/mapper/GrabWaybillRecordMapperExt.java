@@ -34,20 +34,30 @@ public interface GrabWaybillRecordMapperExt extends GrabWaybillRecordMapper {
 
     /**
      * 更新当前拒单人记录
+     *
      * @param dto
      */
     void updateGrabWaybillRecordByReject(GraWaybillConditionDto dto);
 
     /**
      * 批量更新
+     *
      * @param ids
      */
     void batchUpdate(@Param("ids") List<Integer> ids);
 
     /**
      * 判断当前运单是否已经全部拒单
+     *
      * @param dto
      * @return
      */
     List<GrabWaybillRecord> listNotRobGrabWaybill(GraWaybillConditionDto dto);
+
+    /**
+     * 主要判断当前运单是否是抢单模式
+     * @param waybillId
+     * @return
+     */
+    GrabWaybillRecord getGrabWaybillByWaybillId(@Param("waybillId") Integer waybillId);
 }

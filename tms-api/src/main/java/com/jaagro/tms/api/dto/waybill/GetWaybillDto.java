@@ -111,6 +111,9 @@ public class GetWaybillDto implements Serializable {
     /**
      * 订单客户的联系人信息
      */
-   private CustomerContactsReturnDto customerContactsDto;
-
+    private CustomerContactsReturnDto customerContactsDto;
+    /**
+     * 判断是否是抢单模式
+     */
+    private boolean GrabWaybillStatus;
 }

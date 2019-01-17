@@ -583,6 +583,10 @@ public class WaybillServiceImpl implements WaybillService {
         List<GetWaybillDto> getWaybillDtoList = new ArrayList<>(12);
         for (Integer waybillId : waybillIds) {
             GetWaybillDto getWaybillDto = this.getWaybillById(waybillId);
+            GrabWaybillRecord grabWaybill = grabWaybillRecordMapper.getGrabWaybillByWaybillId(waybillId);
+            if (grabWaybill != null) {
+              getWaybillDto.setGrabWaybillStatus(true);
+            }
             getWaybillDtoList.add(getWaybillDto);
         }
         GetWaybillPlanDto getWaybillPlanDto = new GetWaybillPlanDto();
