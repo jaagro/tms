@@ -1417,6 +1417,11 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setWaybillStatus(WaybillStatus.DEPART);
             //抢单模式
             if (!CollectionUtils.isEmpty(grabWaybillRecords)) {
+                ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(grabWaybillRecords.get(0).getTruckId());
+                Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId());
+                waybill
+                        .setTruckId(truckDto.getTruckTeamId())
+                        .setTruckTeamContractId(truckTeamContractId);
                 //更新当前抢单为已抢单
                 grabWaybillRecordMapper.updateGrabWaybillRecordByReceipt(graWaybillConditionDto);
                 //其他未抢到为已结束
@@ -1429,11 +1434,7 @@ public class WaybillServiceImpl implements WaybillService {
                     ids.add(grabWaybillRecord.getId());
                 }
                 grabWaybillRecordMapper.batchUpdate(ids);
-                ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(grabWaybillRecords.get(0).getTruckId());
-                Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId());
-                waybill
-                        .setTruckId(truckDto.getTruckTeamId())
-                        .setTruckTeamContractId(truckTeamContractId);
+
             }
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking.setOldStatus(WaybillStatus.RECEIVE);
