@@ -139,8 +139,8 @@ public class WaybillServiceImpl implements WaybillService {
             throw new RuntimeException("只能导入毛鸡订单数据");
         }
         //1.0 先删除掉所有运单
-       List<Waybill> waybills =  waybillMapper.listWaybillByOrderId(orderId);
-       if(waybills != null) {
+        List<Waybill> waybills = waybillMapper.listWaybillByOrderId(orderId);
+        if (waybills != null) {
             for (Waybill waybill : waybills) {
                 waybillMapper.removeWaybillById(waybill.getId());
             }
@@ -1293,7 +1293,7 @@ public class WaybillServiceImpl implements WaybillService {
         receiptListParamDto.setWaybillStatus(WaybillStatus.RECEIVE)
                 .setTruckId(truckByToken.getId())
                 .setDriverId(getUserId());
-        List<GetWaybillAppDto> waybillAppDtos =  waybillMapper.listWaybillByStatus(receiptListParamDto);
+        List<GetWaybillAppDto> waybillAppDtos = waybillMapper.listWaybillByStatus(receiptListParamDto);
         for (GetWaybillAppDto waybillAppDto : waybillAppDtos) {
             GetReceiptListAppDto receiptListAppDto = new GetReceiptListAppDto();
             receiptListAppDto.setWaybillId(waybillAppDto.getId());
@@ -1373,24 +1373,10 @@ public class WaybillServiceImpl implements WaybillService {
             if (StringUtils.isEmpty(dto.getRefuseReasonId())) {
                 throw new RuntimeException("拒单理由不能为空");
             }
-            if (!CollectionUtils.isEmpty(grabWaybillRecords)) {
-                //更新当前人已拒单
-                grabWaybillRecordMapper.updateGrabWaybillRecordByReject(graWaybillConditionDto);
-                grabWaybillRecords = grabWaybillRecordMapper.listNotRobGrabWaybill(graWaybillConditionDto);
-                if (CollectionUtils.isEmpty(grabWaybillRecords)) {
-                    waybill.setWaybillStatus(WaybillStatus.REJECT);
-                }
-            } else {
-                waybill.setWaybillStatus(WaybillStatus.REJECT);
-            }
-            waybill.setModifyUserId(currentUser.getId());
-            waybill.setModifyTime(new Date());
-            waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking
                     .setRefuseReasonId(dto.getRefuseReasonId())
                     .setOldStatus(WaybillStatus.RECEIVE)
                     .setNewStatus(WaybillStatus.REJECT).setTrackingInfo("运单已被【" + currentUser.getName() + "】取消");
-            waybillTrackingMapper.insertSelective(waybillTracking);
             /**-------添加自动拒单消息----addBy白弋冉**/
             CreateMessageDto createMessageDto = new CreateMessageDto();
             createMessageDto
@@ -1406,8 +1392,24 @@ public class WaybillServiceImpl implements WaybillService {
                     .setToUserType(ToUserType.EMPLOYEE)
                     .setCategory(MsgCategory.WARNING)
                     .setRefuseType(RefuseType.MANUAL);
-            messageService.createMessage(createMessageDto);
-            /**------------------**/
+            if (!CollectionUtils.isEmpty(grabWaybillRecords)) {
+                //更新当前人已拒单
+                grabWaybillRecordMapper.updateGrabWaybillRecordByReject(graWaybillConditionDto);
+                grabWaybillRecords = grabWaybillRecordMapper.listNotRobGrabWaybill(graWaybillConditionDto);
+                if (CollectionUtils.isEmpty(grabWaybillRecords)) {
+                    waybill.setWaybillStatus(WaybillStatus.REJECT);
+                    waybillTrackingMapper.insertSelective(waybillTracking);
+                    messageService.createMessage(createMessageDto);
+                }
+            } else {
+                waybill.setWaybillStatus(WaybillStatus.REJECT);
+                waybillTrackingMapper.insertSelective(waybillTracking);
+                messageService.createMessage(createMessageDto);
+            }
+            waybill.setModifyUserId(currentUser.getId());
+            waybill.setModifyTime(new Date());
+            waybillMapper.updateByPrimaryKey(waybill);
+            redisLock.unLock("redisLock" + waybillId + dto.getReceiptStatus());
             return ServiceResult.toResult(ReceiptConstant.OPERATION_SUCCESS);
             //接单
         } else if (WaybillConstant.RECEIPT.equals(dto.getReceiptStatus())) {
@@ -1441,6 +1443,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybillTracking.setNewStatus(WaybillStatus.DEPART);
             waybillTracking.setTrackingInfo("司机【" + currentUser.getName() + "】已接单，车牌号为【" + truckByToken.getTruckNumber() + "】");
             waybillTrackingMapper.insertSelective(waybillTracking);
+            redisLock.unLock("redisLock" + waybillId + dto.getReceiptStatus());
             return ServiceResult.toResult(ReceiptConstant.OPERATION_SUCCESS);
         }
         //解锁
