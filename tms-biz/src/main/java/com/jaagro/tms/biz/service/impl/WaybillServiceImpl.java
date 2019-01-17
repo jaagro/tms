@@ -138,6 +138,13 @@ public class WaybillServiceImpl implements WaybillService {
         if (!GoodsType.CHICKEN.equals(orders.getGoodsType())) {
             throw new RuntimeException("只能导入毛鸡订单数据");
         }
+        //1.0 先删除掉所有运单
+       List<Waybill> waybills =  waybillMapper.listWaybillByOrderId(orderId);
+       if(waybills != null) {
+            for (Waybill waybill : waybills) {
+                waybillMapper.removeWaybillById(waybill.getId());
+            }
+        }
         //1、更新订单状态为"运输中"
         Integer userId = getUserId();
         orders.setOrderStatus(OrderStatus.TRANSPORT);
@@ -2342,7 +2349,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public List<ChickenImportRecordDto> preImportChickenWaybill(PreImportChickenRecordDto preImportChickenRecordDto) {
         try {
-            // 判断运单状态,只有已下单的运单才能做毛鸡导入
+            // 判断订单状态,只有已下单的运单才能做毛鸡导入
             judgeOrderForChickenImport(preImportChickenRecordDto.getOrderId());
             // 读取excel内容
             List<List<String[]>> lists = PoiUtil.readExcel(preImportChickenRecordDto.getUploadUrl());

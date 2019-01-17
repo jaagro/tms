@@ -144,6 +144,7 @@ public class PeripheralAppController {
                 }
             }
         }
+        gasolineRecordDtos.setList(createGasolineRecordDtos);
         return BaseResponse.successInstance(gasolineRecordDtos);
     }
 
