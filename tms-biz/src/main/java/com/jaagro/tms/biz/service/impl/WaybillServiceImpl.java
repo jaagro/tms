@@ -1346,7 +1346,6 @@ public class WaybillServiceImpl implements WaybillService {
             redisLock.unLock("redisLock" + waybillId + dto.getReceiptStatus());
             return ServiceResult.toResult(ReceiptConstant.ALREADY_RECEIVED);
         }
-
         UserInfo currentUser = currentUserService.getCurrentUser();
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         GraWaybillConditionDto graWaybillConditionDto = new GraWaybillConditionDto();
