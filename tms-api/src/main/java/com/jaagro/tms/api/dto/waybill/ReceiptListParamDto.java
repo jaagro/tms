@@ -17,11 +17,11 @@ public class ReceiptListParamDto implements Serializable {
      */
     private String waybillStatus;
     /**
-     * 司机id
+     * 车辆id
      */
     private Integer truckId;
     /**
-     * 运单号id
+     * 司机id
      */
-    private List<Integer> waybillIds;
+    private Integer driverId;
 }

@@ -37,7 +37,7 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
     @Autowired
     private CurrentUserService currentUserService;
     @Autowired
-    GrabWaybillRecordMapperExt grabWaybillRecordMapper;
+    private GrabWaybillRecordMapperExt grabWaybillRecordMapper;
     @Autowired
     private TruckClientService truckClientService;
     @Autowired
