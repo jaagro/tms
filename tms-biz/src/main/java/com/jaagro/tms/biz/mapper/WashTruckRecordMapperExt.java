@@ -17,7 +17,7 @@ public interface WashTruckRecordMapperExt extends WashTruckRecordMapper {
      * @param criteria
      * @return
      */
-    List<WashTruckRecord> listWashTruckRecordByCriteria(ListWashTruckRecordCriteria criteria);
+    List<WashTruckRecordDto> listWashTruckRecordByCriteria(ListWashTruckRecordCriteria criteria);
 
     /**
      * 根据id查询明细

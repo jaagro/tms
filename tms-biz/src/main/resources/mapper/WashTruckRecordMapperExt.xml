@@ -17,7 +17,7 @@
         <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER"/>
         <collection property="washTruckImageDtoList" column="id" select="com.jaagro.tms.biz.mapper.WashTruckImageMapperExt.listByWashTruckRecordId"/>
     </resultMap>
-    <select id="listWashTruckRecordByCriteria" parameterType="com.jaagro.tms.api.dto.peripheral.ListWashTruckRecordCriteria" resultType="com.jaagro.tms.biz.entity.WashTruckRecord">
+    <select id="listWashTruckRecordByCriteria" parameterType="com.jaagro.tms.api.dto.peripheral.ListWashTruckRecordCriteria" resultMap="DetailResultMap">
         SELECT
         <include refid="Base_Column_List"/>
         FROM wash_truck_record

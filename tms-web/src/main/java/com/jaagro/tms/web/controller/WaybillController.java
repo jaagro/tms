@@ -1,6 +1,5 @@
 package com.jaagro.tms.web.controller;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.truck.TruckDto;
@@ -9,7 +8,6 @@ import com.jaagro.tms.api.service.GrabWaybillService;
 import com.jaagro.tms.api.service.OrderService;
 import com.jaagro.tms.api.service.WaybillPlanService;
 import com.jaagro.tms.api.service.WaybillService;
-import com.jaagro.tms.biz.entity.GrabWaybillRecord;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
@@ -154,7 +152,7 @@ public class WaybillController {
     @PostMapping("/assignWaybillToTruck/{waybillId}/{truckId}")
     public BaseResponse assignWaybillToTruck(@PathVariable Integer waybillId, @PathVariable Integer truckId) {
         try {
-            return BaseResponse.service(waybillService.assignWaybillToTruck(waybillId, truckId));
+            return BaseResponse.successInstance(waybillService.assignWaybillToTruck(waybillId, truckId));
         } catch (Exception e) {
             e.printStackTrace();
             return BaseResponse.errorInstance(ResponseStatusCode.SERVER_ERROR.getCode(), "派单失败:" + e.getMessage());
@@ -254,10 +252,10 @@ public class WaybillController {
     @PostMapping("/grabWaybillToTrucks")
     public BaseResponse grabWaybillToTrucks(@RequestBody GrabWaybillParamDto dto) {
         if (dto.getWaybillId() == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单号id不能为空！");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单号id不能为空！");
         }
         if (CollectionUtils.isEmpty(dto.getTruckIds())) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "添加车辆不能为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "添加车辆不能为空");
         }
         grabWaybillService.grabWaybillToTrucks(dto);
         return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
