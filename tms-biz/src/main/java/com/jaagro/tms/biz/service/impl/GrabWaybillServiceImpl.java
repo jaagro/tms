@@ -118,7 +118,7 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
         List<GrabWaybillRecord> grabWaybillRecords = new ArrayList<>();
         for (ShowTruckDto truckDto : truckDtos) {
             List<ShowDriverDto> drivers = truckDto.getDrivers();
-            if (CollectionUtils.isEmpty(drivers)) {
+            if (!CollectionUtils.isEmpty(drivers)) {
                 for (ShowDriverDto driver : drivers) {
                     //插入抢单模式记录表
                     GrabWaybillRecord grabWaybillRecord = new GrabWaybillRecord();
