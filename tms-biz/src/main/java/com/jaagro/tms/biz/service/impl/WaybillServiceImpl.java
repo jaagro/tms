@@ -311,8 +311,6 @@ public class WaybillServiceImpl implements WaybillService {
                 }
                 chickenImportRecordDto.setTruckNumber(dto.getTruckNumber());
                 chickenImportRecordDto.setTruckId(truckDto.getId());
-                chickenImportRecordDto.setTruckTypeId(truckTypeDto == null ? null : truckTypeDto.getId());
-                chickenImportRecordDto.setTruckTypeName(truckTypeDto == null ? null : truckTypeDto.getTypeName());
                 // 获取车队合同id
                 chickenImportRecordDto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId()));
                 opsForHash.put(key,dto.getSerialNumber().toString(),chickenImportRecordDto);
@@ -2505,6 +2503,15 @@ public class WaybillServiceImpl implements WaybillService {
                     truckNumber = truckNumber.substring(0, truckNumber.length() - 1);
                 }
                 dto.setTruckNumber(truckNumber);
+                BaseResponse<List<ListTruckTypeDto>> response = truckClientService.listTruckTypeByProductName(ProductName.CHICKEN.toString());
+                if (response != null && response.getData() != null) {
+                    response.getData().forEach(listTruckTypeDto -> {
+                        if (listTruckTypeDto.getTruckAmount().equals(dto.getGoodsQuantity() == null ? null : dto.getGoodsQuantity().toString())) {
+                            dto.setTruckTypeId(listTruckTypeDto.getId());
+                            dto.setTruckTypeName(listTruckTypeDto.getTypeName());
+                        }
+                    });
+                }
                 // 校验车牌号合法性
                 BaseResponse<GetTruckDto> res = truckClientService.getByTruckNumber(truckNumber);
                 if (res != null && res.getData() != null) {
@@ -2518,21 +2525,8 @@ public class WaybillServiceImpl implements WaybillService {
                         dto.setVerifyPass(true);
                     }
                     dto.setTruckId(truckDto.getId());
-                    ListTruckTypeDto truckType = truckDto.getTruckTypeId();
-                    dto.setTruckTypeId(truckType == null ? null : truckType.getId());
-                    dto.setTruckTypeName(truckType == null ? null : truckType.getTypeName());
                     // 获取车队合同id
                     dto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId()));
-                } else {
-                    BaseResponse<List<ListTruckTypeDto>> response = truckClientService.listTruckTypeByProductName(ProductName.CHICKEN.toString());
-                    if (response != null && response.getData() != null) {
-                        response.getData().forEach(listTruckTypeDto -> {
-                            if (listTruckTypeDto.getTruckAmount().equals(dto.getGoodsQuantity() == null ? null : dto.getGoodsQuantity().toString())) {
-                                dto.setTruckTypeId(listTruckTypeDto.getId());
-                                dto.setTruckTypeName(listTruckTypeDto.getTypeName());
-                            }
-                        });
-                    }
                 }
                 chickenImportRecordDtoList.add(dto);
             }
