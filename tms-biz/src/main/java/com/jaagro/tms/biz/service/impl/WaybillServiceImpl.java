@@ -2351,7 +2351,7 @@ public class WaybillServiceImpl implements WaybillService {
             List<ImportWaybillDto> importWaybillDtoList = new ArrayList<>();
             for (ChickenImportRecordDto dto : chickenImportRecordDtoValidList) {
                 if (dto.getVerifyPass() == null || !dto.getVerifyPass()) {
-                    throw new RuntimeException("有未校验通过的行不允许提交");
+                    throw new RuntimeException("有无效车牌，请重新确认");
                 }
 
                 ChickenImportRecord record = new ChickenImportRecord();
