@@ -92,6 +92,17 @@ public class WashTruckServiceImpl implements WashTruckService {
             criteria.setDriverId(currentUserId);
         }
         List<WashTruckRecordDto> washTruckRecordList = washTruckRecordMapperExt.listWashTruckRecordByCriteria(criteria);
+        if (RequestSource.APP.equals(criteria.getRequestSource())){
+            if (!CollectionUtils.isEmpty(washTruckRecordList)){
+                for (WashTruckRecordDto dto : washTruckRecordList){
+                    if (!CollectionUtils.isEmpty(dto.getWashTruckImageDtoList())){
+                        for (WashTruckImageDto imageDto : dto.getWashTruckImageDtoList()){
+                            convertImageUrl(imageDto);
+                        }
+                    }
+                }
+            }
+        }
         return new PageInfo(washTruckRecordList);
     }
 
