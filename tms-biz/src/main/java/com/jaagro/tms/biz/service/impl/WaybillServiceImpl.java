@@ -979,7 +979,6 @@ public class WaybillServiceImpl implements WaybillService {
                 waybillItems
                         .setSignStatus(SignStatusConstant.SIGN)
                         .setId(unLoadSiteConfirmProductDtos.get(0).getWaybillItemId())
-                        .setRequiredTime(new Date())
                         .setModifyTime(new Date());
                 waybillItemsMapper.updateByPrimaryKeySelective(waybillItems);
             }
