@@ -5,6 +5,7 @@ import com.jaagro.tms.api.dto.driverapp.ListWaybillAppDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillCriteriaDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillDto;
 import com.jaagro.tms.api.dto.waybill.ListWebChatWaybillCriteriaDto;
+import com.jaagro.tms.api.dto.waybill.ReceiptListParamDto;
 import com.jaagro.tms.biz.entity.Waybill;
 import org.apache.ibatis.annotations.Param;
 
@@ -155,4 +156,26 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @return
      */
     Integer countUnDoneByDriverId(@Param("driverId") Integer driverId);
+
+    /**
+     * 异常运单重置派单
+     *
+     * @param waybill
+     */
+    void updateCancelWaybillById(Waybill waybill);
+
+    /**
+     * 查询接单超时的运单，便于短信提醒
+     *
+     * @param waybillStatus
+     * @return
+     */
+    List<Waybill> listWaybillTimeOut(@Param("waybillStatus") String waybillStatus);
+
+    /**
+     * 根据查询条件查询运单接单列表
+     * @param param
+     * @return
+     */
+    List<GetWaybillAppDto> listWaybillByStatus(ReceiptListParamDto param);
 }

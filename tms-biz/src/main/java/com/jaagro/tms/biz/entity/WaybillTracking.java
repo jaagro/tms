@@ -9,18 +9,19 @@ import java.util.Date;
 
 /**
  * 运单轨迹
+ *
  * @author yj
  */
 @Data
 @Accessors(chain = true)
-public class WaybillTracking implements Serializable{
+public class WaybillTracking implements Serializable {
     /**
      *
      */
     private Integer id;
 
     /**
-     * 
+     *
      */
     private Integer waybillId;
 
@@ -73,5 +74,15 @@ public class WaybillTracking implements Serializable{
      * 运单状态修改记录时间
      */
     private Date createTime;
+
+    /**
+     * 拒单理由类型id(关联字典表:refuseReason)
+     */
+    private Integer refuseReasonId;
+
+    /**
+     * 是否有效
+     */
+    private boolean enabled;
 
 }

@@ -25,4 +25,11 @@ public interface WaybillAnomalyMapperExt extends WaybillAnomalyMapper {
      * @return
      */
     Integer batchUpdateByPrimaryKeySelective(@Param("records") List<WaybillAnomaly> records);
+
+    /**
+     * 根据运单id 查询异常信息
+     * @param dto
+     * @return
+     */
+   List<WaybillAnomalyDto> listWaybillAnomalyByWaybillId(WaybillAnomalyCondition dto);
 }

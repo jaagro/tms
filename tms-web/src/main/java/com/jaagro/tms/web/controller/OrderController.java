@@ -1,5 +1,6 @@
 package com.jaagro.tms.web.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
@@ -13,6 +14,7 @@ import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.AuthClientService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.UserClientService;
+import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.web.vo.chat.*;
 import com.jaagro.tms.web.vo.pc.*;
 import com.jaagro.tms.web.vo.pc.ListOrderItemsVo;
@@ -433,5 +435,43 @@ public class OrderController {
         }
         pageInfo.setList(orderVoList);
         return BaseResponse.successInstance(pageInfo);
+    }
+
+    /**
+     * @author yj
+     * @date 2019-01-08
+     * @param preImportChickenRecordDto
+     * @return
+     */
+    @PostMapping("/preImportChickenWaybill")
+    @ApiOperation("预览毛鸡导入记录")
+    public BaseResponse<List<ChickenImportRecordDto>> preImportChickenWaybill(@RequestBody PreImportChickenRecordDto preImportChickenRecordDto){
+        log.info("O preImportChickenWaybill preImportChickenRecordDto={}",JSON.toJSONString(preImportChickenRecordDto));
+        List<ChickenImportRecordDto> chickenImportRecordDtoList = waybillService.preImportChickenWaybill(preImportChickenRecordDto);
+        if (CollectionUtils.isEmpty(chickenImportRecordDtoList)){
+            return BaseResponse.queryDataEmpty();
+        }
+        return BaseResponse.successInstance(chickenImportRecordDtoList);
+    }
+
+    @PostMapping("/changeImportChickenRecord")
+    @ApiOperation("修改毛鸡导入单条记录")
+    public BaseResponse<List<ChickenImportRecordDto>> changeImportChickenRecord(@RequestBody UpdateChickenImportRecordDto dto){
+        log.info("O changeImportChickenRecord dto={}",dto);
+        return BaseResponse.successInstance(waybillService.changeImportChickenRecord(dto));
+    }
+
+    /**
+     * @author yj
+     * @date 2019-01-08
+     * @param orderId
+     * @return
+     */
+    @PostMapping("/importChickenWaybill/{orderId}")
+    @ApiOperation("导入毛鸡运单")
+    public BaseResponse importChickenWaybill(@PathVariable("orderId") Integer orderId){
+        log.info("O importChickenWaybill orderId={}", orderId);
+        waybillService.importChickenWaybill(orderId);
+        return BaseResponse.successInstance("导入成功");
     }
 }

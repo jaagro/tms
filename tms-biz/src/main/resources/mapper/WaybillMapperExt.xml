@@ -80,7 +80,7 @@
         from waybill wb
         inner join waybill_tracking wt
         on (wb.id=wt.waybill_id)
-        where wb.enabled = 1
+        where wb.enabled = 1 and wt.enabled = 1
         and wb.waybill_status
         in ('待出发','前往装货地','待装货','待送达','待签收')
         <if test="driverId != null">
@@ -167,9 +167,6 @@
         *
         from waybill
         where enabled = 1
-        <if test="waybillStatus != null and waybillStatus != ''">
-            and waybill_status = #{waybillStatus}
-        </if>
         <if test="id != null">
             and id = #{id}
         </if>
@@ -200,8 +197,45 @@
                 ${orderId}
             </foreach>
         </if>
-        and waybill_status not in ('待派单','待接单')
-        order by create_time desc
+        and waybill_status != '待派单'
+        <if test="waybillStatus != null and waybillStatus != ''">
+            <if test="waybillStatus == '运输中'">
+                and (waybill_status = "待出发"
+                or waybill_status = "前往装货地"
+                or waybill_status = "待装货"
+                or waybill_status = "待送达"
+                or waybill_status = "待签收")
+            </if>
+            <if test="waybillStatus != '运输中'">
+                and waybill_status = #{waybillStatus}
+            </if>
+        </if>
+        order by
+        CASE
+        WHEN waybill_status LIKE '%待派单%' THEN
+        1
+        WHEN waybill_status LIKE '%待接单%' THEN
+        2
+        WHEN waybill_status LIKE '%待出发%' THEN
+        3
+        WHEN waybill_status LIKE '%前往装货地%' THEN
+        4
+        WHEN waybill_status LIKE '%待装货%' THEN
+        5
+        WHEN waybill_status LIKE '%待送达%' THEN
+        6
+        WHEN waybill_status LIKE '%待签收%' THEN
+        7
+        WHEN waybill_status LIKE '%已拒单%' THEN
+        8
+        WHEN waybill_status LIKE '%已完成%' THEN
+        9
+        WHEN waybill_status LIKE '%已取消%' THEN
+        10
+        WHEN waybill_status LIKE '%已作废%' THEN
+        11
+        END
+        ,create_time DESC
     </select>
     <select id="listWaybillWaitByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
@@ -293,6 +327,45 @@
       from
       waybill
       where driver_id = #{driverId}
-      and waybill_status in ('待出发','待出发','待装货','待送达','待签收')
+      and waybill_status in ('待出发','前往装货地','待装货','待送达','待签收')
+    </select>
+    <update id="updateCancelWaybillById" parameterType="com.jaagro.tms.biz.entity.Waybill">
+        update waybill set waybill_status =#{waybillStatus},
+        truck_id = #{truckId,jdbcType=INTEGER},
+        driver_id = #{driverId,jdbcType=INTEGER} where id = #{id};
+    </update>
+    <select id="listWaybillTimeOut" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill
+        where
+        <![CDATA[
+        waybill_status=#{waybillStatus} and send_time< DATE_SUB(now(),INTERVAL 60 MINUTE)
+        ]]>
+    </select>
+    <select id="listWaybillByStatus" resultMap="DetailInfo"
+            parameterType="com.jaagro.tms.api.dto.waybill.ReceiptListParamDto">
+        select  <include refid="Base_Column_List"/> from (
+            select
+            <include refid="Base_Column_List"/>
+            from waybill
+            where enabled=1 and waybill_status='待接单'
+            <if test="waybillStatus != null">
+                and waybill_status=#{waybillStatus,jdbcType=VARCHAR}
+            </if>
+            <if test="truckId != null">
+                and truck_Id = #{truckId,jdbcType=INTEGER}
+            </if>
+            union
+            select w.id, w.order_id, w.load_site_id, w.truck_team_contract_id, w.waybill_status,
+            w.receipt_status,w.need_truck_type, w.truck_id, w.driver_id, w.send_time, w.distance,
+            w.create_time, w.created_user_id, w.modify_time, w.modify_user_id, w.enabled,w.load_time,
+            w.department_id, w.network_id
+            from waybill w inner join grab_waybill_record gwr on w.id=gwr.waybill_id
+            where w.enabled=1 and gwr.enabled=1 and w.waybill_status='待接单' and gwr.status='未抢单'
+            <if test="driverId!=null">
+                and gwr.driver_id=#{driverId}
+            </if>
+        )tab order by create_time DESC
     </select>
 </mapper>

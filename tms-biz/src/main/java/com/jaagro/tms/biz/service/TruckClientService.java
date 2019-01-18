@@ -1,9 +1,7 @@
 package com.jaagro.tms.biz.service;
 
-import com.jaagro.tms.api.dto.truck.ChangeTruckDto;
-import com.jaagro.tms.api.dto.truck.ListTruckQualificationDto;
-import com.jaagro.tms.api.dto.truck.ShowTruckDto;
-import com.jaagro.tms.api.dto.truck.TruckQualification;
+import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
+import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.utils.BaseResponse;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -58,4 +56,27 @@ public interface TruckClientService {
     @PutMapping("/truckQualificationToFeign")
     BaseResponse truckQualificationToFeign(@RequestBody TruckQualification qualification);
 
+    /**
+     * 根据车队id获取已经审核通过的车队合同列表（运力合同列表）
+     * @param truckTeamId
+     * @return
+     */
+    @PostMapping("/getTruckTeamContractByTruckTeamId/{truckTeamId}")
+    List<TruckTeamContractReturnDto> getTruckTeamContractByTruckTeamId(@PathVariable("truckTeamId") Integer truckTeamId);
+
+    /**
+     * 根据车牌号查询车辆
+     * @param truckNumber
+     * @return
+     */
+    @GetMapping("/getByTruckNumber")
+    BaseResponse<GetTruckDto> getByTruckNumber(@RequestParam("truckNumber") String truckNumber);
+
+    /**
+     * 根据拉货类型查询车型列表
+     * @param productName
+     * @return
+     */
+    @GetMapping("/listTruckType/{productName}")
+    BaseResponse<List<ListTruckTypeDto>> listTruckTypeByProductName(@PathVariable(value = "productName") String productName);
 }

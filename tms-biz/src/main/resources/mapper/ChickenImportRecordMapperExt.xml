@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jaagro.tms.biz.mapper.ChickenImportRecordMapperExt">
+    <insert id="batchInsert">
+        insert into chicken_import_record (order_id, customer_id,
+      customer_name, load_site_id, load_site_name,
+      load_site_dept_id, truck_id, truck_number,
+      truck_team_contract_id, truck_type_id, truck_type_name,
+      goods_quantity, load_time, required_time,
+      enable, create_time, create_user_id,
+      modify_time, modify_user_id)
+    values
+    <foreach collection="chickenImportRecordList" separator="," item="item">
+        (#{item.orderId,jdbcType=INTEGER}, #{item.customerId,jdbcType=INTEGER},
+        #{item.customerName,jdbcType=VARCHAR}, #{item.loadSiteId,jdbcType=INTEGER}, #{item.loadSiteName,jdbcType=VARCHAR},
+        #{item.loadSiteDeptId,jdbcType=INTEGER}, #{item.truckId,jdbcType=INTEGER}, #{item.truckNumber,jdbcType=VARCHAR},
+        #{item.truckTeamContractId,jdbcType=INTEGER}, #{item.truckTypeId,jdbcType=INTEGER}, #{item.truckTypeName,jdbcType=VARCHAR},
+        #{item.goodsQuantity,jdbcType=INTEGER}, #{item.loadTime,jdbcType=TIMESTAMP}, #{item.requiredTime,jdbcType=TIMESTAMP},
+        #{item.enable,jdbcType=TINYINT}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.createUserId,jdbcType=INTEGER},
+        #{item.modifyTime,jdbcType=TIMESTAMP}, #{item.modifyUserId,jdbcType=INTEGER})
+    </foreach>
+
+    </insert>
+</mapper>

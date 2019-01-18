@@ -1,7 +1,11 @@
 package com.jaagro.tms.api.service;
 
 import com.github.pagehelper.PageInfo;
+import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.api.dto.driverapp.*;
+import com.jaagro.tms.api.dto.order.ChickenImportRecordDto;
+import com.jaagro.tms.api.dto.order.PreImportChickenRecordDto;
+import com.jaagro.tms.api.dto.order.UpdateChickenImportRecordDto;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.ChangeTruckDto;
@@ -243,20 +247,60 @@ public interface WaybillService {
     Map<String, Object> changeTruck(TransferTruckDto truckDto);
 
     /**
+     * @param waybillIds
+     * @return
      * @Author gavin
      * 20181222
      * 客户结算
-     * @param waybillIds
-     * @return
      */
     List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(List<Integer> waybillIds);
 
     /**
      * 司机结算计算价格
-     * @author yj
-     * @since 20181226
+     *
      * @param waybillIds
      * @return
+     * @author yj
+     * @since 20181226
      */
     List<Map<Integer, BigDecimal>> calculatePaymentFromDriver(List<Integer> waybillIds);
+
+    /**
+     * 毛鸡导入预览
+     * @author yj
+     * @param preImportChickenRecordDto
+     * @return
+     */
+    List<ChickenImportRecordDto> preImportChickenWaybill(PreImportChickenRecordDto preImportChickenRecordDto);
+
+    /**
+     * 毛鸡导入记录入库并生成运单派单给车辆下所有司机
+     * @author yj
+     * @param orderId
+     */
+    void importChickenWaybill(Integer orderId);
+
+    /**
+     * 毛鸡运单导入
+     * Author gavin
+     *
+     * @param waybillDto
+     * @return
+     */
+    Boolean importWaybills(Integer orderId,List<ImportWaybillDto> waybillDto);
+
+    /**
+     * 根据司机id统计未完成的运单
+     *
+     * @param driverId
+     * @return
+     */
+    Integer countUnFinishWaybillByDriver(Integer driverId);
+
+    /**
+     * 修改不正确的毛鸡导入记录
+     * @param dto
+     * @return
+     */
+    List<ChickenImportRecordDto> changeImportChickenRecord(UpdateChickenImportRecordDto dto);
 }

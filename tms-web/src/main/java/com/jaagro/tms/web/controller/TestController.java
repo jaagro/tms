@@ -2,13 +2,16 @@ package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.waybill.LocationDto;
 import com.jaagro.tms.biz.mapper.LocationMapperExt;
-import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.biz.schedule.WaybillTaskService;
+import com.jaagro.tms.biz.schedule.WaybillTimeOutTaskService;
 import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import com.jaagro.tms.biz.service.impl.GpsLocationAsync;
 import com.jaagro.utils.BaseResponse;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
@@ -28,10 +31,14 @@ public class TestController {
 
     @Autowired
     LocationMapperExt locationMapper;
+    @Autowired
+    WaybillTimeOutTaskService waybillTimeOutTaskService;
 
 
     @Autowired
     private GpsLocationAsync asyncTask;
+    @Autowired
+    private WaybillTaskService waybillTaskService;
 
 
     @GetMapping("/insertBatch")
@@ -101,6 +108,12 @@ public class TestController {
         return result;
     }
 
+    @ApiOperation("测试")
+    @PutMapping("/test11")
+    public BaseResponse test11() {
+        //waybillTimeOutTaskService.listWaybillTimeOut();
+        return BaseResponse.successInstance(null);
+    }
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
@@ -125,4 +138,5 @@ public class TestController {
         long end = System.currentTimeMillis();
         System.out.println("-----耗时----------" + (start - end) + "---------------");
     }
+
 }

@@ -1,4 +1,4 @@
-package com.jaagro.tms.web.vo;
+package com.jaagro.tms.api.dto;
 
 /**
  * 封装list对象可以对list做validate
