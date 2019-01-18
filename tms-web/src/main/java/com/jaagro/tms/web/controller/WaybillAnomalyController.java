@@ -42,10 +42,23 @@ public class WaybillAnomalyController {
         return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
     }
 
+    @ApiOperation("根据运单查询运单异常类型")
+    @GetMapping("displayWaybillAnomalyType/{waybillId}")
+    public BaseResponse displayWaybillAnomalyType(@PathVariable Integer waybillId) {
+        List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = waybillAnomalyService.displayWaybillAnomalyType(waybillId);
+        List<AnomalyTypeVo> anomalyTypeVos = new ArrayList<>();
+        for (WaybillAnomalyTypeDto waybillAnomalyTypeDto : waybillAnomalyTypeDtos) {
+            AnomalyTypeVo anomalyTypeVo = new AnomalyTypeVo();
+            BeanUtils.copyProperties(waybillAnomalyTypeDto, anomalyTypeVo);
+            anomalyTypeVos.add(anomalyTypeVo);
+        }
+        return BaseResponse.successInstance(anomalyTypeVos);
+    }
+
     @ApiOperation("运单异常类型显示")
-    @GetMapping("displayAnomalyType/{waybillId}")
-    public BaseResponse displayAnomalyType(@PathVariable Integer waybillId) {
-        List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = waybillAnomalyService.displayAnomalyType(waybillId);
+    @GetMapping("displayAnomalyType")
+    public BaseResponse displayAnomalyType() {
+        List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = waybillAnomalyService.displayAnomalyType();
         List<AnomalyTypeVo> anomalyTypeVos = new ArrayList<>();
         for (WaybillAnomalyTypeDto waybillAnomalyTypeDto : waybillAnomalyTypeDtos) {
             AnomalyTypeVo anomalyTypeVo = new AnomalyTypeVo();

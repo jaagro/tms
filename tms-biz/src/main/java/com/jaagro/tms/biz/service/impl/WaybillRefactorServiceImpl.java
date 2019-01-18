@@ -311,8 +311,9 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         //修改waybillItems信息
         ShowSiteDto showSiteDto;
         List<WaybillItems> waybillItems;
+        String ls = waybillOcr.getUnLoadSite();
         try {
-            showSiteDto = customerClientService.getSiteBySiteName(waybillOcr.getUnLoadSite(), 248).getData();
+            showSiteDto = customerClientService.getSiteBySiteName(ls, 248).getData();
             waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillOcr.getWaybillId());
         } catch (Exception e) {
             log.error("O waybillSupplementByOcr feign call failed: {}", e);
@@ -338,16 +339,22 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             wg.setGoodsName("饲料");
             BigDecimal goodsWeight = waybillOcr.getGoodsItems().get(i).divide(new BigDecimal(1000), 2, RoundingMode.HALF_UP);
             wg.setGoodsWeight(goodsWeight);
-            System.out.println(goodsWeight);   //
             wg.setLoadWeight(goodsWeight);
             wg.setUnloadWeight(goodsWeight);
             wg.setWaybillId(waybillOcr.getWaybillId());
             wg.setWaybillItemId(cwd.getId());
             wg.setOrderGoodsId(0);
+            wg.setGoodsUnit(GoodsUnit.TON);
+            wg.setEnabled(true);
             waybillGoodsList.add(wg);
         }
         //插入数据库
-        waybillGoodsMapper.batchInsert(waybillGoodsList);
+        try {
+            waybillGoodsMapper.batchInsert(waybillGoodsList);
+        }catch (Exception e){
+            log.error("O waybillSupplementByOcr create waybillGoods error ", e);
+        }
+
     }
 
     /**

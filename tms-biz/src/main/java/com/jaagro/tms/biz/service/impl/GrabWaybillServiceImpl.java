@@ -29,7 +29,7 @@ import java.util.*;
 @Slf4j
 public class GrabWaybillServiceImpl implements GrabWaybillService {
     @Autowired
-    private OrdersMapper ordersMapper;
+    private OrdersMapperExt ordersMapper;
     @Autowired
     private WaybillMapperExt waybillMapper;
     @Autowired
@@ -37,7 +37,7 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
     @Autowired
     private CurrentUserService currentUserService;
     @Autowired
-    GrabWaybillRecordMapperExt grabWaybillRecordMapper;
+    private GrabWaybillRecordMapperExt grabWaybillRecordMapper;
     @Autowired
     private TruckClientService truckClientService;
     @Autowired
@@ -57,11 +57,11 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
     @Transactional(rollbackFor = Exception.class)
     public void grabWaybillToTrucks(GrabWaybillParamDto dto) {
         Waybill waybill = waybillMapper.selectByPrimaryKey(dto.getWaybillId());
-        String waybillOldStatus = waybill.getWaybillStatus();
-        String waybillNewStatus = WaybillStatus.RECEIVE;
         if (null == waybill) {
             throw new RuntimeException("当前运单" + waybill.getId() + "不存在!");
         }
+        String waybillOldStatus = waybill.getWaybillStatus();
+        String waybillNewStatus = WaybillStatus.RECEIVE;
         List<ShowTruckDto> truckDtos = new ArrayList<>();
         for (Integer truckId : dto.getTruckIds()) {
             ShowTruckDto trucks = truckClientService.getTruckByIdReturnObject(truckId);
@@ -100,7 +100,6 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
                 .setReferUserId(getUserId());
         waybillTrackingMapper.insertSelective(waybillTracking);
         //向司机推送jpush消息
-        orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         //装货地
         ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
         String loadSiteName = loadSite.getSiteName();
@@ -118,7 +117,7 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
         List<GrabWaybillRecord> grabWaybillRecords = new ArrayList<>();
         for (ShowTruckDto truckDto : truckDtos) {
             List<ShowDriverDto> drivers = truckDto.getDrivers();
-            if (CollectionUtils.isEmpty(drivers)) {
+            if (!CollectionUtils.isEmpty(drivers)) {
                 for (ShowDriverDto driver : drivers) {
                     //插入抢单模式记录表
                     GrabWaybillRecord grabWaybillRecord = new GrabWaybillRecord();
@@ -128,7 +127,7 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
                             .setCreateUserId(getUserId())
                             .setTruckId(truckDto.getId())
                             .setDriverId(driver.getId())
-                            .setStatus(waybillNewStatus);
+                            .setStatus(GrabWaybillStatusType.NOT_ROB);
                     grabWaybillRecords.add(grabWaybillRecord);
                     //推送jpush消息
                     Map<String, String> extraParam = new HashMap<>();
