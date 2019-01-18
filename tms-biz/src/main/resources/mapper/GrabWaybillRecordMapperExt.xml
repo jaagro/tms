@@ -5,13 +5,14 @@
         insert into grab_waybill_record (waybill_id, truck_id, driver_id,
         status, create_time, create_user_id, modify_time, modify_user_id)
         values
-        <foreach collection="grabWaybillRecIords" item="item" separator=",">
+        <foreach collection="grabWaybillRecords" item="item" separator=",">
             (#{item.waybillId}, #{item.truckId}, #{item.driverId},
             #{item.status}, #{item.createTime}, #{item.createUserId},#{item.modifyTime},
             #{item.modifyUserId})
         </foreach>
     </insert>
-    <select id="listGrabWaybillByDriverId" resultMap="BaseResultMap" parameterType="com.jaagro.tms.api.dto.waybill.GraWaybillConditionDto">
+    <select id="listGrabWaybillByCondition" resultMap="BaseResultMap"
+            parameterType="com.jaagro.tms.api.dto.waybill.GraWaybillConditionDto">
         select
         <include refid="Base_Column_List"/>
         from grab_waybill_record
@@ -26,4 +27,72 @@
             and waybill_Id=#{waybillId}
         </if>
     </select>
+    <update id="updateGrabWaybillRecordByReceipt" parameterType="com.jaagro.tms.api.dto.waybill.GraWaybillConditionDto">
+        update grab_waybill_record
+        <set>
+            status='已抢单'
+        </set>
+        where enabled=1
+        <if test="driverId!=null">
+            and driver_id = #{driverId,jdbcType=INTEGER}
+        </if>
+        <if test="status!=null">
+            and status=#{status}
+        </if>
+        <if test="waybillId!=null">
+            and waybill_Id=#{waybillId}
+        </if>
+    </update>
+    <update id="updateGrabWaybillRecordByReject" parameterType="com.jaagro.tms.api.dto.waybill.GraWaybillConditionDto">
+        update grab_waybill_record
+        <set>
+            status='已拒单'
+        </set>
+        where enabled=1
+        <if test="driverId!=null">
+            and driver_id = #{driverId,jdbcType=INTEGER}
+        </if>
+        <if test="status!=null">
+            and status=#{status}
+        </if>
+        <if test="waybillId!=null">
+            and waybill_Id=#{waybillId}
+        </if>
+    </update>
+    <update id="batchUpdate" parameterType="java.util.List">
+        update grab_waybill_record
+        <set>
+            status='已结束'
+        </set>
+        <where>
+            <if test="ids!=null">
+                and id in
+                <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </update>
+    <select id="listNotRobGrabWaybill" resultMap="BaseResultMap"
+            parameterType="com.jaagro.tms.api.dto.waybill.GraWaybillConditionDto">
+        select
+        <include refid="Base_Column_List"/>
+        from grab_waybill_record
+        where enabled=1 and status in ('未抢单','已抢单','已结束')
+        <if test="waybillId!=null">
+            and waybill_Id=#{waybillId}
+        </if>
+    </select>
+    <select id="getGrabWaybillByWaybillId" resultMap="BaseResultMap"
+            parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from grab_waybill_record
+        where enabled=1
+        <if test="waybillId!=null">
+            and waybill_Id=#{waybillId}
+        </if>
+        limit 1
+    </select>
+
 </mapper>

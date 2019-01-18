@@ -172,18 +172,7 @@ public class PeripheralAppController {
     @PostMapping("/listWashTruckRecordByCriteria")
     public BaseResponse listWashTruckRecordByCriteria(@RequestBody @Validated ListWashTruckRecordCriteria criteria) {
         log.info("O listWashTruckRecordByCriteria {}", criteria);
-        PageInfo pageInfo = washTruckService.listWashTruckRecordByCriteria(criteria);
-        List<WashTruckRecord> recordList = pageInfo.getList();
-        if (!recordList.isEmpty()) {
-            List<WashTruckRecordVo> washTruckRecordVoList = new ArrayList<>();
-            recordList.forEach(record -> {
-                WashTruckRecordVo vo = new WashTruckRecordVo();
-                BeanUtils.copyProperties(record, vo);
-                washTruckRecordVoList.add(vo);
-            });
-            pageInfo.setList(washTruckRecordVoList);
-        }
-        return BaseResponse.successInstance(pageInfo);
+        return BaseResponse.successInstance(washTruckService.listWashTruckRecordByCriteria(criteria));
     }
 
     @ApiOperation("洗车详情")
