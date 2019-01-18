@@ -2481,12 +2481,9 @@ public class WaybillServiceImpl implements WaybillService {
         List<TruckTeamContractReturnDto> truckTeamContracts = truckClientService.getTruckTeamContractByTruckTeamId(truckTeamId);
         if (!CollectionUtils.isEmpty(truckTeamContracts)) {
             for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
-                if (goodsType.equals(truckTeamContractReturnDto.getBussinessType())) {
+                if (truckTeamContractReturnDto.getBussinessType() != null && truckTeamContractReturnDto.getBussinessType().equals(goodsType)){
                     truckTeamContractId = truckTeamContractReturnDto.getId();
-                } else if (goodsType == 3 && truckTeamContractReturnDto.getBussinessType() == 4) {
-                    truckTeamContractId = truckTeamContractReturnDto.getId();
-                } else if (goodsType == 6 && truckTeamContractReturnDto.getBussinessType() == 4) {
-                    truckTeamContractId = truckTeamContractReturnDto.getId();
+                    break;
                 }
             }
         }
