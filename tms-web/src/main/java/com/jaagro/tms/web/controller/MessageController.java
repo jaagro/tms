@@ -35,7 +35,7 @@ public class MessageController {
     @PostMapping("/listMessages")
     @ApiOperation("消息列表")
     public BaseResponse listMessages(@RequestBody @Validated ListMessageCriteriaDto criteriaDto) {
-        log.debug("listMessages,{}",criteriaDto);
+        log.info("O listMessages,criteriaDto={}",criteriaDto);
         PageInfo<MessageReturnDto> messageReturnDtoPageInfo = messageService.listMessageByCriteriaDto(criteriaDto);
         return BaseResponse.successInstance(messageReturnDtoPageInfo);
     }
@@ -56,6 +56,7 @@ public class MessageController {
     @PostMapping("/listUnreadMessages")
     @ApiOperation("获取未读消息")
     public BaseResponse listUnreadMessages(@RequestBody @Validated ListUnReadMsgCriteriaDto criteriaDto){
+        log.info("O listUnreadMessages criteriaDto={}",criteriaDto);
         List<MessageReturnDto> messageReturnDtos = messageService.listUnreadMessages(criteriaDto);
         return BaseResponse.successInstance(messageReturnDtos);
     }
