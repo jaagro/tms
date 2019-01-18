@@ -83,4 +83,16 @@
             and waybill_Id=#{waybillId}
         </if>
     </select>
+    <select id="getGrabWaybillByWaybillId" resultMap="BaseResultMap"
+            parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from grab_waybill_record
+        where enabled=1
+        <if test="waybillId!=null">
+            and waybill_Id=#{waybillId}
+        </if>
+        limit 1
+    </select>
+
 </mapper>
