@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.ConnectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -292,67 +293,82 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     @RabbitListener(queues = RabbitMqConfig.MUYUAN_OCR_QUEUE)
     @Transactional(rollbackFor = Exception.class)
     public void waybillSupplementByOcr(Map<String, String> map) {
-        int waybillId = Integer.parseInt(map.get("waybillId"));
-        String imageUrl = map.get("imageUrl");
-        System.out.println(waybillId);
-        if (waybillMapper.getWaybillById(waybillId) == null) {
-            log.error("R waybillSupplementByOcr waybillId failed: {}", waybillId);
-            return;
-        }
-        String[] strArray = {imageUrl};
-        List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
-        WaybillOcrDto waybillOcr = ocrService.getOcrByMuYuanAppImage(waybillId, urls.get(0).toString());
-        if (StringUtils.isEmpty(waybillOcr.getUnLoadSite())) {
-            log.error("R waybillSupplementByOcr unLoadSite is invalid");
-            return;
-        }
-
-        //河南牧原id为248，目前图片识别只适用于牧原项目
-        //修改waybillItems信息
-        ShowSiteDto showSiteDto;
-        List<WaybillItems> waybillItems;
-        String ls = waybillOcr.getUnLoadSite();
         try {
-            showSiteDto = customerClientService.getSiteBySiteName(ls, 248).getData();
-            waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillOcr.getWaybillId());
+            int waybillId = Integer.parseInt(map.get("waybillId"));
+            String imageUrl = map.get("imageUrl");
+            System.out.println(waybillId);
+            if (waybillMapper.getWaybillById(waybillId) == null) {
+                log.error("R waybillSupplementByOcr waybillId failed: {}", waybillId);
+                return;
+            }
+            String[] strArray = {imageUrl};
+            List<URL> urls;
+            WaybillOcrDto waybillOcr;
+            try {
+                urls = ossSignUrlClientService.listSignedUrl(strArray);
+                waybillOcr = ocrService.getOcrByMuYuanAppImage(waybillId, urls.get(0).toString());
+            } catch (Exception e) {
+                log.error("O waybillSupplementByOcr Image recognition failed waybillId: " + waybillId + " exception:" + e);
+                return;
+            }
+
+            if (StringUtils.isEmpty(waybillOcr.getUnLoadSite())) {
+                log.error("R waybillSupplementByOcr unLoadSite is invalid");
+                return;
+            }
+
+            //河南牧原id为248，目前图片识别只适用于牧原项目
+            //修改waybillItems信息
+            ShowSiteDto showSiteDto = null;
+            List<WaybillItems> waybillItems = null;
+            String ls = waybillOcr.getUnLoadSite();
+            try {
+                showSiteDto = customerClientService.getSiteBySiteName(ls, 248).getData();
+                waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillOcr.getWaybillId());
+            } catch (Exception e) {
+                log.error("O waybillSupplementByOcr feign call failed: {}", e);
+                return;
+            }
+            GetWaybillItemDto cwd = new GetWaybillItemDto();
+            if (!CollectionUtils.isEmpty(waybillItems) || showSiteDto != null) {
+                cwd.setId(waybillItems.get(0).getId());
+                cwd.setUnloadSiteId(showSiteDto.getId());
+            }
+            WaybillItems wis = new WaybillItems();
+            BeanUtils.copyProperties(cwd, wis);
+            try {
+                waybillItemsMapper.updateByPrimaryKeySelective(wis);
+                waybillGoodsMapper.deleteByWaybillId(waybillOcr.getWaybillId());
+            } catch (Exception e) {
+                log.error("O waybillSupplementByOcr update waybillItems error, " + wis + "exception" + e);
+                return;
+            }
+            log.info("O waybillSupplementByOcr update waybillItems, object: {}", wis);
+            //根据waybillOcr记录 循环创建waybillGoods;
+            List<WaybillGoods> waybillGoodsList = new LinkedList<>();
+            for (int i = 0; i < waybillOcr.getGoodsItems().size(); i++) {
+                WaybillGoods wg = new WaybillGoods();
+                wg.setGoodsName("饲料");
+                BigDecimal goodsWeight = waybillOcr.getGoodsItems().get(i).divide(new BigDecimal(1000), 2, RoundingMode.HALF_UP);
+                wg.setGoodsWeight(goodsWeight);
+                wg.setLoadWeight(goodsWeight);
+                wg.setUnloadWeight(goodsWeight);
+                wg.setWaybillId(waybillOcr.getWaybillId());
+                wg.setWaybillItemId(cwd.getId());
+                wg.setOrderGoodsId(0);
+                wg.setGoodsUnit(GoodsUnit.TON);
+                wg.setEnabled(true);
+                waybillGoodsList.add(wg);
+            }
+            //插入数据库
+            try {
+                waybillGoodsMapper.batchInsert(waybillGoodsList);
+            } catch (Exception e) {
+                log.error("O waybillSupplementByOcr create waybillGoods error ", e);
+            }
+
         } catch (Exception e) {
-            log.error("O waybillSupplementByOcr feign call failed: {}", e);
-            return;
-        }
-
-        GetWaybillItemDto cwd = new GetWaybillItemDto();
-        if (waybillItems != null) {
-            cwd.setId(waybillItems.get(0).getId());
-        }
-        cwd.setUnloadSiteId(showSiteDto.getId());
-        WaybillItems wis = new WaybillItems();
-        BeanUtils.copyProperties(cwd, wis);
-        waybillItemsMapper.updateByPrimaryKeySelective(wis);
-        log.info("O waybillSupplementByOcr update waybillItems, object: {}", wis);
-        //创建goods信息
-        //删除现有的goods记录
-        waybillGoodsMapper.deleteByWaybillId(waybillOcr.getWaybillId());
-        //根据waybillOcr记录 循环创建waybillGoods;
-        List<WaybillGoods> waybillGoodsList = new LinkedList<>();
-        for (int i = 0; i < waybillOcr.getGoodsItems().size(); i++) {
-            WaybillGoods wg = new WaybillGoods();
-            wg.setGoodsName("饲料");
-            BigDecimal goodsWeight = waybillOcr.getGoodsItems().get(i).divide(new BigDecimal(1000), 2, RoundingMode.HALF_UP);
-            wg.setGoodsWeight(goodsWeight);
-            wg.setLoadWeight(goodsWeight);
-            wg.setUnloadWeight(goodsWeight);
-            wg.setWaybillId(waybillOcr.getWaybillId());
-            wg.setWaybillItemId(cwd.getId());
-            wg.setOrderGoodsId(0);
-            wg.setGoodsUnit(GoodsUnit.TON);
-            wg.setEnabled(true);
-            waybillGoodsList.add(wg);
-        }
-        //插入数据库
-        try {
-            waybillGoodsMapper.batchInsert(waybillGoodsList);
-        }catch (Exception e){
-            log.error("O waybillSupplementByOcr create waybillGoods error ", e);
+            log.error("R waybillSupplementByOcr Image recognition failed waybillId");
         }
 
     }

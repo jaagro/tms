@@ -31,8 +31,13 @@ public class OcrServiceImpl implements OcrService {
 
     @Override
     public WaybillOcrDto getOcrByMuYuanAppImage(int waybillId, String imageUrl) {
-        System.out.println(imageUrl);
-        String jsonResult = ocrUtils(imageUrl);
+        String jsonResult;
+        try {
+            jsonResult = ocrUtils(imageUrl);
+        }catch (Exception e){
+            log.error("O getOcrByMuYuanAppImage Image recognition failed ", e);
+            return new WaybillOcrDto();
+        }
         System.out.println("源数据：" + jsonResult);
         MuYuanAppImageDto image = JSON.parseObject(jsonResult, MuYuanAppImageDto.class);
         List<String> out = new ArrayList<>();
