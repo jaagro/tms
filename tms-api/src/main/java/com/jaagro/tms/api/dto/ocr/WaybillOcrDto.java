@@ -3,6 +3,8 @@ package com.jaagro.tms.api.dto.ocr;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,6 +20,11 @@ public class WaybillOcrDto implements Serializable {
     /** 货物总条数 */
     private int goodsCount;
 
+    /**
+     * 卸货地
+     */
+    private String unLoadSite;
+
     /** 货物明细 */
-    private Map<String, String> goodsItems;
+    private List<BigDecimal> goodsItems;
 }

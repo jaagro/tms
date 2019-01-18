@@ -12,6 +12,5 @@ import java.util.List;
 public class MuYuanAppImageDto {
     String code;
     String msg;
-    List<MuYuanAppImageResultDto> result;
-    String words;
+    List<MuYuanAppResultDto> result;
 }

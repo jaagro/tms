@@ -13,5 +13,5 @@ public interface OcrService {
      *
      * @return
      */
-    WaybillOcrDto getOcrByMuYuanAppImage();
+    WaybillOcrDto getOcrByMuYuanAppImage(int waybillId, String imageUrl);
 }

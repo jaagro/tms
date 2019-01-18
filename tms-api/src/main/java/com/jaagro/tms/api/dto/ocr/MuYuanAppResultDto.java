@@ -7,6 +7,6 @@ import lombok.Data;
  * @date 2019-01-14 18:27
  */
 @Data
-public class MuYuanAppImageResultDto {
+public class MuYuanAppResultDto {
     String words;
 }
