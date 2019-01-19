@@ -1427,7 +1427,7 @@ public class WaybillServiceImpl implements WaybillService {
                 ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(grabWaybillRecords.get(0).getTruckId());
                 Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId());
                 waybill
-                        .setTruckId(truckDto.getTruckTeamId())
+                        .setTruckId(truckDto.getId())
                         .setTruckTeamContractId(truckTeamContractId);
                 //更新当前抢单为已抢单
                 grabWaybillRecordMapper.updateGrabWaybillRecordByReceipt(graWaybillConditionDto);

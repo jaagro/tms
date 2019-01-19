@@ -18,4 +18,11 @@ public interface GrabWaybillService {
      * @author @Gao.
      */
     void grabWaybillToTrucks(GrabWaybillParamDto dto);
+
+    /**
+     * 撤销抢单
+     * @param waybillId
+     * @author @Gao.
+     */
+    public void withdrawGrabWaybill(Integer waybillId);
 }
