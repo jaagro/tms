@@ -14,4 +14,12 @@ public final class ReceiptConstant {
      * 该运单已接单
      */
     public static final String ALREADY_RECEIVED = "ALREADY_RECEIVED";
+    /**
+     * 服务请求中
+     */
+    public static final String SERVICE_REQUEST="SERVICE_REQUEST";
+
+
+
+
 }
