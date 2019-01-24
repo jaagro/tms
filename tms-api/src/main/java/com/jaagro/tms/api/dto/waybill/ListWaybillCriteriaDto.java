@@ -55,6 +55,11 @@ public class ListWaybillCriteriaDto implements Serializable {
     private List<Integer> departIds;
 
     /**
+     * 部门
+     */
+    private Integer deptId;
+
+    /**
      * 车牌号
      */
     private String truckNumber;
