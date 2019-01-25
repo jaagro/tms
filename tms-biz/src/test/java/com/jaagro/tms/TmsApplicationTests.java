@@ -45,10 +45,4 @@ public class TmsApplicationTests {
         MyBatisGenerator myBatisGenerator = new MyBatisGenerator(config, callback, warnings);
         myBatisGenerator.generate(null);
     }
-
-    @Test
-    public void ocrTest(){
-        ocrService.getOcrByMuYuanAppImage();
-    }
-
 }
