@@ -39,7 +39,7 @@ public class PushClientTest extends BaseTest {
         try {
             PushResult result = jpushClient.sendPush(payload);
             int status = result.getResponseCode();
-            LOG.info("Got result - " + result);
+            LOG.info("Got muYuanAppImageResultBo - " + result);
             LOG.info("push status====:::" +status);
         } catch (APIConnectionException e) {
             LOG.error("Connection error. Should retry later. ", e);
@@ -67,7 +67,7 @@ public class PushClientTest extends BaseTest {
 //            client.sendRequest(HttpMethod.POST, payload.toString(), uri, new NettyHttpClient.BaseCallback() {
 //                @Override
 //                public void onSucceed(ResponseWrapper responseWrapper) {
-//                    LOG.info("Got result: " + responseWrapper.responseContent);
+//                    LOG.info("Got muYuanAppImageResultBo: " + responseWrapper.responseContent);
 //                }
 //            });
 //        } catch (URISyntaxException e) {
@@ -135,7 +135,7 @@ public class PushClientTest extends BaseTest {
         JPushClient jPushClient = new JPushClient(MASTER_SECRET, APP_KEY);
         try {
             CIDResult result = jPushClient.getCidList(3, "push");
-            LOG.info("Got result - " + result);
+            LOG.info("Got muYuanAppImageResultBo - " + result);
         } catch (APIConnectionException e) {
             LOG.error("Connection error. Should retry later. ", e);
         } catch (APIRequestException e) {
@@ -152,7 +152,7 @@ public class PushClientTest extends BaseTest {
         PushPayload pushPayload = buildPushObject_android_cid();
         try {
             PushResult result = jPushClient.sendPush(pushPayload);
-            LOG.info("Got result - " + result);
+            LOG.info("Got muYuanAppImageResultBo - " + result);
         } catch (APIConnectionException e) {
             LOG.error("Connection error. Should retry later. ", e);
         } catch (APIRequestException e) {
