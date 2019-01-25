@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -33,7 +34,8 @@ public class TestController {
     @Autowired
     WaybillTimeOutTaskService waybillTimeOutTaskService;
 
-
+    @Autowired
+    private StringRedisTemplate redisTemplate;
     @Autowired
     private GpsLocationAsync asyncTask;
     @Autowired
@@ -160,4 +162,12 @@ public class TestController {
         map.put("imageUrl", imageUrl);
         amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "muyuan.ocr", map);
     }
+
+private static int increaseIIvalue;
+    @GetMapping("/increaseIIvalue")
+    public void refreshRedisValue(){
+        int value = increaseIIvalue++;
+        redisTemplate.opsForValue().getAndSet("increaseII",String.valueOf(value));
+    }
+
 }
