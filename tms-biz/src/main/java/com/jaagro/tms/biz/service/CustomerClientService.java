@@ -1,6 +1,7 @@
 package com.jaagro.tms.biz.service;
 
 import com.jaagro.tms.api.dto.customer.*;
+import com.jaagro.utils.BaseResponse;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +45,16 @@ public interface CustomerClientService {
      */
     @GetMapping("/getShowSite/{id}")
     ShowSiteDto getShowSiteById(@PathVariable("id") Integer id);
+
+    /**
+     * 根据地址名称获取地址对象
+     * @param siteName
+     * @param customerId
+     * @return
+     */
+    @GetMapping("/getSiteBySiteName/{siteName}/{customerId}")
+    BaseResponse<ShowSiteDto> getSiteBySiteName(@PathVariable("siteName") String siteName,
+                                                       @PathVariable("customerId") Integer customerId);
 
     /**
      * 从crm项目获取显示客户联系人
