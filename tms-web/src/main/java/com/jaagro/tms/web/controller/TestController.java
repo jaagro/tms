@@ -163,7 +163,7 @@ public class TestController {
         amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "muyuan.ocr", map);
     }
 
-private static int increaseIIvalue;
+    private static int increaseIIvalue;
     @GetMapping("/increaseIIvalue")
     public void refreshRedisValue(){
         int value = increaseIIvalue++;
