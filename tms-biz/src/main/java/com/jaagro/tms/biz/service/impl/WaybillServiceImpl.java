@@ -122,6 +122,8 @@ public class WaybillServiceImpl implements WaybillService {
     @Qualifier(value = "objectRedisTemplate")
     private RedisTemplate<String, Object> objectRedisTemplate;
 
+    @Autowired
+    private OcrService ocrService;
     /**
      * 毛鸡运单导入
      * Author gavin
@@ -824,9 +826,9 @@ public class WaybillServiceImpl implements WaybillService {
                     if (ImagesTypeConstant.POUND_BILL.equals(waybillImagesUrl.getImagesType())) {
                         //磅单
                         waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
-                        //****************gavin *牧源绿色磅单图片识别begin
+                        //****************gavin *牧源磅单绿色磅单图片识别begin
                         if (orders.getCustomerId() == 248) {
-
+                            ocrService.getOcrByMuYuanAppImage(waybillId,waybillImagesUrl.getImagesUrl());
                         }
                         //****************gavin *牧源绿色磅单图片识别end
                     }
