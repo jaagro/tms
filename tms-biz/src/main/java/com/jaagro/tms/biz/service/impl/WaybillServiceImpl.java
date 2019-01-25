@@ -20,6 +20,7 @@ import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.entity.ChickenImportRecord;
 import com.jaagro.tms.api.service.*;
+import com.jaagro.tms.biz.config.RabbitMqConfig;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.*;
@@ -32,6 +33,7 @@ import com.jaagro.utils.ServiceResult;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -123,7 +125,7 @@ public class WaybillServiceImpl implements WaybillService {
     private RedisTemplate<String, Object> objectRedisTemplate;
 
     @Autowired
-    private OcrService ocrService;
+    AmqpTemplate amqpTemplate;
     /**
      * 毛鸡运单导入
      * Author gavin
@@ -828,7 +830,10 @@ public class WaybillServiceImpl implements WaybillService {
                         waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
                         //****************gavin *牧源磅单绿色磅单图片识别begin
                         if (orders.getCustomerId() == 248) {
-                            ocrService.getOcrByMuYuanAppImage(waybillId,waybillImagesUrl.getImagesUrl());
+                            Map<String, String> map = new HashMap<>(16);
+                            map.put("waybillId", waybillId.toString());
+                            map.put("imageUrl", waybillImagesUrl.getImagesUrl());
+                            amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "muyuan.ocr", map);
                         }
                         //****************gavin *牧源绿色磅单图片识别end
                     }
