@@ -123,9 +123,9 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     @Qualifier(value = "objectRedisTemplate")
     private RedisTemplate<String, Object> objectRedisTemplate;
-
     @Autowired
-    AmqpTemplate amqpTemplate;
+    private AmqpTemplate amqpTemplate;
+
     /**
      * 毛鸡运单导入
      * Author gavin
@@ -828,19 +828,25 @@ public class WaybillServiceImpl implements WaybillService {
                     if (ImagesTypeConstant.POUND_BILL.equals(waybillImagesUrl.getImagesType())) {
                         //磅单
                         waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
-                        //****************gavin *牧源磅单绿色磅单图片识别begin
-                        if (orders.getCustomerId() == 248) {
-                            Map<String, String> map = new HashMap<>(16);
-                            map.put("waybillId", waybillId.toString());
-                            map.put("imageUrl", waybillImagesUrl.getImagesUrl());
-                            amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "muyuan.ocr", map);
-                        }
-                        //****************gavin *牧源绿色磅单图片识别end
                     }
                     if (!"invalidPicUrl".equalsIgnoreCase(waybillImagesUrl.getImagesUrl())) {
                         waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
                     }
                 }
+                //****************gavin *牧源绿色磅单图片识别begin
+                if (orders.getCustomerId() == 248) {
+                    Map<String, String> map = new HashMap<>(16);
+                    map.put("waybillId", waybillId.toString());
+                    try{
+                        map.put("imageUrl", imagesUrls.get(0).getImagesUrl());
+                    }catch (Exception e){
+                        log.info("O upDateWaybillTrucking 图片识别失败，{}", waybillId);
+                    }
+                    map.put("imageUrl", imagesUrls.get(0).getImagesUrl());
+                    amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "muyuan.ocr", map);
+                }
+                //****************gavin *牧源绿色磅单图片识别end
+
             }
             /**
              * 兼容老版本*******************************************************
