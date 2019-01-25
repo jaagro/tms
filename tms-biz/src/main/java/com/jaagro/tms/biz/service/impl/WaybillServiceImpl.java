@@ -1708,17 +1708,31 @@ public class WaybillServiceImpl implements WaybillService {
         try {
             Integer userId = getUserId();
             Integer truckId = waybill.getTruckId();
-            //1。把所派车辆置空、状态改为带派单
+            //1.把所派车辆置空、状态改为带派单
             waybill.setTruckId(null);
+            waybill.setDriverId(null);
             waybill.setWaybillStatus(WaybillStatus.SEND_TRUCK);
             waybill.setModifyTime(new Date());
             waybill.setModifyUserId(userId);
             waybillMapper.updateByPrimaryKey(waybill);
             //2.删除司机的短信
-            List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
             Set<Integer> driverIdSet = new HashSet<>();
-            for (int i = 0; i < drivers.size(); i++) {
-                driverIdSet.add(drivers.get(i).getId());
+            GraWaybillConditionDto graWaybillConditionDto = new GraWaybillConditionDto();
+            graWaybillConditionDto.setWaybillId(waybillId);
+            List<GrabWaybillRecord> grabWaybillRecords = grabWaybillRecordMapper.listGrabWaybillByCondition(graWaybillConditionDto);
+            //2.1.抢单模式撤单
+            if (!CollectionUtils.isEmpty(grabWaybillRecords)) {
+                for (GrabWaybillRecord grabWaybillRecord : grabWaybillRecords) {
+                    driverIdSet.add(grabWaybillRecord.getDriverId());
+                }
+                //删除抢单记录表
+                grabWaybillRecordMapper.deleteByPrimaryKey(waybillId);
+            }else{
+                //2.2.派单模式撤单
+                List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
+                for (int i = 0; i < drivers.size(); i++) {
+                    driverIdSet.add(drivers.get(i).getId());
+                }
             }
             List<Integer> driverIds = new ArrayList<Integer>(driverIdSet);
             if (!CollectionUtils.isEmpty(driverIds)) {
@@ -2485,7 +2499,7 @@ public class WaybillServiceImpl implements WaybillService {
         List<TruckTeamContractReturnDto> truckTeamContracts = truckClientService.getTruckTeamContractByTruckTeamId(truckTeamId);
         if (!CollectionUtils.isEmpty(truckTeamContracts)) {
             for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
-                if (truckTeamContractReturnDto.getBussinessType() != null && truckTeamContractReturnDto.getBussinessType().equals(goodsType)){
+                if (truckTeamContractReturnDto.getBussinessType() != null && truckTeamContractReturnDto.getBussinessType().equals(goodsType)) {
                     truckTeamContractId = truckTeamContractReturnDto.getId();
                     break;
                 }
