@@ -298,7 +298,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             String imageUrl = map.get("imageUrl");
             System.out.println(waybillId);
             if (waybillMapper.getWaybillById(waybillId) == null) {
-                log.error("R waybillSupplementByOcr waybillId failed: {}", waybillId);
+                log.error("R waybillSupplementByOcr waybillId failed:", waybillId);
                 return;
             }
             String[] strArray = {imageUrl};

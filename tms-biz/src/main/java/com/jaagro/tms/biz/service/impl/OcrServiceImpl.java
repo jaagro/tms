@@ -56,10 +56,12 @@ public class OcrServiceImpl implements OcrService {
         for (String ss : out) {
             log.info("o getOcrByMuYuanAppImage Before data cleaning: {}", ss);
         }
+
         //清洗list数据
-        for (int i = 0; i < out.size(); i++) {
-            if (!(out.get(i).contains("车号") && out.get(i).contains("发料"))) {
-                out.remove(i);
+        Iterator<String> iterator = out.iterator();
+        while (iterator.hasNext()){
+            if(!(iterator.next().contains("车号") && iterator.next().contains("发料"))){
+                iterator.remove();
             }
         }
 
