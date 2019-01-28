@@ -811,6 +811,7 @@ public class WaybillServiceImpl implements WaybillService {
             if (!CollectionUtils.isEmpty(dto.getWaybillImagesUrl())) {
                 //批量插入提货单
                 List<WaybillImagesUrlDto> imagesUrls = dto.getWaybillImagesUrl();
+                List<String> urlList = new ArrayList<>();
                 for (int i = 0; i < imagesUrls.size(); i++) {
                     WaybillImagesUrlDto waybillImagesUrl = imagesUrls.get(i);
                     WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
@@ -828,22 +829,22 @@ public class WaybillServiceImpl implements WaybillService {
                     if (ImagesTypeConstant.POUND_BILL.equals(waybillImagesUrl.getImagesType())) {
                         //磅单
                         waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
+                        urlList.add(waybillImagesUrl.getImagesUrl());
                     }
                     if (!"invalidPicUrl".equalsIgnoreCase(waybillImagesUrl.getImagesUrl())) {
                         waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
                     }
                 }
                 //****************gavin *牧源绿色磅单图片识别begin
-                if (orders.getCustomerId() == 248) {
-                    Map<String, String> map = new HashMap<>(16);
-                    map.put("waybillId", waybillId.toString());
+                if (orders.getCustomerId() == 248 && !CollectionUtils.isEmpty(urlList)) {
                     try{
-                        map.put("imageUrl", imagesUrls.get(0).getImagesUrl());
-                    }catch (Exception e){
+                        Map<String, String> map = new HashMap<>(16);
+                        map.put("waybillId", waybillId.toString());
+                        map.put("imageUrl", urlList.get(0));
+                        amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "muyuan.ocr", map);
+                    } catch (Exception e) {
                         log.info("O upDateWaybillTrucking 图片识别失败，{}", waybillId);
                     }
-                    map.put("imageUrl", imagesUrls.get(0).getImagesUrl());
-                    amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "muyuan.ocr", map);
                 }
                 //****************gavin *牧源绿色磅单图片识别end
 
@@ -1948,6 +1949,7 @@ public class WaybillServiceImpl implements WaybillService {
             Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
             if (waybill != null) {
                 waybill.setReceiptStatus(ReceiptStatus.UNLOAD_RECEIPT);
+                waybill.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
                 int updateWaybillNum = waybillMapper.updateByPrimaryKeySelective(waybill);
                 if (updateWaybillNum < 1) {
                     throw new RuntimeException("修改运单失败");

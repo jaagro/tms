@@ -17,13 +17,12 @@ import com.jaagro.tms.biz.config.RabbitMqConfig;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
-import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.ConnectionUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -71,6 +70,9 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     private OssSignUrlClientService ossSignUrlClientService;
     @Autowired
     private OcrServiceImpl ocrService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+    private static int readFromOCRTimes;
 
     /**
      * 根据状态查询我的运单信息
@@ -304,6 +306,11 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             String[] strArray = {imageUrl};
             List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
             WaybillOcrDto waybillOcr = ocrService.getOcrByMuYuanAppImage(waybillId, urls.get(0).toString());
+            /*add by gavin 访问图片次数*/
+            int value = readFromOCRTimes++;
+            redisTemplate.opsForValue().getAndSet("readImageFromOCRTimes",String.valueOf(value));
+
+            /**/
             if (StringUtils.isEmpty(waybillOcr.getUnLoadSite())) {
                 log.error("R waybillSupplementByOcr unLoadSite is invalid");
                 return;
