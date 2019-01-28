@@ -116,4 +116,9 @@ public class GetWaybillDto implements Serializable {
      * 判断是否是抢单模式
      */
     private boolean GrabWaybillStatus;
+
+    /**
+     * 司机拒单理由
+     */
+    private GetRefuseTrackingDto refuseDto;
 }
