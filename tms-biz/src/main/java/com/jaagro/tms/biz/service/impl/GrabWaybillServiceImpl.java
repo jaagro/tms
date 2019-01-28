@@ -6,6 +6,7 @@ import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.truck.DriverReturnDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
+import com.jaagro.tms.api.dto.waybill.GraWaybillConditionDto;
 import com.jaagro.tms.api.dto.waybill.GrabWaybillParamDto;
 import com.jaagro.tms.api.service.GrabWaybillService;
 import com.jaagro.tms.biz.entity.*;
@@ -48,8 +49,6 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
     private WaybillItemsMapperExt waybillItemsMapper;
     @Autowired
     private MessageMapperExt messageMapper;
-    @Autowired
-    private DriverClientService driverClientService;
 
     /**
      * 进行抢单模式派单
@@ -78,6 +77,8 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
         if (CollectionUtils.isEmpty(truckDtos)) {
             throw new RuntimeException("当前选择的车辆无效请重新选择车辆！");
         }
+        //如果重新抢单 删除抢单记录
+        grabWaybillRecordMapper.deleteByWaybillId(waybill.getId());
         //更新订单状态：从已配载(STOWAGE)改为运输中(TRANSPORT)
         Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         orders.setId(waybill.getOrderId());
@@ -184,7 +185,6 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
             throw new RuntimeException("只有待接单的运单才可以撤回以便重新派单");
         }
         try {
-            Integer truckId = waybill.getTruckId();
             Integer userId = getUserId();
             //1.把所派车辆置空、状态改为带派单
             waybill.setTruckId(null);
@@ -193,10 +193,12 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
             waybill.setModifyUserId(userId);
             waybillMapper.updateByPrimaryKey(waybill);
             //2.删除司机的短信
-            List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
+            GraWaybillConditionDto graWaybillConditionDto = new GraWaybillConditionDto();
+            graWaybillConditionDto.setWaybillId(waybillId);
+            List<GrabWaybillRecord> grabWaybillRecords = grabWaybillRecordMapper.listGrabWaybillByCondition(graWaybillConditionDto);
             Set<Integer> driverIdSet = new HashSet<>();
-            for (int i = 0; i < drivers.size(); i++) {
-                driverIdSet.add(drivers.get(i).getId());
+            for (GrabWaybillRecord grabWaybillRecord : grabWaybillRecords) {
+                driverIdSet.add(grabWaybillRecord.getDriverId());
             }
             List<Integer> driverIds = new ArrayList<Integer>(driverIdSet);
             if (!CollectionUtils.isEmpty(driverIds)) {
