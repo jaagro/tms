@@ -567,7 +567,7 @@ public class WaybillServiceImpl implements WaybillService {
         getWaybillDto.setCustomerContactsDto(customerContactsDto);
         //20181207 end
         //20190128 如果运单已经回单补录，详情显示状态为"已补录"
-        if(waybill.getReceiptStatus()==2){
+        if(waybill.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH) && waybill.getReceiptStatus()==2){
             getWaybillDto.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
         }
         return getWaybillDto;
@@ -1636,7 +1636,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto) {
-                if(null!=criteriaDto.getReceiptStatus() && criteriaDto.getReceiptStatus()==2) {
+                if(waybillDto.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH) && waybillDto.getReceiptStatus()==2) {
                     waybillDto.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
                 }
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
