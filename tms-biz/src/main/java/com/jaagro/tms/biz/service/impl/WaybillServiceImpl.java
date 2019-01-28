@@ -1636,7 +1636,7 @@ public class WaybillServiceImpl implements WaybillService {
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
             for (ListWaybillDto waybillDto : listWaybillDto) {
-                if(criteriaDto.getReceiptStatus()==2) {
+                if(null!=criteriaDto.getReceiptStatus() && criteriaDto.getReceiptStatus()==2) {
                     waybillDto.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
                 }
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
