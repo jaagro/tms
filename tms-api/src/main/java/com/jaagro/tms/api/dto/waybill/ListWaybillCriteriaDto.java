@@ -78,4 +78,9 @@ public class ListWaybillCriteriaDto implements Serializable {
      * 订单id数组 （用于查询条件有客户的情况）
      */
     private List<Integer> orderIds;
+
+    /**
+     * 回单补录状态 0-未回单,1-已补录实提,2-已补录实卸
+     */
+    private Integer receiptStatus;
 }
