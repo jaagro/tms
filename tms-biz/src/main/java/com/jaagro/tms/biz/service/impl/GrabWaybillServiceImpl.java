@@ -78,7 +78,7 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
             throw new RuntimeException("当前选择的车辆无效请重新选择车辆！");
         }
         //如果重新抢单 删除抢单记录
-        grabWaybillRecordMapper.deleteByPrimaryKey(waybill.getId());
+        grabWaybillRecordMapper.deleteByWaybillId(waybill.getId());
         //更新订单状态：从已配载(STOWAGE)改为运输中(TRANSPORT)
         Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         orders.setId(waybill.getOrderId());

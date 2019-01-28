@@ -591,7 +591,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             }
             List<Integer> waybillTrackingIds = waybillTrackingMapper.listWaybillTrackingIdByWaybillId(waybillId);
             //删除抢单记录表
-            grabWaybillRecordMapper.deleteByPrimaryKey(waybill.getId());
+            grabWaybillRecordMapper.deleteByWaybillId(waybill.getId());
             //批量逻辑删除
             waybillTrackingMapper.deleteWaybillTrackingId(waybillTrackingIds);
             //删除运单轨迹关联图片

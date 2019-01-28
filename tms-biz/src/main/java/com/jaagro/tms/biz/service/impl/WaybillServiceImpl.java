@@ -1750,7 +1750,7 @@ public class WaybillServiceImpl implements WaybillService {
                     driverIdSet.add(grabWaybillRecord.getDriverId());
                 }
                 //删除抢单记录表
-                grabWaybillRecordMapper.deleteByPrimaryKey(waybillId);
+                grabWaybillRecordMapper.deleteByWaybillId(waybillId);
             }else{
                 //2.2.派单模式撤单
                 List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
