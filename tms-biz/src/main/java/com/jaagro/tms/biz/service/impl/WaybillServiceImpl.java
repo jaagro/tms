@@ -45,6 +45,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -2530,7 +2531,7 @@ public class WaybillServiceImpl implements WaybillService {
                 // 货物数量(单车筐数)
                 String quantity = cells[20];
                 if (StringUtils.hasText(quantity)) {
-                    Integer goodsQuantity = Integer.parseInt(cells[20]);
+                    Integer goodsQuantity = Integer.parseInt(new DecimalFormat("0").format(Double.valueOf(cells[20])));
                     dto.setGoodsQuantity(goodsQuantity);
                 }
                 // 装货地对应网点id

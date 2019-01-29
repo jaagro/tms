@@ -43,6 +43,7 @@ public class MessageController {
     @PostMapping("/readMessages")
     @ApiOperation("将消息置为已读")
     public BaseResponse readMessages(@RequestBody List<Integer> messageIdList){
+        log.info("O readMessages,messageIdList={}",messageIdList);
         if (CollectionUtils.isEmpty(messageIdList)){
             return BaseResponse.errorInstance("消息id列表不能为空");
         }
@@ -64,6 +65,7 @@ public class MessageController {
     @PostMapping("/createMessage")
     @ApiOperation("创建消息")
     public BaseResponse createMessage(@RequestBody @Validated CreateMessageDto createMessageDto){
+        log.info("O createMessage,createMessageDto={}",createMessageDto);
         boolean success = messageService.createMessage(createMessageDto);
         if (success){
             return BaseResponse.successInstance("创建消息成功");
