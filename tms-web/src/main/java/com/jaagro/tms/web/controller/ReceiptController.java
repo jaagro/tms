@@ -257,7 +257,7 @@ public class ReceiptController {
             List<Map<Integer, BigDecimal>> driverMaps = waybillService.calculatePaymentFromDriver(waybillIdList);
             log.info("O calculateDriverPrice waybillId={},result={}",waybillId,driverMaps);
         }catch (Exception e){
-            log.error("O calculatePrice error waybillId={}",waybillId);
+            log.error("O calculatePrice error waybillId="+waybillId,e);
         }
 
     }
