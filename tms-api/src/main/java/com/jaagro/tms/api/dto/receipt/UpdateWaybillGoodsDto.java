@@ -67,7 +67,7 @@ public class UpdateWaybillGoodsDto implements Serializable{
     /**
      * 计划重量
      */
-    @Max(value = 99999999,message = "{goodsWeight.Max}")
+    @Max(value = 30,message = "{goodsWeight.Max}")
     private BigDecimal goodsWeight;
 
     /**
@@ -79,7 +79,7 @@ public class UpdateWaybillGoodsDto implements Serializable{
     /**
      * 装货重量
      */
-    @Max(value = 99999999,message = "{loadWeight.Max}")
+    @Max(value = 30,message = "{loadWeight.Max}")
     private BigDecimal loadWeight;
 
     /**
@@ -91,7 +91,7 @@ public class UpdateWaybillGoodsDto implements Serializable{
     /**
      * 卸货重量
      */
-    @Max(value = 99999999,message = "{unloadWeight.Max}")
+    @Max(value = 30,message = "{unloadWeight.Max}")
     private BigDecimal unloadWeight;
 
     /**

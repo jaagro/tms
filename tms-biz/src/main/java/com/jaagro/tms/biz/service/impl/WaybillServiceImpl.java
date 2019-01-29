@@ -9,6 +9,7 @@ import com.jaagro.tms.api.dto.Message.CreateMessageDto;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.MessageReturnDto;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
+import com.jaagro.tms.api.dto.base.DictionaryDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.*;
@@ -20,6 +21,7 @@ import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.entity.ChickenImportRecord;
 import com.jaagro.tms.api.service.*;
+import com.jaagro.tms.biz.config.RabbitMqConfig;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.*;
@@ -32,6 +34,7 @@ import com.jaagro.utils.ServiceResult;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -122,6 +125,8 @@ public class WaybillServiceImpl implements WaybillService {
     @Autowired
     @Qualifier(value = "objectRedisTemplate")
     private RedisTemplate<String, Object> objectRedisTemplate;
+    @Autowired
+    private AmqpTemplate amqpTemplate;
 
     /**
      * 毛鸡运单导入
@@ -318,7 +323,7 @@ public class WaybillServiceImpl implements WaybillService {
             }
         }
         Map<Object, Object> entries = opsForHash.entries(key);
-        if (CollectionUtils.isEmpty(entries)){
+        if (CollectionUtils.isEmpty(entries)) {
             throw new RuntimeException("操作超时了,请重新导入");
         }
         return getChickenImportRecordDtoListFromMap(entries);
@@ -563,6 +568,10 @@ public class WaybillServiceImpl implements WaybillService {
         getWaybillDto.setCustomerDto(customerDto);
         getWaybillDto.setCustomerContactsDto(customerContactsDto);
         //20181207 end
+        //20190128 如果运单已经回单补录，详情显示状态为"已补录"
+        if (waybill.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH) && waybill.getReceiptStatus() == 2) {
+            getWaybillDto.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
+        }
         return getWaybillDto;
     }
 
@@ -590,7 +599,24 @@ public class WaybillServiceImpl implements WaybillService {
             GetWaybillDto getWaybillDto = this.getWaybillById(waybillId);
             GrabWaybillRecord grabWaybill = grabWaybillRecordMapper.getGrabWaybillByWaybillId(waybillId);
             if (grabWaybill != null) {
-              getWaybillDto.setGrabWaybillStatus(true);
+                getWaybillDto.setGrabWaybillStatus(true);
+            }
+            //运单状态为已拒单填充拒单理由(取时间倒序 limit 1)
+            if (getWaybillDto.getWaybillStatus().equals(WaybillStatus.REJECT)) {
+                GetRefuseTrackingDto trackingDto = new GetRefuseTrackingDto();
+                WaybillTracking waybillTracking = waybillTrackingMapper.getRefuseTrackingByWaybillId(getWaybillDto.getId());
+                if (waybillTracking != null) {
+                    BeanUtils.copyProperties(waybillTracking, trackingDto);
+                    if (waybillTracking.getRefuseReasonId() == null) {
+                        trackingDto.setRefuseReason("系统自动拒单");
+                    } else {
+                        DictionaryDto dictionaryDto = customerClientService.getDictionaryById(waybillTracking.getRefuseReasonId());
+                        if (dictionaryDto != null) {
+                            trackingDto.setRefuseReason(dictionaryDto.getTypeName());
+                        }
+                    }
+                    getWaybillDto.setRefuseDto(trackingDto);
+                }
             }
             getWaybillDtoList.add(getWaybillDto);
         }
@@ -808,6 +834,7 @@ public class WaybillServiceImpl implements WaybillService {
             if (!CollectionUtils.isEmpty(dto.getWaybillImagesUrl())) {
                 //批量插入提货单
                 List<WaybillImagesUrlDto> imagesUrls = dto.getWaybillImagesUrl();
+                List<String> urlList = new ArrayList<>();
                 for (int i = 0; i < imagesUrls.size(); i++) {
                     WaybillImagesUrlDto waybillImagesUrl = imagesUrls.get(i);
                     WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
@@ -825,16 +852,25 @@ public class WaybillServiceImpl implements WaybillService {
                     if (ImagesTypeConstant.POUND_BILL.equals(waybillImagesUrl.getImagesType())) {
                         //磅单
                         waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
-                        //****************gavin *牧源绿色磅单图片识别begin
-                        if (orders.getCustomerId() == 248) {
-
-                        }
-                        //****************gavin *牧源绿色磅单图片识别end
+                        urlList.add(waybillImagesUrl.getImagesUrl());
                     }
                     if (!"invalidPicUrl".equalsIgnoreCase(waybillImagesUrl.getImagesUrl())) {
                         waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
                     }
                 }
+                //****************gavin *牧源绿色磅单图片识别begin
+                if (orders.getCustomerId() == 248 && !CollectionUtils.isEmpty(urlList)) {
+                    try {
+                        Map<String, String> map = new HashMap<>(16);
+                        map.put("waybillId", waybillId.toString());
+                        map.put("imageUrl", urlList.get(0));
+                        amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "muyuan.ocr", map);
+                    } catch (Exception e) {
+                        log.info("O upDateWaybillTrucking 图片识别失败，{}", waybillId);
+                    }
+                }
+                //****************gavin *牧源绿色磅单图片识别end
+
             }
             /**
              * 兼容老版本*******************************************************
@@ -1348,7 +1384,7 @@ public class WaybillServiceImpl implements WaybillService {
         long time = System.currentTimeMillis() + TIMEOUT;
         boolean success = redisLock.lock("redisLock" + waybillId + dto.getReceiptStatus(), String.valueOf(time));
         if (!success) {
-            throw new RuntimeException("请求正在处理中");
+            return ServiceResult.toResult(ReceiptConstant.SERVICE_REQUEST);
         }
 
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
@@ -1428,7 +1464,7 @@ public class WaybillServiceImpl implements WaybillService {
                 ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(grabWaybillRecords.get(0).getTruckId());
                 Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId());
                 waybill
-                        .setTruckId(truckDto.getTruckTeamId())
+                        .setTruckId(truckDto.getId())
                         .setTruckTeamContractId(truckTeamContractId);
                 //更新当前抢单为已抢单
                 grabWaybillRecordMapper.updateGrabWaybillRecordByReceipt(graWaybillConditionDto);
@@ -1578,6 +1614,8 @@ public class WaybillServiceImpl implements WaybillService {
             appMessage.setToUserId(driver.getId());
             messageMapper.insertSelective(appMessage);
         }
+        //7.删除抢单记录
+        grabWaybillRecordMapper.deleteByWaybillId(waybillId);
         return ServiceResult.toResult("派单成功");
     }
 
@@ -1593,6 +1631,10 @@ public class WaybillServiceImpl implements WaybillService {
         List<Integer> departIds = userClientService.getDownDepartment();
         if (departIds.size() != 0) {
             criteriaDto.setDepartIds(departIds);
+        }
+        if (criteriaDto.getWaybillStatus().equals(WaybillStatus.UNLOAD_RECEIPT)) {
+            criteriaDto.setWaybillStatus("");
+            criteriaDto.setReceiptStatus(2);
         }
         List<ListWaybillDto> listWaybillDto = new ArrayList<>();
         if (!StringUtils.isEmpty(criteriaDto.getTruckNumber())) {
@@ -1614,8 +1656,10 @@ public class WaybillServiceImpl implements WaybillService {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
         listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDto != null && listWaybillDto.size() > 0) {
-            for (ListWaybillDto waybillDto : listWaybillDto
-            ) {
+            for (ListWaybillDto waybillDto : listWaybillDto) {
+                if (waybillDto.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH) && waybillDto.getReceiptStatus() == 2) {
+                    waybillDto.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
+                }
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1709,17 +1753,31 @@ public class WaybillServiceImpl implements WaybillService {
         try {
             Integer userId = getUserId();
             Integer truckId = waybill.getTruckId();
-            //1。把所派车辆置空、状态改为带派单
+            //1.把所派车辆置空、状态改为带派单
             waybill.setTruckId(null);
+            waybill.setDriverId(null);
             waybill.setWaybillStatus(WaybillStatus.SEND_TRUCK);
             waybill.setModifyTime(new Date());
             waybill.setModifyUserId(userId);
             waybillMapper.updateByPrimaryKey(waybill);
             //2.删除司机的短信
-            List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
             Set<Integer> driverIdSet = new HashSet<>();
-            for (int i = 0; i < drivers.size(); i++) {
-                driverIdSet.add(drivers.get(i).getId());
+            GraWaybillConditionDto graWaybillConditionDto = new GraWaybillConditionDto();
+            graWaybillConditionDto.setWaybillId(waybillId);
+            List<GrabWaybillRecord> grabWaybillRecords = grabWaybillRecordMapper.listGrabWaybillByCondition(graWaybillConditionDto);
+            //2.1.抢单模式撤单
+            if (!CollectionUtils.isEmpty(grabWaybillRecords)) {
+                for (GrabWaybillRecord grabWaybillRecord : grabWaybillRecords) {
+                    driverIdSet.add(grabWaybillRecord.getDriverId());
+                }
+                //删除抢单记录表
+                grabWaybillRecordMapper.deleteByWaybillId(waybillId);
+            } else {
+                //2.2.派单模式撤单
+                List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
+                for (int i = 0; i < drivers.size(); i++) {
+                    driverIdSet.add(drivers.get(i).getId());
+                }
             }
             List<Integer> driverIds = new ArrayList<Integer>(driverIdSet);
             if (!CollectionUtils.isEmpty(driverIds)) {
@@ -2271,6 +2329,8 @@ public class WaybillServiceImpl implements WaybillService {
             ordersMapper.updateByPrimaryKeySelective(order);
 
         }
+        //5.删除抢单记录
+        grabWaybillRecordMapper.deleteByWaybillId(waybillId);
         return true;
     }
 
@@ -2486,7 +2546,7 @@ public class WaybillServiceImpl implements WaybillService {
         List<TruckTeamContractReturnDto> truckTeamContracts = truckClientService.getTruckTeamContractByTruckTeamId(truckTeamId);
         if (!CollectionUtils.isEmpty(truckTeamContracts)) {
             for (TruckTeamContractReturnDto truckTeamContractReturnDto : truckTeamContracts) {
-                if (truckTeamContractReturnDto.getBussinessType() != null && truckTeamContractReturnDto.getBussinessType().equals(goodsType)){
+                if (truckTeamContractReturnDto.getBussinessType() != null && truckTeamContractReturnDto.getBussinessType().equals(goodsType)) {
                     truckTeamContractId = truckTeamContractReturnDto.getId();
                     break;
                 }
@@ -2598,19 +2658,19 @@ public class WaybillServiceImpl implements WaybillService {
             String key = CHICKEN_IMPORT + orderId;
             // 先清空原缓存
             objectRedisTemplate.delete(key);
-            Map<String,ChickenImportRecordDto> map = new LinkedHashMap<>();
-            chickenImportRecordDtoList.forEach(dto->map.put(dto.getSerialNumber() == null ? null : dto.getSerialNumber().toString(),dto));
-            opsForHash.putAll(key,map);
-            objectRedisTemplate.expire(key,1, TimeUnit.HOURS);
+            Map<String, ChickenImportRecordDto> map = new LinkedHashMap<>();
+            chickenImportRecordDtoList.forEach(dto -> map.put(dto.getSerialNumber() == null ? null : dto.getSerialNumber().toString(), dto));
+            opsForHash.putAll(key, map);
+            objectRedisTemplate.expire(key, 1, TimeUnit.HOURS);
         }
     }
 
-    private List<ChickenImportRecordDto> getChickenImportRecordDtoListFromMap(Map<Object,Object> map){
+    private List<ChickenImportRecordDto> getChickenImportRecordDtoListFromMap(Map<Object, Object> map) {
         List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
         Set<Object> ketSet = map.keySet();
         Iterator<Object> iterator = ketSet.iterator();
-        iterator.forEachRemaining(element->chickenImportRecordDtoList.add((ChickenImportRecordDto)map.get(element.toString())));
-        Collections.sort(chickenImportRecordDtoList,Comparator.comparingInt(ChickenImportRecordDto :: getSerialNumber));
+        iterator.forEachRemaining(element -> chickenImportRecordDtoList.add((ChickenImportRecordDto) map.get(element.toString())));
+        Collections.sort(chickenImportRecordDtoList, Comparator.comparingInt(ChickenImportRecordDto::getSerialNumber));
         return chickenImportRecordDtoList;
     }
 }

@@ -67,6 +67,8 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     private DriverClientService driverClientService;
     @Autowired
     private TruckClientService truckClientService;
+    @Autowired
+    private GrabWaybillRecordMapperExt grabWaybillRecordMapper;
 
 
     /**
@@ -141,7 +143,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         while (iterator.hasNext()) {
             WaybillAnomalyType waybillAnomalyType = iterator.next();
             boolean flag = ((WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus()) && CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomalyType.getId()))
-                           || (!CollectionUtils.isEmpty(waybillAnomalyDtos) && CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomalyType.getId())));
+                    || (!CollectionUtils.isEmpty(waybillAnomalyDtos) && CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomalyType.getId())));
             if (flag) {
                 continue;
             }
@@ -588,6 +590,8 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 }
             }
             List<Integer> waybillTrackingIds = waybillTrackingMapper.listWaybillTrackingIdByWaybillId(waybillId);
+            //删除抢单记录表
+            grabWaybillRecordMapper.deleteByWaybillId(waybill.getId());
             //批量逻辑删除
             waybillTrackingMapper.deleteWaybillTrackingId(waybillTrackingIds);
             //删除运单轨迹关联图片

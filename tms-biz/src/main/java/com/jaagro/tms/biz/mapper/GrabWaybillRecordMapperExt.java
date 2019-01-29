@@ -56,8 +56,15 @@ public interface GrabWaybillRecordMapperExt extends GrabWaybillRecordMapper {
 
     /**
      * 主要判断当前运单是否是抢单模式
+     *
      * @param waybillId
      * @return
      */
     GrabWaybillRecord getGrabWaybillByWaybillId(@Param("waybillId") Integer waybillId);
+
+    /**
+     * 根据运单id 删除抢单记录表
+     * @param waybillId
+     */
+    void deleteByWaybillId(@Param("waybillId") Integer waybillId);
 }

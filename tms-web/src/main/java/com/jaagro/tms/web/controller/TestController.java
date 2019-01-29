@@ -1,6 +1,8 @@
 package com.jaagro.tms.web.controller;
 
 import com.jaagro.tms.api.dto.waybill.LocationDto;
+import com.jaagro.tms.api.service.OcrService;
+import com.jaagro.tms.biz.config.RabbitMqConfig;
 import com.jaagro.tms.biz.mapper.LocationMapperExt;
 import com.jaagro.tms.biz.schedule.WaybillTaskService;
 import com.jaagro.tms.biz.schedule.WaybillTimeOutTaskService;
@@ -9,15 +11,13 @@ import com.jaagro.tms.biz.service.impl.GpsLocationAsync;
 import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Future;
 
 /**
@@ -34,7 +34,8 @@ public class TestController {
     @Autowired
     WaybillTimeOutTaskService waybillTimeOutTaskService;
 
-
+    @Autowired
+    private StringRedisTemplate redisTemplate;
     @Autowired
     private GpsLocationAsync asyncTask;
     @Autowired
@@ -137,6 +138,36 @@ public class TestController {
         System.out.println(lll.get(4).size());
         long end = System.currentTimeMillis();
         System.out.println("-----耗时----------" + (start - end) + "---------------");
+    }
+
+    @Autowired
+    OcrService ocrService;
+
+    @GetMapping("/ocrTest")
+    public void ocrTest(String url){
+        try {
+            ocrService.getOcrByMuYuanAppImage(1, url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Autowired
+    AmqpTemplate amqpTemplate;
+
+    @GetMapping("/muYuanOcrMq")
+    public void muYuanOcrMq(@RequestParam("waybillId") String waybillId, @RequestParam("imageUrl") String imageUrl){
+        Map<String, String> map = new HashMap<>(16);
+        map.put("waybillId", waybillId);
+        map.put("imageUrl", imageUrl);
+        amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_EXCHANGE, "muyuan.ocr", map);
+    }
+
+    private static int increaseIIvalue;
+    @GetMapping("/increaseIIvalue")
+    public void refreshRedisValue(){
+        int value = increaseIIvalue++;
+        redisTemplate.opsForValue().getAndSet("increaseII",String.valueOf(value));
     }
 
 }
