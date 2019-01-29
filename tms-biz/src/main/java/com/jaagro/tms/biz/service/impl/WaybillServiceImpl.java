@@ -9,6 +9,7 @@ import com.jaagro.tms.api.dto.Message.CreateMessageDto;
 import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
 import com.jaagro.tms.api.dto.Message.MessageReturnDto;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
+import com.jaagro.tms.api.dto.base.DictionaryDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.*;
@@ -598,6 +599,23 @@ public class WaybillServiceImpl implements WaybillService {
             GrabWaybillRecord grabWaybill = grabWaybillRecordMapper.getGrabWaybillByWaybillId(waybillId);
             if (grabWaybill != null) {
                 getWaybillDto.setGrabWaybillStatus(true);
+            }
+            //运单状态为已拒单填充拒单理由(取时间倒序 limit 1)
+            if (getWaybillDto.getWaybillStatus().equals(WaybillStatus.REJECT)) {
+                GetRefuseTrackingDto trackingDto = new GetRefuseTrackingDto();
+                WaybillTracking waybillTracking = waybillTrackingMapper.getRefuseTrackingByWaybillId(getWaybillDto.getId());
+                if (waybillTracking != null) {
+                    BeanUtils.copyProperties(waybillTracking, trackingDto);
+                    if (waybillTracking.getRefuseReasonId() == null) {
+                        trackingDto.setRefuseReason("系统自动拒单");
+                    } else {
+                        DictionaryDto dictionaryDto = customerClientService.getDictionaryById(waybillTracking.getRefuseReasonId());
+                        if (dictionaryDto != null) {
+                            trackingDto.setRefuseReason(dictionaryDto.getTypeName());
+                        }
+                    }
+                    getWaybillDto.setRefuseDto(trackingDto);
+                }
             }
             getWaybillDtoList.add(getWaybillDto);
         }
