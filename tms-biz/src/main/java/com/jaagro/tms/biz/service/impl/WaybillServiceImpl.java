@@ -1613,7 +1613,6 @@ public class WaybillServiceImpl implements WaybillService {
             appMessage.setToUserId(driver.getId());
             messageMapper.insertSelective(appMessage);
         }
-        
         //7.删除抢单记录
         grabWaybillRecordMapper.deleteByWaybillId(waybillId);
         return ServiceResult.toResult("派单成功");
