@@ -4,6 +4,7 @@ import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.utils.BaseResponse;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -79,4 +80,13 @@ public interface TruckClientService {
      */
     @GetMapping("/listTruckType/{productName}")
     BaseResponse<List<ListTruckTypeDto>> listTruckTypeByProductName(@PathVariable(value = "productName") String productName);
+
+    /**
+     *
+     * 根据货物类型、客户id、运单完成时间获取客户合同和运力合同
+     * @param contractDto
+     * @return
+     */
+    @PostMapping("/getContractByContractDto")
+    ContractDto getContractByContractDto(@RequestBody @Validated ContractDto contractDto);
 }

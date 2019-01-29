@@ -1026,6 +1026,7 @@ public class WaybillServiceImpl implements WaybillService {
             }
             //如果运单全部签收 运单状态
             if (unSignUnloadSite.size() == 1) {
+                updateContractOfWaybillAndOrders(waybill,orders);
                 //更改运单状态
                 waybill
                         .setWaybillStatus(WaybillStatus.ACCOMPLISH)
@@ -1063,6 +1064,51 @@ public class WaybillServiceImpl implements WaybillService {
             return ServiceResult.toResult("操作成功");
         }
         return ServiceResult.toResult("操作异常");
+    }
+
+    /**
+     * 运单全部签收完成时，运单的运力合同id更新到最新，订单的客户合同id更新到最新
+     * Gavin
+     * @param waybill
+     * @param orders
+     */
+    private void updateContractOfWaybillAndOrders(Waybill waybill, Orders orders) {
+        ContractDto customerContractDto = new ContractDto();
+        ContractDto truckTeamContractDto = new ContractDto();
+        try {
+            Date date = new Date();
+            //1、更新订单的最新有效的客户合同id
+            customerContractDto.setContractType(1)
+                    .setCustomerId(orders.getCustomerId())
+                    .setGoodsType(orders.getGoodsType())
+                    .setWaybillDoneDate(date);
+
+            customerContractDto = truckClientService.getContractByContractDto(customerContractDto);
+            if (customerContractDto.getId() != null) {
+                orders.setCustomerContractId(customerContractDto.getId());
+                ordersMapper.updateByPrimaryKeySelective(orders);
+            }
+            //2、更新运单的最新运力合同id
+            ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
+            if (truckDto != null) {
+                truckTeamContractDto.setContractType(2)
+                        .setTruckTeamId(truckDto.getTruckTeamId())
+                        .setGoodsType(orders.getGoodsType())
+                        .setWaybillDoneDate(date);
+
+                truckTeamContractDto = truckClientService.getContractByContractDto(truckTeamContractDto);
+                if(truckTeamContractDto.getId()!=null){
+                    waybill.setTruckTeamContractId(truckTeamContractDto.getId());
+                    waybillMapper.updateByPrimaryKeySelective(waybill);
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println("customerContractDto::::::::::::"+ customerContractDto.toString());
+            System.out.println("truckTeamContractDto::::::::::::"+ truckTeamContractDto.toString());
+            log.error("R waybillServiceImpl.updateContractOfWaybillAndOrders() failed::" + ex.getStackTrace());
+
+        }
+
     }
 
     /**
