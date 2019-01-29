@@ -260,4 +260,15 @@ public class WaybillController {
         grabWaybillService.grabWaybillToTrucks(dto);
         return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
     }
+
+    /**
+     * 查询未完成的运单 提供给删除报价
+     *
+     * @return
+     */
+    @Ignore
+    @PostMapping("/countUnFinishWaybillByContract")
+    public Integer countUnFinishWaybillByContract(@RequestBody CountUnFinishWaybillCriteriaDto criteriaDto) {
+        return waybillService.countUnFinishWaybillByContract(criteriaDto);
+    }
 }

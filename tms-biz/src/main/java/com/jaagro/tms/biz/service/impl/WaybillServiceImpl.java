@@ -330,6 +330,17 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     /**
+     * 查询未完成的运单 提供给删除报价
+     *
+     * @param criteriaDto
+     * @return
+     */
+    @Override
+    public Integer countUnFinishWaybillByContract(CountUnFinishWaybillCriteriaDto criteriaDto) {
+        return waybillItemsMapper.countUnFinishWaybillByContract(criteriaDto);
+    }
+
+    /**
      * @param waybillDtoList
      * @return
      * @Author gavin
