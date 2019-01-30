@@ -1114,12 +1114,8 @@ public class WaybillServiceImpl implements WaybillService {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("customerContractDto::::::::::::"+ customerContractDto.toString());
-            System.out.println("truckTeamContractDto::::::::::::"+ truckTeamContractDto.toString());
-            log.error("R waybillServiceImpl.updateContractOfWaybillAndOrders() failed::" + ex.getStackTrace());
-
+            log.error("R waybillServiceImpl.updateContractOfWaybillAndOrders() failed waybill="+waybill+"orders="+orders,ex);
         }
-
     }
 
     /**
