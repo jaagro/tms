@@ -3,14 +3,17 @@ package com.jaagro.tms.biz.service.impl;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
+import com.jaagro.tms.api.dto.truck.DriverReturnDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
+import com.jaagro.tms.api.dto.waybill.GraWaybillConditionDto;
 import com.jaagro.tms.api.dto.waybill.GrabWaybillParamDto;
 import com.jaagro.tms.api.service.GrabWaybillService;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.jpush.JpushClientUtil;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
+import com.jaagro.tms.biz.service.DriverClientService;
 import com.jaagro.tms.biz.service.TruckClientService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +77,8 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
         if (CollectionUtils.isEmpty(truckDtos)) {
             throw new RuntimeException("当前选择的车辆无效请重新选择车辆！");
         }
+        //如果重新抢单 删除抢单记录
+        grabWaybillRecordMapper.deleteByWaybillId(waybill.getId());
         //更新订单状态：从已配载(STOWAGE)改为运输中(TRANSPORT)
         Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         orders.setId(waybill.getOrderId());
@@ -159,6 +164,53 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
         if (!CollectionUtils.isEmpty(grabWaybillRecords)) {
             grabWaybillRecordMapper.batchInsert(grabWaybillRecords);
         }
+    }
+
+    /**
+     * 撤销抢单
+     *
+     * @param waybillId
+     * @author @Gao.
+     */
+    @Override
+    public void withdrawGrabWaybill(Integer waybillId) {
+        if (null == waybillId) {
+            throw new RuntimeException("运单Id不能为空");
+        }
+        Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+        if (null == waybill) {
+            throw new RuntimeException("运单不存在");
+        }
+        if (!WaybillStatus.RECEIVE.equals(waybill.getWaybillStatus())) {
+            throw new RuntimeException("只有待接单的运单才可以撤回以便重新派单");
+        }
+        try {
+            Integer userId = getUserId();
+            //1.把所派车辆置空、状态改为带派单
+            waybill.setTruckId(null);
+            waybill.setWaybillStatus(WaybillStatus.SEND_TRUCK);
+            waybill.setModifyTime(new Date());
+            waybill.setModifyUserId(userId);
+            waybillMapper.updateByPrimaryKey(waybill);
+            //2.删除司机的短信
+            GraWaybillConditionDto graWaybillConditionDto = new GraWaybillConditionDto();
+            graWaybillConditionDto.setWaybillId(waybillId);
+            List<GrabWaybillRecord> grabWaybillRecords = grabWaybillRecordMapper.listGrabWaybillByCondition(graWaybillConditionDto);
+            Set<Integer> driverIdSet = new HashSet<>();
+            for (GrabWaybillRecord grabWaybillRecord : grabWaybillRecords) {
+                driverIdSet.add(grabWaybillRecord.getDriverId());
+            }
+            List<Integer> driverIds = new ArrayList<Integer>(driverIdSet);
+            if (!CollectionUtils.isEmpty(driverIds)) {
+                messageMapper.deleteMessage(waybillId, driverIds);
+            }
+            //3.删除抢单记录表
+            grabWaybillRecordMapper.deleteByPrimaryKey(waybillId);
+        } catch (Exception ex) {
+            log.error("删除司机短信失败,运单id:{},原因{}", waybillId, ex.getMessage());
+            throw ex;
+        }
+
     }
 
     /**

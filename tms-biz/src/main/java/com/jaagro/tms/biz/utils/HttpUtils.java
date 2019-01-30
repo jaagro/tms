@@ -30,6 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 仅仅用于图片识别，为ocr官方推荐工具，直接使用的没做过任何蒂尼
+ * @author tony
+ */
 public class HttpUtils {
 
     /**

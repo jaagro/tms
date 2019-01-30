@@ -76,4 +76,8 @@ public class ListWaybillDto implements Serializable {
      * 磅差超过千分之二 进行预警提醒
      */
     private boolean poundAlert;
+    /**
+     * 回单补录状态 0-未回单,1-已补录实提,2-已补录实卸
+     */
+    private Integer receiptStatus;
 }

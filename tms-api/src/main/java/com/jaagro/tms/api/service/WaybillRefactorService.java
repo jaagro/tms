@@ -6,6 +6,7 @@ import com.jaagro.tms.api.dto.waybill.GetWaybillDetailDto;
 import com.jaagro.tms.api.dto.waybill.ListWebChatWaybillCriteriaDto;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tony
@@ -46,4 +47,11 @@ public interface WaybillRefactorService {
      * @return
      */
     PageInfo listWebChatWaybillByCriteria(ListWebChatWaybillCriteriaDto criteriaDto);
+
+    /**
+     * 根据ocr自动补录牧原运单
+     *
+     * @param map
+     */
+    void waybillSupplementByOcr(Map<String, String> map);
 }
