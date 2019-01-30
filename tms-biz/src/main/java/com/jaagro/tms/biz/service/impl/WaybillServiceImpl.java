@@ -1037,7 +1037,7 @@ public class WaybillServiceImpl implements WaybillService {
             }
             //如果运单全部签收 运单状态
             if (unSignUnloadSite.size() == 1) {
-                updateContractOfWaybillAndOrders(waybill,orders);
+                updateContractOfWaybillAndOrders(waybill, orders);
                 //更改运单状态
                 waybill
                         .setWaybillStatus(WaybillStatus.ACCOMPLISH)
@@ -1080,6 +1080,7 @@ public class WaybillServiceImpl implements WaybillService {
     /**
      * 运单全部签收完成时，运单的运力合同id更新到最新，订单的客户合同id更新到最新
      * Gavin
+     *
      * @param waybill
      * @param orders
      */
@@ -1108,13 +1109,13 @@ public class WaybillServiceImpl implements WaybillService {
                         .setWaybillDoneDate(date);
 
                 truckTeamContractDto = truckClientService.getContractByContractDto(truckTeamContractDto);
-                if(truckTeamContractDto.getId()!=null){
+                if (null != truckTeamContractDto && null != truckTeamContractDto.getId()) {
                     waybill.setTruckTeamContractId(truckTeamContractDto.getId());
                     waybillMapper.updateByPrimaryKeySelective(waybill);
                 }
             }
         } catch (Exception ex) {
-            log.error("R waybillServiceImpl.updateContractOfWaybillAndOrders() failed waybill="+waybill+"orders="+orders,ex);
+            log.error("R waybillServiceImpl.updateContractOfWaybillAndOrders() failed waybill=" + waybill + "orders=" + orders, ex);
         }
     }
 
