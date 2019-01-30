@@ -9,12 +9,12 @@ import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
 import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
 import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
+import com.jaagro.tms.api.dto.truck.DriverReturnDto;
+import com.jaagro.tms.api.dto.truck.ShowTruckDto;
 import com.jaagro.tms.api.service.WaybillAnomalyService;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
-import com.jaagro.tms.biz.service.CustomerClientService;
-import com.jaagro.tms.biz.service.SmsClientService;
-import com.jaagro.tms.biz.service.UserClientService;
+import com.jaagro.tms.biz.service.*;
 import com.jaagro.utils.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -59,6 +59,14 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     private WaybillAnomalyLogMapperExt waybillAnomalyLogMapperExt;
     @Autowired
     private SmsClientService smsClientService;
+    @Autowired
+    private WaybillTrackingMapperExt waybillTrackingMapper;
+    @Autowired
+    private WaybillTrackingImagesMapperExt waybillTrackingImagesMapper;
+    @Autowired
+    private DriverClientService driverClientService;
+    @Autowired
+    private TruckClientService truckClientService;
 
 
     /**
@@ -76,6 +84,18 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         Waybill waybill = waybillMapper.getWaybillById(dto.getWaybillId());
         if (null == waybill) {
             throw new RuntimeException("该运单号删除或不存在！");
+        }
+        if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(dto.getAnomalyTypeId())) {
+            if (WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
+
+            }
+        }
+        WaybillAnomalyCondition waybillAnomalyCondition = new WaybillAnomalyCondition();
+        waybillAnomalyCondition
+                .setWaybillId(dto.getWaybillId())
+                .setAnomalyTypeId(dto.getAnomalyTypeId());
+        List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(waybillAnomalyCondition);
+        if (!CollectionUtils.isEmpty(waybillAnomalyDtos)) {
         }
         //插入异常表
         WaybillAnomaly waybillAnomaly = new WaybillAnomaly();
@@ -106,10 +126,25 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
      * Author @Gao.
      */
     @Override
-    public List<WaybillAnomalyTypeDto> displayAnomalyType() {
+    public List<WaybillAnomalyTypeDto> displayWaybillAnomalyType(Integer waybillId) {
+
         List<WaybillAnomalyType> waybillAnomalyTypes = waybillAnomalyTypeMapper.listAnomalyType();
+        Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+        WaybillAnomalyCondition waybillAnomalyCondition = new WaybillAnomalyCondition();
+        waybillAnomalyCondition
+                .setWaybillId(waybillId)
+                .setAnomalyTypeId(CancelAnomalyWaybillType.CANCEL_WAYBILL);
+        List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByWaybillId(waybillAnomalyCondition);
+
+        Iterator<WaybillAnomalyType> iterator = waybillAnomalyTypes.iterator();
         List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = new ArrayList<>();
-        for (WaybillAnomalyType waybillAnomalyType : waybillAnomalyTypes) {
+        while (iterator.hasNext()) {
+            WaybillAnomalyType waybillAnomalyType = iterator.next();
+            boolean flag = ((WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus()) && CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomalyType.getId()))
+                           || (!CollectionUtils.isEmpty(waybillAnomalyDtos) && CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomalyType.getId())));
+            if (flag) {
+                continue;
+            }
             WaybillAnomalyTypeDto dto = new WaybillAnomalyTypeDto();
             BeanUtils.copyProperties(waybillAnomalyType, dto);
             waybillAnomalyTypeDtos.add(dto);
@@ -118,14 +153,41 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     }
 
     /**
-     * 根据运单Id查询客户信息
+     * 兼容老版本
+     * *************************************************************
+     *
+     * @param
+     * @return
+     */
+    @Override
+    public List<WaybillAnomalyTypeDto> displayAnomalyType() {
+
+        List<WaybillAnomalyType> waybillAnomalyTypes = waybillAnomalyTypeMapper.listAnomalyType();
+        Iterator<WaybillAnomalyType> iterator = waybillAnomalyTypes.iterator();
+        List<WaybillAnomalyTypeDto> waybillAnomalyTypeDtos = new ArrayList<>();
+        while (iterator.hasNext()) {
+            WaybillAnomalyType waybillAnomalyType = iterator.next();
+            WaybillAnomalyTypeDto dto = new WaybillAnomalyTypeDto();
+            BeanUtils.copyProperties(waybillAnomalyType, dto);
+            waybillAnomalyTypeDtos.add(dto);
+            waybillAnomalyTypeDtos.add(dto);
+        }
+        return waybillAnomalyTypeDtos;
+    }
+    /**
+     * *********************************************************************
+     */
+
+    /**
+     * 根据运单Id查询客户信息 司机信息
      * Author @Gao.
      *
      * @param waybillId
      * @return
      */
     @Override
-    public ShowCustomerDto getCustomerByWaybillId(Integer waybillId) {
+    public AnomalyUserProfileDto getAnomalyUserProfileByWaybillId(Integer waybillId) {
+        AnomalyUserProfileDto anomalyUserProfileDto = new AnomalyUserProfileDto();
         Waybill waybill = waybillMapper.getWaybillById(waybillId);
         if (null == waybill) {
             return null;
@@ -133,7 +195,22 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         //根据订单id 查询客户信息
         Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         ShowCustomerDto customer = customerClientService.getShowCustomerById(orders.getCustomerId());
-        return customer;
+        if (customer != null) {
+            anomalyUserProfileDto.setCustomerName(customer.getCustomerName());
+        }
+        //根据运单查询司机相关信息
+        Integer driverId = waybill.getDriverId();
+        DriverReturnDto driverByIdFeign = null;
+        if (driverId != null) {
+            driverByIdFeign = driverClientService.getDriverByIdFeign(driverId);
+            anomalyUserProfileDto.setDriverName(driverByIdFeign.getName());
+        }
+        //查询该司机的车牌号
+        ShowTruckDto truckByIdReturnObject = truckClientService.getTruckByIdReturnObject(driverByIdFeign.getTruckId());
+        if (truckByIdReturnObject != null) {
+            anomalyUserProfileDto.setTruckNumber(truckByIdReturnObject.getTruckNumber());
+        }
+        return anomalyUserProfileDto;
     }
 
     /**
@@ -221,6 +298,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             waybillAnomalyMapper.updateByPrimaryKeySelective(waybillAnomaly);
             return;
         }
+
         if (true == dto.getAdjustStatus() && true == dto.getVerifiedStatus()) {
             //是否涉及费用调整
             List<AnomalyDeductCompensationDto> feeAdjust = dto.getFeeAdjust();
@@ -418,12 +496,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     //判断是否需要审核
                     if (!waybillAnomaly.getAdjustStatus()) {
                         //当前异常为该类型 则可以撤派单并可以进入审核流程
-//                        if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
-//                            //更新状态为待审核
-//                            record.setAuditStatus(AnomalyStatus.TO_AUDIT);
-//                            record.setProcessingStatus(AnomalyStatus.AUDIT);
-//                            break;
-//                        }
+                        if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
+                            cancelWaybill(waybillAnomaly, currentUser);
+                        }
                         // 更新状态为已结束
                         record.setProcessingStatus(AnomalyStatus.FINISH);
                     } else {
@@ -482,9 +557,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         if (AnomalyStatus.OK.equals(dto.getAuditStatus())) {
             waybillAnomaly.setAuditStatus(AnomalyStatus.AUDIT_APPROVAL);
             waybillAnomaly.setProcessingStatus(AnomalyStatus.FINISH);
-//            if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(waybillAnomaly.getAnomalyTypeId())) {
-//                cancelWaybill(waybillAnomaly);
-//            }
         }
         //审核拒绝
         if (AnomalyStatus.NO.equals(dto.getAuditStatus())) {
@@ -495,25 +567,73 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     }
 
     /**
-     * 运单异常撤派单
+     * 特殊运单异常重置派单
      * Author @Gao.
      *
      * @param waybillAnomaly
      */
-    private void cancelWaybill(WaybillAnomaly waybillAnomaly) {
+    private void cancelWaybill(WaybillAnomaly waybillAnomaly, UserInfo currentUser) {
         Map<String, Object> templateMap = new HashMap<>();
         if (waybillAnomaly.getWaybillId() != null) {
-            Waybill waybill = new Waybill();
-            waybill.setId(waybillAnomaly.getWaybillId())
-                    .setWaybillStatus("已拒绝");
-            waybillMapper.updateByPrimaryKeySelective(waybill);
+            Integer waybillId = waybillAnomaly.getWaybillId();
+            Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
+            //发送短信
             if (waybill.getDriverId() != null) {
                 BaseResponse<UserInfo> globalUser = userClientService.getGlobalUser(waybill.getDriverId());
                 if (globalUser.getData() != null) {
                     UserInfo driver = globalUser.getData();
                     templateMap.put("driver", driver.getName());
                     templateMap.put("waybillId", waybill.getId());
-                    smsClientService.sendSMS(driver.getPhoneNumber(), "SMS_151690363", templateMap);
+                    smsClientService.sendSMS(driver.getPhoneNumber(), "SMS_154586744", templateMap);
+                }
+            }
+            List<Integer> waybillTrackingIds = waybillTrackingMapper.listWaybillTrackingIdByWaybillId(waybillId);
+            //批量逻辑删除
+            waybillTrackingMapper.deleteWaybillTrackingId(waybillTrackingIds);
+            //删除运单轨迹关联图片
+            waybillTrackingImagesMapper.deleteByWaybillIdAndImageType(waybillId, null);
+            WaybillTracking waybillTracking = new WaybillTracking();
+            waybillTracking
+                    .setEnabled(true)
+                    .setWaybillId(waybillId)
+                    .setTrackingType(TrackingType.ANOMALY_WAYBILL_RESET)
+                    .setReferUserId(currentUser.getId())
+                    .setNewStatus(WaybillStatus.SEND_TRUCK)
+                    .setOldStatus(waybill.getWaybillStatus())
+                    .setTrackingInfo("异常运单" + waybillId + "申请重置派单已通过审核");
+            waybillTrackingMapper.insertSelective(waybillTracking);
+            //更改运单状态
+            Waybill wb = new Waybill();
+            wb.setId(waybillId)
+                    .setWaybillStatus(WaybillStatus.SEND_TRUCK)
+                    .setDriverId(null)
+                    .setTruckId(null);
+            waybillMapper.updateCancelWaybillById(wb);
+            //更改订单状态
+            Orders orderUpdate = new Orders();
+            orderUpdate
+                    .setId(waybill.getOrderId())
+                    .setModifyTime(new Date());
+            List<Waybill> waybills = waybillMapper.listWaybillByOrderId(waybill.getOrderId());
+            int count = 0;
+            if (!CollectionUtils.isEmpty(waybills)) {
+                for (Waybill w : waybills) {
+                    boolean flag = WaybillStatus.DEPART.equals(w.getWaybillStatus()) || WaybillStatus.ARRIVE_LOAD_SITE.equals(w.getWaybillStatus())
+                            || WaybillStatus.LOAD_PRODUCT.equals(w.getWaybillStatus()) || WaybillStatus.DELIVERY.equals(w.getWaybillStatus())
+                            || WaybillStatus.RECEIVE.equals(w.getWaybillStatus());
+                    if (flag) {
+                        orderUpdate
+                                .setOrderStatus(OrderStatus.TRANSPORT);
+                        ordersMapper.updateByPrimaryKeySelective(orderUpdate);
+                    }
+                    if (WaybillStatus.SEND_TRUCK.equals(w.getWaybillStatus())) {
+                        count++;
+                        if (waybills.size() == count) {
+                            orderUpdate
+                                    .setOrderStatus(OrderStatus.STOWAGE);
+                            ordersMapper.updateByPrimaryKeySelective(orderUpdate);
+                        }
+                    }
                 }
             }
         }
@@ -540,6 +660,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             WaybillCustomerFee waybillCustomerFees = waybillCustomerFeeMapper.selectByAnomalyId(dto.getAnomalId());
             WaybillCustomerFee waybillCustomerFee = new WaybillCustomerFee();
             waybillCustomerFee
+                    .setDirection(CostType.COMPENSATE.equals(costType) ? Direction.SUBSTRACT : Direction.PLUS)
                     .setAnomalyId(dto.getAnomalId())
                     .setMoney(anomalyDeductCompensationDto.getMoney())
                     .setEarningType(CostType.ADDITIONAL)
@@ -556,6 +677,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 waybillFeeAdjustmentMapper.insertSelective(waybillFeeAdjustment);
             } else {
                 waybillCustomerFees
+                        .setDirection(CostType.COMPENSATE.equals(costType) ? Direction.SUBSTRACT : Direction.PLUS)
                         .setMoney(anomalyDeductCompensationDto.getMoney())
                         .setEnabled(true);
                 waybillCustomerFeeMapper.updateByPrimaryKeySelective(waybillCustomerFees);
@@ -572,6 +694,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             WaybillTruckFee waybillTruckFees = waybillTruckFeeMapper.selectByAnomalyId(dto.getAnomalId());
             WaybillTruckFee waybillTruckFee = new WaybillTruckFee();
             waybillTruckFee
+                    .setDirection(CostType.COMPENSATE.equals(costType) ? Direction.SUBSTRACT : Direction.PLUS)
                     .setAnomalyId(dto.getAnomalId())
                     .setCostType(CostType.ADDITIONAL)
                     .setWaybillId(dto.getWaybillId())
@@ -588,6 +711,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 waybillFeeAdjustmentMapper.insertSelective(waybillFeeAdjustment);
             } else {
                 waybillTruckFees
+                        .setDirection(CostType.COMPENSATE.equals(costType) ? Direction.SUBSTRACT : Direction.PLUS)
                         .setMoney(anomalyDeductCompensationDto.getMoney())
                         .setEnabled(true);
                 waybillTruckFeeMapper.updateByPrimaryKeySelective(waybillTruckFees);

@@ -75,4 +75,11 @@ public class RedisConfig extends CachingConfigurerSupport {
         template.afterPropertiesSet();
         return template;
     }
+
+    @Bean(name = "objectRedisTemplate")
+    public RedisTemplate<String, Object> objectRedisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String,Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(factory);
+        return redisTemplate;
+    }
 }

@@ -99,7 +99,11 @@ public class LocationServiceImpl implements LocationService {
      */
     @RabbitListener(queues = RabbitMqConfig.LOCATION_SEND_QUEUE)
     private void receiveMessage(List<LocationDto> locationList) {
-        locationMapper.insertBatch(locationList);
+        try {
+            locationMapper.insertBatch(locationList);
+        }catch (Exception ex){
+            log.error("R LocationServiceImpl.receiveMessage params error{}",ex);
+        }
     }
 
     /**

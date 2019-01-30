@@ -9,7 +9,9 @@
     <result column="to_user_type" property="toUserType" jdbcType="INTEGER" />
     <result column="header" property="header" jdbcType="VARCHAR" />
     <result column="body" property="body" jdbcType="VARCHAR" />
+    <result column="category" property="category" jdbcType="INTEGER" />
     <result column="msg_type" property="msgType" jdbcType="INTEGER" />
+    <result column="refuse_type" property="refuseType" jdbcType="INTEGER" />
     <result column="msg_source" property="msgSource" jdbcType="INTEGER" />
     <result column="refer_id" property="referId" jdbcType="INTEGER" />
     <result column="msg_status" property="msgStatus" jdbcType="INTEGER" />
@@ -20,11 +22,12 @@
     <result column="modify_user_id" property="modifyUserId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, from_user_id, from_user_type, to_user_id, to_user_type, header, body, msg_type, msg_source,
-    refer_id, msg_status, enabled, create_time, create_user_id, modify_time, modify_user_id
+    id, from_user_id, from_user_type, to_user_id, to_user_type, header, body, category,
+    msg_type, refuse_type, msg_source, refer_id, msg_status, enabled, create_time, create_user_id,
+    modify_time, modify_user_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from message
     where id = #{id,jdbcType=INTEGER}
@@ -33,23 +36,23 @@
     delete from message
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Message" useGeneratedKeys="true"
-          keyProperty="id" keyColumn="id">
-    insert into message (id, from_user_id, from_user_type, 
-      to_user_id, to_user_type, header, 
-      body, msg_type, msg_source, refer_id,
-      msg_status, enabled, create_time, 
+  <insert id="insert" parameterType="com.jaagro.tms.biz.entity.Message" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    insert into message (id, from_user_id, from_user_type,
+      to_user_id, to_user_type, header,
+      body, category, msg_type,
+      refuse_type, msg_source, refer_id,
+      msg_status, enabled, create_time,
       create_user_id, modify_time, modify_user_id
       )
-    values (#{id,jdbcType=INTEGER}, #{fromUserId,jdbcType=INTEGER}, #{fromUserType,jdbcType=INTEGER}, 
-      #{toUserId,jdbcType=INTEGER}, #{toUserType,jdbcType=INTEGER}, #{header,jdbcType=VARCHAR}, 
-      #{body,jdbcType=VARCHAR}, #{msgType,jdbcType=INTEGER}, #{msgSource,jdbcType=INTEGER}, #{referId,jdbcType=INTEGER},
-      #{msgStatus,jdbcType=INTEGER}, #{enabled,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, 
+    values (#{id,jdbcType=INTEGER}, #{fromUserId,jdbcType=INTEGER}, #{fromUserType,jdbcType=INTEGER},
+      #{toUserId,jdbcType=INTEGER}, #{toUserType,jdbcType=INTEGER}, #{header,jdbcType=VARCHAR},
+      #{body,jdbcType=VARCHAR}, #{category,jdbcType=INTEGER}, #{msgType,jdbcType=INTEGER},
+      #{refuseType,jdbcType=INTEGER}, #{msgSource,jdbcType=INTEGER}, #{referId,jdbcType=INTEGER},
+      #{msgStatus,jdbcType=INTEGER}, #{enabled,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP},
       #{createUserId,jdbcType=INTEGER}, #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Message" useGeneratedKeys="true"
-          keyProperty="id" keyColumn="id">
+  <insert id="insertSelective" parameterType="com.jaagro.tms.biz.entity.Message" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
     insert into message
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -73,8 +76,14 @@
       <if test="body != null" >
         body,
       </if>
+      <if test="category != null" >
+        category,
+      </if>
       <if test="msgType != null" >
         msg_type,
+      </if>
+      <if test="refuseType != null" >
+        refuse_type,
       </if>
       <if test="msgSource != null" >
         msg_source,
@@ -123,8 +132,14 @@
       <if test="body != null" >
         #{body,jdbcType=VARCHAR},
       </if>
+      <if test="category != null" >
+        #{category,jdbcType=INTEGER},
+      </if>
       <if test="msgType != null" >
         #{msgType,jdbcType=INTEGER},
+      </if>
+      <if test="refuseType != null" >
+        #{refuseType,jdbcType=INTEGER},
       </if>
       <if test="msgSource != null" >
         #{msgSource,jdbcType=INTEGER},
@@ -152,7 +167,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.Message" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.jaagro.tms.biz.entity.Message" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
     update message
     <set >
       <if test="fromUserId != null" >
@@ -173,8 +188,14 @@
       <if test="body != null" >
         body = #{body,jdbcType=VARCHAR},
       </if>
+      <if test="category != null" >
+        category = #{category,jdbcType=INTEGER},
+      </if>
       <if test="msgType != null" >
         msg_type = #{msgType,jdbcType=INTEGER},
+      </if>
+      <if test="refuseType != null" >
+        refuse_type = #{refuseType,jdbcType=INTEGER},
       </if>
       <if test="msgSource != null" >
         msg_source = #{msgSource,jdbcType=INTEGER},
@@ -203,7 +224,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.Message" >
+  <update id="updateByPrimaryKey" parameterType="com.jaagro.tms.biz.entity.Message" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
     update message
     set from_user_id = #{fromUserId,jdbcType=INTEGER},
       from_user_type = #{fromUserType,jdbcType=INTEGER},
@@ -211,7 +232,9 @@
       to_user_type = #{toUserType,jdbcType=INTEGER},
       header = #{header,jdbcType=VARCHAR},
       body = #{body,jdbcType=VARCHAR},
+      category = #{category,jdbcType=INTEGER},
       msg_type = #{msgType,jdbcType=INTEGER},
+      refuse_type = #{refuseType,jdbcType=INTEGER},
       msg_source = #{msgSource,jdbcType=INTEGER},
       refer_id = #{referId,jdbcType=INTEGER},
       msg_status = #{msgStatus,jdbcType=INTEGER},

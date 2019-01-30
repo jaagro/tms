@@ -68,9 +68,9 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         if (!StringUtils.isEmpty(waybillDto.getEnableDirectOrder()) && "y".equalsIgnoreCase(waybillDto.getEnableDirectOrder())) {
             List<TruckDto> trucks = waybillDto.getTrucks();
             //牧源需要重置计划量
-            Integer proportioning = 0 ;
+            Integer proportioning = 0;
             for (TruckDto truck : trucks) {
-                proportioning += truck.getCapacity()*truck.getNumber();
+                proportioning += truck.getCapacity() * truck.getNumber();
             }
             waybillItemsDtos.get(0).getGoods().get(0).setProportioning(proportioning);
         }
@@ -259,7 +259,6 @@ public class WaybillPlanServiceImpl implements WaybillPlanService {
         waybillPlanDto.setNeedTruckTypeId(truckTypeId);
         waybillPlanDto.setNeedTruckType(truckType);
         waybillPlanDto.setLoadSiteId(ordersData.getLoadSiteId());
-        waybillPlanDto.setTruckTeamContractId(ordersData.getCustomerContractId());
         waybillPlanDto.setLoadTime(ordersData.getLoadTime());
         waybillPlanDto.setWaybillPlanTime(new Date());
         waybillPlanDto.setGoodType(ordersData.getGoodsType());

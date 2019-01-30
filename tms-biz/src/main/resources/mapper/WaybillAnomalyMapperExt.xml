@@ -178,4 +178,17 @@
             #{i.id}
         </foreach>
     </update>
+    <select id="listWaybillAnomalyByWaybillId" resultType="com.jaagro.tms.api.dto.anomaly.WaybillAnomalyDto"
+            parameterType="com.jaagro.tms.api.dto.anomaly.WaybillAnomalyCondition" >
+        select
+        <include refid="Base_Column_List" />
+        from waybill_anomaly
+        where enabled = 1  and processing_status !='已结束'
+        <if test="waybillId != null and waybillId!=''">
+            and waybill_id = #{waybillId}
+        </if>
+        <if test="anomalyTypeId != null and anomalyTypeId!=''">
+            and anomaly_type_id = #{anomalyTypeId}
+        </if>
+    </select>
 </mapper>

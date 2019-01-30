@@ -5,6 +5,8 @@ import com.jaagro.tms.api.dto.driverapp.ShowTruckInfoDto;
 import com.jaagro.tms.api.dto.peripheral.*;
 import com.jaagro.tms.api.entity.RepairRecord;
 import com.jaagro.tms.api.enums.GasolineCompanyNameEnum;
+import com.jaagro.tms.api.enums.GasolineTypeEnum;
+import com.jaagro.tms.api.enums.PaymentMethodEnum;
 import com.jaagro.tms.api.service.GasolinePlusService;
 import com.jaagro.tms.api.service.RepairRecordService;
 import com.jaagro.tms.api.service.WashTruckService;
@@ -127,16 +129,22 @@ public class PeripheralAppController {
         }
         PageInfo gasolineRecordDtos = gasolinePlusService.listGasolineRecords(param);
         List<CreateGasolineRecordDto> createGasolineRecordDtos = gasolineRecordDtos.getList();
-        List<GasolineRecordListVo> gasolineRecordListVos = new ArrayList<>();
         if (!CollectionUtils.isEmpty(createGasolineRecordDtos)) {
-            for (CreateGasolineRecordDto gasolineRecordList : createGasolineRecordDtos) {
-                GasolineRecordListVo vo = new GasolineRecordListVo();
-                BeanUtils.copyProperties(gasolineRecordList, vo);
-                vo.setGasolineCompany(GasolineCompanyNameEnum.getTypeByDesc(gasolineRecordList.getGasolineCompany()));
-                gasolineRecordListVos.add(vo);
+            for (CreateGasolineRecordDto createGasolineRecordDto : createGasolineRecordDtos) {
+                if (null != createGasolineRecordDto.getGasolineCompany()) {
+                    createGasolineRecordDto
+                            .setGasolineCompany(GasolineCompanyNameEnum.getTypeByDesc(createGasolineRecordDto.getGasolineCompany()));
+                }
+                if (null != createGasolineRecordDto.getGasolineType()) {
+                    createGasolineRecordDto
+                            .setGasolineType(GasolineTypeEnum.getTypeByDesc(createGasolineRecordDto.getGasolineType()));
+                }
+                if (null != createGasolineRecordDto.getPaymentMethod()) {
+                    createGasolineRecordDto.setPaymentMethod(PaymentMethodEnum.getTypeByDesc(createGasolineRecordDto.getPaymentMethod()));
+                }
             }
         }
-        gasolineRecordDtos.setList(gasolineRecordListVos);
+        gasolineRecordDtos.setList(createGasolineRecordDtos);
         return BaseResponse.successInstance(gasolineRecordDtos);
     }
 
@@ -164,18 +172,7 @@ public class PeripheralAppController {
     @PostMapping("/listWashTruckRecordByCriteria")
     public BaseResponse listWashTruckRecordByCriteria(@RequestBody @Validated ListWashTruckRecordCriteria criteria) {
         log.info("O listWashTruckRecordByCriteria {}", criteria);
-        PageInfo pageInfo = washTruckService.listWashTruckRecordByCriteria(criteria);
-        List<WashTruckRecord> recordList = pageInfo.getList();
-        if (!recordList.isEmpty()) {
-            List<WashTruckRecordVo> washTruckRecordVoList = new ArrayList<>();
-            recordList.forEach(record -> {
-                WashTruckRecordVo vo = new WashTruckRecordVo();
-                BeanUtils.copyProperties(record, vo);
-                washTruckRecordVoList.add(vo);
-            });
-            pageInfo.setList(washTruckRecordVoList);
-        }
-        return BaseResponse.successInstance(pageInfo);
+        return BaseResponse.successInstance(washTruckService.listWashTruckRecordByCriteria(criteria));
     }
 
     @ApiOperation("洗车详情")

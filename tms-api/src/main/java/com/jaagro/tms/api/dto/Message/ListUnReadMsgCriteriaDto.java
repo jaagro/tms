@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -24,7 +23,6 @@ public class ListUnReadMsgCriteriaDto implements Serializable{
     /**
      * 消息来源:1-APP,2-小程序,3-站内
      */
-    @NotNull(message = "{msgSource.NotNull}")
     @Min(value = 1,message = "{msgSource.Min}")
     private Integer msgSource;
 

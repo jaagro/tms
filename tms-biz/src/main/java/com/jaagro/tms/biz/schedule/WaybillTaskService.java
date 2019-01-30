@@ -1,12 +1,15 @@
 package com.jaagro.tms.biz.schedule;
 
 
-import com.jaagro.tms.api.constant.TrackingType;
-import com.jaagro.tms.api.constant.WaybillStatus;
+import com.jaagro.tms.api.constant.*;
+import com.jaagro.tms.biz.common.RedisOperator;
+import com.jaagro.tms.biz.entity.Message;
 import com.jaagro.tms.biz.entity.Waybill;
 import com.jaagro.tms.biz.entity.WaybillTracking;
+import com.jaagro.tms.biz.mapper.MessageMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillTrackingMapperExt;
+import com.jaagro.tms.biz.utils.RedisLock;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +36,12 @@ public class WaybillTaskService {
     private WaybillMapperExt waybillMapperExt;
     @Autowired
     private WaybillTrackingMapperExt waybillTrackingMapper;
-
+    @Autowired
+    private MessageMapperExt messageMapper;
+    @Autowired
+    private RedisLock redisLock;
+    @Autowired
+    private RedisOperator redisOperator;
     /**
      * 超过30分钟未接的运单修改为被司机拒绝以便重新派单,10分钟跑一次
      */
@@ -49,6 +57,12 @@ public class WaybillTaskService {
             Date endTime = new SimpleDateFormat(format).parse("09:00:00");
 
             if (!isEffectiveDate(nowTime, startTime, endTime)) {
+                //加锁
+                long time = System.currentTimeMillis() + 10*1000;
+                boolean success = redisLock.lock("Scheduled:redisLock:waybillDefaultRejectBySystem" , String.valueOf(time));
+                if (!success) {
+                    throw new RuntimeException("请求正在处理中");
+                }
 
                 List<Waybill> waybillList = waybillMapperExt.listOverTimeWaybills();
 
@@ -59,6 +73,7 @@ public class WaybillTaskService {
                     for (Waybill waybill : waybillList) {
                         WaybillTracking waybillTracking = new WaybillTracking();
                         waybillTracking
+                                .setEnabled(true)
                                 .setWaybillId(waybill.getId())
                                 .setTrackingInfo("System auto Reject!")
                                 .setTrackingType(TrackingType.WAYBILL_SYSTEM_REJECT)
@@ -67,10 +82,32 @@ public class WaybillTaskService {
                                 .setReferUserId(1)
                                 .setCreateTime(new Date());
                         waybillTrackingMapper.insertSelective(waybillTracking);
+
+                        /**-------添加自动拒单消息---**/
+                        Message appMessage = new Message();
+                        appMessage.setReferId(waybill.getId());
+                        // 消息类型：1-系统通知 2-运单相关 3-账务相关
+                        appMessage.setMsgType(MsgType.WAYBILL);
+                        //消息来源:1-APP,2-小程序,3-站内
+                        appMessage.setMsgSource(MsgSource.WEB);
+                        appMessage.setMsgStatus(MsgStatusConstant.UNREAD);
+                        appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
+                        appMessage.setBody("运单号为（" + waybill.getId() + "）的运单，系统已超时拒单，请及时处理！");
+                        appMessage.setCreateTime(new Date());
+                        appMessage.setCreateUserId(1);
+                        appMessage.setFromUserId(FromUserType.SYSTEM);
+                        appMessage.setToUserId(waybillTrackingMapper.getCreateUserByWaybillId(waybill.getId()));
+                        appMessage.setHeader("你有一个拒单待处理");
+                        appMessage.setFromUserType(FromUserType.SYSTEM);
+                        appMessage.setToUserType(ToUserType.EMPLOYEE);
+                        appMessage.setCategory(MsgCategory.WARNING);
+                        appMessage.setRefuseType(RefuseType.AUTO);
+                        messageMapper.insertSelective(appMessage);
+                        /**------------------**/
                     }
                     /**********************/
                 }
-
+                redisOperator.del("Scheduled:redisLock:waybillDefaultRejectBySystem");
                 log.info("定时钟执行结束");
             }
         } catch (ParseException ex) {
@@ -78,6 +115,7 @@ public class WaybillTaskService {
             log.error("定时钟waybillDefaultRejectBySystem执行异常:", ex);
         }
     }
+
 
     public static void main(String[] args) {
 
