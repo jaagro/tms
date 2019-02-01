@@ -427,24 +427,40 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             //登记人
             if (!CollectionUtils.isEmpty(employeeLists) && null != waybillAnomalyDto.getCreateUserId()) {
                 if (UserType.EMPLOYEE.equals(waybillAnomalyDto.getCreateUserType())) {
-                    UserInfo creatorName = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList()).get(0);
+                    UserInfo creatorName = null;
+                    List<UserInfo> collect = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(collect)) {
+                        creatorName = collect.get(0);
+                    }
                     waybillAnomalyDto.setCreatorName(creatorName.getName());
                 }
             }
             if (!CollectionUtils.isEmpty(driverLists) && null != waybillAnomalyDto.getCreateUserId()) {
                 if (UserType.DRIVER.equals(waybillAnomalyDto.getCreateUserType())) {
-                    UserInfo driverName = driverLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList()).get(0);
+                    UserInfo driverName = null;
+                    List<UserInfo> collect = driverLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getCreateUserId())).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(collect)) {
+                        driverName = collect.get(0);
+                    }
                     waybillAnomalyDto.setCreatorName(driverName.getName());
                 }
             }
             //处理人
             if (!CollectionUtils.isEmpty(employeeLists) && null != waybillAnomalyDto.getProcessorUserId()) {
-                UserInfo processUser = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getProcessorUserId())).collect(Collectors.toList()).get(0);
+                List<UserInfo> collect = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getProcessorUserId())).collect(Collectors.toList());
+                UserInfo processUser = null;
+                if (!CollectionUtils.isEmpty(collect)) {
+                    processUser = collect.get(0);
+                }
                 waybillAnomalyDto.setProcessorName(processUser.getName());
             }
             //审核人
             if (!CollectionUtils.isEmpty(employeeLists) && null != waybillAnomalyDto.getAuditUserId()) {
-                UserInfo auditName = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getAuditUserId())).collect(Collectors.toList()).get(0);
+                UserInfo auditName = null;
+                List<UserInfo> collect = employeeLists.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getAuditUserId())).collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(collect)) {
+                    auditName = collect.get(0);
+                }
                 waybillAnomalyDto.setAuditName(auditName.getName());
             }
         }
