@@ -62,4 +62,10 @@ public interface WaybillItemsMapperExt extends WaybillItemsMapper {
      * @author baiyiran
      */
     Integer countUnFinishWaybillByContract(CountUnFinishWaybillCriteriaDto criteriaDto);
+
+    /**
+     * 根据运单号将明细跟新为待签收状态
+     * @param waybillId
+     */
+    void updateWaybillItemsForUnSign(@Param("waybillId") Integer waybillId);
 }

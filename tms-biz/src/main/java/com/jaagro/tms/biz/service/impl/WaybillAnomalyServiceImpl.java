@@ -69,6 +69,8 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
     private TruckClientService truckClientService;
     @Autowired
     private GrabWaybillRecordMapperExt grabWaybillRecordMapper;
+    @Autowired
+    private WaybillItemsMapperExt waybillItemsMapper;
 
 
     /**
@@ -613,6 +615,8 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     .setDriverId(null)
                     .setTruckId(null);
             waybillMapper.updateCancelWaybillById(wb);
+            //更新运单为待签收状态
+            waybillItemsMapper.updateWaybillItemsForUnSign(waybillId);
             //更改订单状态
             Orders orderUpdate = new Orders();
             orderUpdate
