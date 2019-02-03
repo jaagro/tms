@@ -80,7 +80,9 @@ public class WaybillEvaluateServiceImpl implements WaybillEvaluateService {
     public ListEvaluateTypeDto getWaybillEvaluateByWaybillId(Integer waybillId) {
         ListEvaluateTypeDto listEvaluateTypeDto = new ListEvaluateTypeDto();
         WaybillEvaluate waybillEvaluate = waybillEvaluateMapper.getWaybillEvaluateByWaybillId(waybillId);
-        BeanUtils.copyProperties(waybillEvaluate, listEvaluateTypeDto);
+        if (waybillEvaluate != null) {
+            BeanUtils.copyProperties(waybillEvaluate, listEvaluateTypeDto);
+        }
         return listEvaluateTypeDto;
     }
 }
