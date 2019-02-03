@@ -333,6 +333,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             WaybillItems wis = new WaybillItems();
             BeanUtils.copyProperties(cwd, wis);
             waybillItemsMapper.updateByPrimaryKeySelective(wis);
+
             waybillGoodsMapper.deleteByWaybillId(waybillOcr.getWaybillId());
             log.info("O waybillSupplementByOcr update waybillItems, object: {}", wis);
             //根据waybillOcr记录 循环创建waybillGoods;
