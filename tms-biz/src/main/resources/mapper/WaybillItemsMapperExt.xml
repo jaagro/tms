@@ -145,4 +145,9 @@
         and t.unload_site_id = #{unloadSiteId}
         and w.waybill_status in ('待派单','待接单','待出发','前往装货地','待装货','待送达','待签收')
     </select>
+    <update id="updateWaybillItemsForUnSign" parameterType="java.lang.Integer">
+    update waybill_items
+    set sign_status = false
+    where waybill_id = #{waybillId,jdbcType=INTEGER}
+  </update>
 </mapper>

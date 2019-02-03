@@ -117,6 +117,11 @@ public class WebChatAppWaybillController {
             trackingVos.add(waybillTrackingVo);
         }
         detailVo.setTracking(trackingVos);
+        //判断运单是否已评价
+        ListEvaluateTypeDto waybillEvaluate = waybillEvaluateService.getWaybillEvaluateByWaybillId(id);
+        if (waybillEvaluate != null) {
+            detailVo.setWaybillEvaluate(true);
+        }
         return BaseResponse.successInstance(detailVo);
     }
 
@@ -198,10 +203,6 @@ public class WebChatAppWaybillController {
         for (GetWaybillDto waybillDto : getWaybillDtos) {
 
             ListWaybillVo waybillVo = new ListWaybillVo();
-            ListEvaluateTypeDto waybillEvaluate = waybillEvaluateService.getWaybillEvaluateByWaybillId(waybillDto.getId());
-            if (waybillEvaluate != null) {
-                waybillVo.setWaybillEvaluate(true);
-            }
             BeanUtils.copyProperties(waybillDto, waybillVo);
             //运单装货地
             if (waybillDto.getLoadSite() != null) {

@@ -1096,13 +1096,13 @@ public class WaybillServiceImpl implements WaybillService {
                     .setWaybillDoneDate(date);
 
             customerContractDto = truckClientService.getContractByContractDto(customerContractDto);
-            if (customerContractDto.getId() != null) {
+            if (null != customerContractDto && null != customerContractDto.getId()) {
                 orders.setCustomerContractId(customerContractDto.getId());
                 ordersMapper.updateByPrimaryKeySelective(orders);
             }
             //2、更新运单的最新运力合同id
             ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
-            if (truckDto != null) {
+            if (null != truckDto && null != truckDto.getTruckTeamId()) {
                 truckTeamContractDto.setContractType(2)
                         .setTruckTeamId(truckDto.getTruckTeamId())
                         .setGoodsType(orders.getGoodsType())
