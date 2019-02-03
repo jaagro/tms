@@ -307,8 +307,8 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
             WaybillOcrDto waybillOcr = ocrService.getOcrByMuYuanAppImage(waybillId, urls.get(0).toString());
             if (CollectionUtils.isEmpty(waybillOcr.getGoodsItems()) || StringUtils.isEmpty(waybillOcr.getUnLoadSite())) {
-                log.info("R waybillSupplementByOcr OCR does not recognize valid data, error data: {}", waybillOcr);
-                throw new NullPointerException("OCR does not recognize valid data, error data" + waybillOcr);
+                log.warn("R waybillSupplementByOcr OCR does not recognize valid data, error data: ", waybillOcr);
+                return;
             }
             /*add by gavin 访问图片次数*/
             int value = readFromOCRTimes++;
