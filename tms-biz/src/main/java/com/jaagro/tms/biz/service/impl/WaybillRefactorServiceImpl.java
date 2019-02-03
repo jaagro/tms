@@ -329,7 +329,6 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             WaybillItems wis = new WaybillItems();
             BeanUtils.copyProperties(cwd, wis);
             waybillItemsMapper.updateByPrimaryKeySelective(wis);
-            waybillGoodsMapper.deleteByWaybillId(waybillOcr.getWaybillId());
             log.info("O waybillSupplementByOcr update waybillItems, object: {}", wis);
             //根据waybillOcr记录 循环创建waybillGoods;
             List<WaybillGoods> waybillGoodsList = new LinkedList<>();
@@ -348,7 +347,10 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 waybillGoodsList.add(wg);
             }
             //插入数据库
-            waybillGoodsMapper.batchInsert(waybillGoodsList);
+            if(!CollectionUtils.isEmpty(waybillGoodsList)){
+                waybillGoodsMapper.deleteByWaybillId(waybillOcr.getWaybillId());
+                waybillGoodsMapper.batchInsert(waybillGoodsList);
+            }
         } catch (Exception e) {
             log.error("R waybillSupplementByOcr Image recognition failed waybillId");
         }
