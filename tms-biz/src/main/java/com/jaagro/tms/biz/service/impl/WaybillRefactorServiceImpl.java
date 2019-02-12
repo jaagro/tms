@@ -326,13 +326,13 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             ShowSiteDto showSiteDto = customerClientService.getSiteBySiteName(ls, 248).getData();
             List<WaybillItems> waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillOcr.getWaybillId());
             GetWaybillItemDto cwd = new GetWaybillItemDto();
+            WaybillItems wis = new WaybillItems();
             if (!CollectionUtils.isEmpty(waybillItems) && showSiteDto != null) {
                 cwd.setId(waybillItems.get(0).getId());
                 cwd.setUnloadSiteId(showSiteDto.getId());
+                BeanUtils.copyProperties(cwd, wis);
+                waybillItemsMapper.updateByPrimaryKeySelective(wis);
             }
-            WaybillItems wis = new WaybillItems();
-            BeanUtils.copyProperties(cwd, wis);
-            waybillItemsMapper.updateByPrimaryKeySelective(wis);
 
 //            waybillGoodsMapper.deleteByWaybillId(waybillOcr.getWaybillId());
 
