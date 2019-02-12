@@ -357,7 +357,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
 
         } catch (Exception e) {
             log.error("R waybillSupplementByOcr Image recognition failed waybillId: " + map.get("waybillId"), e);
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
     }
 
