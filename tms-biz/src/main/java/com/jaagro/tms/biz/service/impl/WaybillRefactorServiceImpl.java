@@ -294,6 +294,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
 
     @Override
     @RabbitListener(queues = RabbitMqConfig.MUYUAN_OCR_QUEUE)
+    @Transactional(rollbackFor = Exception.class)
     public void waybillSupplementByOcr(Map<String, String> map) {
         try {
             int waybillId = Integer.parseInt(map.get("waybillId"));
