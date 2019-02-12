@@ -362,6 +362,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         }
         //插入数据库
         waybillGoodsMapper.batchInsert(waybillGoodsList);
+        log.info("O waybillSupplementByOcr update data success {}", waybillGoodsList);
     }
 
     /**
