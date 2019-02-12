@@ -294,6 +294,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
 
     @Override
     @RabbitListener(queues = RabbitMqConfig.MUYUAN_OCR_QUEUE)
+    @Transactional(rollbackFor = Exception.class)
     public void waybillSupplementByOcr(Map<String, String> map) {
         try {
             int waybillId = Integer.parseInt(map.get("waybillId"));
@@ -362,7 +363,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     }
 
     @Override
-    @Transactional(rollbackFor = Throwable.class)
+    @Transactional(rollbackFor = Exception.class)
     public void waybillSupplementUpdateDataByOcr(WaybillOcrDto waybillOcr){
         //河南牧原id为248，目前图片识别只适用于牧原项目
         //修改waybillItems信息
