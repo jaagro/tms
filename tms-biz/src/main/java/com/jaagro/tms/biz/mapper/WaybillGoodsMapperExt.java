@@ -59,4 +59,11 @@ public interface WaybillGoodsMapperExt extends WaybillGoodsMapper {
      * @return
      */
     Integer batchInsert(@Param("waybillGoodsList") List<WaybillGoods> waybillGoodsList);
+
+    /**
+     * 根据运单id逻辑删除相关的waybillGoods记录
+     * @param waybillId
+     * @return
+     */
+    Integer disableWaybillGoodsByWaybillId(@Param("waybillId") Integer waybillId);
 }

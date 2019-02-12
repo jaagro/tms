@@ -307,7 +307,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
             WaybillOcrDto waybillOcr = ocrService.getOcrByMuYuanAppImage(waybillId, urls.get(0).toString());
             if (CollectionUtils.isEmpty(waybillOcr.getGoodsItems()) || StringUtils.isEmpty(waybillOcr.getUnLoadSite())) {
-                log.warn("R waybillSupplementByOcr OCR does not recognize valid data, error data: ", waybillOcr);
+                log.error("R waybillSupplementByOcr OCR does not recognize valid data, error data: ", waybillOcr);
                 return;
             }
             /*add by gavin 访问图片次数*/
@@ -334,7 +334,10 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             BeanUtils.copyProperties(cwd, wis);
             waybillItemsMapper.updateByPrimaryKeySelective(wis);
 
-            waybillGoodsMapper.deleteByWaybillId(waybillOcr.getWaybillId());
+//            waybillGoodsMapper.deleteByWaybillId(waybillOcr.getWaybillId());
+
+//            逻辑删除，为了排bug
+            waybillGoodsMapper.disableWaybillGoodsByWaybillId(waybillId);
             log.info("O waybillSupplementByOcr update waybillItems, object: {}", wis);
             //根据waybillOcr记录 循环创建waybillGoods;
             List<WaybillGoods> waybillGoodsList = new LinkedList<>();
@@ -355,7 +358,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             //插入数据库
             waybillGoodsMapper.batchInsert(waybillGoodsList);
         } catch (Exception e) {
-            log.error("R waybillSupplementByOcr Image recognition failed waybillId");
+            log.error("R waybillSupplementByOcr Image recognition failed waybillId: " + map.get("waybillId"), e);
         }
     }
 
