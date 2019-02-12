@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -318,15 +319,50 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 log.error("R waybillSupplementByOcr unLoadSite is invalid");
                 return;
             }
-            this.waybillSupplementUpdateDataByOcr(waybillOcr);
+            //河南牧原id为248，目前图片识别只适用于牧原项目
+            //修改waybillItems信息
+            String ls = waybillOcr.getUnLoadSite();
+            ShowSiteDto showSiteDto = customerClientService.getSiteBySiteName(ls, 248).getData();
+            List<WaybillItems> waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillOcr.getWaybillId());
+            GetWaybillItemDto cwd = new GetWaybillItemDto();
+            WaybillItems wis = new WaybillItems();
+            if (!CollectionUtils.isEmpty(waybillItems) && showSiteDto != null) {
+                cwd.setId(waybillItems.get(0).getId());
+                cwd.setUnloadSiteId(showSiteDto.getId());
+                BeanUtils.copyProperties(cwd, wis);
+                waybillItemsMapper.updateByPrimaryKeySelective(wis);
+            }
+
+            waybillGoodsMapper.deleteByWaybillId(waybillOcr.getWaybillId());
+            log.info("O waybillSupplementByOcr update waybillItems, object: {}", wis);
+            //根据waybillOcr记录 循环创建waybillGoods;
+            List<WaybillGoods> waybillGoodsList = new LinkedList<>();
+            for (int i = 0; i < waybillOcr.getGoodsItems().size(); i++) {
+                WaybillGoods wg = new WaybillGoods();
+                wg.setGoodsName("饲料");
+                BigDecimal goodsWeight = waybillOcr.getGoodsItems().get(i).divide(new BigDecimal(1000), 2, RoundingMode.HALF_UP);
+                wg.setGoodsWeight(goodsWeight);
+                wg.setLoadWeight(goodsWeight);
+                wg.setUnloadWeight(goodsWeight);
+                wg.setWaybillId(waybillOcr.getWaybillId());
+                wg.setWaybillItemId(cwd.getId());
+                wg.setOrderGoodsId(0);
+                wg.setGoodsUnit(GoodsUnit.TON);
+                wg.setEnabled(true);
+                waybillGoodsList.add(wg);
+            }
+            //插入数据库
+            waybillGoodsMapper.batchInsert(waybillGoodsList);
+            log.info("O waybillSupplementByOcr update data success {}", waybillGoodsList);
 
         } catch (Exception e) {
             log.error("R waybillSupplementByOcr Image recognition failed waybillId: " + map.get("waybillId"), e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
         }
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Throwable.class)
     public void waybillSupplementUpdateDataByOcr(WaybillOcrDto waybillOcr){
         //河南牧原id为248，目前图片识别只适用于牧原项目
         //修改waybillItems信息
