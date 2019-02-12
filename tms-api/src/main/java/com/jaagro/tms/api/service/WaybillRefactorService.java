@@ -56,5 +56,4 @@ public interface WaybillRefactorService {
      */
     void waybillSupplementByOcr(Map<String, String> map);
 
-    void waybillSupplementUpdateDataByOcr(WaybillOcrDto waybillOcr);
 }

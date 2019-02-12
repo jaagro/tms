@@ -294,7 +294,6 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
 
     @Override
     @RabbitListener(queues = RabbitMqConfig.MUYUAN_OCR_QUEUE)
-    @Transactional(rollbackFor = Exception.class)
     public void waybillSupplementByOcr(Map<String, String> map) {
         try {
             int waybillId = Integer.parseInt(map.get("waybillId"));
@@ -362,45 +361,6 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         }
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void waybillSupplementUpdateDataByOcr(WaybillOcrDto waybillOcr){
-        //河南牧原id为248，目前图片识别只适用于牧原项目
-        //修改waybillItems信息
-        String ls = waybillOcr.getUnLoadSite();
-        ShowSiteDto showSiteDto = customerClientService.getSiteBySiteName(ls, 248).getData();
-        List<WaybillItems> waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillOcr.getWaybillId());
-        GetWaybillItemDto cwd = new GetWaybillItemDto();
-        WaybillItems wis = new WaybillItems();
-        if (!CollectionUtils.isEmpty(waybillItems) && showSiteDto != null) {
-            cwd.setId(waybillItems.get(0).getId());
-            cwd.setUnloadSiteId(showSiteDto.getId());
-            BeanUtils.copyProperties(cwd, wis);
-            waybillItemsMapper.updateByPrimaryKeySelective(wis);
-        }
-
-        waybillGoodsMapper.deleteByWaybillId(waybillOcr.getWaybillId());
-        log.info("O waybillSupplementByOcr update waybillItems, object: {}", wis);
-        //根据waybillOcr记录 循环创建waybillGoods;
-        List<WaybillGoods> waybillGoodsList = new LinkedList<>();
-        for (int i = 0; i < waybillOcr.getGoodsItems().size(); i++) {
-            WaybillGoods wg = new WaybillGoods();
-            wg.setGoodsName("饲料");
-            BigDecimal goodsWeight = waybillOcr.getGoodsItems().get(i).divide(new BigDecimal(1000), 2, RoundingMode.HALF_UP);
-            wg.setGoodsWeight(goodsWeight);
-            wg.setLoadWeight(goodsWeight);
-            wg.setUnloadWeight(goodsWeight);
-            wg.setWaybillId(waybillOcr.getWaybillId());
-            wg.setWaybillItemId(cwd.getId());
-            wg.setOrderGoodsId(0);
-            wg.setGoodsUnit(GoodsUnit.TON);
-            wg.setEnabled(true);
-            waybillGoodsList.add(wg);
-        }
-        //插入数据库
-        waybillGoodsMapper.batchInsert(waybillGoodsList);
-        log.info("O waybillSupplementByOcr update data success {}", waybillGoodsList);
-    }
 
     /**
      * 根据waybillId获取Items和goods
