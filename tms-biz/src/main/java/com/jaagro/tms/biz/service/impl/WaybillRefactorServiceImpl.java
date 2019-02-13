@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -306,8 +307,9 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             String[] strArray = {imageUrl};
             List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
             WaybillOcrDto waybillOcr = ocrService.getOcrByMuYuanAppImage(waybillId, urls.get(0).toString());
+            log.info("O waybillSupplementByOcr waybillOcr={}",waybillOcr);
             if (CollectionUtils.isEmpty(waybillOcr.getGoodsItems()) || StringUtils.isEmpty(waybillOcr.getUnLoadSite())) {
-                log.warn("R waybillSupplementByOcr OCR does not recognize valid data, error data: ", waybillOcr);
+                log.error("R waybillSupplementByOcr OCR does not recognize valid data, error data: ", waybillOcr);
                 return;
             }
             /*add by gavin 访问图片次数*/
@@ -319,20 +321,19 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 log.error("R waybillSupplementByOcr unLoadSite is invalid");
                 return;
             }
-
             //河南牧原id为248，目前图片识别只适用于牧原项目
             //修改waybillItems信息
             String ls = waybillOcr.getUnLoadSite();
             ShowSiteDto showSiteDto = customerClientService.getSiteBySiteName(ls, 248).getData();
             List<WaybillItems> waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillOcr.getWaybillId());
             GetWaybillItemDto cwd = new GetWaybillItemDto();
+            WaybillItems wis = new WaybillItems();
             if (!CollectionUtils.isEmpty(waybillItems) && showSiteDto != null) {
                 cwd.setId(waybillItems.get(0).getId());
                 cwd.setUnloadSiteId(showSiteDto.getId());
+                BeanUtils.copyProperties(cwd, wis);
+                waybillItemsMapper.updateByPrimaryKeySelective(wis);
             }
-            WaybillItems wis = new WaybillItems();
-            BeanUtils.copyProperties(cwd, wis);
-            waybillItemsMapper.updateByPrimaryKeySelective(wis);
 
             waybillGoodsMapper.deleteByWaybillId(waybillOcr.getWaybillId());
             log.info("O waybillSupplementByOcr update waybillItems, object: {}", wis);
@@ -354,10 +355,14 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             }
             //插入数据库
             waybillGoodsMapper.batchInsert(waybillGoodsList);
+            log.info("O waybillSupplementByOcr update data success {}", waybillGoodsList);
+
         } catch (Exception e) {
-            log.error("R waybillSupplementByOcr Image recognition failed waybillId");
+            log.error("R waybillSupplementByOcr Image recognition failed waybillId: " + map.get("waybillId"), e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
     }
+
 
     /**
      * 根据waybillId获取Items和goods

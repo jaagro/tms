@@ -6,17 +6,14 @@ import com.jaagro.tms.api.dto.ocr.MuYuanAppResultDto;
 import com.jaagro.tms.api.dto.ocr.WaybillOcrDto;
 import com.jaagro.tms.api.service.OcrService;
 import com.jaagro.tms.biz.utils.HttpUtils;
-import lombok.extern.log4j.Log4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,7 +51,7 @@ public class OcrServiceImpl implements OcrService {
             sb.append(rs.get(i).getWords());
         }
         for (String ss : out) {
-            log.info("o getOcrByMuYuanAppImage Before data cleaning: {}", ss);
+            log.info("O getOcrByMuYuanAppImage Before data cleaning: {}", ss);
         }
 
         //清洗list数据

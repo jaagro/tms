@@ -173,4 +173,8 @@
     </foreach>
     </insert>
 
+    <update id="disableWaybillGoodsByWaybillId">
+        update waybill_goods set enabled = 0 where waybill_id = #{waybillId}
+    </update>
+
 </mapper>
