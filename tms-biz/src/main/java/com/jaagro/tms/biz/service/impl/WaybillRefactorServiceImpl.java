@@ -493,6 +493,6 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         waybillTrackingImages
                 .setId(dto.getWaybillImagesId())
                 .setImageUrl(dto.getWaybillImagesUrl());
-        waybillTrackingImagesMapper.updateByPrimaryKey(waybillTrackingImages);
+        waybillTrackingImagesMapper.updateByPrimaryKeySelective(waybillTrackingImages);
     }
 }
