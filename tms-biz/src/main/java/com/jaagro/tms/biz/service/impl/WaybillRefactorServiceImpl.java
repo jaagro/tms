@@ -204,7 +204,6 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
      * @param id
      * @return
      * @Author Gavin
-     * @Author Gavin
      */
 
     @Override
@@ -307,7 +306,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             String[] strArray = {imageUrl};
             List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
             WaybillOcrDto waybillOcr = ocrService.getOcrByMuYuanAppImage(waybillId, urls.get(0).toString());
-            log.info("O waybillSupplementByOcr waybillOcr={}",waybillOcr);
+            log.info("O waybillSupplementByOcr waybillOcr={}", waybillOcr);
             if (CollectionUtils.isEmpty(waybillOcr.getGoodsItems()) || StringUtils.isEmpty(waybillOcr.getUnLoadSite())) {
                 log.error("R waybillSupplementByOcr OCR does not recognize valid data, error data: ", waybillOcr);
                 return;
@@ -362,7 +361,6 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
         }
     }
-
 
     /**
      * 根据waybillId获取Items和goods
@@ -475,5 +473,26 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 }
             }
         }
+    }
+
+    /**
+     * 运单详情页图片修改
+     *
+     * @param dto
+     * @Author @Gao.
+     */
+    @Override
+    public void waybillImageChange(WaybillImageChangeParamDto dto) {
+        Waybill waybill = waybillMapper.selectByPrimaryKey(dto.getWaybillId());
+        if (waybill != null) {
+            if (waybill.getReceiptStatus() == 1 || waybill.getReceiptStatus() == 2) {
+                throw new RuntimeException("该运单已经补录，图片不能更该");
+            }
+        }
+        WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
+        waybillTrackingImages
+                .setId(dto.getWaybillImagesId())
+                .setImageUrl(dto.getWaybillImagesUrl());
+        waybillTrackingImagesMapper.updateByPrimaryKey(waybillTrackingImages);
     }
 }

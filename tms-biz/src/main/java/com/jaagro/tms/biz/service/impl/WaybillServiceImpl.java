@@ -718,7 +718,7 @@ public class WaybillServiceImpl implements WaybillService {
                 }
                 List<ShowGoodsDto> goods = waybillItem.getGoods();
                 ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
-                ShowSiteAppDto unloadSiteApp = new ShowSiteAppDto();
+                ShowSiteAppDto  unloadSiteApp = new ShowSiteAppDto();
                 BeanUtils.copyProperties(unloadSite, unloadSiteApp);
                 unloadSiteApp.setGoods(goods);
                 unloadSiteApp.setRequiredTime(waybillItem.getRequiredTime());
@@ -881,40 +881,7 @@ public class WaybillServiceImpl implements WaybillService {
                     }
                 }
                 //****************gavin *牧源绿色磅单图片识别end
-
             }
-            /**
-             * 兼容老版本*******************************************************
-             *
-             */
-            if (!CollectionUtils.isEmpty(dto.getImagesUrl())) {
-                List<String> imagesUrl = dto.getImagesUrl();
-                for (int i = 0; i < imagesUrl.size(); i++) {
-                    WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
-                    waybillTrackingImages
-                            .setWaybillId(waybillId)
-                            .setSiteId(loadSite.getId())
-                            .setCreateTime(new Date())
-                            .setCreateUserId(currentUser.getId())
-                            .setImageUrl(imagesUrl.get(i))
-                            .setWaybillTrackingId(waybillTracking.getId());
-                    //出库单
-                    if (i == 0) {
-                        waybillTrackingImages.setImageType(ImagesTypeConstant.OUTBOUND_BILL);
-                    } else if (i == 1) {
-                        //磅单
-                        waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
-                    }
-                    if (!"invalidPicUrl".equalsIgnoreCase(imagesUrl.get(i))) {
-                        waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
-                    }
-                }
-            }
-
-            /**
-             * ****************************************************************
-             */
-
             waybill.setWaybillStatus(WaybillStatus.DELIVERY);
             waybillMapper.updateByPrimaryKey(waybill);
             return ServiceResult.toResult("操作成功");
@@ -993,40 +960,6 @@ public class WaybillServiceImpl implements WaybillService {
                         }
                     }
                 }
-                /**
-                 *  兼容老版本************************************************
-                 *
-                 */
-                //批量插入卸货单
-
-                if (!CollectionUtils.isEmpty(dto.getImagesUrl())) {
-                    List<String> imagesUrls = dto.getImagesUrl();
-                    for (int i = 0; i < imagesUrls.size(); i++) {
-                        String waybillImagesUrl = imagesUrls.get(i);
-                        WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
-                        waybillTrackingImages
-                                .setWaybillId(waybillId)
-                                .setSiteId(unLoadSiteConfirmProductDtos.get(0).getUnLoadSiteId())
-                                .setCreateTime(new Date())
-                                .setCreateUserId(currentUser.getId())
-                                .setImageUrl(waybillImagesUrl)
-                                .setWaybillTrackingId(waybillTracking.getId());
-                        //签收单
-                        if (i == 0) {
-                            waybillTrackingImages.setImageType(ImagesTypeConstant.SIGN_BILL);
-                        } else if (i == 1) {
-                            //磅单
-                            waybillTrackingImages.setImageType(ImagesTypeConstant.POUND_BILL);
-                        }
-                        if (!"invalidPicUrl".equalsIgnoreCase(waybillImagesUrl)) {
-                            waybillTrackingImagesMapper.insertSelective(waybillTrackingImages);
-                        }
-                    }
-                }
-                /**
-                 * **************************************************************
-                 */
-
                 //更新该运单签收
                 WaybillItems waybillItems = new WaybillItems();
                 waybillItems
