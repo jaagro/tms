@@ -185,7 +185,7 @@ public class WaybillAppController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单轨迹图片id不能为空");
         }
         if (dto.getWaybillImagesUrl() == null) {
-            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单图片url不能为空");
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单轨迹图片url不能为空");
         }
         waybillRefactorService.waybillImageChange(dto);
         return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
