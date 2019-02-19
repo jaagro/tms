@@ -718,7 +718,7 @@ public class WaybillServiceImpl implements WaybillService {
                 }
                 List<ShowGoodsDto> goods = waybillItem.getGoods();
                 ShowSiteDto unloadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
-                ShowSiteAppDto  unloadSiteApp = new ShowSiteAppDto();
+                ShowSiteAppDto unloadSiteApp = new ShowSiteAppDto();
                 BeanUtils.copyProperties(unloadSite, unloadSiteApp);
                 unloadSiteApp.setGoods(goods);
                 unloadSiteApp.setRequiredTime(waybillItem.getRequiredTime());
@@ -1619,7 +1619,7 @@ public class WaybillServiceImpl implements WaybillService {
         if (departIds.size() != 0) {
             criteriaDto.setDepartIds(departIds);
         }
-        if (criteriaDto.getWaybillStatus().equals(WaybillStatus.UNLOAD_RECEIPT)) {
+        if (!StringUtils.isEmpty(criteriaDto.getWaybillStatus()) && criteriaDto.getWaybillStatus().equals(WaybillStatus.UNLOAD_RECEIPT)) {
             criteriaDto.setWaybillStatus("");
             criteriaDto.setReceiptStatus(2);
         }
@@ -1655,7 +1655,7 @@ public class WaybillServiceImpl implements WaybillService {
                         waybillDto.setCustomerName(customer.getCustomerName());
                     }
                 }
-                if(null !=orders.getGoodsType()){
+                if (null != orders.getGoodsType()) {
                     waybillDto.setGoodsType(orders.getGoodsType());
                 }
                 if (waybill.getCreatedUserId() != null) {
