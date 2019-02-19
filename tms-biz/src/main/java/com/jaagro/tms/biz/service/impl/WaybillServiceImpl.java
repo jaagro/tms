@@ -1511,98 +1511,101 @@ public class WaybillServiceImpl implements WaybillService {
         Integer userId = getUserId();
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         String waybillOldStatus = waybill.getWaybillStatus();
-        String waybillNewStatus = WaybillStatus.RECEIVE;
-        if (null == waybill) {
-            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " ：id不正确");
-        }
-        if (null == truckClientService.getTruckByIdReturnObject(truckId)) {
-            return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), truckId + " ：id不正确");
-        }
-        //1.更新订单状态：从已配载(STOWAGE)改为运输中(TRANSPORT)
-        Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
-        orders.setId(waybill.getOrderId());
-        orders.setOrderStatus(OrderStatus.TRANSPORT);
-        orders.setModifyTime(new Date());
-        orders.setModifyUserId(userId);
-        ordersMapper.updateByPrimaryKeySelective(orders);
-        //2.更新waybill
-        ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(truckId);
-        Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId());
-        waybill.setTruckId(truckId);
-        waybill.setTruckTeamContractId(truckTeamContractId);
-        waybill.setWaybillStatus(waybillNewStatus);
-        waybill.setSendTime(new Date());
-        waybill.setModifyTime(new Date());
-        waybill.setModifyUserId(userId);
-        waybillMapper.updateByPrimaryKeySelective(waybill);
-        //3.在waybill_tracking表插入一条记录
-        WaybillTracking waybillTracking = new WaybillTracking();
-        waybillTracking
-                .setEnabled(true)
-                .setWaybillId(waybillId)
-                .setCreateTime(new Date())
-                .setOldStatus(waybillOldStatus)
-                .setNewStatus(waybillNewStatus)
-                .setTrackingInfo("已派单 ，运单号为【" + waybillId + "】")
-                .setReferUserId(userId);
-        waybillTrackingMapper.insertSelective(waybillTracking);
+        if(WaybillStatus.SEND_TRUCK.equals(waybillOldStatus) || WaybillStatus.REJECT.equals(waybillOldStatus)) {
+            String waybillNewStatus = WaybillStatus.RECEIVE;
+            if (null == waybill) {
+                return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " ：id不正确");
+            }
+            if (null == truckClientService.getTruckByIdReturnObject(truckId)) {
+                return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), truckId + " ：id不正确");
+            }
 
-        //4.掉用Jpush接口给司机推送消息
-        List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
-        orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
-        //装货地
-        ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
-        String loadSiteName = loadSite.getSiteName();
-        List<WaybillItems> waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
-        StringBuffer unLoadSiteNames = new StringBuffer();
-        for (WaybillItems waybillItem : waybillItems) {
-            //卸货地
-            ShowSiteDto unLoadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
-            unLoadSiteNames.append(unLoadSite.getSiteName() + "、");
-        }
-        String unloadSiteName = unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1);
-        String alias;
-        String msgTitle = "派单消息";
-        String msgContent;
-        String regId;
-        for (DriverReturnDto driver : drivers) {
-            Map<String, String> extraParam = new HashMap<>();
-            extraParam.put("driverId", driver.getId().toString());
-            extraParam.put("waybillId", waybillId.toString());
-            extraParam.put("needVoice", "y");
-            //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
-            msgContent = "您有新的健安运单待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
-            alias = driver.getPhoneNumber();
-            regId = driver.getRegistrationId();
-            JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
-        }
+            //1.更新订单状态：从已配载(STOWAGE)改为运输中(TRANSPORT)
+            Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
+            orders.setId(waybill.getOrderId());
+            orders.setOrderStatus(OrderStatus.TRANSPORT);
+            orders.setModifyTime(new Date());
+            orders.setModifyUserId(userId);
+            ordersMapper.updateByPrimaryKeySelective(orders);
+            //2.更新waybill
+            ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(truckId);
+            Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId());
+            waybill.setTruckId(truckId);
+            waybill.setTruckTeamContractId(truckTeamContractId);
+            waybill.setWaybillStatus(waybillNewStatus);
+            waybill.setSendTime(new Date());
+            waybill.setModifyTime(new Date());
+            waybill.setModifyUserId(userId);
+            waybillMapper.updateByPrimaryKeySelective(waybill);
+            //3.在waybill_tracking表插入一条记录
+            WaybillTracking waybillTracking = new WaybillTracking();
+            waybillTracking
+                    .setEnabled(true)
+                    .setWaybillId(waybillId)
+                    .setCreateTime(new Date())
+                    .setOldStatus(waybillOldStatus)
+                    .setNewStatus(waybillNewStatus)
+                    .setTrackingInfo("已派单 ，运单号为【" + waybillId + "】")
+                    .setReferUserId(userId);
+            waybillTrackingMapper.insertSelective(waybillTracking);
 
-        //5.在app消息表插入一条司机记录
-        //6.发送短信给truckId对应的司机
-        for (int i = 0; i < drivers.size(); i++) {
-            DriverReturnDto driver = drivers.get(i);
-            Map<String, Object> templateMap = new HashMap<>();
-            templateMap.put("driverName", driver.getName());
-            BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(), "SMS_146803933", templateMap);
-            log.trace("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
-            System.out.println("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
-            Message appMessage = new Message();
-            appMessage.setReferId(waybillId);
-            // 消息类型：1-系统通知 2-运单相关 3-账务相关
-            appMessage.setMsgType(MsgType.WAYBILL);
-            //消息来源:1-APP,2-小程序,3-站内
-            appMessage.setMsgSource(MsgSource.APP);
-            appMessage.setMsgStatus(MsgStatusConstant.UNREAD);
-            appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
-            appMessage.setBody("您有新的健安运单待接单,从" + loadSiteName + "到" + unloadSiteName + "的运单。");
-            appMessage.setCreateTime(new Date());
-            appMessage.setCreateUserId(userId);
-            appMessage.setFromUserId(userId);
-            appMessage.setToUserId(driver.getId());
-            messageMapper.insertSelective(appMessage);
+            //4.掉用Jpush接口给司机推送消息
+            List<DriverReturnDto> drivers = driverClientService.listByTruckId(truckId);
+            orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
+            //装货地
+            ShowSiteDto loadSite = customerClientService.getShowSiteById(orders.getLoadSiteId());
+            String loadSiteName = loadSite.getSiteName();
+            List<WaybillItems> waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillId);
+            StringBuffer unLoadSiteNames = new StringBuffer();
+            for (WaybillItems waybillItem : waybillItems) {
+                //卸货地
+                ShowSiteDto unLoadSite = customerClientService.getShowSiteById(waybillItem.getUnloadSiteId());
+                unLoadSiteNames.append(unLoadSite.getSiteName() + "、");
+            }
+            String unloadSiteName = unLoadSiteNames.substring(0, unLoadSiteNames.length() - 1);
+            String alias;
+            String msgTitle = "派单消息";
+            String msgContent;
+            String regId;
+            for (DriverReturnDto driver : drivers) {
+                Map<String, String> extraParam = new HashMap<>();
+                extraParam.put("driverId", driver.getId().toString());
+                extraParam.put("waybillId", waybillId.toString());
+                extraParam.put("needVoice", "y");
+                //您有新的运单信息待接单，从｛装货地名｝到｛卸货地名1｝/｛卸货地名2｝的运单。
+                msgContent = "您有新的健安运单待接单，从" + loadSiteName + "到" + unloadSiteName + "的运单。";
+                alias = driver.getPhoneNumber();
+                regId = driver.getRegistrationId();
+                JpushClientUtil.sendPush(alias, msgTitle, msgContent, regId, extraParam);
+            }
+
+            //5.在app消息表插入一条司机记录
+            //6.发送短信给truckId对应的司机
+            for (int i = 0; i < drivers.size(); i++) {
+                DriverReturnDto driver = drivers.get(i);
+                Map<String, Object> templateMap = new HashMap<>();
+                templateMap.put("driverName", driver.getName());
+                BaseResponse response = smsClientService.sendSMS(driver.getPhoneNumber(), "SMS_146803933", templateMap);
+                log.trace("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
+                System.out.println("给司机发短信,driver" + i + "::::" + driver + ",短信结果:::" + response);
+                Message appMessage = new Message();
+                appMessage.setReferId(waybillId);
+                // 消息类型：1-系统通知 2-运单相关 3-账务相关
+                appMessage.setMsgType(MsgType.WAYBILL);
+                //消息来源:1-APP,2-小程序,3-站内
+                appMessage.setMsgSource(MsgSource.APP);
+                appMessage.setMsgStatus(MsgStatusConstant.UNREAD);
+                appMessage.setHeader(WaybillConstant.NEW__WAYBILL_FOR_RECEIVE);
+                appMessage.setBody("您有新的健安运单待接单,从" + loadSiteName + "到" + unloadSiteName + "的运单。");
+                appMessage.setCreateTime(new Date());
+                appMessage.setCreateUserId(userId);
+                appMessage.setFromUserId(userId);
+                appMessage.setToUserId(driver.getId());
+                messageMapper.insertSelective(appMessage);
+            }
+            //7.删除抢单记录
+            grabWaybillRecordMapper.deleteByWaybillId(waybillId);
         }
-        //7.删除抢单记录
-        grabWaybillRecordMapper.deleteByWaybillId(waybillId);
         return ServiceResult.toResult("派单成功");
     }
 
