@@ -29,10 +29,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * 回单管理
@@ -107,8 +105,10 @@ public class ReceiptController {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_EMPTY.getCode(), "运单id=" + waybillId + "未完成不能补录实卸");
         }
         boolean success = waybillService.updateUnLoadGoodsReceipt(updateWaybillGoodsDtoList);
+        // 计算客户报价,运力报价(如果效率低考虑异步)
+        calculatePrice(waybillId);
         if (success) {
-            return BaseResponse.successInstance("回单修改卸货信息成功");
+            return BaseResponse.successInstance("回单修改卸货信息,计算报价成功");
         }
         return BaseResponse.errorInstance("回单修改卸货信息失败");
     }
@@ -246,5 +246,19 @@ public class ReceiptController {
             return true;
         }
         return false;
+    }
+
+    private void calculatePrice(Integer waybillId){
+        try {
+            List<Integer> waybillIdList = new ArrayList<>();
+            waybillIdList.add(waybillId);
+            List<Map<Integer, BigDecimal>> customerMaps = waybillService.calculatePaymentFromCustomer(waybillIdList);
+            log.info("O calculateCustomerPrice waybillId={},result={}",waybillId,customerMaps);
+            List<Map<Integer, BigDecimal>> driverMaps = waybillService.calculatePaymentFromDriver(waybillIdList);
+            log.info("O calculateDriverPrice waybillId={},result={}",waybillId,driverMaps);
+        }catch (Exception e){
+            log.error("O calculatePrice error waybillId="+waybillId,e);
+        }
+
     }
 }

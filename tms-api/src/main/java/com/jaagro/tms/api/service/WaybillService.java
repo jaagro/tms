@@ -1,7 +1,6 @@
 package com.jaagro.tms.api.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.order.ChickenImportRecordDto;
 import com.jaagro.tms.api.dto.order.PreImportChickenRecordDto;
@@ -267,16 +266,18 @@ public interface WaybillService {
 
     /**
      * 毛鸡导入预览
-     * @author yj
+     *
      * @param preImportChickenRecordDto
      * @return
+     * @author yj
      */
     List<ChickenImportRecordDto> preImportChickenWaybill(PreImportChickenRecordDto preImportChickenRecordDto);
 
     /**
      * 毛鸡导入记录入库并生成运单派单给车辆下所有司机
-     * @author yj
+     *
      * @param orderId
+     * @author yj
      */
     void importChickenWaybill(Integer orderId);
 
@@ -287,7 +288,7 @@ public interface WaybillService {
      * @param waybillDto
      * @return
      */
-    Boolean importWaybills(Integer orderId,List<ImportWaybillDto> waybillDto);
+    Boolean importWaybills(Integer orderId, List<ImportWaybillDto> waybillDto);
 
     /**
      * 根据司机id统计未完成的运单
@@ -299,8 +300,17 @@ public interface WaybillService {
 
     /**
      * 修改不正确的毛鸡导入记录
+     *
      * @param dto
      * @return
      */
     List<ChickenImportRecordDto> changeImportChickenRecord(UpdateChickenImportRecordDto dto);
+
+    /**
+     * 查询未完成的运单 提供给删除报价
+     *
+     * @param criteriaDto
+     * @return
+     */
+    Integer countUnFinishWaybillByContract(CountUnFinishWaybillCriteriaDto criteriaDto);
 }

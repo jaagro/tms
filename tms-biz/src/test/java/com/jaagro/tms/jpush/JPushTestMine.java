@@ -59,7 +59,7 @@ public class JPushTestMine {
 
         try {
             PushResult result = jpushClient.sendPush(payload);
-            System.out.println("result========"+result);
+            System.out.println("muYuanAppImageResultBo========"+result);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("JPUSH Failed root cause:"+e.getMessage());

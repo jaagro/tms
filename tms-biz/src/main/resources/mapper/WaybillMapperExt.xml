@@ -173,6 +173,9 @@
         <if test="orderId != null">
             and order_id = #{orderId}
         </if>
+        <if test="deptId != null">
+            and department_id = #{deptId}
+        </if>
         <if test="createStartTime != null">
             <![CDATA[and create_time >= #{createStartTime}]]>
         </if>
@@ -209,6 +212,9 @@
             <if test="waybillStatus != '运输中'">
                 and waybill_status = #{waybillStatus}
             </if>
+        </if>
+        <if test="receiptStatus != null and receiptStatus != ''">
+            and receipt_status=#{receiptStatus}
         </if>
         order by
         CASE
@@ -345,27 +351,29 @@
     </select>
     <select id="listWaybillByStatus" resultMap="DetailInfo"
             parameterType="com.jaagro.tms.api.dto.waybill.ReceiptListParamDto">
-        select  <include refid="Base_Column_List"/> from (
-            select
-            <include refid="Base_Column_List"/>
-            from waybill
-            where enabled=1 and waybill_status='待接单'
-            <if test="waybillStatus != null">
-                and waybill_status=#{waybillStatus,jdbcType=VARCHAR}
-            </if>
-            <if test="truckId != null">
-                and truck_Id = #{truckId,jdbcType=INTEGER}
-            </if>
-            union
-            select w.id, w.order_id, w.load_site_id, w.truck_team_contract_id, w.waybill_status,
-            w.receipt_status,w.need_truck_type, w.truck_id, w.driver_id, w.send_time, w.distance,
-            w.create_time, w.created_user_id, w.modify_time, w.modify_user_id, w.enabled,w.load_time,
-            w.department_id, w.network_id
-            from waybill w inner join grab_waybill_record gwr on w.id=gwr.waybill_id
-            where w.enabled=1 and gwr.enabled=1 and w.waybill_status='待接单' and gwr.status='未抢单'
-            <if test="driverId!=null">
-                and gwr.driver_id=#{driverId}
-            </if>
+        select
+        <include refid="Base_Column_List"/>
+        from (
+        select
+        <include refid="Base_Column_List"/>
+        from waybill
+        where enabled=1 and waybill_status='待接单'
+        <if test="waybillStatus != null">
+            and waybill_status=#{waybillStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="truckId != null">
+            and truck_Id = #{truckId,jdbcType=INTEGER}
+        </if>
+        union
+        select w.id, w.order_id, w.load_site_id, w.truck_team_contract_id, w.waybill_status,
+        w.receipt_status,w.need_truck_type, w.truck_id, w.driver_id, w.send_time, w.distance,
+        w.create_time, w.created_user_id, w.modify_time, w.modify_user_id, w.enabled,w.load_time,
+        w.department_id, w.network_id
+        from waybill w inner join grab_waybill_record gwr on w.id=gwr.waybill_id
+        where w.enabled=1 and gwr.enabled=1 and w.waybill_status='待接单' and gwr.status='未抢单'
+        <if test="driverId!=null">
+            and gwr.driver_id=#{driverId}
+        </if>
         )tab order by create_time DESC
     </select>
 </mapper>

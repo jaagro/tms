@@ -94,5 +94,8 @@
         </if>
         limit 1
     </select>
-
+    <delete id="deleteByWaybillId" parameterType="java.lang.Integer">
+    delete from grab_waybill_record
+    where waybill_id = #{waybillId,jdbcType=INTEGER}
+  </delete>
 </mapper>

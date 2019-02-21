@@ -5,3 +5,4 @@ ADD tms-web-2.0.0-SNAPSHOT.jar app.jar
 RUN echo "Asia/shanghai" > /etc/timezone
 ENTRYPOINT ["java","-Xmx1024m","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 EXPOSE 8010
+EXPOSE 5005

@@ -1,12 +1,10 @@
 package com.jaagro.tms.biz.service;
 
+import com.jaagro.tms.api.dto.base.DictionaryDto;
 import com.jaagro.tms.api.dto.customer.*;
+import com.jaagro.utils.BaseResponse;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -46,6 +44,17 @@ public interface CustomerClientService {
     ShowSiteDto getShowSiteById(@PathVariable("id") Integer id);
 
     /**
+     * 根据地址名称获取地址对象
+     *
+     * @param siteName
+     * @param customerId
+     * @return
+     */
+    @GetMapping("/getSiteBySiteName/{siteName}/{customerId}")
+    BaseResponse<ShowSiteDto> getSiteBySiteName(@PathVariable("siteName") String siteName,
+                                                @PathVariable("customerId") Integer customerId);
+
+    /**
      * 从crm项目获取显示客户联系人
      *
      * @param customerId
@@ -82,18 +91,29 @@ public interface CustomerClientService {
 
     /**
      * 与客户结算的计算
+     *
      * @param dtoList
      * @return 结算金额
      */
     @PostMapping("/calculatePaymentFromCustomer")
-    List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(@RequestBody  List<CalculatePaymentDto> dtoList);
+    List<Map<Integer, BigDecimal>> calculatePaymentFromCustomer(@RequestBody List<CalculatePaymentDto> dtoList);
 
     /**
      * 与司机结算的计价
+     *
      * @param dtoList
      * @return
      */
     @PostMapping("/calculatePaymentFromDriver")
     List<Map<Integer, BigDecimal>> calculatePaymentFromDriver(@RequestBody List<CalculatePaymentDto> dtoList);
+
+    /**
+     * 根据id查询字典
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/getDictionaryById")
+    DictionaryDto getDictionaryById(@RequestParam("id") Integer id);
 
 }

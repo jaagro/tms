@@ -77,4 +77,13 @@ public interface WaybillTrackingMapperExt extends WaybillTrackingMapper {
      * @return
      */
     Integer getCreateUserByWaybillId(@Param("waybillId") Integer waybillId);
+
+    /**
+     * 根据运单查询运单轨迹
+     *
+     * @param waybillId
+     * @return
+     */
+    WaybillTracking getRefuseTrackingByWaybillId(@Param("waybillId") Integer waybillId);
+
 }

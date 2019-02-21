@@ -35,7 +35,7 @@ public class MessageController {
     @PostMapping("/listMessages")
     @ApiOperation("消息列表")
     public BaseResponse listMessages(@RequestBody @Validated ListMessageCriteriaDto criteriaDto) {
-        log.debug("listMessages,{}",criteriaDto);
+        log.info("O listMessages,criteriaDto={}",criteriaDto);
         PageInfo<MessageReturnDto> messageReturnDtoPageInfo = messageService.listMessageByCriteriaDto(criteriaDto);
         return BaseResponse.successInstance(messageReturnDtoPageInfo);
     }
@@ -43,6 +43,7 @@ public class MessageController {
     @PostMapping("/readMessages")
     @ApiOperation("将消息置为已读")
     public BaseResponse readMessages(@RequestBody List<Integer> messageIdList){
+        log.info("O readMessages,messageIdList={}",messageIdList);
         if (CollectionUtils.isEmpty(messageIdList)){
             return BaseResponse.errorInstance("消息id列表不能为空");
         }
@@ -56,6 +57,7 @@ public class MessageController {
     @PostMapping("/listUnreadMessages")
     @ApiOperation("获取未读消息")
     public BaseResponse listUnreadMessages(@RequestBody @Validated ListUnReadMsgCriteriaDto criteriaDto){
+        log.info("O listUnreadMessages criteriaDto={}",criteriaDto);
         List<MessageReturnDto> messageReturnDtos = messageService.listUnreadMessages(criteriaDto);
         return BaseResponse.successInstance(messageReturnDtos);
     }
@@ -63,6 +65,7 @@ public class MessageController {
     @PostMapping("/createMessage")
     @ApiOperation("创建消息")
     public BaseResponse createMessage(@RequestBody @Validated CreateMessageDto createMessageDto){
+        log.info("O createMessage,createMessageDto={}",createMessageDto);
         boolean success = messageService.createMessage(createMessageDto);
         if (success){
             return BaseResponse.successInstance("创建消息成功");

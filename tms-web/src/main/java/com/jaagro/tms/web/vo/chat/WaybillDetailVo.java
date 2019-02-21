@@ -50,6 +50,11 @@ public class WaybillDetailVo {
     private String driverPhoneNumber;
 
     /**
+     * 用于判断当前运单是否评价
+     */
+    private boolean waybillEvaluate;
+
+    /**
      * 运单明细list
      */
     private List<WaybillItemsVo> waybillItems;

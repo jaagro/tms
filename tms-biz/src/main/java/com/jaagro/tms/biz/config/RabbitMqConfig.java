@@ -15,12 +15,22 @@ public class RabbitMqConfig {
      */
     public static final String LOCATION_SEND_QUEUE = "location.send.queue";
 
+    /**
+     * 牧原图片识别自动创建运单队列
+     */
+    public static final String MUYUAN_OCR_QUEUE = "muyuan.ocr.queue";
+
     public static final String TOPIC_EXCHANGE = "topic.exchange";
     public static final String FANOUT_EXCHANGE = "fanout.exchange";
 
     @Bean
     public Queue locationSendQueue() {
         return new Queue(LOCATION_SEND_QUEUE, true);
+    }
+
+    @Bean
+    public Queue muYuanOcrQueue() {
+        return new Queue(MUYUAN_OCR_QUEUE, true);
     }
 
     /**
@@ -47,5 +57,10 @@ public class RabbitMqConfig {
     @Bean
     public Binding locationSendBindingTopic() {
         return BindingBuilder.bind(locationSendQueue()).to(topicExchange()).with("location.send");
+    }
+
+    @Bean
+    public Binding muyuanOcrBindingTopic() {
+        return BindingBuilder.bind(muYuanOcrQueue()).to(topicExchange()).with("muyuan.ocr");
     }
 }
