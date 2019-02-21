@@ -15,29 +15,30 @@ import java.util.Date;
 
 /**
  * 更新运单货物
+ *
  * @author yj
  * @date 2018/11/1
  */
 @Data
 @Accessors(chain = true)
-public class UpdateWaybillGoodsDto implements Serializable{
+public class UpdateWaybillGoodsDto implements Serializable {
     /**
      * 运单货物id
      */
-    @Min(value = 1,message = "{waybillGoodsId.Min}")
+    @Min(value = 1, message = "{waybillGoodsId.Min}")
     private Integer id;
 
     /**
      * 运单id
      */
     @NotNull(message = "{waybillId.NotNull}")
-    @Min(value = 1,message = "{waybillId.Min}")
+    @Min(value = 1, message = "{waybillId.Min}")
     private Integer waybillId;
 
     /**
      * 运单卸货地id
      */
-    @Min(value = 1,message = "{waybillItemId.Min}")
+    @Min(value = 1, message = "{waybillItemId.Min}")
     private Integer waybillItemId;
 
     /**
@@ -56,42 +57,42 @@ public class UpdateWaybillGoodsDto implements Serializable{
      * 货物单位：1-羽 2-头 3-吨
      */
     @NotNull(message = "{goodsUnit.NotNull}")
-    @Min(value = 1,message = "{goodsUnit.Min}")
+    @Min(value = 1, message = "{goodsUnit.Min}")
     private Integer goodsUnit;
     /**
      * 计划数量
      */
-    @Max(value = 99999999,message = "{goodsQuantity.Max}")
+    @Max(value = 99999999, message = "{goodsQuantity.Max}")
     private Integer goodsQuantity;
 
     /**
      * 计划重量
      */
-    @Max(value = 30,message = "{goodsWeight.Max}")
+    @Max(value = 99999999, message = "{goodsWeight.Max}")
     private BigDecimal goodsWeight;
 
     /**
      * 装货数量
      */
-    @Max(value = 99999999,message = "{loadQuantity.Max}")
+    @Max(value = 99999999, message = "{loadQuantity.Max}")
     private Integer loadQuantity;
 
     /**
      * 装货重量
      */
-    @Max(value = 30,message = "{loadWeight.Max}")
+    @Max(value = 99999999, message = "{loadWeight.Max}")
     private BigDecimal loadWeight;
 
     /**
      * 卸货数量
      */
-    @Max(value = 99999999,message = "{unloadQuantity.Max}")
+    @Max(value = 99999999, message = "{unloadQuantity.Max}")
     private Integer unloadQuantity;
 
     /**
      * 卸货重量
      */
-    @Max(value = 30,message = "{unloadWeight.Max}")
+    @Max(value = 99999999, message = "{unloadWeight.Max}")
     private BigDecimal unloadWeight;
 
     /**

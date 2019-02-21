@@ -3,6 +3,7 @@ package com.jaagro.tms.web.controller;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.waybill.GetReceiptMessageParamDto;
+import com.jaagro.tms.api.dto.waybill.WaybillImageChangeParamDto;
 import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.impl.WaybillServiceImpl;
@@ -174,4 +175,19 @@ public class WaybillAppController {
         return BaseResponse.service(result);
     }
 
+    @ApiOperation("运单详情图片修改")
+    @PostMapping("waybillImageChange")
+    public BaseResponse waybillImageChange(@RequestBody WaybillImageChangeParamDto dto) {
+        if (dto.getWaybillId() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单号id不能为空");
+        }
+        if (dto.getWaybillImagesId() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单轨迹图片id不能为空");
+        }
+        if (dto.getWaybillImagesUrl() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单轨迹图片url不能为空");
+        }
+        waybillRefactorService.waybillImageChange(dto);
+        return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
+    }
 }

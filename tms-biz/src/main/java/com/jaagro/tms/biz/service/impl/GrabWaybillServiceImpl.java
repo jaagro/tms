@@ -60,11 +60,14 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
     @Transactional(rollbackFor = Exception.class)
     public void grabWaybillToTrucks(GrabWaybillParamDto dto) {
         Waybill waybill = waybillMapper.selectByPrimaryKey(dto.getWaybillId());
+        String waybillOldStatus = waybill.getWaybillStatus();
+        String waybillNewStatus = WaybillStatus.RECEIVE;
         if (null == waybill) {
             throw new RuntimeException("当前运单" + waybill.getId() + "不存在!");
         }
-        String waybillOldStatus = waybill.getWaybillStatus();
-        String waybillNewStatus = WaybillStatus.RECEIVE;
+        if (!(WaybillStatus.SEND_TRUCK.equals(waybillOldStatus) || WaybillStatus.REJECT.equals(waybillOldStatus))) {
+            throw new RuntimeException("只有待派单或者已拒单才能抢单");
+        }
         List<ShowTruckDto> truckDtos = new ArrayList<>();
         for (Integer truckId : dto.getTruckIds()) {
             ShowTruckDto trucks = truckClientService.getTruckByIdReturnObject(truckId);
@@ -101,7 +104,7 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
                 .setCreateTime(new Date())
                 .setOldStatus(waybillOldStatus)
                 .setNewStatus(waybillNewStatus)
-                .setTrackingInfo("已派单 ，运单号为【" + waybill.getId() + "】")
+                .setTrackingInfo("抢单已派 ，运单号为【" + waybill.getId() + "】")
                 .setReferUserId(getUserId());
         waybillTrackingMapper.insertSelective(waybillTracking);
         //向司机推送jpush消息

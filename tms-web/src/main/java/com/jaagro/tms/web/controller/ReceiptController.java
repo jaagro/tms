@@ -74,6 +74,13 @@ public class ReceiptController {
         if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)) {
             return BaseResponse.errorInstance("提货信息不能为空");
         }
+        for (UpdateWaybillGoodsDto updateWaybillGoodsDto : updateWaybillGoodsDtoList) {
+            if (updateWaybillGoodsDto.getLoadWeight() != null) {
+                if (new BigDecimal("30").compareTo(updateWaybillGoodsDto.getLoadWeight()) == -1) {
+                    return BaseResponse.errorInstance("实提量不能超过30吨");
+                }
+            }
+        }
         Integer waybillId = updateWaybillGoodsDtoList.get(0).getWaybillId();
         Waybill waybill = waybillMapperExt.selectByPrimaryKey(waybillId);
         if (waybill == null) {
@@ -95,6 +102,15 @@ public class ReceiptController {
         log.info("updateUnLoadGoodsReceipt,{}", updateWaybillGoodsDtoList);
         if (CollectionUtils.isEmpty(updateWaybillGoodsDtoList)) {
             return BaseResponse.errorInstance("卸货信息不能为空");
+        }
+        for (UpdateWaybillGoodsDto updateWaybillGoodsDto : updateWaybillGoodsDtoList) {
+            if (updateWaybillGoodsDto.getUnloadWeight() != null && updateWaybillGoodsDto.getLoadWeight() != null) {
+                boolean flag = (new BigDecimal("30").compareTo(updateWaybillGoodsDto.getLoadWeight()) == -1
+                        || new BigDecimal("30").compareTo(updateWaybillGoodsDto.getUnloadWeight()) == -1);
+                if (flag) {
+                    return BaseResponse.errorInstance("实提量或实卸量不能超过30吨");
+                }
+            }
         }
         Integer waybillId = updateWaybillGoodsDtoList.get(0).getWaybillId();
         Waybill waybill = waybillMapperExt.selectByPrimaryKey(waybillId);
@@ -206,7 +222,7 @@ public class ReceiptController {
             }
             wayBillReceiptsVo.setLoadImagesList(loadImagesList);
             // 图片排序,磅单在前
-            Collections.sort(unLoadImagesList,Comparator.comparingInt(WaybillTrackingImagesVo::getImageType));
+            Collections.sort(unLoadImagesList, Comparator.comparingInt(WaybillTrackingImagesVo::getImageType));
             wayBillReceiptsVo.setUnLoadImagesList(unLoadImagesList);
         }
         return wayBillReceiptsVo;
@@ -248,16 +264,16 @@ public class ReceiptController {
         return false;
     }
 
-    private void calculatePrice(Integer waybillId){
+    private void calculatePrice(Integer waybillId) {
         try {
             List<Integer> waybillIdList = new ArrayList<>();
             waybillIdList.add(waybillId);
             List<Map<Integer, BigDecimal>> customerMaps = waybillService.calculatePaymentFromCustomer(waybillIdList);
-            log.info("O calculateCustomerPrice waybillId={},result={}",waybillId,customerMaps);
+            log.info("O calculateCustomerPrice waybillId={},result={}", waybillId, customerMaps);
             List<Map<Integer, BigDecimal>> driverMaps = waybillService.calculatePaymentFromDriver(waybillIdList);
-            log.info("O calculateDriverPrice waybillId={},result={}",waybillId,driverMaps);
-        }catch (Exception e){
-            log.error("O calculatePrice error waybillId="+waybillId,e);
+            log.info("O calculateDriverPrice waybillId={},result={}", waybillId, driverMaps);
+        } catch (Exception e) {
+            log.error("O calculatePrice error waybillId=" + waybillId, e);
         }
 
     }
