@@ -486,7 +486,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         Waybill waybill = waybillMapper.selectByPrimaryKey(dto.getWaybillId());
         if (waybill != null) {
             if (waybill.getReceiptStatus() == 1 || waybill.getReceiptStatus() == 2) {
-                throw new RuntimeException("该运单已经补录，图片不能更该");
+                throw new RuntimeException("该运单已经补录，图片不能更改");
             }
         }
         WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
