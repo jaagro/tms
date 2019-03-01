@@ -174,7 +174,7 @@
             and order_id = #{orderId}
         </if>
         <if test="deptId != null">
-            and department_id = #{deptId}
+            and network_id = #{deptId}
         </if>
         <if test="createStartTime != null">
             <![CDATA[and create_time >= #{createStartTime}]]>
