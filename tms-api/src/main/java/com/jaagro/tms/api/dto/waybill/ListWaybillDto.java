@@ -80,4 +80,9 @@ public class ListWaybillDto implements Serializable {
      * 回单补录状态 0-未回单,1-已补录实提,2-已补录实卸
      */
     private Integer receiptStatus;
+
+    /**
+     * 货物类型
+     */
+    private Integer goodsType;
 }

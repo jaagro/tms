@@ -5,6 +5,7 @@ import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
 import com.jaagro.tms.api.dto.ocr.WaybillOcrDto;
 import com.jaagro.tms.api.dto.waybill.GetWaybillDetailDto;
 import com.jaagro.tms.api.dto.waybill.ListWebChatWaybillCriteriaDto;
+import com.jaagro.tms.api.dto.waybill.WaybillImageChangeParamDto;
 
 import java.util.List;
 import java.util.Map;
@@ -55,5 +56,12 @@ public interface WaybillRefactorService {
      * @param map
      */
     void waybillSupplementByOcr(Map<String, String> map);
+
+    /**
+     * 更改运单详情图片
+     *
+     * @param dto
+     */
+    void waybillImageChange(WaybillImageChangeParamDto dto);
 
 }
