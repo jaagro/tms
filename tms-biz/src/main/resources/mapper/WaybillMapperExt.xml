@@ -189,7 +189,7 @@
             </foreach>
         </if>
         <if test="departIds!=null and departIds.size()>0">
-            and department_id in
+            and network_id in
             <foreach collection="departIds" open="(" separator="," close=")" item="did">
                 ${did}
             </foreach>
