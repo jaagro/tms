@@ -271,4 +271,23 @@ public class WaybillController {
     public Integer countUnFinishWaybillByContract(@RequestBody CountUnFinishWaybillCriteriaDto criteriaDto) {
         return waybillService.countUnFinishWaybillByContract(criteriaDto);
     }
+
+    /**
+     * 客户费用
+     *
+     * @param dto
+     * @return
+     */
+    @ApiOperation("客户费用")
+    @GetMapping("/listWaybillCustomerFee")
+    public BaseResponse listWaybillCustomerFee(@RequestBody ListWaybillCustomerFeeDto dto) {
+        if (dto.getPageNum() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空！");
+        }
+        if (dto.getPageSize() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
+        }
+        waybillService.listWaybillCustomerFee(dto);
+        return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
+    }
 }

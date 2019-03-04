@@ -1,7 +1,9 @@
 package com.jaagro.tms.biz.mapper;
 
+import com.jaagro.tms.api.dto.fee.ReturnWaybillCustomerFeeDto;
 import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
 import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
+import com.jaagro.tms.api.dto.waybill.ListWaybillCustomerFeeDto;
 import com.jaagro.tms.biz.entity.WaybillCustomerFee;
 
 import java.util.List;
@@ -30,8 +32,17 @@ public interface WaybillCustomerFeeMapperExt extends WaybillCustomerFeeMapper {
 
     /**
      * 删除运单客户结算
+     *
      * @param record
      * @return
      */
     int deleteRecordByCritera(WaybillCustomerFee record);
+
+    /**
+     * 客户费用
+     *
+     * @param dto
+     * @return
+     */
+    List<ReturnWaybillCustomerFeeDto> listWaybillCustomerFee(ListWaybillCustomerFeeDto dto);
 }

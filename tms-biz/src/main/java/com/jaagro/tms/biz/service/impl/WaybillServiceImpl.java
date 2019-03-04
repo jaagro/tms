@@ -14,6 +14,8 @@ import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
+import com.jaagro.tms.api.dto.fee.ReturnWaybillCustomerFeeDto;
+import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
@@ -341,9 +343,27 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     /**
+     * 客户费用
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public PageInfo listWaybillCustomerFee(ListWaybillCustomerFeeDto dto) {
+        PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+        //项目部隔离
+
+        List<ReturnWaybillCustomerFeeDto> customerFeeDtoList = waybillCustomerFeeMapperExt.listWaybillCustomerFee(dto);
+        if (!CollectionUtils.isEmpty(customerFeeDtoList)) {
+
+        }
+        return null;
+    }
+
+    /**
      * @param waybillDtoList
      * @return
-     * @Author gavin
+     * @Author gavins
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
