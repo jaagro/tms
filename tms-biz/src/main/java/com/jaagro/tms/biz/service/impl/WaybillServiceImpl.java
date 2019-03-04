@@ -1511,7 +1511,7 @@ public class WaybillServiceImpl implements WaybillService {
         Integer userId = getUserId();
         Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
         String waybillOldStatus = waybill.getWaybillStatus();
-        if(WaybillStatus.SEND_TRUCK.equals(waybillOldStatus) || WaybillStatus.REJECT.equals(waybillOldStatus)) {
+        if (WaybillStatus.SEND_TRUCK.equals(waybillOldStatus) || WaybillStatus.REJECT.equals(waybillOldStatus)) {
             String waybillNewStatus = WaybillStatus.RECEIVE;
             if (null == waybill) {
                 return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), waybillId + " ：id不正确");
@@ -1626,13 +1626,14 @@ public class WaybillServiceImpl implements WaybillService {
             criteriaDto.setWaybillStatus("");
             criteriaDto.setReceiptStatus(2);
         }
-        List<ListWaybillDto> listWaybillDto = new ArrayList<>();
+
+        List<ListWaybillDto> listWaybillDtos = new ArrayList<>();
         if (!StringUtils.isEmpty(criteriaDto.getTruckNumber())) {
             List<Integer> truckIds = this.customerClientService.getTruckIdsByTruckNum(criteriaDto.getTruckNumber());
             if (truckIds.size() > 0) {
                 criteriaDto.setTruckIds(truckIds);
             } else {
-                return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
+                return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
             }
         }
         if (criteriaDto.getCustomerId() != null) {
@@ -1640,16 +1641,20 @@ public class WaybillServiceImpl implements WaybillService {
             if (orderIds.size() > 0) {
                 criteriaDto.setOrderIds(orderIds);
             } else {
-                return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
+                return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
             }
         }
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
-        listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
-        if (listWaybillDto != null && listWaybillDto.size() > 0) {
-            for (ListWaybillDto waybillDto : listWaybillDto) {
-                if (waybillDto.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH) && waybillDto.getReceiptStatus() == 2) {
+        listWaybillDtos = waybillMapper.listWaybillByCriteria(criteriaDto);
+        if (listWaybillDtos != null && listWaybillDtos.size() > 0) {
+            Iterator<ListWaybillDto> dtoIterator = listWaybillDtos.iterator();
+            while (dtoIterator.hasNext()) {
+                ListWaybillDto waybillDto = dtoIterator.next();
+
+                if (!StringUtils.isEmpty(criteriaDto.getReceiptStatus())) {
                     waybillDto.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
                 }
+
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1700,7 +1705,7 @@ public class WaybillServiceImpl implements WaybillService {
                 }
             }
         }
-        return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
+        return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
     }
 
     /**

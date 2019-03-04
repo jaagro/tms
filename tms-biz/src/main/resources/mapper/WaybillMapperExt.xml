@@ -213,6 +213,11 @@
                 and waybill_status = #{waybillStatus}
             </if>
         </if>
+        <if test="waybillStatus != null and waybillStatus != ''">
+            <if test="waybillStatus == '已完成'">
+                and receipt_status in(0,1)
+            </if>
+        </if>
         <if test="receiptStatus != null and receiptStatus != ''">
             and receipt_status=#{receiptStatus}
         </if>
