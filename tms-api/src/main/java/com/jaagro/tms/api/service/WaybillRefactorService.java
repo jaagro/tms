@@ -2,6 +2,8 @@ package com.jaagro.tms.api.service;
 
 import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.driverapp.GetWaybillParamDto;
+import com.jaagro.tms.api.dto.fee.ListTruckFeeCriteria;
+import com.jaagro.tms.api.dto.fee.ListTruckFeeDto;
 import com.jaagro.tms.api.dto.ocr.WaybillOcrDto;
 import com.jaagro.tms.api.dto.waybill.GetWaybillDetailDto;
 import com.jaagro.tms.api.dto.waybill.ListWebChatWaybillCriteriaDto;
@@ -56,4 +58,11 @@ public interface WaybillRefactorService {
      */
     void waybillSupplementByOcr(Map<String, String> map);
 
+    /**
+     * 运力费用列表
+     * @param criteria
+     * @author yj
+     * @return
+     */
+    PageInfo<ListTruckFeeDto> listTruckFeeByCriteria(ListTruckFeeCriteria criteria);
 }

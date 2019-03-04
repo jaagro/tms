@@ -8,6 +8,8 @@ import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
 import com.jaagro.tms.api.dto.driverapp.*;
+import com.jaagro.tms.api.dto.fee.ListTruckFeeCriteria;
+import com.jaagro.tms.api.dto.fee.ListTruckFeeDto;
 import com.jaagro.tms.api.dto.ocr.WaybillOcrDto;
 import com.jaagro.tms.api.dto.truck.ShowDriverDto;
 import com.jaagro.tms.api.dto.truck.ShowTruckDto;
@@ -17,6 +19,7 @@ import com.jaagro.tms.biz.config.RabbitMqConfig;
 import com.jaagro.tms.biz.entity.*;
 import com.jaagro.tms.biz.mapper.*;
 import com.jaagro.tms.biz.service.*;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -32,6 +35,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,6 +77,8 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     private OcrServiceImpl ocrService;
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private WaybillTruckFeeMapperExt waybillTruckFeeMapper;
     private static int readFromOCRTimes;
 
     /**
@@ -307,16 +313,15 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             String[] strArray = {imageUrl};
             List<URL> urls = ossSignUrlClientService.listSignedUrl(strArray);
             WaybillOcrDto waybillOcr = ocrService.getOcrByMuYuanAppImage(waybillId, urls.get(0).toString());
+            /*add by gavin 访问图片次数*/
+            int value = readFromOCRTimes++;
+            redisTemplate.opsForValue().getAndSet("readImageFromOCRTimes", String.valueOf(value));
+            /**/
             log.info("O waybillSupplementByOcr waybillOcr={}",waybillOcr);
             if (CollectionUtils.isEmpty(waybillOcr.getGoodsItems()) || StringUtils.isEmpty(waybillOcr.getUnLoadSite())) {
                 log.error("R waybillSupplementByOcr OCR does not recognize valid data, error data: ", waybillOcr);
                 return;
             }
-            /*add by gavin 访问图片次数*/
-            int value = readFromOCRTimes++;
-            redisTemplate.opsForValue().getAndSet("readImageFromOCRTimes", String.valueOf(value));
-
-            /**/
             if (StringUtils.isEmpty(waybillOcr.getUnLoadSite())) {
                 log.error("R waybillSupplementByOcr unLoadSite is invalid");
                 return;
@@ -325,6 +330,9 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             //修改waybillItems信息
             String ls = waybillOcr.getUnLoadSite();
             ShowSiteDto showSiteDto = customerClientService.getSiteBySiteName(ls, 248).getData();
+            if (showSiteDto == null){
+                log.info("R waybillSupplementByOcr showSiteDto is null unloadSite={}",ls);
+            }
             List<WaybillItems> waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillOcr.getWaybillId());
             GetWaybillItemDto cwd = new GetWaybillItemDto();
             WaybillItems wis = new WaybillItems();
@@ -360,6 +368,49 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
         } catch (Exception e) {
             log.error("R waybillSupplementByOcr Image recognition failed waybillId: " + map.get("waybillId"), e);
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+        }
+    }
+
+    /**
+     * 运力费用列表
+     *
+     * @param criteria
+     * @return
+     * @author yj
+     */
+    @Override
+    public PageInfo<ListTruckFeeDto> listTruckFeeByCriteria(ListTruckFeeCriteria criteria) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            PageHelper.startPage(criteria.getPageNum(),criteria.getPageSize());
+            if (StringUtils.hasText(criteria.getCompleteTimeStart())){
+                criteria.setCompleteTimeStart(criteria.getCompleteTimeStart());
+            }
+            if (StringUtils.hasText(criteria.getCompleteTimeEnd())){
+                criteria.setCompleteTimeEnd(sdf.format(DateUtils.addDays(sdf.parse(criteria.getCompleteTimeEnd()),1)));
+            }
+            List<ListTruckFeeDto> truckFeeDtoList = waybillTruckFeeMapper.listTruckFeeByCriteria(criteria);
+            // 去除重复的卸货地名称
+            Set<String> unloadSiteSet = new HashSet<>();
+            StringBuilder sb = new StringBuilder();
+            for (ListTruckFeeDto dto : truckFeeDtoList){
+                String unloadSite = dto.getUnloadSite();
+                if (StringUtils.hasText(unloadSite) && unloadSite.contains(",")){
+                    String[] unloadSiteArray = unloadSite.split(",");
+                    for (int i=0;i<unloadSiteArray.length;i++){
+                        unloadSiteSet.add(unloadSiteArray[i]);
+                    }
+                    unloadSiteSet.forEach(unloadSiteStr->sb.append(unloadSiteStr).append(","));
+                    sb.deleteCharAt(sb.lastIndexOf(","));
+                    dto.setUnloadSite(sb.toString());
+                    sb.delete(0,sb.length());
+                    unloadSiteSet.clear();
+                }
+            }
+            return new PageInfo<>(truckFeeDtoList);
+        }catch (Exception ex){
+            log.error("O listTruckFeeByCriteria error,criteria="+criteria,ex);
+            throw new RuntimeException("查询运力费用列表出现异常了!");
         }
     }
 
