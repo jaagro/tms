@@ -371,12 +371,17 @@ public class WaybillServiceImpl implements WaybillService {
                         .setCustomerName(customerClientService.getShowCustomerById(feeDto.getCustomerId()).getCustomerName())
                         .setGoodsNames(waybillGoodsMapper.listGoodsNameByWaybillId(feeDto.getWaybillId()))
                         .setDepartmentName(userClientService.getDeptNameById(feeDto.getDepartmentId()));
+                //重量、数量
                 WaybillGoods goods = waybillGoodsMapper.getQuantityAndWeightByWaybillId(feeDto.getWaybillId());
                 if (goods != null) {
                     feeDto
                             .setQuantity(goods.getUnloadQuantity())
                             .setWeight(goods.getUnloadWeight());
                 }
+                //运输费用、异常费用
+                feeDto
+                        .setWaybillMoney(waybillCustomerFeeMapperExt.getWaybillMoneyByWaybillId(feeDto.getWaybillId()))
+                        .setAnomalyMoney(waybillCustomerFeeMapperExt.getAnomalyMoneyByWaybillId(feeDto.getWaybillId()));
             }
         }
         return new PageInfo(customerFeeDtoList);

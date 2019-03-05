@@ -33,8 +33,6 @@
         o.customer_id AS customer_id,
         w.network_id AS department_id,
         o.goods_type AS goods_type,
-        SUM( f.money ) AS money,
-        any_value ( f.anomaly_id ) AS anomaly_id,
         w.modify_time AS modify_time
         FROM
         waybill_customer_fee f
@@ -65,5 +63,39 @@
         f.waybill_id
         ORDER BY
         w.modify_time DESC
+    </select>
+    <select id="getWaybillMoneyByWaybillId" parameterType="java.lang.Integer" resultType="java.math.BigDecimal">
+        SELECT
+            SUM( f.money )
+        FROM
+            waybill_customer_fee f
+            LEFT JOIN waybill w ON ( w.id = f.waybill_id )
+            LEFT JOIN orders o ON ( w.order_id = o.id )
+        WHERE
+            w.waybill_status = "已完成"
+            AND w.receipt_status = 2
+            and f.waybill_id = #{waybillId}
+            AND anomaly_id IS NULL
+        GROUP BY
+            f.waybill_id
+        ORDER BY
+            w.modify_time DESC
+    </select>
+    <select id="getAnomalyMoneyByWaybillId" parameterType="java.lang.Integer" resultType="java.math.BigDecimal">
+        SELECT
+            SUM( f.money )
+        FROM
+            waybill_customer_fee f
+            LEFT JOIN waybill w ON ( w.id = f.waybill_id )
+            LEFT JOIN orders o ON ( w.order_id = o.id )
+        WHERE
+            w.waybill_status = "已完成"
+            AND w.receipt_status = 2
+            and f.waybill_id = #{waybillId}
+            AND anomaly_id IS NOT NULL
+        GROUP BY
+            f.waybill_id
+        ORDER BY
+            w.modify_time DESC
     </select>
 </mapper>

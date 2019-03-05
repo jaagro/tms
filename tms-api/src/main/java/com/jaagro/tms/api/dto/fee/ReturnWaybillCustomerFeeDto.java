@@ -62,14 +62,14 @@ public class ReturnWaybillCustomerFeeDto implements Serializable {
     private BigDecimal weight;
 
     /**
-     * 异常id
+     * 运输费用
      */
-    private Integer anomalyId;
+    private BigDecimal waybillMoney;
 
     /**
-     * 金额
+     * 异常费用
      */
-    private BigDecimal money;
+    private BigDecimal anomalyMoney;
 
     /**
      * 完成时间
