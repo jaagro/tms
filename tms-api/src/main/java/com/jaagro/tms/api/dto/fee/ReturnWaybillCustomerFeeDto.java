@@ -57,9 +57,14 @@ public class ReturnWaybillCustomerFeeDto implements Serializable {
     private Integer goodsType;
 
     /**
-     * 货物类型
+     * 数量
      */
     private Integer quantity;
+
+    /**
+     * 重量
+     */
+    private BigDecimal weight;
 
     /**
      * 异常id

@@ -185,5 +185,12 @@
     <update id="disableWaybillGoodsByWaybillId">
         update waybill_goods set enabled = 0 where waybill_id = #{waybillId}
     </update>
+    <select id="getQuantityAndWeightByWaybillId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        sum( unload_quantity ) as unload_quantity,
+	    sum( unload_weight ) as unload_weight
+        from waybill_goods
+        where waybill_id = #{waybillId,jdbcType=INTEGER} and enabled=1
+    </select>
 
 </mapper>

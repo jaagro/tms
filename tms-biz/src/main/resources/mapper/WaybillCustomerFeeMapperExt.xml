@@ -37,13 +37,11 @@
         any_value ( f.anomaly_id ) AS anomaly_id,
         w.modify_time AS modify_time
         FROM
-        waybill_customer_fee f,
-        waybill w,
-        orders o
+        waybill_customer_fee f
+        LEFT JOIN waybill w ON ( w.id = f.waybill_id )
+        LEFT JOIN orders o ON ( w.order_id = o.id )
         WHERE
-        w.id = f.waybill_id
-        AND w.order_id = o.id
-        AND w.waybill_status = "已完成"
+        w.waybill_status = "已完成"
         AND w.receipt_status = 2
         <if test="goodsType != null">
             AND o.goods_type = #{goodsType}

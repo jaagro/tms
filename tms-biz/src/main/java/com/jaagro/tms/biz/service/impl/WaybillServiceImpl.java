@@ -371,6 +371,12 @@ public class WaybillServiceImpl implements WaybillService {
                         .setCustomerName(customerClientService.getShowCustomerById(feeDto.getCustomerId()).getCustomerName())
                         .setGoodsNames(waybillGoodsMapper.listGoodsNameByWaybillId(feeDto.getWaybillId()))
                         .setDepartmentName(userClientService.getDeptNameById(feeDto.getDepartmentId()));
+                WaybillGoods goods = waybillGoodsMapper.getQuantityAndWeightByWaybillId(feeDto.getWaybillId());
+                if (goods != null) {
+                    feeDto
+                            .setQuantity(goods.getUnloadQuantity())
+                            .setWeight(goods.getUnloadWeight());
+                }
             }
         }
         return new PageInfo(customerFeeDtoList);

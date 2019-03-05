@@ -78,4 +78,13 @@ public interface WaybillGoodsMapperExt extends WaybillGoodsMapper {
      * @return
      */
     Integer disableWaybillGoodsByWaybillId(@Param("waybillId") Integer waybillId);
+
+    /**
+     * 根据运单id获取数量或重量的总值
+     *
+     * @param waybillId
+     * @return
+     */
+    WaybillGoods getQuantityAndWeightByWaybillId(@Param("waybillId") Integer waybillId);
+
 }
