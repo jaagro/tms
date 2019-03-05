@@ -357,9 +357,11 @@ public class WaybillServiceImpl implements WaybillService {
             dto.setDepartIds(departIds);
         }
         //客户名称查询
-        List<Integer> customerIds = customerClientService.listCustomerIdByName(dto.getCustomerName());
-        if (!CollectionUtils.isEmpty(customerIds)) {
-            dto.setCustomerIds(customerIds);
+        if (!StringUtils.isEmpty(dto.getCustomerName())) {
+            List<Integer> customerIds = customerClientService.listCustomerIdByName(dto.getCustomerName());
+            if (!CollectionUtils.isEmpty(customerIds)) {
+                dto.setCustomerIds(customerIds);
+            }
         }
         //得到列表
         List<ReturnWaybillCustomerFeeDto> customerFeeDtoList = waybillCustomerFeeMapperExt.listWaybillCustomerFee(dto);

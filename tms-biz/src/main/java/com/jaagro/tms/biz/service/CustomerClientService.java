@@ -26,6 +26,15 @@ public interface CustomerClientService {
     ShowCustomerDto getShowCustomerById(@PathVariable("id") Integer id);
 
     /**
+     * 根据客户名称查询客户id集合
+     *
+     * @param customerName
+     * @return
+     */
+    @GetMapping("/listCustomerIdByName/{customerName}")
+    List<Integer> listCustomerIdByName(@PathVariable("customerName") String customerName);
+
+    /**
      * 获取客户合同显示对象
      *
      * @param id
@@ -116,12 +125,4 @@ public interface CustomerClientService {
     @GetMapping("/getDictionaryById")
     DictionaryDto getDictionaryById(@RequestParam("id") Integer id);
 
-    /**
-     * 根据客户名称查询客户id集合
-     *
-     * @param customerName
-     * @return
-     */
-    @PostMapping("/listCustomerIdByName/{customerName}")
-    List<Integer> listCustomerIdByName(@PathVariable("customerName") String customerName);
 }
