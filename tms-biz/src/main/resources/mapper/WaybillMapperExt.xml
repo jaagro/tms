@@ -174,7 +174,7 @@
             and order_id = #{orderId}
         </if>
         <if test="deptId != null">
-            and department_id = #{deptId}
+            and network_id = #{deptId}
         </if>
         <if test="createStartTime != null">
             <![CDATA[and create_time >= #{createStartTime}]]>
@@ -189,7 +189,7 @@
             </foreach>
         </if>
         <if test="departIds!=null and departIds.size()>0">
-            and department_id in
+            and network_id in
             <foreach collection="departIds" open="(" separator="," close=")" item="did">
                 ${did}
             </foreach>
@@ -211,6 +211,11 @@
             </if>
             <if test="waybillStatus != '运输中'">
                 and waybill_status = #{waybillStatus}
+            </if>
+        </if>
+        <if test="waybillStatus != null and waybillStatus != ''">
+            <if test="waybillStatus == '已完成'">
+                and receipt_status in(0,1)
             </if>
         </if>
         <if test="receiptStatus != null and receiptStatus != ''">
