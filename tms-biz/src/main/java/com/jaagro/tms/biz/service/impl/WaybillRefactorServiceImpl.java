@@ -532,4 +532,25 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             }
         }
     }
+
+    /**
+     * 运单详情页图片修改
+     *
+     * @param dto
+     * @Author @Gao.
+     */
+    @Override
+    public void waybillImageChange(WaybillImageChangeParamDto dto) {
+        Waybill waybill = waybillMapper.selectByPrimaryKey(dto.getWaybillId());
+        if (waybill != null) {
+            if (waybill.getReceiptStatus() == 1 || waybill.getReceiptStatus() == 2) {
+                throw new RuntimeException("该运单已经补录，图片不能更改");
+            }
+        }
+        WaybillTrackingImages waybillTrackingImages = new WaybillTrackingImages();
+        waybillTrackingImages
+                .setId(dto.getWaybillImagesId())
+                .setImageUrl(dto.getWaybillImagesUrl());
+        waybillTrackingImagesMapper.updateByPrimaryKeySelective(waybillTrackingImages);
+    }
 }
