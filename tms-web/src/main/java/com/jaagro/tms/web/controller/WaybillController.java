@@ -279,7 +279,7 @@ public class WaybillController {
      * @return
      */
     @ApiOperation("客户费用")
-    @GetMapping("/listWaybillCustomerFee")
+    @PostMapping("/listWaybillCustomerFee")
     public BaseResponse listWaybillCustomerFee(@RequestBody ListWaybillCustomerFeeDto dto) {
         if (dto.getPageNum() == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空！");
@@ -287,7 +287,6 @@ public class WaybillController {
         if (dto.getPageSize() == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
         }
-        waybillService.listWaybillCustomerFee(dto);
-        return BaseResponse.successInstance(ResponseStatusCode.OPERATION_SUCCESS);
+        return BaseResponse.successInstance(waybillService.listWaybillCustomerFee(dto));
     }
 }

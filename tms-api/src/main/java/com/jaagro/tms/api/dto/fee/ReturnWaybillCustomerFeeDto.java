@@ -42,9 +42,14 @@ public class ReturnWaybillCustomerFeeDto implements Serializable {
     private String customerName;
 
     /**
+     * 项目部id
+     */
+    private Integer departmentId;
+
+    /**
      * 项目部
      */
-    private String departName;
+    private String departmentName;
 
     /**
      * 货物类型

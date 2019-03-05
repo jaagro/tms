@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,7 +41,18 @@ public class ListWaybillCustomerFeeDto implements Serializable {
     private String customerName;
 
     /**
+     * 客户ids
+     */
+    private List<Integer> customerIds;
+
+    /**
      * 货物类型
      */
     private Integer goodsType;
+
+    /**
+     * 完成时间
+     */
+    private Date endDate;
+
 }
