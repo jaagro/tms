@@ -1,7 +1,6 @@
 package com.jaagro.tms;
 
 import com.jaagro.tms.api.service.OcrService;
-import com.jaagro.tms.biz.service.impl.OcrServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mybatis.generator.api.MyBatisGenerator;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.annotation.Resource;
 import javax.ws.rs.core.Application;
 import java.io.File;
 import java.util.ArrayList;
