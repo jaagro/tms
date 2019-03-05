@@ -17,11 +17,6 @@ import java.util.List;
 public class ReturnWaybillCustomerFeeDto implements Serializable {
 
     /**
-     *
-     */
-    private Integer id;
-
-    /**
      * 运单id
      */
     private Integer waybillId;
