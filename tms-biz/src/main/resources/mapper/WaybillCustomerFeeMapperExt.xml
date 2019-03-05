@@ -34,7 +34,7 @@
         w.network_id AS department_id,
         o.goods_type AS goods_type,
         SUM( f.money ) AS money,
-        f.anomaly_id AS anomaly_id,
+        any_value ( f.anomaly_id ) AS anomaly_id,
         w.modify_time AS modify_time
         FROM
         waybill_customer_fee f,

@@ -45,6 +45,7 @@ public class WaybillController {
     private GrabWaybillService grabWaybillService;
     @Autowired
     private WaybillRefactorService waybillRefactorService;
+
     /**
      * 创建运单计划
      *
@@ -278,14 +279,15 @@ public class WaybillController {
 
     /**
      * 获取司机费用列表
-     * @author yj
+     *
      * @param criteria
      * @return
+     * @author yj
      */
     @ApiOperation("获取司机费用列表")
     @PostMapping("/listTruckFeeByCriteria")
-    public BaseResponse listTruckFeeByCriteria(@RequestBody @Validated ListTruckFeeCriteria criteria){
-        log.info("O listTruckFeeByCriteria criteria={}",criteria);
+    public BaseResponse listTruckFeeByCriteria(@RequestBody @Validated ListTruckFeeCriteria criteria) {
+        log.info("O listTruckFeeByCriteria criteria={}", criteria);
         PageInfo<ListTruckFeeDto> pageInfo = waybillRefactorService.listTruckFeeByCriteria(criteria);
         return BaseResponse.successInstance(pageInfo);
     }
