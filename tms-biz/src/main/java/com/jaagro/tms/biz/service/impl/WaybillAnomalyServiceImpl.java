@@ -432,7 +432,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     if (!CollectionUtils.isEmpty(collect)) {
                         creatorName = collect.get(0);
                     }
-                    waybillAnomalyDto.setCreatorName(creatorName.getName());
+                    if (creatorName != null) {
+                        waybillAnomalyDto.setCreatorName(creatorName.getName());
+                    }
                 }
             }
             if (!CollectionUtils.isEmpty(driverLists) && null != waybillAnomalyDto.getCreateUserId()) {
@@ -442,7 +444,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     if (!CollectionUtils.isEmpty(collect)) {
                         driverName = collect.get(0);
                     }
-                    waybillAnomalyDto.setCreatorName(driverName.getName());
+                    if (driverName != null) {
+                        waybillAnomalyDto.setCreatorName(driverName.getName());
+                    }
                 }
             }
             //处理人
@@ -452,7 +456,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 if (!CollectionUtils.isEmpty(collect)) {
                     processUser = collect.get(0);
                 }
-                waybillAnomalyDto.setProcessorName(processUser.getName());
+                if (processUser != null) {
+                    waybillAnomalyDto.setProcessorName(processUser.getName());
+                }
             }
             //审核人
             if (!CollectionUtils.isEmpty(employeeLists) && null != waybillAnomalyDto.getAuditUserId()) {
@@ -461,7 +467,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 if (!CollectionUtils.isEmpty(collect)) {
                     auditName = collect.get(0);
                 }
-                waybillAnomalyDto.setAuditName(auditName.getName());
+                if (auditName != null) {
+                    waybillAnomalyDto.setAuditName(auditName.getName());
+                }
             }
         }
         return new PageInfo(waybillAnomalyDtos);
