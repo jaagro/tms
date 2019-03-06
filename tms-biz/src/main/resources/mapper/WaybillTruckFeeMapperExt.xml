@@ -95,7 +95,7 @@
         JOIN (
             SELECT
                 wg.waybill_id waybillId,
-                max(w.modify_time) completeTime,
+                max(date_format(w.modify_time,'%Y-%m-%d')) completeTime,
                 GROUP_CONCAT(wg.goods_name) goodsName,
                 SUM(wg.unload_quantity) unloadQuantity,
                 SUM(wg.unload_weight) unloadWeight,
@@ -132,6 +132,6 @@
             </if>
             GROUP BY
                 wg.waybill_id
-        ) result2 ON result1.waybillId = result2.waybillId
+        ) result2 ON result1.waybillId = result2.waybillId order by result2.completeTime DESC
     </select>
 </mapper>

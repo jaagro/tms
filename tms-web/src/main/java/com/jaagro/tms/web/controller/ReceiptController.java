@@ -160,7 +160,7 @@ public class ReceiptController {
                         WaybillGoodsVo waybillGoodsVo = new WaybillGoodsVo();
                         BeanUtils.copyProperties(goodsDto, waybillGoodsVo);
                         waybillGoodsVo
-                                .setUnloadSiteName(showSiteDto == null ? null : showSiteDto.getSiteName())
+                                .setUnloadSiteName(showSiteDto == null ? "" : showSiteDto.getSiteName())
                                 .setUnloadSiteId(getWaybillItemDto.getUnloadSiteId())
                                 .setWaybillItemId(getWaybillItemDto.getId())
                                 .setRequiredTime(getWaybillItemDto.getRequiredTime())
@@ -180,7 +180,7 @@ public class ReceiptController {
                     UserInfo userInfo = trackingDto.getUserInfo();
                     loadTrackingVo
                             .setCreateTime(trackingDto.getCreateTime())
-                            .setOperator(userInfo == null ? null : userInfo.getName());
+                            .setOperator(userInfo == null ? "" : userInfo.getName());
                     wayBillReceiptsVo.setLoadTracking(loadTrackingVo);
                 }
                 if (trackingDto.getTrackingType().equals(TrackingType.UNLOAD_RECEIPT)) {
@@ -188,7 +188,7 @@ public class ReceiptController {
                     UserInfo userInfo = trackingDto.getUserInfo();
                     unloadTrackingVo
                             .setCreateTime(trackingDto.getCreateTime())
-                            .setOperator(userInfo == null ? null : userInfo.getName());
+                            .setOperator(userInfo == null ? "" : userInfo.getName());
                     wayBillReceiptsVo.setUnLoadTracking(unloadTrackingVo);
                 }
             }
@@ -208,7 +208,7 @@ public class ReceiptController {
                         UserInfo userInfo = imagesDto.getUserInfo();
                         imagesVo
                                 .setCreateTime(imagesDto.getCreateTime())
-                                .setCreateUserName(userInfo == null ? null : userInfo.getName())
+                                .setCreateUserName(userInfo == null ? "" : userInfo.getName())
                                 .setImageType(imagesDto.getImageType())
                                 .setImageUrl(imagesDto.getImageUrl());
                         if (WaybillStatus.LOAD_PRODUCT.equals(trackingDto.getOldStatus())) {
