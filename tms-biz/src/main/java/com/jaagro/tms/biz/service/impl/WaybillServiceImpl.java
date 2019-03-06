@@ -1673,9 +1673,17 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
-        List<Integer> departIds = userClientService.getDownDepartment();
-        if (departIds.size() != 0) {
-            criteriaDto.setDepartIds(departIds);
+        //项目部隔离
+        if (!StringUtils.isEmpty(criteriaDto.getDeptId())) {
+            List<Integer> downDepartmentByDeptId = userClientService.getDownDepartmentByDeptId(criteriaDto.getDeptId());
+            if (!CollectionUtils.isEmpty(downDepartmentByDeptId)) {
+                criteriaDto.setDepartIds(downDepartmentByDeptId);
+            }
+        } else {
+            List<Integer> departIds = userClientService.getDownDepartment();
+            if (!CollectionUtils.isEmpty(departIds)) {
+                criteriaDto.setDepartIds(departIds);
+            }
         }
         if (!StringUtils.isEmpty(criteriaDto.getWaybillStatus()) && criteriaDto.getWaybillStatus().equals(WaybillStatus.UNLOAD_RECEIPT)) {
             criteriaDto.setWaybillStatus("");
