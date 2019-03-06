@@ -351,6 +351,7 @@ public class WaybillServiceImpl implements WaybillService {
     @Override
     public PageInfo listWaybillCustomerFee(ListWaybillCustomerFeeDto dto) {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+        List<ReturnWaybillCustomerFeeDto> customerFeeDtoList = new ArrayList<>();
         //项目部隔离
         List<Integer> departIds = userClientService.getDownDepartment();
         if (!CollectionUtils.isEmpty(departIds)) {
@@ -361,10 +362,12 @@ public class WaybillServiceImpl implements WaybillService {
             List<Integer> customerIds = customerClientService.listCustomerIdByName(dto.getCustomerName());
             if (!CollectionUtils.isEmpty(customerIds)) {
                 dto.setCustomerIds(customerIds);
+            } else {
+                return new PageInfo(customerFeeDtoList);
             }
         }
         //得到列表
-        List<ReturnWaybillCustomerFeeDto> customerFeeDtoList = waybillCustomerFeeMapperExt.listWaybillCustomerFee(dto);
+        customerFeeDtoList = waybillCustomerFeeMapperExt.listWaybillCustomerFee(dto);
         if (!CollectionUtils.isEmpty(customerFeeDtoList)) {
             for (ReturnWaybillCustomerFeeDto feeDto : customerFeeDtoList) {
                 feeDto
