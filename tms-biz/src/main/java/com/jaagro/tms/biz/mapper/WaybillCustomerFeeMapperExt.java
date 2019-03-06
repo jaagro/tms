@@ -5,9 +5,7 @@ import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
 import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
 import com.jaagro.tms.api.dto.waybill.ListWaybillCustomerFeeDto;
 import com.jaagro.tms.biz.entity.WaybillCustomerFee;
-import org.apache.ibatis.annotations.Param;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -47,20 +45,4 @@ public interface WaybillCustomerFeeMapperExt extends WaybillCustomerFeeMapper {
      * @return
      */
     List<ReturnWaybillCustomerFeeDto> listWaybillCustomerFee(ListWaybillCustomerFeeDto dto);
-
-    /**
-     * 根据运单id获取运输费用
-     *
-     * @param waybillId
-     * @return
-     */
-    BigDecimal getWaybillMoneyByWaybillId(@Param("waybillId") Integer waybillId);
-
-    /**
-     * 根据运单id获取异常费用
-     *
-     * @param waybillId
-     * @return
-     */
-    BigDecimal getAnomalyMoneyByWaybillId(@Param("waybillId") Integer waybillId);
 }

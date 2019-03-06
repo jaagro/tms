@@ -353,9 +353,16 @@ public class WaybillServiceImpl implements WaybillService {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         List<ReturnWaybillCustomerFeeDto> customerFeeDtoList = new ArrayList<>();
         //项目部隔离
-        List<Integer> departIds = userClientService.getDownDepartment();
-        if (!CollectionUtils.isEmpty(departIds)) {
-            dto.setDepartIds(departIds);
+        if (StringUtils.isEmpty(dto.getDepartId())) {
+            List<Integer> downDepartmentByDeptId = userClientService.getDownDepartmentByDeptId(dto.getDepartId());
+            if (!CollectionUtils.isEmpty(downDepartmentByDeptId)) {
+                dto.setDepartIds(downDepartmentByDeptId);
+            }
+        } else {
+            List<Integer> departIds = userClientService.getDownDepartment();
+            if (!CollectionUtils.isEmpty(departIds)) {
+                dto.setDepartIds(departIds);
+            }
         }
         //客户名称查询
         if (!StringUtils.isEmpty(dto.getCustomerName())) {
@@ -381,10 +388,6 @@ public class WaybillServiceImpl implements WaybillService {
                             .setQuantity(goods.getUnloadQuantity())
                             .setWeight(goods.getUnloadWeight());
                 }
-                //运输费用、异常费用
-                feeDto
-                        .setWaybillMoney(waybillCustomerFeeMapperExt.getWaybillMoneyByWaybillId(feeDto.getWaybillId()))
-                        .setAnomalyMoney(waybillCustomerFeeMapperExt.getAnomalyMoneyByWaybillId(feeDto.getWaybillId()));
             }
         }
         return new PageInfo(customerFeeDtoList);

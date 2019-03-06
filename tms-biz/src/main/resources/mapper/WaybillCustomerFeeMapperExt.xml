@@ -33,7 +33,10 @@
         o.customer_id AS customer_id,
         w.network_id AS department_id,
         o.goods_type AS goods_type,
-        w.modify_time AS modify_time
+        w.modify_time AS modify_time,
+        SUM( CASE WHEN f.anomaly_id IS NULL THEN f.money ELSE 0 END ) AS waybill_money,
+        SUM( CASE WHEN f.anomaly_id IS NOT NULL AND f.direction = 1 THEN f.money WHEN f.anomaly_id IS NOT NULL AND
+        f.direction = 2 THEN - f.money ELSE 0 END ) AS anomaly_money
         FROM
         waybill_customer_fee f
         LEFT JOIN waybill w ON ( w.id = f.waybill_id )
@@ -41,6 +44,7 @@
         WHERE
         w.waybill_status = "已完成"
         AND w.receipt_status = 2
+        AND f.money > 0
         <if test="goodsType != null">
             AND o.goods_type = #{goodsType}
         </if>
@@ -66,39 +70,5 @@
         f.waybill_id
         ORDER BY
         w.modify_time DESC
-    </select>
-    <select id="getWaybillMoneyByWaybillId" parameterType="java.lang.Integer" resultType="java.math.BigDecimal">
-        SELECT
-            SUM( f.money )
-        FROM
-            waybill_customer_fee f
-            LEFT JOIN waybill w ON ( w.id = f.waybill_id )
-            LEFT JOIN orders o ON ( w.order_id = o.id )
-        WHERE
-            w.waybill_status = "已完成"
-            AND w.receipt_status = 2
-            and f.waybill_id = #{waybillId}
-            AND anomaly_id IS NULL
-        GROUP BY
-            f.waybill_id
-        ORDER BY
-            w.modify_time DESC
-    </select>
-    <select id="getAnomalyMoneyByWaybillId" parameterType="java.lang.Integer" resultType="java.math.BigDecimal">
-        SELECT
-            SUM( CASE WHEN f.direction = 1 THEN f.money WHEN f.direction = 2 THEN - f.money ELSE 0 END )
-        FROM
-            waybill_customer_fee f
-            LEFT JOIN waybill w ON ( w.id = f.waybill_id )
-            LEFT JOIN orders o ON ( w.order_id = o.id )
-        WHERE
-            w.waybill_status = "已完成"
-            AND w.receipt_status = 2
-            and f.waybill_id = #{waybillId}
-            AND anomaly_id IS NOT NULL
-        GROUP BY
-            f.waybill_id
-        ORDER BY
-            w.modify_time DESC
     </select>
 </mapper>
