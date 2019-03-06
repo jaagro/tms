@@ -411,6 +411,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                     sb.delete(0,sb.length());
                     unloadSiteSet.clear();
                 }
+                dto.setTotalFee(dto.getAnomalyFee().add(dto.getTransportFee()));
             }
             return new PageInfo<>(truckFeeDtoList);
         }catch (Exception ex){
