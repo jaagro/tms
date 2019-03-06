@@ -1514,7 +1514,6 @@ public class WaybillServiceImpl implements WaybillService {
                 if (!CollectionUtils.isEmpty(ids)) {
                     grabWaybillRecordMapper.batchUpdate(ids);
                 }
-
             }
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking.setOldStatus(WaybillStatus.RECEIVE);
