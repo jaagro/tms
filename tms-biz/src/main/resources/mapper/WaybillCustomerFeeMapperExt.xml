@@ -47,6 +47,9 @@
         <if test="endDate != null">
             AND w.modify_time = #{endDate}
         </if>
+        <if test="departId != null">
+            AND w.network_id = #{departId}
+        </if>
         <if test="departIds != null and departIds.size() > 0">
             and w.network_id in
             <foreach collection="departIds" open="(" separator="," close=")" item="did">

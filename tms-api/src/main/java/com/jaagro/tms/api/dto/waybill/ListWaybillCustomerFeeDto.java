@@ -28,7 +28,7 @@ public class ListWaybillCustomerFeeDto implements Serializable {
     /**
      * 项目部
      */
-    private List<Integer> departId;
+    private Integer departId;
 
     /**
      * 项目部
