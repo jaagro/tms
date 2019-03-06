@@ -726,7 +726,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             WaybillTruckFee waybillTruckFees = waybillTruckFeeMapper.selectByAnomalyId(dto.getAnomalId());
             WaybillTruckFee waybillTruckFee = new WaybillTruckFee();
             waybillTruckFee
-                    .setDirection(CostType.COMPENSATE.equals(costType) ? Direction.SUBSTRACT : Direction.PLUS)
+                    .setDirection(CostType.COMPENSATE.equals(costType) ? Direction.PLUS : Direction.SUBSTRACT)
                     .setAnomalyId(dto.getAnomalId())
                     .setCostType(CostType.ADDITIONAL)
                     .setWaybillId(dto.getWaybillId())
@@ -743,7 +743,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 waybillFeeAdjustmentMapper.insertSelective(waybillFeeAdjustment);
             } else {
                 waybillTruckFees
-                        .setDirection(CostType.COMPENSATE.equals(costType) ? Direction.SUBSTRACT : Direction.PLUS)
+                        .setDirection(CostType.COMPENSATE.equals(costType) ? Direction.PLUS : Direction.SUBSTRACT)
                         .setMoney(anomalyDeductCompensationDto.getMoney())
                         .setEnabled(true);
                 waybillTruckFeeMapper.updateByPrimaryKeySelective(waybillTruckFees);
