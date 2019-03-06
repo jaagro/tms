@@ -14,6 +14,8 @@ import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
+import com.jaagro.tms.api.dto.fee.ReturnWaybillCustomerFeeDto;
+import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
@@ -341,9 +343,54 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     /**
+     * 客户费用
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public PageInfo listWaybillCustomerFee(ListWaybillCustomerFeeDto dto) {
+        PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+        //项目部隔离
+        List<Integer> departIds = userClientService.getDownDepartment();
+        if (!CollectionUtils.isEmpty(departIds)) {
+            dto.setDepartIds(departIds);
+        }
+        //客户名称查询
+        if (!StringUtils.isEmpty(dto.getCustomerName())) {
+            List<Integer> customerIds = customerClientService.listCustomerIdByName(dto.getCustomerName());
+            if (!CollectionUtils.isEmpty(customerIds)) {
+                dto.setCustomerIds(customerIds);
+            }
+        }
+        //得到列表
+        List<ReturnWaybillCustomerFeeDto> customerFeeDtoList = waybillCustomerFeeMapperExt.listWaybillCustomerFee(dto);
+        if (!CollectionUtils.isEmpty(customerFeeDtoList)) {
+            for (ReturnWaybillCustomerFeeDto feeDto : customerFeeDtoList) {
+                feeDto
+                        .setCustomerName(customerClientService.getShowCustomerById(feeDto.getCustomerId()).getCustomerName())
+                        .setGoodsNames(waybillGoodsMapper.listGoodsNameByWaybillId(feeDto.getWaybillId()))
+                        .setDepartmentName(userClientService.getDeptNameById(feeDto.getDepartmentId()));
+                //重量、数量
+                WaybillGoods goods = waybillGoodsMapper.getQuantityAndWeightByWaybillId(feeDto.getWaybillId());
+                if (goods != null) {
+                    feeDto
+                            .setQuantity(goods.getUnloadQuantity())
+                            .setWeight(goods.getUnloadWeight());
+                }
+                //运输费用、异常费用
+                feeDto
+                        .setWaybillMoney(waybillCustomerFeeMapperExt.getWaybillMoneyByWaybillId(feeDto.getWaybillId()))
+                        .setAnomalyMoney(waybillCustomerFeeMapperExt.getAnomalyMoneyByWaybillId(feeDto.getWaybillId()));
+            }
+        }
+        return new PageInfo(customerFeeDtoList);
+    }
+
+    /**
      * @param waybillDtoList
      * @return
-     * @Author gavin
+     * @Author gavins
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -1464,8 +1511,9 @@ public class WaybillServiceImpl implements WaybillService {
                 for (GrabWaybillRecord grabWaybillRecord : grabWaybillRecords) {
                     ids.add(grabWaybillRecord.getId());
                 }
-                grabWaybillRecordMapper.batchUpdate(ids);
-
+                if (!CollectionUtils.isEmpty(ids)) {
+                    grabWaybillRecordMapper.batchUpdate(ids);
+                }
             }
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking.setOldStatus(WaybillStatus.RECEIVE);
@@ -1626,14 +1674,13 @@ public class WaybillServiceImpl implements WaybillService {
             criteriaDto.setWaybillStatus("");
             criteriaDto.setReceiptStatus(2);
         }
-
-        List<ListWaybillDto> listWaybillDtos = new ArrayList<>();
+        List<ListWaybillDto> listWaybillDto = new ArrayList<>();
         if (!StringUtils.isEmpty(criteriaDto.getTruckNumber())) {
             List<Integer> truckIds = this.customerClientService.getTruckIdsByTruckNum(criteriaDto.getTruckNumber());
             if (truckIds.size() > 0) {
                 criteriaDto.setTruckIds(truckIds);
             } else {
-                return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
+                return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
             }
         }
         if (criteriaDto.getCustomerId() != null) {
@@ -1641,20 +1688,16 @@ public class WaybillServiceImpl implements WaybillService {
             if (orderIds.size() > 0) {
                 criteriaDto.setOrderIds(orderIds);
             } else {
-                return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
+                return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
             }
         }
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
-        listWaybillDtos = waybillMapper.listWaybillByCriteria(criteriaDto);
-        if (listWaybillDtos != null && listWaybillDtos.size() > 0) {
-            Iterator<ListWaybillDto> dtoIterator = listWaybillDtos.iterator();
-            while (dtoIterator.hasNext()) {
-                ListWaybillDto waybillDto = dtoIterator.next();
-
-                if (!StringUtils.isEmpty(criteriaDto.getReceiptStatus())) {
+        listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
+        if (listWaybillDto != null && listWaybillDto.size() > 0) {
+            for (ListWaybillDto waybillDto : listWaybillDto) {
+                if (waybillDto.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH) && waybillDto.getReceiptStatus() == 2) {
                     waybillDto.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
                 }
-
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1705,7 +1748,7 @@ public class WaybillServiceImpl implements WaybillService {
                 }
             }
         }
-        return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
+        return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
     }
 
     /**

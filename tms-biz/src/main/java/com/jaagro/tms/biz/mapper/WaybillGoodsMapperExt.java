@@ -37,33 +37,54 @@ public interface WaybillGoodsMapperExt extends WaybillGoodsMapper {
     List<ShowGoodsDto> listWaybillGoodsByWaybillItemId(Integer id);
 
     /**
+     * 根据运单id获取商品名称
+     *
+     * @param waybillId
+     * @return
+     */
+    List<String> listGoodsNameByWaybillId(Integer waybillId);
+
+    /**
      * 批量更新运单货物
-     * @author yj
+     *
      * @param waybillGoodsList
      * @return
+     * @author yj
      */
     Integer batchUpdateByPrimaryKeySelective(@Param("waybillGoodsList") List<WaybillGoods> waybillGoodsList);
 
     /**
      * 根据运单id删除
-     * @author yj
+     *
      * @param waybillId
      * @return
+     * @author yj
      */
     Integer deleteByWaybillId(@Param("waybillId") Integer waybillId);
 
     /**
      * 批量插入
-     * @author yj
+     *
      * @param waybillGoodsList
      * @return
+     * @author yj
      */
     Integer batchInsert(@Param("waybillGoodsList") List<WaybillGoods> waybillGoodsList);
 
     /**
      * 根据运单id逻辑删除相关的waybillGoods记录
+     *
      * @param waybillId
      * @return
      */
     Integer disableWaybillGoodsByWaybillId(@Param("waybillId") Integer waybillId);
+
+    /**
+     * 根据运单id获取数量或重量的总值
+     *
+     * @param waybillId
+     * @return
+     */
+    WaybillGoods getQuantityAndWeightByWaybillId(@Param("waybillId") Integer waybillId);
+
 }

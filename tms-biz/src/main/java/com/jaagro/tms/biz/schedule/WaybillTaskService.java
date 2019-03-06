@@ -42,6 +42,7 @@ public class WaybillTaskService {
     private RedisLock redisLock;
     @Autowired
     private RedisOperator redisOperator;
+
     /**
      * 超过30分钟未接的运单修改为被司机拒绝以便重新派单,10分钟跑一次
      */
@@ -58,8 +59,8 @@ public class WaybillTaskService {
 
             if (!isEffectiveDate(nowTime, startTime, endTime)) {
                 //加锁
-                long time = System.currentTimeMillis() + 10*1000;
-                boolean success = redisLock.lock("Scheduled:redisLock:waybillDefaultRejectBySystem" , String.valueOf(time));
+                long time = System.currentTimeMillis() + 10 * 1000;
+                boolean success = redisLock.lock("Scheduled:redisLock:waybillDefaultRejectBySystem", String.valueOf(time));
                 if (!success) {
                     throw new RuntimeException("请求正在处理中");
                 }

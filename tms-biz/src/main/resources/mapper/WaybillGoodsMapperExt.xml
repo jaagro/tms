@@ -31,11 +31,16 @@
     </select>
 
     <select id="listWaybillGoodsByWaybillItemId" resultMap="DetailInfo" parameterType="java.lang.Integer">
-    select id,goods_name,goods_unit,goods_quantity,goods_weight,load_quantity,load_weight,unload_quantity,unload_weight,join_drug
-    from waybill_goods
-    where waybill_item_id = #{id,jdbcType=INTEGER} and enabled=1
-  </select>
-
+        select id,goods_name,goods_unit,goods_quantity,goods_weight,load_quantity,load_weight,unload_quantity,unload_weight,join_drug
+        from waybill_goods
+        where waybill_item_id = #{id,jdbcType=INTEGER} and enabled=1
+    </select>
+    <select id="listGoodsNameByWaybillId" parameterType="java.lang.Integer" resultType="java.lang.String">
+      select
+        goods_name
+      from waybill_goods
+      where waybill_id = #{waybillId,jdbcType=INTEGER} and enabled=1
+    </select>
     <update id="batchUpdateByPrimaryKeySelective" parameterType="list">
         update waybill_goods
         <trim prefix="set" suffixOverrides=",">
@@ -157,24 +162,35 @@
     </delete>
     <insert id="batchInsert" parameterType="list">
         insert into waybill_goods (waybill_id, waybill_item_id,
-      goods_name, goods_unit, goods_quantity,
-      goods_weight, load_quantity, load_weight,
-      unload_quantity, unload_weight, join_drug,
-      enabled, modify_time, modify_user_id,
-      order_goods_id)
-    values
-    <foreach collection="waybillGoodsList" separator="," item="goods">
-        ( #{goods.waybillId,jdbcType=INTEGER}, #{goods.waybillItemId,jdbcType=INTEGER},
-        #{goods.goodsName,jdbcType=VARCHAR}, #{goods.goodsUnit,jdbcType=INTEGER}, #{goods.goodsQuantity,jdbcType=INTEGER},
-        #{goods.goodsWeight,jdbcType=DECIMAL}, #{goods.loadQuantity,jdbcType=INTEGER}, #{goods.loadWeight,jdbcType=DECIMAL},
-        #{goods.unloadQuantity,jdbcType=INTEGER}, #{goods.unloadWeight,jdbcType=DECIMAL}, #{goods.joinDrug,jdbcType=BIT},
-        #{goods.enabled,jdbcType=BIT}, #{goods.modifyTime,jdbcType=TIMESTAMP}, #{goods.modifyUserId,jdbcType=INTEGER},
-        #{goods.orderGoodsId,jdbcType=INTEGER})
-    </foreach>
+        goods_name, goods_unit, goods_quantity,
+        goods_weight, load_quantity, load_weight,
+        unload_quantity, unload_weight, join_drug,
+        enabled, modify_time, modify_user_id,
+        order_goods_id)
+        values
+        <foreach collection="waybillGoodsList" separator="," item="goods">
+            ( #{goods.waybillId,jdbcType=INTEGER}, #{goods.waybillItemId,jdbcType=INTEGER},
+            #{goods.goodsName,jdbcType=VARCHAR}, #{goods.goodsUnit,jdbcType=INTEGER},
+            #{goods.goodsQuantity,jdbcType=INTEGER},
+            #{goods.goodsWeight,jdbcType=DECIMAL}, #{goods.loadQuantity,jdbcType=INTEGER},
+            #{goods.loadWeight,jdbcType=DECIMAL},
+            #{goods.unloadQuantity,jdbcType=INTEGER}, #{goods.unloadWeight,jdbcType=DECIMAL},
+            #{goods.joinDrug,jdbcType=BIT},
+            #{goods.enabled,jdbcType=BIT}, #{goods.modifyTime,jdbcType=TIMESTAMP},
+            #{goods.modifyUserId,jdbcType=INTEGER},
+            #{goods.orderGoodsId,jdbcType=INTEGER})
+        </foreach>
     </insert>
 
     <update id="disableWaybillGoodsByWaybillId">
         update waybill_goods set enabled = 0 where waybill_id = #{waybillId}
     </update>
+    <select id="getQuantityAndWeightByWaybillId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        sum( unload_quantity ) as unload_quantity,
+	    sum( unload_weight ) as unload_weight
+        from waybill_goods
+        where waybill_id = #{waybillId,jdbcType=INTEGER} and enabled=1
+    </select>
 
 </mapper>

@@ -45,6 +45,7 @@ public class WaybillController {
     private GrabWaybillService grabWaybillService;
     @Autowired
     private WaybillRefactorService waybillRefactorService;
+
     /**
      * 创建运单计划
      *
@@ -278,16 +279,34 @@ public class WaybillController {
 
     /**
      * 获取司机费用列表
-     * @author yj
+     *
      * @param criteria
      * @return
+     * @author yj
      */
     @ApiOperation("获取司机费用列表")
     @PostMapping("/listTruckFeeByCriteria")
-    public BaseResponse listTruckFeeByCriteria(@RequestBody @Validated ListTruckFeeCriteria criteria){
-        log.info("O listTruckFeeByCriteria criteria={}",criteria);
+    public BaseResponse listTruckFeeByCriteria(@RequestBody @Validated ListTruckFeeCriteria criteria) {
+        log.info("O listTruckFeeByCriteria criteria={}", criteria);
         PageInfo<ListTruckFeeDto> pageInfo = waybillRefactorService.listTruckFeeByCriteria(criteria);
         return BaseResponse.successInstance(pageInfo);
     }
 
+    /**
+     * 客户费用
+     *
+     * @param dto
+     * @return
+     */
+    @ApiOperation("客户费用")
+    @PostMapping("/listWaybillCustomerFee")
+    public BaseResponse listWaybillCustomerFee(@RequestBody ListWaybillCustomerFeeDto dto) {
+        if (dto.getPageNum() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空！");
+        }
+        if (dto.getPageSize() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
+        }
+        return BaseResponse.successInstance(waybillService.listWaybillCustomerFee(dto));
+    }
 }
