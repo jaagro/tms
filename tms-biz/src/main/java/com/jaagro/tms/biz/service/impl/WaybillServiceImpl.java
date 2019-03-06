@@ -15,7 +15,6 @@ import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.fee.ReturnWaybillCustomerFeeDto;
-import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
@@ -1666,7 +1665,6 @@ public class WaybillServiceImpl implements WaybillService {
         return ServiceResult.toResult("派单成功");
     }
 
-
     /**
      * 分页查询运单
      *
@@ -1675,18 +1673,6 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
-        //项目部隔离
-        if (!StringUtils.isEmpty(criteriaDto.getDeptId())) {
-            List<Integer> downDepartmentByDeptId = userClientService.getDownDepartmentByDeptId(criteriaDto.getDeptId());
-            if (!CollectionUtils.isEmpty(downDepartmentByDeptId)) {
-                criteriaDto.setDepartIds(downDepartmentByDeptId);
-            }
-        } else {
-            List<Integer> departIds = userClientService.getDownDepartment();
-            if (!CollectionUtils.isEmpty(departIds)) {
-                criteriaDto.setDepartIds(departIds);
-            }
-        }
         List<Integer> departIds = userClientService.getDownDepartment();
         if (departIds.size() != 0) {
             criteriaDto.setDepartIds(departIds);
@@ -1695,13 +1681,14 @@ public class WaybillServiceImpl implements WaybillService {
             criteriaDto.setWaybillStatus("");
             criteriaDto.setReceiptStatus(2);
         }
-        List<ListWaybillDto> listWaybillDto = new ArrayList<>();
+
+        List<ListWaybillDto> listWaybillDtos = new ArrayList<>();
         if (!StringUtils.isEmpty(criteriaDto.getTruckNumber())) {
             List<Integer> truckIds = this.customerClientService.getTruckIdsByTruckNum(criteriaDto.getTruckNumber());
             if (truckIds.size() > 0) {
                 criteriaDto.setTruckIds(truckIds);
             } else {
-                return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
+                return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
             }
         }
         if (criteriaDto.getCustomerId() != null) {
@@ -1709,16 +1696,20 @@ public class WaybillServiceImpl implements WaybillService {
             if (orderIds.size() > 0) {
                 criteriaDto.setOrderIds(orderIds);
             } else {
-                return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
+                return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
             }
         }
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
-        listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
-        if (listWaybillDto != null && listWaybillDto.size() > 0) {
-            for (ListWaybillDto waybillDto : listWaybillDto) {
-                if (waybillDto.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH) && waybillDto.getReceiptStatus() == 2) {
+        listWaybillDtos = waybillMapper.listWaybillByCriteria(criteriaDto);
+        if (listWaybillDtos != null && listWaybillDtos.size() > 0) {
+            Iterator<ListWaybillDto> dtoIterator = listWaybillDtos.iterator();
+            while (dtoIterator.hasNext()) {
+                ListWaybillDto waybillDto = dtoIterator.next();
+
+                if (!StringUtils.isEmpty(criteriaDto.getReceiptStatus())) {
                     waybillDto.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
                 }
+
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
@@ -1769,7 +1760,7 @@ public class WaybillServiceImpl implements WaybillService {
                 }
             }
         }
-        return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
+        return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
     }
 
     /**
