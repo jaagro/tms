@@ -360,6 +360,10 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         }
         List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(dto);
+        if(CollectionUtils.isEmpty(waybillAnomalyDtos)){
+            log.info("O anomalyManagementList: waybillAnomalyDtos is null {}", dto);
+            throw new NullPointerException("waybillAnomalyDtos must not be null");
+        }
         List<Integer> driverList = new ArrayList<>();
         List<Integer> employeeList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(waybillAnomalyDtos)) {
@@ -379,7 +383,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             }
         }
         List<UserInfo> driverLists = new ArrayList<>();
-        if (null != driverList && driverList.size() != 0) {
+        if (!CollectionUtils.isEmpty(driverList)) {
             try {
                 driverLists = userClientService.listUserInfo(driverList, UserType.DRIVER);
             } catch (Exception e) {
@@ -389,7 +393,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             }
         }
         List<UserInfo> employeeLists = new ArrayList<>();
-        if (null != employeeList && employeeList.size() != 0) {
+        if (!CollectionUtils.isEmpty(employeeList)) {
             try {
                 employeeLists = userClientService.listUserInfo(employeeList, UserType.EMPLOYEE);
             } catch (Exception e) {
@@ -432,7 +436,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     if (!CollectionUtils.isEmpty(collect)) {
                         creatorName = collect.get(0);
                     }
-                    waybillAnomalyDto.setCreatorName(creatorName.getName());
+                    if (creatorName != null) {
+                        waybillAnomalyDto.setCreatorName(creatorName.getName());
+                    }
                 }
             }
             if (!CollectionUtils.isEmpty(driverLists) && null != waybillAnomalyDto.getCreateUserId()) {
@@ -442,7 +448,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     if (!CollectionUtils.isEmpty(collect)) {
                         driverName = collect.get(0);
                     }
-                    waybillAnomalyDto.setCreatorName(driverName.getName());
+                    if (driverName != null) {
+                        waybillAnomalyDto.setCreatorName(driverName.getName());
+                    }
                 }
             }
             //处理人
@@ -452,7 +460,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 if (!CollectionUtils.isEmpty(collect)) {
                     processUser = collect.get(0);
                 }
-                waybillAnomalyDto.setProcessorName(processUser.getName());
+                if (processUser != null) {
+                    waybillAnomalyDto.setProcessorName(processUser.getName());
+                }
             }
             //审核人
             if (!CollectionUtils.isEmpty(employeeLists) && null != waybillAnomalyDto.getAuditUserId()) {
@@ -461,7 +471,9 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 if (!CollectionUtils.isEmpty(collect)) {
                     auditName = collect.get(0);
                 }
-                waybillAnomalyDto.setAuditName(auditName.getName());
+                if (auditName != null) {
+                    waybillAnomalyDto.setAuditName(auditName.getName());
+                }
             }
         }
         return new PageInfo(waybillAnomalyDtos);
@@ -718,7 +730,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             WaybillTruckFee waybillTruckFees = waybillTruckFeeMapper.selectByAnomalyId(dto.getAnomalId());
             WaybillTruckFee waybillTruckFee = new WaybillTruckFee();
             waybillTruckFee
-                    .setDirection(CostType.COMPENSATE.equals(costType) ? Direction.SUBSTRACT : Direction.PLUS)
+                    .setDirection(CostType.COMPENSATE.equals(costType) ? Direction.PLUS : Direction.SUBSTRACT)
                     .setAnomalyId(dto.getAnomalId())
                     .setCostType(CostType.ADDITIONAL)
                     .setWaybillId(dto.getWaybillId())
@@ -735,7 +747,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 waybillFeeAdjustmentMapper.insertSelective(waybillFeeAdjustment);
             } else {
                 waybillTruckFees
-                        .setDirection(CostType.COMPENSATE.equals(costType) ? Direction.SUBSTRACT : Direction.PLUS)
+                        .setDirection(CostType.COMPENSATE.equals(costType) ? Direction.PLUS : Direction.SUBSTRACT)
                         .setMoney(anomalyDeductCompensationDto.getMoney())
                         .setEnabled(true);
                 waybillTruckFeeMapper.updateByPrimaryKeySelective(waybillTruckFees);

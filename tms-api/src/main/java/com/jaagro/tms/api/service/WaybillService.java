@@ -313,4 +313,12 @@ public interface WaybillService {
      * @return
      */
     Integer countUnFinishWaybillByContract(CountUnFinishWaybillCriteriaDto criteriaDto);
+
+    /**
+     * 客户费用
+     *
+     * @param dto
+     * @return
+     */
+    PageInfo listWaybillCustomerFee(ListWaybillCustomerFeeDto dto);
 }

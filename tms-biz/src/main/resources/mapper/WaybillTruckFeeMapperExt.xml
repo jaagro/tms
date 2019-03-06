@@ -45,4 +45,81 @@
             waybill_id = #{item.waybillId,jdbcType=INTEGER} and settle_status = 0)
         </foreach>
     </delete>
+    <select id="listTruckFeeByCriteria" parameterType="com.jaagro.tms.api.dto.fee.ListTruckFeeCriteria"
+            resultType="com.jaagro.tms.api.dto.fee.ListTruckFeeDto">
+        SELECT
+        result2.*, result1.transportFee,
+        result1.anomalyFee
+        FROM
+        (
+        SELECT
+        wtf.waybill_id waybillId,
+        SUM(
+        CASE
+        WHEN wtf.anomaly_id IS NULL THEN
+        wtf.money
+        ELSE
+        0
+        END
+        ) transportFee,
+        SUM(
+        CASE
+        WHEN wtf.anomaly_id IS NOT NULL AND wtf.direction = 1 THEN
+        wtf.money
+        WHEN wtf.anomaly_id IS NOT NULL AND wtf.direction = 2 THEN
+        -wtf.money
+        ELSE
+        0
+        END
+        ) anomalyFee
+
+        FROM
+        waybill_truck_fee wtf
+        LEFT JOIN waybill w ON wtf.waybill_id = w.id
+        WHERE wtf.enabled = 1
+        GROUP BY
+        wtf.waybill_id
+        ) result1
+        JOIN (
+        SELECT
+        wg.waybill_id waybillId,
+        max(date_format(w.modify_time,'%Y-%m-%d')) completeTime,
+        GROUP_CONCAT(wg.goods_name) goodsName,
+        SUM(wg.unload_quantity) unloadQuantity,
+        SUM(wg.unload_weight) unloadWeight,
+        max(o.goods_type) goodsType,
+        max(d.department_name) departmentName,
+        t.truck_number truckNumber,
+        cs1.site_name AS loadSite,
+        GROUP_CONCAT(cs2.site_name) unloadSite
+        FROM
+        waybill_goods wg
+        LEFT JOIN waybill w ON wg.waybill_id = w.id
+        LEFT JOIN orders o ON w.order_id = o.id
+        LEFT JOIN waybill_items wi ON wg.waybill_item_id = wi.id
+        LEFT JOIN crmserver.customer_site cs1 ON cs1.id = o.load_site_id
+        LEFT JOIN crmserver.customer_site cs2 ON cs2.id = wi.unload_site_id
+        LEFT JOIN crmserver.truck t ON w.truck_id = t.id
+        LEFT JOIN userserver.department d ON w.network_id = d.id
+        WHERE
+        w.waybill_status = '已完成'
+        <if test="waybillId != null">
+            AND w.id = #{waybillId}
+        </if>
+        <if test="truckNumber != null and truckNumber !=''">
+            AND t.truck_number = #{truckNumber}
+        </if>
+        <if test="completeTimeStart != null and completeTimeStart != ''">
+            AND w.modify_time &gt;= #{completeTimeStart}
+        </if>
+        <if test="completeTimeEnd != null and completeTimeEnd != ''">
+            AND w.modify_time &lt; #{completeTimeEnd}
+        </if>
+        <if test="goodsType != null">
+            AND o.goods_type = #{goodsType}
+        </if>
+        GROUP BY
+        wg.waybill_id
+        ) result2 ON result1.waybillId = result2.waybillId order by result2.completeTime DESC
+    </select>
 </mapper>
