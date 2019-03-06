@@ -45,7 +45,7 @@
             AND o.goods_type = #{goodsType}
         </if>
         <if test="endDate != null">
-            AND w.modify_time = #{endDate}
+            AND DATE_FORMAT( w.modify_time, '%Y-%m-%d' ) = DATE_FORMAT( #{endDate}, '%Y-%m-%d' )
         </if>
         <if test="departId != null">
             AND w.network_id = #{departId}
@@ -86,7 +86,7 @@
     </select>
     <select id="getAnomalyMoneyByWaybillId" parameterType="java.lang.Integer" resultType="java.math.BigDecimal">
         SELECT
-            SUM( f.money )
+            SUM( CASE WHEN f.direction = 1 THEN f.money WHEN f.direction = 2 THEN - f.money ELSE 0 END )
         FROM
             waybill_customer_fee f
             LEFT JOIN waybill w ON ( w.id = f.waybill_id )
