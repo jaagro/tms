@@ -1464,7 +1464,9 @@ public class WaybillServiceImpl implements WaybillService {
                 for (GrabWaybillRecord grabWaybillRecord : grabWaybillRecords) {
                     ids.add(grabWaybillRecord.getId());
                 }
-                grabWaybillRecordMapper.batchUpdate(ids);
+                if (!CollectionUtils.isEmpty(ids)) {
+                    grabWaybillRecordMapper.batchUpdate(ids);
+                }
 
             }
             waybillMapper.updateByPrimaryKey(waybill);
