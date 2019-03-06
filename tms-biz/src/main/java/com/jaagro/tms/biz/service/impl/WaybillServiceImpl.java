@@ -1654,7 +1654,6 @@ public class WaybillServiceImpl implements WaybillService {
                 if (!StringUtils.isEmpty(criteriaDto.getReceiptStatus())) {
                     waybillDto.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
                 }
-
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
                 Orders orders = this.ordersMapper.selectByPrimaryKey(waybillDto.getOrderId());
                 if (orders != null) {
