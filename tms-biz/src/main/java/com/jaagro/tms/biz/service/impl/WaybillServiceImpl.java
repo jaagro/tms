@@ -2440,7 +2440,7 @@ public class WaybillServiceImpl implements WaybillService {
                     Entry<Integer, BigDecimal> entry = it.next();
                     waybillTruckFee.setCreatedUserId(currentUserId)
                             .setCreateTime(new Date())
-                            .setDirection(Direction.SUBSTRACT)
+                            .setDirection(Direction.PLUS)
                             .setEnabled(Boolean.TRUE)
                             .setCostType(CostType.FREIGHT)
                             .setMoney(entry.getValue())
