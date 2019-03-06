@@ -1,23 +1,25 @@
 package com.jaagro.tms.web.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.constant.OrderStatus;
+import com.jaagro.tms.api.dto.fee.ListTruckFeeCriteria;
+import com.jaagro.tms.api.dto.fee.ListTruckFeeDto;
 import com.jaagro.tms.api.dto.order.GetOrderDto;
 import com.jaagro.tms.api.dto.truck.TruckDto;
 import com.jaagro.tms.api.dto.waybill.*;
-import com.jaagro.tms.api.service.GrabWaybillService;
-import com.jaagro.tms.api.service.OrderService;
-import com.jaagro.tms.api.service.WaybillPlanService;
-import com.jaagro.tms.api.service.WaybillService;
+import com.jaagro.tms.api.service.*;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import jdk.nashorn.internal.ir.annotations.Ignore;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +30,7 @@ import java.util.Map;
  */
 @RestController
 @Api(description = "运单管理", produces = MediaType.APPLICATION_JSON_VALUE)
+@Slf4j
 public class WaybillController {
 
     @Autowired
@@ -40,6 +43,8 @@ public class WaybillController {
     private OrderService orderService;
     @Autowired
     private GrabWaybillService grabWaybillService;
+    @Autowired
+    private WaybillRefactorService waybillRefactorService;
 
     /**
      * 创建运单计划
@@ -270,5 +275,38 @@ public class WaybillController {
     @PostMapping("/countUnFinishWaybillByContract")
     public Integer countUnFinishWaybillByContract(@RequestBody CountUnFinishWaybillCriteriaDto criteriaDto) {
         return waybillService.countUnFinishWaybillByContract(criteriaDto);
+    }
+
+    /**
+     * 获取司机费用列表
+     *
+     * @param criteria
+     * @return
+     * @author yj
+     */
+    @ApiOperation("获取司机费用列表")
+    @PostMapping("/listTruckFeeByCriteria")
+    public BaseResponse listTruckFeeByCriteria(@RequestBody @Validated ListTruckFeeCriteria criteria) {
+        log.info("O listTruckFeeByCriteria criteria={}", criteria);
+        PageInfo<ListTruckFeeDto> pageInfo = waybillRefactorService.listTruckFeeByCriteria(criteria);
+        return BaseResponse.successInstance(pageInfo);
+    }
+
+    /**
+     * 客户费用
+     *
+     * @param dto
+     * @return
+     */
+    @ApiOperation("客户费用")
+    @PostMapping("/listWaybillCustomerFee")
+    public BaseResponse listWaybillCustomerFee(@RequestBody ListWaybillCustomerFeeDto dto) {
+        if (dto.getPageNum() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageNum不能为空！");
+        }
+        if (dto.getPageSize() == null) {
+            return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "pageSize不能为空");
+        }
+        return BaseResponse.successInstance(waybillService.listWaybillCustomerFee(dto));
     }
 }

@@ -14,6 +14,8 @@ import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
+import com.jaagro.tms.api.dto.fee.ReturnWaybillCustomerFeeDto;
+import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
@@ -341,9 +343,60 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     /**
+     * 客户费用
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public PageInfo listWaybillCustomerFee(ListWaybillCustomerFeeDto dto) {
+        PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
+        List<ReturnWaybillCustomerFeeDto> customerFeeDtoList = new ArrayList<>();
+        //项目部隔离
+        if (!StringUtils.isEmpty(dto.getDepartId())) {
+            List<Integer> downDepartmentByDeptId = userClientService.getDownDepartmentByDeptId(dto.getDepartId());
+            if (!CollectionUtils.isEmpty(downDepartmentByDeptId)) {
+                dto.setDepartIds(downDepartmentByDeptId);
+            }
+        } else {
+            List<Integer> departIds = userClientService.getDownDepartment();
+            if (!CollectionUtils.isEmpty(departIds)) {
+                dto.setDepartIds(departIds);
+            }
+        }
+        //客户名称查询
+        if (!StringUtils.isEmpty(dto.getCustomerName())) {
+            List<Integer> customerIds = customerClientService.listCustomerIdByName(dto.getCustomerName());
+            if (!CollectionUtils.isEmpty(customerIds)) {
+                dto.setCustomerIds(customerIds);
+            } else {
+                return new PageInfo(customerFeeDtoList);
+            }
+        }
+        //得到列表
+        customerFeeDtoList = waybillCustomerFeeMapperExt.listWaybillCustomerFee(dto);
+        if (!CollectionUtils.isEmpty(customerFeeDtoList)) {
+            for (ReturnWaybillCustomerFeeDto feeDto : customerFeeDtoList) {
+                feeDto
+                        .setCustomerName(customerClientService.getShowCustomerById(feeDto.getCustomerId()).getCustomerName())
+                        .setGoodsNames(waybillGoodsMapper.listGoodsNameByWaybillId(feeDto.getWaybillId()))
+                        .setDepartmentName(userClientService.getDeptNameById(feeDto.getDepartmentId()));
+                //重量、数量
+                WaybillGoods goods = waybillGoodsMapper.getQuantityAndWeightByWaybillId(feeDto.getWaybillId());
+                if (goods != null) {
+                    feeDto
+                            .setQuantity(goods.getUnloadQuantity())
+                            .setWeight(goods.getUnloadWeight());
+                }
+            }
+        }
+        return new PageInfo(customerFeeDtoList);
+    }
+
+    /**
      * @param waybillDtoList
      * @return
-     * @Author gavin
+     * @Author gavins
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -1446,10 +1499,13 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setModifyTime(new Date());
             waybill.setDriverId(currentUser.getId());
             waybill.setWaybillStatus(WaybillStatus.DEPART);
+            waybill.setTruckId(truckByToken.getId());
+            Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckByToken.getTruckTeamId());
+            waybill.setTruckTeamContractId(truckTeamContractId);
             //抢单模式
             if (!CollectionUtils.isEmpty(grabWaybillRecords)) {
                 ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(grabWaybillRecords.get(0).getTruckId());
-                Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId());
+                truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId());
                 waybill
                         .setTruckId(truckDto.getId())
                         .setTruckTeamContractId(truckTeamContractId);
@@ -1464,8 +1520,9 @@ public class WaybillServiceImpl implements WaybillService {
                 for (GrabWaybillRecord grabWaybillRecord : grabWaybillRecords) {
                     ids.add(grabWaybillRecord.getId());
                 }
-                grabWaybillRecordMapper.batchUpdate(ids);
-
+                if (!CollectionUtils.isEmpty(ids)) {
+                    grabWaybillRecordMapper.batchUpdate(ids);
+                }
             }
             waybillMapper.updateByPrimaryKey(waybill);
             waybillTracking.setOldStatus(WaybillStatus.RECEIVE);
@@ -1618,6 +1675,18 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
+        //项目部隔离
+        if (!StringUtils.isEmpty(criteriaDto.getDeptId())) {
+            List<Integer> downDepartmentByDeptId = userClientService.getDownDepartmentByDeptId(criteriaDto.getDeptId());
+            if (!CollectionUtils.isEmpty(downDepartmentByDeptId)) {
+                criteriaDto.setDepartIds(downDepartmentByDeptId);
+            }
+        } else {
+            List<Integer> departIds = userClientService.getDownDepartment();
+            if (!CollectionUtils.isEmpty(departIds)) {
+                criteriaDto.setDepartIds(departIds);
+            }
+        }
         List<Integer> departIds = userClientService.getDownDepartment();
         if (departIds.size() != 0) {
             criteriaDto.setDepartIds(departIds);
@@ -1626,14 +1695,13 @@ public class WaybillServiceImpl implements WaybillService {
             criteriaDto.setWaybillStatus("");
             criteriaDto.setReceiptStatus(2);
         }
-
-        List<ListWaybillDto> listWaybillDtos = new ArrayList<>();
+        List<ListWaybillDto> listWaybillDto = new ArrayList<>();
         if (!StringUtils.isEmpty(criteriaDto.getTruckNumber())) {
             List<Integer> truckIds = this.customerClientService.getTruckIdsByTruckNum(criteriaDto.getTruckNumber());
             if (truckIds.size() > 0) {
                 criteriaDto.setTruckIds(truckIds);
             } else {
-                return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
+                return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
             }
         }
         if (criteriaDto.getCustomerId() != null) {
@@ -1641,17 +1709,14 @@ public class WaybillServiceImpl implements WaybillService {
             if (orderIds.size() > 0) {
                 criteriaDto.setOrderIds(orderIds);
             } else {
-                return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
+                return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
             }
         }
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
-        listWaybillDtos = waybillMapper.listWaybillByCriteria(criteriaDto);
-        if (listWaybillDtos != null && listWaybillDtos.size() > 0) {
-            Iterator<ListWaybillDto> dtoIterator = listWaybillDtos.iterator();
-            while (dtoIterator.hasNext()) {
-                ListWaybillDto waybillDto = dtoIterator.next();
-
-                if (!StringUtils.isEmpty(criteriaDto.getReceiptStatus())) {
+        listWaybillDto = waybillMapper.listWaybillByCriteria(criteriaDto);
+        if (listWaybillDto != null && listWaybillDto.size() > 0) {
+            for (ListWaybillDto waybillDto : listWaybillDto) {
+                if (waybillDto.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH) && waybillDto.getReceiptStatus() == 2) {
                     waybillDto.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
                 }
                 Waybill waybill = this.waybillMapper.selectByPrimaryKey(waybillDto.getId());
@@ -1704,7 +1769,7 @@ public class WaybillServiceImpl implements WaybillService {
                 }
             }
         }
-        return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
+        return ServiceResult.toResult(new PageInfo<>(listWaybillDto));
     }
 
     /**
@@ -2390,7 +2455,7 @@ public class WaybillServiceImpl implements WaybillService {
                     Entry<Integer, BigDecimal> entry = it.next();
                     waybillTruckFee.setCreatedUserId(currentUserId)
                             .setCreateTime(new Date())
-                            .setDirection(Direction.SUBSTRACT)
+                            .setDirection(Direction.PLUS)
                             .setEnabled(Boolean.TRUE)
                             .setCostType(CostType.FREIGHT)
                             .setMoney(entry.getValue())
