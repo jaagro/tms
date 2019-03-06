@@ -34,9 +34,8 @@
         w.network_id AS department_id,
         o.goods_type AS goods_type,
         w.modify_time AS modify_time,
-        SUM( CASE WHEN f.anomaly_id IS NULL THEN f.money ELSE 0 END ) AS waybill_money,
-        SUM( CASE WHEN f.anomaly_id IS NOT NULL AND f.direction = 1 THEN f.money WHEN f.anomaly_id IS NOT NULL AND
-        f.direction = 2 THEN - f.money ELSE 0 END ) AS anomaly_money
+        SUM( CASE WHEN f.anomaly_id IS NULL AND f.direction = 1 THEN f.money ELSE 0 END ) AS waybill_money,
+        SUM( CASE WHEN f.anomaly_id IS NOT NULL AND f.direction = 1 THEN f.money WHEN f.anomaly_id IS NOT NULL AND f.direction = 2 THEN - f.money ELSE 0 END ) AS anomaly_money
         FROM
         waybill_customer_fee f
         LEFT JOIN waybill w ON ( w.id = f.waybill_id )

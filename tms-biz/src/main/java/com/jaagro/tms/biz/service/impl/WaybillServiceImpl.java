@@ -353,7 +353,7 @@ public class WaybillServiceImpl implements WaybillService {
         PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         List<ReturnWaybillCustomerFeeDto> customerFeeDtoList = new ArrayList<>();
         //项目部隔离
-        if (StringUtils.isEmpty(dto.getDepartId())) {
+        if (!StringUtils.isEmpty(dto.getDepartId())) {
             List<Integer> downDepartmentByDeptId = userClientService.getDownDepartmentByDeptId(dto.getDepartId());
             if (!CollectionUtils.isEmpty(downDepartmentByDeptId)) {
                 dto.setDepartIds(downDepartmentByDeptId);
@@ -1672,6 +1672,18 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Override
     public Map<String, Object> listWaybillByCriteria(ListWaybillCriteriaDto criteriaDto) {
+        //项目部隔离
+        if (!StringUtils.isEmpty(criteriaDto.getDeptId())) {
+            List<Integer> downDepartmentByDeptId = userClientService.getDownDepartmentByDeptId(criteriaDto.getDeptId());
+            if (!CollectionUtils.isEmpty(downDepartmentByDeptId)) {
+                criteriaDto.setDepartIds(downDepartmentByDeptId);
+            }
+        } else {
+            List<Integer> departIds = userClientService.getDownDepartment();
+            if (!CollectionUtils.isEmpty(departIds)) {
+                criteriaDto.setDepartIds(departIds);
+            }
+        }
         List<Integer> departIds = userClientService.getDownDepartment();
         if (departIds.size() != 0) {
             criteriaDto.setDepartIds(departIds);
