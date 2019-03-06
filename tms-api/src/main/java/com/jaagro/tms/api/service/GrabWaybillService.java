@@ -1,8 +1,8 @@
 package com.jaagro.tms.api.service;
 
+import com.github.pagehelper.PageInfo;
 import com.jaagro.tms.api.dto.waybill.GrabWaybillParamDto;
-
-import java.util.List;
+import com.jaagro.tms.api.dto.waybill.ListWaybillCustomerFeeDto;
 
 /**
  * 派单到多个车辆 抢单服务
@@ -21,8 +21,9 @@ public interface GrabWaybillService {
 
     /**
      * 撤销抢单
+     *
      * @param waybillId
      * @author @Gao.
      */
-    public void withdrawGrabWaybill(Integer waybillId);
+     void withdrawGrabWaybill(Integer waybillId);
 }

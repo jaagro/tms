@@ -14,7 +14,6 @@ import com.jaagro.tms.api.service.WaybillService;
 import com.jaagro.tms.biz.service.AuthClientService;
 import com.jaagro.tms.biz.service.CustomerClientService;
 import com.jaagro.tms.biz.service.UserClientService;
-import com.jaagro.tms.api.dto.ValidList;
 import com.jaagro.tms.web.vo.chat.*;
 import com.jaagro.tms.web.vo.pc.*;
 import com.jaagro.tms.web.vo.pc.ListOrderItemsVo;
@@ -438,17 +437,17 @@ public class OrderController {
     }
 
     /**
-     * @author yj
-     * @date 2019-01-08
      * @param preImportChickenRecordDto
      * @return
+     * @author yj
+     * @date 2019-01-08
      */
     @PostMapping("/preImportChickenWaybill")
     @ApiOperation("预览毛鸡导入记录")
-    public BaseResponse<List<ChickenImportRecordDto>> preImportChickenWaybill(@RequestBody PreImportChickenRecordDto preImportChickenRecordDto){
-        log.info("O preImportChickenWaybill preImportChickenRecordDto={}",JSON.toJSONString(preImportChickenRecordDto));
+    public BaseResponse<List<ChickenImportRecordDto>> preImportChickenWaybill(@RequestBody PreImportChickenRecordDto preImportChickenRecordDto) {
+        log.info("O preImportChickenWaybill preImportChickenRecordDto={}", JSON.toJSONString(preImportChickenRecordDto));
         List<ChickenImportRecordDto> chickenImportRecordDtoList = waybillService.preImportChickenWaybill(preImportChickenRecordDto);
-        if (CollectionUtils.isEmpty(chickenImportRecordDtoList)){
+        if (CollectionUtils.isEmpty(chickenImportRecordDtoList)) {
             return BaseResponse.queryDataEmpty();
         }
         return BaseResponse.successInstance(chickenImportRecordDtoList);
@@ -456,20 +455,20 @@ public class OrderController {
 
     @PostMapping("/changeImportChickenRecord")
     @ApiOperation("修改毛鸡导入单条记录")
-    public BaseResponse<List<ChickenImportRecordDto>> changeImportChickenRecord(@RequestBody UpdateChickenImportRecordDto dto){
-        log.info("O changeImportChickenRecord dto={}",dto);
+    public BaseResponse<List<ChickenImportRecordDto>> changeImportChickenRecord(@RequestBody UpdateChickenImportRecordDto dto) {
+        log.info("O changeImportChickenRecord dto={}", dto);
         return BaseResponse.successInstance(waybillService.changeImportChickenRecord(dto));
     }
 
     /**
-     * @author yj
-     * @date 2019-01-08
      * @param orderId
      * @return
+     * @author yj
+     * @date 2019-01-08
      */
     @PostMapping("/importChickenWaybill/{orderId}")
     @ApiOperation("导入毛鸡运单")
-    public BaseResponse importChickenWaybill(@PathVariable("orderId") Integer orderId){
+    public BaseResponse importChickenWaybill(@PathVariable("orderId") Integer orderId) {
         log.info("O importChickenWaybill orderId={}", orderId);
         waybillService.importChickenWaybill(orderId);
         return BaseResponse.successInstance("导入成功");
