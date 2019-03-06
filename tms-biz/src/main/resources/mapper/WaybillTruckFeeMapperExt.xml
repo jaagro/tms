@@ -56,10 +56,8 @@
         wtf.waybill_id waybillId,
         SUM(
         CASE
-        WHEN wtf.anomaly_id IS NULL AND wtf.direction = 1 THEN
+        WHEN wtf.anomaly_id IS NULL THEN
         wtf.money
-        WHEN wtf.anomaly_id IS NULL AND wtf.direction = 2 THEN
-        -wtf.money
         ELSE
         0
         END

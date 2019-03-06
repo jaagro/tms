@@ -1499,10 +1499,13 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setModifyTime(new Date());
             waybill.setDriverId(currentUser.getId());
             waybill.setWaybillStatus(WaybillStatus.DEPART);
+            waybill.setTruckId(truckByToken.getId());
+            Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckByToken.getTruckTeamId());
+            waybill.setTruckTeamContractId(truckTeamContractId);
             //抢单模式
             if (!CollectionUtils.isEmpty(grabWaybillRecords)) {
                 ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(grabWaybillRecords.get(0).getTruckId());
-                Integer truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId());
+                truckTeamContractId = getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId());
                 waybill
                         .setTruckId(truckDto.getId())
                         .setTruckTeamContractId(truckTeamContractId);
@@ -2452,7 +2455,7 @@ public class WaybillServiceImpl implements WaybillService {
                     Entry<Integer, BigDecimal> entry = it.next();
                     waybillTruckFee.setCreatedUserId(currentUserId)
                             .setCreateTime(new Date())
-                            .setDirection(Direction.SUBSTRACT)
+                            .setDirection(Direction.PLUS)
                             .setEnabled(Boolean.TRUE)
                             .setCostType(CostType.FREIGHT)
                             .setMoney(entry.getValue())
