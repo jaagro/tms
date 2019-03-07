@@ -103,6 +103,7 @@
         LEFT JOIN userserver.department d ON w.network_id = d.id
         WHERE
         w.waybill_status = '已完成'
+        AND w.receipt_status = 2
         <if test="waybillId != null">
             AND w.id = #{waybillId}
         </if>
@@ -120,6 +121,6 @@
         </if>
         GROUP BY
         wg.waybill_id
-        ) result2 ON result1.waybillId = result2.waybillId order by result2.completeTime DESC
+        ) result2 ON result1.waybillId = result2.waybillId where result1.transportFee > 0 order by result2.completeTime DESC
     </select>
 </mapper>
