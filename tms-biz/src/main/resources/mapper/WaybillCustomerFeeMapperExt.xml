@@ -43,7 +43,7 @@
         WHERE
         w.waybill_status = "已完成"
         AND w.receipt_status = 2
-        AND f.money > 0
+        AND (CASE WHEN f.anomaly_id IS NULL AND f.direction = 1 THEN f.money ELSE 0 END  > 0 )
         <if test="goodsType != null">
             AND o.goods_type = #{goodsType}
         </if>
