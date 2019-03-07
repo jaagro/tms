@@ -29,13 +29,33 @@
     <select id="listWaybillCustomerFee" parameterType="com.jaagro.tms.api.dto.waybill.ListWaybillCustomerFeeDto"
             resultType="com.jaagro.tms.api.dto.fee.ReturnWaybillCustomerFeeDto">
         SELECT
+        temp_f.waybill_id,
+        temp_f.customer_id,
+        temp_f.department_id,
+        temp_f.goods_type,
+        temp_f.modify_time,
+        temp_f.waybill_money,
+        temp_f.anomaly_money
+        FROM
+        (
+        SELECT
         f.waybill_id AS waybill_id,
         o.customer_id AS customer_id,
         w.network_id AS department_id,
         o.goods_type AS goods_type,
         w.modify_time AS modify_time,
         SUM( CASE WHEN f.anomaly_id IS NULL AND f.direction = 1 THEN f.money ELSE 0 END ) AS waybill_money,
-        SUM( CASE WHEN f.anomaly_id IS NOT NULL AND f.direction = 1 THEN f.money WHEN f.anomaly_id IS NOT NULL AND f.direction = 2 THEN - f.money ELSE 0 END ) AS anomaly_money
+        SUM(
+        CASE
+
+        WHEN f.anomaly_id IS NOT NULL
+        AND f.direction = 1 THEN
+        f.money
+        WHEN f.anomaly_id IS NOT NULL
+        AND f.direction = 2 THEN
+        - f.money ELSE 0
+        END
+        ) AS anomaly_money
         FROM
         waybill_customer_fee f
         LEFT JOIN waybill w ON ( w.id = f.waybill_id )
@@ -43,7 +63,7 @@
         WHERE
         w.waybill_status = "已完成"
         AND w.receipt_status = 2
-        AND (CASE WHEN f.anomaly_id IS NULL AND f.direction = 1 THEN f.money ELSE 0 END  > 0 )
+        AND f.money > 0
         <if test="goodsType != null">
             AND o.goods_type = #{goodsType}
         </if>
@@ -64,7 +84,8 @@
         </if>
         GROUP BY
         f.waybill_id
-        ORDER BY
-        w.modify_time DESC
+        ) temp_f
+        WHERE
+        temp_f.waybill_money > 0
     </select>
 </mapper>
