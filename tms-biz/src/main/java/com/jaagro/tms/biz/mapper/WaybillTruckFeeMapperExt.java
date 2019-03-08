@@ -1,5 +1,7 @@
 package com.jaagro.tms.biz.mapper;
 
+import com.jaagro.tms.api.dto.fee.ListTruckFeeCriteria;
+import com.jaagro.tms.api.dto.fee.ListTruckFeeDto;
 import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
 import com.jaagro.tms.api.dto.fee.WaybillTruckFeeDto;
 import com.jaagro.tms.biz.entity.WaybillTruckFee;
@@ -41,4 +43,12 @@ public interface WaybillTruckFeeMapperExt extends WaybillTruckFeeMapper {
      * @return
      */
     Integer batchDelete(@Param("waybillTruckFeeList") List<WaybillTruckFee> waybillTruckFeeList);
+
+    /**
+     * 查询运力费用列表
+     * @author yj
+     * @param criteria
+     * @return
+     */
+    List<ListTruckFeeDto> listTruckFeeByCriteria(ListTruckFeeCriteria criteria);
 }
