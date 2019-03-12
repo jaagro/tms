@@ -1714,7 +1714,7 @@ public class WaybillServiceImpl implements WaybillService {
             while (dtoIterator.hasNext()) {
                 ListWaybillDto waybillDto = dtoIterator.next();
 
-                if (!StringUtils.isEmpty(criteriaDto.getReceiptStatus())) {
+                if (!StringUtils.isEmpty(criteriaDto.getReceiptStatus()) || waybillDto.getReceiptStatus()==2) {
                     waybillDto.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
                 }
 
