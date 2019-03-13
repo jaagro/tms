@@ -121,4 +121,8 @@ public class GetWaybillDto implements Serializable {
      * 司机拒单理由
      */
     private GetRefuseTrackingDto refuseDto;
+    /**
+     * 客户网点
+     */
+    private Integer networkId;
 }
