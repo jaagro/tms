@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
 import com.jaagro.tms.api.dto.anomaly.*;
+import com.jaagro.tms.api.dto.base.DepartmentReturnDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.fee.WaybillCustomerFeeDto;
 import com.jaagro.tms.api.dto.fee.WaybillFeeCondition;
@@ -104,6 +105,10 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         //插入异常表
         WaybillAnomaly waybillAnomaly = new WaybillAnomaly();
         BeanUtils.copyProperties(dto, waybillAnomaly);
+        if (waybill.getNetworkId() != null) {
+            waybillAnomaly
+                    .setNetworkId(waybill.getNetworkId());
+        }
         waybillAnomaly
                 .setProcessingStatus(AnomalyStatus.TO_DO);
         UserInfo currentUser = currentUserService.getCurrentUser();
@@ -359,8 +364,12 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         if (null != dto.getPageNum() && null != dto.getPageSize()) {
             PageHelper.startPage(dto.getPageNum(), dto.getPageSize());
         }
+        List<Integer> downDepartment = userClientService.getDownDepartment();
+        if (!CollectionUtils.isEmpty(downDepartment)) {
+            dto.setNetworkIds(downDepartment);
+        }
         List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(dto);
-        if(CollectionUtils.isEmpty(waybillAnomalyDtos)){
+        if (CollectionUtils.isEmpty(waybillAnomalyDtos)) {
             log.info("O anomalyManagementList: waybillAnomalyDtos is null {}", dto);
             throw new NullPointerException("waybillAnomalyDtos must not be null");
         }
@@ -402,6 +411,8 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 throw new RuntimeException("获取员工基本信息失败");
             }
         }
+        // 获取所有项目部
+        List<DepartmentReturnDto> departmentReturnDtos = userClientService.getAllDepartments();
         for (WaybillAnomalyDto waybillAnomalyDto : waybillAnomalyDtos) {
             WaybillFeeCondition waybillFeeCondition = new WaybillFeeCondition();
             waybillFeeCondition
@@ -473,6 +484,21 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 }
                 if (auditName != null) {
                     waybillAnomalyDto.setAuditName(auditName.getName());
+                }
+            }
+            //项目部
+            if (waybillAnomalyDto.getNetworkId() == null) {
+                waybillAnomalyDto.setProjectDeptName("其他");
+            } else {
+                if (!CollectionUtils.isEmpty(departmentReturnDtos)) {
+                    DepartmentReturnDto departmentReturnDto = null;
+                    List<DepartmentReturnDto> collect = departmentReturnDtos.stream().filter(c -> c.getId().equals(waybillAnomalyDto.getNetworkId())).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(collect)) {
+                        departmentReturnDto = collect.get(0);
+                    }
+                    if (departmentReturnDto != null) {
+                        waybillAnomalyDto.setProjectDeptName(departmentReturnDto.getDepartmentName());
+                    }
                 }
             }
         }

@@ -68,7 +68,7 @@ public class WaybillAnomaly implements Serializable {
     private Integer createUserId;
 
     /**
-     *创建人的类型
+     * 创建人的类型
      */
     private String createUserType;
 
@@ -88,7 +88,7 @@ public class WaybillAnomaly implements Serializable {
     private Date processorTime;
 
     /**
-     * 
+     *
      */
     private Integer auditUserId;
 
@@ -96,6 +96,11 @@ public class WaybillAnomaly implements Serializable {
      * 审核时间
      */
     private Date auditTime;
+
+    /**
+     * 网点id
+     */
+    private Integer networkId;
 
     /**
      * 逻辑删除

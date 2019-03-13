@@ -1,6 +1,7 @@
 package com.jaagro.tms.biz.service;
 
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.dto.base.DepartmentReturnDto;
 import com.jaagro.utils.BaseResponse;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,4 +60,8 @@ public interface UserClientService {
      */
     @GetMapping("/getGlobalUser/{userId}")
     BaseResponse<UserInfo> getGlobalUser(@PathVariable("userId") int userId);
+
+    @PostMapping("/getAllDepartments")
+    List<DepartmentReturnDto> getAllDepartments();
+
 }
