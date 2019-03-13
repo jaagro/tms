@@ -496,7 +496,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     if (!CollectionUtils.isEmpty(collect)) {
                         departmentReturnDto = collect.get(0);
                     }
-                    if (departmentReturnDto != null) {
+                    if (departmentReturnDto != null && departmentReturnDto.getDepartmentName() != null) {
                         waybillAnomalyDto.setProjectDeptName(departmentReturnDto.getDepartmentName());
                     }
                 }
