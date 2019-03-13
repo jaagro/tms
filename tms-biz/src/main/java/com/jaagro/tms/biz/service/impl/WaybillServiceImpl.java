@@ -539,6 +539,14 @@ public class WaybillServiceImpl implements WaybillService {
         if (!StringUtils.isEmpty(waybill.getTruckId())) {
             truckDto = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
         }
+        //派单人
+        ShowUserDto userDto = new ShowUserDto();
+        if (!StringUtils.isEmpty(waybill.getCreatedUserId())) {
+            UserInfo userInfo = this.authClientService.getUserInfoById(waybill.getCreatedUserId(), "employee");
+            if (userInfo != null) {
+                userDto.setUserName(userInfo.getName());
+            }
+        }
         //获取waybillItem列表
         List<GetWaybillItemDto> getWaybillItemsDtoList = new ArrayList<>();
         List<WaybillItems> waybillItemsList = waybillItemsMapper.listWaybillItemsByWaybillId(waybill.getId());
@@ -618,6 +626,7 @@ public class WaybillServiceImpl implements WaybillService {
                 .setNeedTruckType(truckTypeDto)
                 .setTruckId(truckDto)
                 .setDriverId(showDriverDto)
+                .setCreatedUserId(userDto)
                 .setWaybillItems(getWaybillItemsDtoList)
                 .setGoodType(ordersData.getGoodsType())
                 .setTotalQuantity(getWaybillDto.getWaybillItems().stream().mapToInt(GetWaybillItemDto::getTotalQuantity).sum())
