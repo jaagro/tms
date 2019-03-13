@@ -615,6 +615,7 @@ public class WaybillServiceImpl implements WaybillService {
         BeanUtils.copyProperties(waybill, getWaybillDto);
         getWaybillDto
                 .setLoadSite(loadSiteDto)
+                .setNetworkId(waybill.getNetworkId())
                 .setNeedTruckType(truckTypeDto)
                 .setTruckId(truckDto)
                 .setDriverId(showDriverDto)
