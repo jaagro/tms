@@ -1707,6 +1707,7 @@ public class WaybillServiceImpl implements WaybillService {
                 return ServiceResult.toResult(new PageInfo<>(listWaybillDtos));
             }
         }
+        //得到分页列表
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
         listWaybillDtos = waybillMapper.listWaybillByCriteria(criteriaDto);
         if (listWaybillDtos != null && listWaybillDtos.size() > 0) {
@@ -1714,7 +1715,7 @@ public class WaybillServiceImpl implements WaybillService {
             while (dtoIterator.hasNext()) {
                 ListWaybillDto waybillDto = dtoIterator.next();
 
-                if (!StringUtils.isEmpty(criteriaDto.getReceiptStatus()) || waybillDto.getReceiptStatus()==2) {
+                if (!StringUtils.isEmpty(criteriaDto.getReceiptStatus()) || waybillDto.getReceiptStatus() == 2) {
                     waybillDto.setWaybillStatus(WaybillStatus.UNLOAD_RECEIPT);
                 }
 
@@ -1736,6 +1737,13 @@ public class WaybillServiceImpl implements WaybillService {
                         userDto.setUserName(userInfo.getName());
                         waybillDto.setCreatedUserId(userDto);
                     }
+                }
+                //数量 & 重量
+                WaybillGoods goods = waybillGoodsMapper.getUnFinishQuantityAndWeightByWaybillId(waybillDto.getId());
+                if (goods != null) {
+                    waybillDto
+                            .setQuantity(goods.getUnloadQuantity())
+                            .setWeight(goods.getUnloadWeight());
                 }
                 if (waybill.getTruckId() != null) {
                     waybillDto.setTruck(this.truckClientService.getTruckByIdReturnObject(waybill.getTruckId()));
