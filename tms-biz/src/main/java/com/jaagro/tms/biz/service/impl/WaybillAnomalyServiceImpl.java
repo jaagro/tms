@@ -447,7 +447,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     if (!CollectionUtils.isEmpty(collect)) {
                         creatorName = collect.get(0);
                     }
-                    if (creatorName != null) {
+                    if (creatorName != null && creatorName.getName() != null) {
                         waybillAnomalyDto.setCreatorName(creatorName.getName());
                     }
                 }
@@ -459,7 +459,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                     if (!CollectionUtils.isEmpty(collect)) {
                         driverName = collect.get(0);
                     }
-                    if (driverName != null) {
+                    if (driverName != null && driverName.getName() != null) {
                         waybillAnomalyDto.setCreatorName(driverName.getName());
                     }
                 }
@@ -471,7 +471,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 if (!CollectionUtils.isEmpty(collect)) {
                     processUser = collect.get(0);
                 }
-                if (processUser != null) {
+                if (processUser != null && processUser.getName() != null) {
                     waybillAnomalyDto.setProcessorName(processUser.getName());
                 }
             }
@@ -482,7 +482,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
                 if (!CollectionUtils.isEmpty(collect)) {
                     auditName = collect.get(0);
                 }
-                if (auditName != null) {
+                if (auditName != null && auditName.getName() != null) {
                     waybillAnomalyDto.setAuditName(auditName.getName());
                 }
             }
