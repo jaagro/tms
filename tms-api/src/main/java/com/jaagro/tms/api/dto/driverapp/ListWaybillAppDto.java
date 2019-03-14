@@ -150,4 +150,9 @@ public class ListWaybillAppDto implements Serializable {
      * 货物列表
      */
     private List<ShowGoodsDto> goods;
+
+    /**
+     * 备注
+     */
+    private String notes;
 }

@@ -122,4 +122,10 @@ public class ChickenImportRecordDto implements Serializable{
      * 数据校验是否通过
      */
     private Boolean verifyPass;
+
+    /**
+     * 备注信息
+     */
+    @NotBlank(message = "{notes.NotBlank}")
+    private String notes;
 }

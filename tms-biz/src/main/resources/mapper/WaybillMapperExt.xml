@@ -76,7 +76,7 @@
         select wb.id, wb.order_id, wb.load_site_id, wb.truck_team_contract_id, wb.waybill_status, wb.receipt_status,
         wb.need_truck_type,
         wb.truck_id, wb.driver_id, wb.send_time, wb.distance, wb.create_time, wb.created_user_id, wb.modify_time,
-        wb.modify_user_id, wb.enabled, wb.load_time, wb.department_id, wt.create_time trackingDate
+        wb.modify_user_id, wb.enabled, wb.load_time, wb.department_id, wt.create_time trackingDate,wb.notes
         from waybill wb
         inner join waybill_tracking wt
         on (wb.id=wt.waybill_id)

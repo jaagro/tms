@@ -49,6 +49,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -2634,6 +2635,13 @@ public class WaybillServiceImpl implements WaybillService {
         return truckTeamContractId;
     }
 
+    /**
+     * 解析毛鸡导入的内容
+     * @param list
+     * @param preImportChickenRecordDto
+     * @return
+     * @throws ParseException
+     */
     private List<ChickenImportRecordDto> parsingExcel(List<String[]> list, PreImportChickenRecordDto preImportChickenRecordDto) throws ParseException {
         if (!CollectionUtils.isEmpty(list)) {
             List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
@@ -2678,37 +2686,11 @@ public class WaybillServiceImpl implements WaybillService {
                 if (showSiteById != null) {
                     dto.setLoadSiteDeptId(showSiteById.getDeptId());
                 }
-                // 去除车牌号中"大","中","小"
-                String truckNumber = cells[8];
-                if (truckNumber.endsWith("大") || truckNumber.endsWith("中") || truckNumber.endsWith("小")) {
-                    truckNumber = truckNumber.substring(0, truckNumber.length() - 1);
-                }
-                dto.setTruckNumber(truckNumber);
-                BaseResponse<List<ListTruckTypeDto>> response = truckClientService.listTruckTypeByProductName(ProductName.CHICKEN.toString());
-                if (response != null && response.getData() != null) {
-                    response.getData().forEach(listTruckTypeDto -> {
-                        if (listTruckTypeDto.getTruckAmount().equals(dto.getGoodsQuantity() == null ? null : dto.getGoodsQuantity().toString())) {
-                            dto.setTruckTypeId(listTruckTypeDto.getId());
-                            dto.setTruckTypeName(listTruckTypeDto.getTypeName());
-                        }
-                    });
-                }
-                // 校验车牌号合法性
-                BaseResponse<GetTruckDto> res = truckClientService.getByTruckNumber(truckNumber);
-                if (res != null && res.getData() != null) {
-                    GetTruckDto truckDto = res.getData();
-                    ListTruckTypeDto truckTypeDto = truckDto.getTruckTypeId();
-                    if (truckTypeDto == null) {
-                        continue;
-                    }
-                    boolean checkTruckType = ProductName.CHICKEN.toString().equals(truckTypeDto.getProductName()) && (dto.getGoodsQuantity() != null && dto.getGoodsQuantity().toString().equals(truckTypeDto.getTruckAmount()));
-                    if (checkTruckType) {
-                        dto.setVerifyPass(true);
-                    }
-                    dto.setTruckId(truckDto.getId());
-                    // 获取车队合同id
-                    dto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId()));
-                }
+                // 车牌号
+                parsingTruckNumber(cells[8],dto,orders.getGoodsType());
+                // 拼装运单备注信息
+                String notes = parsingNotes(i,cells,list,day);
+                dto.setNotes(notes);
                 chickenImportRecordDtoList.add(dto);
             }
             return chickenImportRecordDtoList;
@@ -2716,6 +2698,112 @@ public class WaybillServiceImpl implements WaybillService {
         return new ArrayList<>();
     }
 
+    private String parsingNotes(int index,String[] cells,List<String[]> list,String day){
+        String newLineFlag = "<br/>";
+        // 栋号
+        String buildingNumber = cells[4];
+        // 车入鸡场时间
+        String enterPlantTime = cells[10];
+        // 卸筐起始时间
+        String unloadBasketTime = cells[11];
+        // 装鸡完毕时间
+        String loadChickenTime = cells[12];
+        // 车辆出场时间
+        String outPlantTime = cells[14];
+        // 入屠宰场时间
+        String enterSlaughterhouseTime = cells[16];
+        // 挂鸡开始时间
+        String hangChickenTime = cells[18];
+        // 上一辆车信息
+        String lastTruckNumber = "";
+        String lastDriverName = "";
+        // 下一辆车信息
+        String nextTruckNumber = "";
+        String nextDriverName = "";
+        // 同栋车辆信息
+        List<String> sameBuildingList = new ArrayList<>();
+        for (int i = 3; i < list.size(); i++) {
+            String[] cellsIn = list.get(i);
+            // 栋号
+            String buildingNumberIn = cellsIn[4];
+            if (i == index - 1){
+                lastTruckNumber = cellsIn[8];
+                lastDriverName = cellsIn[9];
+            }
+            if (i == index + 1){
+                lastTruckNumber = cellsIn[8];
+                lastDriverName = cellsIn[9];
+            }
+            if (buildingNumber.equals(buildingNumberIn)){
+                String truckInfo = cellsIn[8]+"/"+cellsIn[9];
+                sameBuildingList.add(truckInfo);
+            }
+        }
+        StringBuffer result = new StringBuffer();
+        result.append("时间排程").append(newLineFlag)
+                .append("栋号: ").append(buildingNumber).append(newLineFlag)
+                .append("车入鸡场时间: ").append(day).append(" ").append(enterPlantTime).append(newLineFlag)
+                .append("卸筐起始时间: ").append(day).append(" ").append(unloadBasketTime).append(newLineFlag)
+                .append("装鸡完毕时间: ").append(day).append(" ").append(loadChickenTime).append(newLineFlag)
+                .append("车辆出场时间: ").append(day).append(" ").append(outPlantTime).append(newLineFlag)
+                .append("入屠宰场时间: ").append(day).append(" ").append(enterSlaughterhouseTime).append(newLineFlag)
+                .append("挂鸡开始时间: ").append(day).append(" ").append(hangChickenTime).append(newLineFlag)
+                .append(newLineFlag)
+                .append("相邻司机").append(newLineFlag)
+                .append("上一车: ").append(lastTruckNumber).append("/").append(lastDriverName).append(newLineFlag)
+                .append("下一车: ").append(nextTruckNumber).append("/").append(nextDriverName).append(newLineFlag)
+                .append(newLineFlag)
+                .append("同栋司机(按顺序)");
+        for (int i = 0; i < sameBuildingList.size(); i++){
+            result.append("第").append(i+1).append("辆:").append(sameBuildingList.get(i));
+        }
+        return result.toString();
+    }
+    /**
+     * 车牌号转换及校验合法性
+     * @param truckNumber
+     * @param dto
+     * @param goodsType
+     */
+    private void parsingTruckNumber(String truckNumber,ChickenImportRecordDto dto,Integer goodsType){
+        // 去除车牌号中"大","中","小"
+        String truckTypeBig = "大";
+        String truckTypeMedium = "中";
+        String truckTypeSmall = "小";
+        if (truckNumber.endsWith(truckTypeBig) || truckNumber.endsWith(truckTypeMedium) || truckNumber.endsWith(truckTypeSmall)) {
+            truckNumber = truckNumber.substring(0, truckNumber.length() - 1);
+        }
+        dto.setTruckNumber(truckNumber);
+        BaseResponse<List<ListTruckTypeDto>> response = truckClientService.listTruckTypeByProductName(ProductName.CHICKEN.toString());
+        if (response != null && response.getData() != null) {
+            response.getData().forEach(listTruckTypeDto -> {
+                if (listTruckTypeDto.getTruckAmount().equals(dto.getGoodsQuantity() == null ? null : dto.getGoodsQuantity().toString())) {
+                    dto.setTruckTypeId(listTruckTypeDto.getId());
+                    dto.setTruckTypeName(listTruckTypeDto.getTypeName());
+                }
+            });
+        }
+        // 校验车牌号合法性
+        BaseResponse<GetTruckDto> res = truckClientService.getByTruckNumber(truckNumber);
+        if (res != null && res.getData() != null) {
+            GetTruckDto truckDto = res.getData();
+            ListTruckTypeDto truckTypeDto = truckDto.getTruckTypeId();
+            if (truckTypeDto != null) {
+                boolean checkTruckType = ProductName.CHICKEN.toString().equals(truckTypeDto.getProductName()) && (dto.getGoodsQuantity() != null && dto.getGoodsQuantity().toString().equals(truckTypeDto.getTruckAmount()));
+                if (checkTruckType) {
+                    dto.setVerifyPass(true);
+                }
+                dto.setTruckId(truckDto.getId());
+                // 获取车队合同id
+                dto.setTruckTeamContractId(getTruckTeamContractId(goodsType, truckDto.getTruckTeamId()));
+            }
+        }
+    }
+
+    /**
+     * 判断订单是否可以做毛鸡导入
+     * @param orderId
+     */
     private void judgeOrderForChickenImport(Integer orderId) {
         // 判断订单状态
         Orders orders = ordersMapper.selectByPrimaryKey(orderId);
@@ -2730,6 +2818,10 @@ public class WaybillServiceImpl implements WaybillService {
         }
     }
 
+    /**
+     * 将毛鸡导入信息存入redis
+     * @param chickenImportRecordDtoList
+     */
     private void putChickenImportRecordToRedis(List<ChickenImportRecordDto> chickenImportRecordDtoList) {
         if (!CollectionUtils.isEmpty(chickenImportRecordDtoList)) {
             HashOperations<String, Object, Object> opsForHash = objectRedisTemplate.opsForHash();
@@ -2744,6 +2836,11 @@ public class WaybillServiceImpl implements WaybillService {
         }
     }
 
+    /**
+     * 将map信息解析成dto
+     * @param map
+     * @return
+     */
     private List<ChickenImportRecordDto> getChickenImportRecordDtoListFromMap(Map<Object, Object> map) {
         List<ChickenImportRecordDto> chickenImportRecordDtoList = new ArrayList<>();
         Set<Object> ketSet = map.keySet();
