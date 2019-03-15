@@ -2633,10 +2633,10 @@ public class WaybillServiceImpl implements WaybillService {
                         result.append("下一车: ").append(nextTruckNumber).append("/").append(nextDriverName).append(newLineFlag);
                     }
                     result.append(newLineFlag);
-                    result.append("同栋司机(按顺序)");
+                    result.append("同栋司机(按顺序)").append(newLineFlag);
             if (!CollectionUtils.isEmpty(sameBuildingList)) {
                 for (int i = 0; i < sameBuildingList.size(); i++){
-                    result.append("第").append(i+1).append("辆:").append(sameBuildingList.get(i));
+                    result.append("第").append(i+1).append("辆:").append(sameBuildingList.get(i)).append(newLineFlag);
                 }
             }
             dto.setNotes(result.toString());
