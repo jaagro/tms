@@ -2630,7 +2630,7 @@ public class WaybillServiceImpl implements WaybillService {
                         result.append("上一车: ").append(lastTruckNumber).append("/").append(lastDriverName).append(newLineFlag);
                     }
                     if (StringUtils.hasText(nextTruckNumber) && StringUtils.hasText(nextDriverName)){
-                        result.append("下一车: ").append(nextTruckNumber).append("/").append(nextDriverName).append(newLineFlag)
+                        result.append("下一车: ").append(nextTruckNumber).append("/").append(nextDriverName).append(newLineFlag);
                     }
                     result.append(newLineFlag);
                     result.append("同栋司机(按顺序)");
