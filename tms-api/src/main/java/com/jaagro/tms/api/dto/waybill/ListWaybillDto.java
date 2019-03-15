@@ -85,4 +85,19 @@ public class ListWaybillDto implements Serializable {
      * 货物类型
      */
     private Integer goodsType;
+
+    /**
+     * 数量
+     */
+    private Integer quantity;
+
+    /**
+     * 重量
+     */
+    private BigDecimal weight;
+
+    /**
+     *
+     */
+    private Integer networkId;
 }

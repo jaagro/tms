@@ -1,11 +1,13 @@
 package com.jaagro.tms.biz.service.impl;
 
+import com.jaagro.tms.api.constant.GoodsType;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.service.OrderGoodsService;
 import com.jaagro.tms.api.service.OrderItemsService;
 import com.jaagro.tms.biz.entity.OrderGoodsMargin;
 import com.jaagro.tms.biz.entity.OrderItems;
+import com.jaagro.tms.biz.entity.Orders;
 import com.jaagro.tms.biz.mapper.OrderGoodsMapperExt;
 import com.jaagro.tms.biz.mapper.OrderGoodsMarginMapperExt;
 import com.jaagro.tms.biz.mapper.OrderItemsMapperExt;
@@ -54,9 +56,18 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         OrderItems orderItem = new OrderItems();
         BeanUtils.copyProperties(orderItemDto, orderItem);
         this.orderItemsMapper.insertSelective(orderItem);
+        Orders order = ordersMapper.selectByPrimaryKey(orderItem.getOrderId());
+        if (order == null) {
+            throw new NullPointerException("订单不存在");
+        }
         if (orderItemDto.getGoods() != null && orderItemDto.getGoods().size() > 0) {
             for (CreateOrderGoodsDto goodsDto : orderItemDto.getGoods()
             ) {
+//                if (GoodsType.FODDER.equals(order.getGoodsType())) {
+//                    if (StringUtils.isEmpty(goodsDto.getFeedType())) {
+//                        throw new NullPointerException("饲料类型不能为空");
+//                    }
+//                }
                 goodsDto
                         .setId(null)
                         .setOrderItemId(orderItem.getId())

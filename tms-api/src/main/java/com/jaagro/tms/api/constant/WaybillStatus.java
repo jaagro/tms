@@ -15,6 +15,6 @@ public final class WaybillStatus {
     public static final String REJECT = "已拒单";
     public static final String CANCEL = "已取消";
     public static final String ABANDON = "已作废";
-    public static final String UNLOAD_RECEIPT="已补录";
+    public static final String UNLOAD_RECEIPT = "已补录";
 
 }

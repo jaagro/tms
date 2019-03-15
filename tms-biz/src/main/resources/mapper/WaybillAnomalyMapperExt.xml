@@ -7,7 +7,7 @@
         select
         wa.id, wa.waybill_id, wa.anomaly_type_id, wa.anomaly_desc, wa.processing_status, wa.processing_desc,
         wa.audit_status, wa.audit_desc, wa.verified_status, wa.adjust_status, wa.create_user_id,wa.create_user_type,
-        wa.create_time,
+        wa.create_time,wa.network_id,
         wa.processor_user_id, wa.processor_time, wa.audit_user_id, wa.audit_time,
         wat.type_name
         from waybill_anomaly wa
@@ -41,13 +41,18 @@
         <if test="audit == 1">
             and wa.audit_status in("已通过","待审核","已拒绝")
         </if>
+        <if test="networkIds != null and networkIds.size() > 0">
+            and wa.network_id in
+            <foreach collection="networkIds" open="(" separator="," close=")" item="did">
+                ${did}
+            </foreach>
+        </if>
         <if test="audit == 1">
-            order by FIELD(audit_status,'待审核','已通过','已拒绝'),wa.audit_time desc
+            order by FIELD(audit_status,'待审核','已通过','已拒绝'),wa.processor_time desc
         </if>
         <if test="audit == 2">
-            order by FIELD(processing_status,'待处理','已处理','审核中','已结束','已作废') ,wa.processor_time desc
+            order by FIELD(processing_status,'待处理','已处理','审核中','已结束','已作废') ,wa.create_time desc
         </if>
-
     </select>
 
     <update id="batchUpdateByPrimaryKeySelective" parameterType="list">
@@ -179,11 +184,11 @@
         </foreach>
     </update>
     <select id="listWaybillAnomalyByWaybillId" resultType="com.jaagro.tms.api.dto.anomaly.WaybillAnomalyDto"
-            parameterType="com.jaagro.tms.api.dto.anomaly.WaybillAnomalyCondition" >
+            parameterType="com.jaagro.tms.api.dto.anomaly.WaybillAnomalyCondition">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from waybill_anomaly
-        where enabled = 1  and processing_status !='已结束'
+        where enabled = 1 and processing_status !='已结束'
         <if test="waybillId != null and waybillId!=''">
             and waybill_id = #{waybillId}
         </if>

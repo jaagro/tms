@@ -73,7 +73,20 @@
         </if>
         GROUP BY o.id
         <if test="differentiateStatus == null">
-            order by o.load_time desc
+            order by
+            CASE
+            WHEN o.order_status LIKE '%已下单%' THEN
+            1
+            WHEN o.order_status LIKE '%已配载%' THEN
+            2
+            WHEN o.order_status LIKE '%运输中%' THEN
+            3
+            WHEN o.order_status LIKE '%已完成%' THEN
+            4
+            WHEN o.order_status LIKE '%取消%' THEN
+            5
+            END,
+            o.load_time desc
         </if>
         <if test="differentiateStatus != null and differentiateStatus == 'WeChat'">
             order by o.create_time desc

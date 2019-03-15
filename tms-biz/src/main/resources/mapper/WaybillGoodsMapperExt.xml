@@ -190,7 +190,13 @@
         sum( unload_quantity ) as unload_quantity,
 	    sum( unload_weight ) as unload_weight
         from waybill_goods
-        where waybill_id = #{waybillId,jdbcType=INTEGER} and enabled=1
+        where waybill_id = #{waybillId,jdbcType=INTEGER} and enabled = 1
     </select>
-
+    <select id="getUnFinishQuantityAndWeightByWaybillId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        sum( goods_quantity ) as unload_quantity,
+	    sum( goods_weight ) as unload_weight
+        from waybill_goods
+        where waybill_id = #{waybillId,jdbcType=INTEGER} and enabled = 1
+    </select>
 </mapper>

@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author @Gao.
@@ -66,7 +67,12 @@ public class WaybillAnomalyCondition implements Serializable {
      */
     private String auditStatus;
     /**
-     *主要用于查询待审核数据
+     * 主要用于查询待审核数据
      */
     private Integer audit;
+
+    /**
+     * 网点集合
+     */
+    private List<Integer> networkIds;
 }

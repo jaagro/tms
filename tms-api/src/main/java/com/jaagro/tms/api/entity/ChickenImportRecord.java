@@ -115,4 +115,8 @@ public class ChickenImportRecord implements Serializable{
      */
     private Integer modifyUserId;
 
+    /**
+     * 备注
+     */
+    private String notes;
 }
