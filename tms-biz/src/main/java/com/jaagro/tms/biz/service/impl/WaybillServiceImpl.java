@@ -2591,7 +2591,7 @@ public class WaybillServiceImpl implements WaybillService {
             // 挂鸡开始时间
             String hangChickenTime = dto.getHangChickenTime();
             // 换行标识
-            String newLineFlag = "\\n";
+            String newLineFlag = "\n";
             // 上辆车车牌号
             String lastTruckNumber = "";
             // 上辆车四季名城
