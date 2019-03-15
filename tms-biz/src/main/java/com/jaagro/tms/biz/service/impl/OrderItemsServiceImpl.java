@@ -63,11 +63,11 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         if (orderItemDto.getGoods() != null && orderItemDto.getGoods().size() > 0) {
             for (CreateOrderGoodsDto goodsDto : orderItemDto.getGoods()
             ) {
-                if (GoodsType.FODDER.equals(order.getGoodsType())) {
-                    if (StringUtils.isEmpty(goodsDto.getFeedType())) {
-                        throw new NullPointerException("饲料类型不能为空");
-                    }
-                }
+//                if (GoodsType.FODDER.equals(order.getGoodsType())) {
+//                    if (StringUtils.isEmpty(goodsDto.getFeedType())) {
+//                        throw new NullPointerException("饲料类型不能为空");
+//                    }
+//                }
                 goodsDto
                         .setId(null)
                         .setOrderItemId(orderItem.getId())
