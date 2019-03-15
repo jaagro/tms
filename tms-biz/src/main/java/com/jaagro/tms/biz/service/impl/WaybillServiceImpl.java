@@ -308,10 +308,6 @@ public class WaybillServiceImpl implements WaybillService {
         Orders orders = ordersMapper.selectByPrimaryKey(dto.getOrderId());
         HashOperations<String, Object, Object> opsForHash = objectRedisTemplate.opsForHash();
         String key = CHICKEN_IMPORT + dto.getOrderId();
-        Map<Object, Object> entries = opsForHash.entries(key);
-        if (CollectionUtils.isEmpty(entries)) {
-            throw new RuntimeException("操作超时了,请重新导入");
-        }
         Object object = opsForHash.get(key, dto.getSerialNumber().toString());
         if (object != null) {
             ChickenImportRecordDto chickenImportRecordDto = (ChickenImportRecordDto) object;
@@ -332,6 +328,10 @@ public class WaybillServiceImpl implements WaybillService {
                 chickenImportRecordDto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId()));
                 opsForHash.put(key, dto.getSerialNumber().toString(), chickenImportRecordDto);
             }
+        }
+        Map<Object, Object> entries = opsForHash.entries(key);
+        if (CollectionUtils.isEmpty(entries)) {
+            throw new RuntimeException("操作超时了,请重新导入");
         }
         return getChickenImportRecordDtoListFromMap(entries);
     }
