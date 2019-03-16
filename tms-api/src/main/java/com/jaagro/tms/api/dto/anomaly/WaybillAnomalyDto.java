@@ -128,4 +128,14 @@ public class WaybillAnomalyDto implements Serializable {
      * 审核人
      */
     private String auditName;
+
+    /**
+     * 网点id
+     */
+    private Integer networkId;
+
+    /**
+     * 项目部名称
+     */
+    private String projectDeptName;
 }

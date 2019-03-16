@@ -17,6 +17,7 @@
     <result column="goods_quantity" jdbcType="INTEGER" property="goodsQuantity" />
     <result column="load_time" jdbcType="TIMESTAMP" property="loadTime" />
     <result column="required_time" jdbcType="TIMESTAMP" property="requiredTime" />
+    <result column="notes" jdbcType="VARCHAR" property="notes" />
     <result column="enable" jdbcType="TINYINT" property="enable" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="create_user_id" jdbcType="INTEGER" property="createUserId" />
@@ -26,7 +27,7 @@
   <sql id="Base_Column_List">
     id, order_id, customer_id, customer_name, load_site_id, load_site_name, load_site_dept_id, 
     truck_id, truck_number, truck_team_contract_id, truck_type_id, truck_type_name, goods_quantity, 
-    load_time, required_time, enable, create_time, create_user_id, modify_time, modify_user_id
+    load_time, required_time, notes, enable, create_time, create_user_id, modify_time, modify_user_id
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -43,14 +44,14 @@
       customer_name, load_site_id, load_site_name, 
       load_site_dept_id, truck_id, truck_number, 
       truck_team_contract_id, truck_type_id, truck_type_name, 
-      goods_quantity, load_time, required_time, 
+      goods_quantity, load_time, required_time, notes,
       enable, create_time, create_user_id, 
       modify_time, modify_user_id)
     values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, #{customerId,jdbcType=INTEGER}, 
       #{customerName,jdbcType=VARCHAR}, #{loadSiteId,jdbcType=INTEGER}, #{loadSiteName,jdbcType=VARCHAR}, 
       #{loadSiteDeptId,jdbcType=INTEGER}, #{truckId,jdbcType=INTEGER}, #{truckNumber,jdbcType=VARCHAR}, 
       #{truckTeamContractId,jdbcType=INTEGER}, #{truckTypeId,jdbcType=INTEGER}, #{truckTypeName,jdbcType=VARCHAR}, 
-      #{goodsQuantity,jdbcType=INTEGER}, #{loadTime,jdbcType=TIMESTAMP}, #{requiredTime,jdbcType=TIMESTAMP}, 
+      #{goodsQuantity,jdbcType=INTEGER}, #{loadTime,jdbcType=TIMESTAMP}, #{requiredTime,jdbcType=TIMESTAMP}, #{notes,jdbcType=VARCHAR},
       #{enable,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{createUserId,jdbcType=INTEGER}, 
       #{modifyTime,jdbcType=TIMESTAMP}, #{modifyUserId,jdbcType=INTEGER})
   </insert>
@@ -101,6 +102,9 @@
       </if>
       <if test="requiredTime != null">
         required_time,
+      </if>
+      <if test="notes != null">
+        notes,
       </if>
       <if test="enable != null">
         enable,
@@ -164,6 +168,9 @@
       <if test="requiredTime != null">
         #{requiredTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="notes != null">
+        #{notes,jdbcType=VARCHAR},
+      </if>
       <if test="enable != null">
         #{enable,jdbcType=TINYINT},
       </if>
@@ -226,6 +233,9 @@
       <if test="requiredTime != null">
         required_time = #{requiredTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="notes != null">
+        notes = #{notes,jdbcType=VARCHAR},
+      </if>
       <if test="enable != null">
         enable = #{enable,jdbcType=TINYINT},
       </if>
@@ -260,6 +270,7 @@
       goods_quantity = #{goodsQuantity,jdbcType=INTEGER},
       load_time = #{loadTime,jdbcType=TIMESTAMP},
       required_time = #{requiredTime,jdbcType=TIMESTAMP},
+      notes = #{notes,jdbcType=VARCHAR},
       enable = #{enable,jdbcType=TINYINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       create_user_id = #{createUserId,jdbcType=INTEGER},

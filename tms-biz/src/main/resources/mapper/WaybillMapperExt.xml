@@ -76,7 +76,7 @@
         select wb.id, wb.order_id, wb.load_site_id, wb.truck_team_contract_id, wb.waybill_status, wb.receipt_status,
         wb.need_truck_type,
         wb.truck_id, wb.driver_id, wb.send_time, wb.distance, wb.create_time, wb.created_user_id, wb.modify_time,
-        wb.modify_user_id, wb.enabled, wb.load_time, wb.department_id, wt.create_time trackingDate
+        wb.modify_user_id, wb.enabled, wb.load_time, wb.department_id, wt.create_time trackingDate,wb.notes
         from waybill wb
         inner join waybill_tracking wt
         on (wb.id=wt.waybill_id)
@@ -160,6 +160,33 @@
         from waybill
         where order_id = #{orderId, jdbcType=INTEGER}
         and enabled = 1
+        ORDER BY
+        CASE
+            WHEN waybill_status LIKE '%待派单%' THEN
+            1
+            WHEN waybill_status LIKE '%已拒单%' THEN
+            2
+            WHEN waybill_status LIKE '%待接单%' THEN
+            3
+            WHEN waybill_status LIKE '%待出发%' THEN
+            4
+            WHEN waybill_status LIKE '%前往装货地%' THEN
+            5
+            WHEN waybill_status LIKE '%待装货%' THEN
+            6
+            WHEN waybill_status LIKE '%待送达%' THEN
+            7
+            WHEN waybill_status LIKE '%待签收%' THEN
+            8
+            WHEN waybill_status LIKE '%已完成%' THEN
+            9
+            WHEN waybill_status LIKE '%已取消%' THEN
+            10
+            WHEN waybill_status LIKE '%已作废%' THEN
+            11
+            WHEN waybill_status LIKE '%已补录%' THEN
+            12
+        END
     </select>
     <select id="listWaybillByCriteria" parameterType="com.jaagro.tms.api.dto.waybill.ListWaybillCriteriaDto"
             resultMap="ReturnMap">
@@ -357,10 +384,15 @@
     <select id="listWaybillByStatus" resultMap="DetailInfo"
             parameterType="com.jaagro.tms.api.dto.waybill.ReceiptListParamDto">
         select
-        <include refid="Base_Column_List"/>
-        from (
+        id, order_id, load_site_id, truck_team_contract_id, waybill_status,
+        receipt_status,need_truck_type, truck_id, driver_id, send_time, distance,
+        create_time, created_user_id, modify_time, modify_user_id, enabled,load_time,
+        department_id, network_id from (
         select
-        <include refid="Base_Column_List"/>
+        id, order_id, load_site_id, truck_team_contract_id, waybill_status,
+        receipt_status,need_truck_type, truck_id, driver_id, send_time, distance,
+        create_time, created_user_id, modify_time, modify_user_id, enabled,load_time,
+        department_id, network_id
         from waybill
         where enabled=1 and waybill_status='待接单'
         <if test="waybillStatus != null">

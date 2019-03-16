@@ -8,11 +8,11 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * @Author gavin
+ * @author yj
  */
 @Data
 @Accessors(chain = true)
-public class Waybill implements Serializable {
+public class Waybill implements Serializable{
     /**
      * 
      */
@@ -107,5 +107,10 @@ public class Waybill implements Serializable {
      * 客户网点
      */
     private Integer networkId;
+
+    /**
+     * 备注
+     */
+    private String notes;
 
 }

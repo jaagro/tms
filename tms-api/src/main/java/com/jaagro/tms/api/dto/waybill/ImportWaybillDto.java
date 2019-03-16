@@ -86,4 +86,9 @@ public class ImportWaybillDto implements Serializable {
      * 要求送达时间
      */
     private Date requiredTime;
+
+    /**
+     * 运单备注
+     */
+    private String notes;
 }
