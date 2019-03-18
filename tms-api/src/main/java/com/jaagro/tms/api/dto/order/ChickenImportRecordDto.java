@@ -128,4 +128,37 @@ public class ChickenImportRecordDto implements Serializable{
      */
     @NotBlank(message = "{notes.NotBlank}")
     private String notes;
+
+    /**
+     * 栋号
+     */
+    private String buildingNumber;
+    /**
+     * 车入鸡场时间
+     */
+    private String enterPlantTime;
+    /**
+     * 卸筐起始时间
+     */
+    private String unloadBasketTime;
+    /**
+     * 装鸡完毕时间
+     */
+    private String loadChickenTime;
+    /**
+     * 车辆出场时间
+     */
+   private String outPlantTime;
+    /**
+     * 入屠宰场时间
+     */
+    private String enterSlaughterhouseTime;
+    /**
+     * 挂鸡开始时间
+     */
+    private String hangChickenTime;
+    /**
+     * 司机名称
+     */
+    private String driverName;
 }

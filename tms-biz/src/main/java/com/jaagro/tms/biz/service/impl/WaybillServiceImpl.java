@@ -49,7 +49,6 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -180,6 +179,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setModifyUserId(userId);
             waybill.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
             waybill.setNetworkId(importWaybillDto.getLoadSiteDeptId());
+            waybill.setNotes(importWaybillDto.getNotes());
             waybillMapper.insertSelective(waybill);
             int waybillId = waybill.getId();
 
@@ -319,6 +319,9 @@ public class WaybillServiceImpl implements WaybillService {
                 }
                 chickenImportRecordDto.setTruckNumber(dto.getTruckNumber());
                 chickenImportRecordDto.setTruckId(truckDto.getId());
+                if (!CollectionUtils.isEmpty(truckDto.getDrivers())) {
+                    chickenImportRecordDto.setDriverName(truckDto.getDrivers().get(0).getName());
+                }
                 // 获取车队合同id
                 chickenImportRecordDto.setTruckTeamContractId(getTruckTeamContractId(orders.getGoodsType(), truckDto.getTruckTeamId()));
                 opsForHash.put(key, dto.getSerialNumber().toString(), chickenImportRecordDto);
@@ -407,8 +410,9 @@ public class WaybillServiceImpl implements WaybillService {
         }
         Integer userId = getUserId();
         //更新orders表的状态OrderStatus.STOWAGE
+        Integer orderId = 0;
         for (CreateWaybillDto createWaybillDto : waybillDtoList) {
-            Integer orderId = createWaybillDto.getOrderId();
+            orderId = createWaybillDto.getOrderId();
             Orders orders = new Orders();
             orders.setId(orderId);
             orders.setOrderStatus(OrderStatus.STOWAGE);
@@ -417,6 +421,8 @@ public class WaybillServiceImpl implements WaybillService {
             ordersMapper.updateByPrimaryKeySelective(orders);
             break;
         }
+        Orders orders = ordersMapper.selectByPrimaryKey(orderId);
+        int newWorkId = orders.getNetworkId();
         for (CreateWaybillDto createWaybillDto : waybillDtoList) {
             if (StringUtils.isEmpty(createWaybillDto.getLoadSiteId())) {
                 throw new NullPointerException("装货地id为空");
@@ -425,7 +431,6 @@ public class WaybillServiceImpl implements WaybillService {
             if (showSiteDto == null) {
                 throw new RuntimeException("装货地不存在");
             }
-            Integer orderId = createWaybillDto.getOrderId();
             Waybill waybill = new Waybill();
             waybill.setOrderId(orderId);
             waybill.setLoadSiteId(createWaybillDto.getLoadSiteId());
@@ -435,7 +440,7 @@ public class WaybillServiceImpl implements WaybillService {
             waybill.setCreateTime(new Date());
             waybill.setCreatedUserId(userId);
             waybill.setDepartmentId(currentUserService.getCurrentUser().getDepartmentId());
-            waybill.setNetworkId(showSiteDto.getDeptId());
+            waybill.setNetworkId(newWorkId);
             waybillMapper.insertSelective(waybill);
             int waybillId = waybill.getId();
             List<CreateWaybillItemsDto> waybillItemsList = createWaybillDto.getWaybillItems();
@@ -2544,7 +2549,8 @@ public class WaybillServiceImpl implements WaybillService {
                 if (dto.getVerifyPass() == null || !dto.getVerifyPass()) {
                     throw new RuntimeException("有无效车牌，请重新确认");
                 }
-
+                // 拼装备注信息
+                setImportChickenWaybillNotes(dto, chickenImportRecordDtoValidList);
                 ChickenImportRecord record = new ChickenImportRecord();
                 ImportWaybillDto importWaybillDto = new ImportWaybillDto();
                 BeanUtils.copyProperties(dto, importWaybillDto);
@@ -2563,6 +2569,77 @@ public class WaybillServiceImpl implements WaybillService {
             objectRedisTemplate.delete(key);
         } else {
             throw new RuntimeException("导入失败");
+        }
+    }
+
+    private void setImportChickenWaybillNotes(ChickenImportRecordDto dto, List<ChickenImportRecordDto> chickenImportRecordDtoList) {
+        if (dto != null && !CollectionUtils.isEmpty(chickenImportRecordDtoList)) {
+            // 栋号
+            String buildingNumber = dto.getBuildingNumber();
+            // 序号
+            Integer serialNumber = dto.getSerialNumber();
+            // 车入鸡场时间
+            String enterPlantTime = dto.getEnterPlantTime();
+            // 卸筐起始时间
+            String unloadBasketTime = dto.getUnloadBasketTime();
+            // 装鸡时间
+            String loadChickenTime = dto.getLoadChickenTime();
+            // 车辆出场时间
+            String outPlantTime = dto.getOutPlantTime();
+            // 入屠宰场时间
+            String enterSlaughterhouseTime = dto.getEnterSlaughterhouseTime();
+            // 挂鸡开始时间
+            String hangChickenTime = dto.getHangChickenTime();
+            // 换行标识
+            String newLineFlag = "\n";
+            // 上辆车车牌号
+            String lastTruckNumber = "";
+            // 上辆车四季名城
+            String lastDriverName = "";
+            // 下辆车车牌号
+            String nextTruckNumber = "";
+            // 下辆车司机名称
+            String nextDriverName = "";
+            // 同栋司机列表
+            List<String> sameBuildingList = new ArrayList<>();
+            for (ChickenImportRecordDto dtoIn : chickenImportRecordDtoList) {
+                if (dtoIn.getSerialNumber() != null && dtoIn.getSerialNumber().equals(serialNumber - 1)) {
+                    lastDriverName = dtoIn.getDriverName();
+                    lastTruckNumber = dtoIn.getTruckNumber();
+                }
+                if (dtoIn.getSerialNumber() != null && dtoIn.getSerialNumber().equals(serialNumber + 1)) {
+                    nextDriverName = dtoIn.getDriverName();
+                    nextTruckNumber = dtoIn.getTruckNumber();
+                }
+                if (dto.getBuildingNumber() != null && dto.getBuildingNumber().equals(dtoIn.getBuildingNumber())) {
+                    sameBuildingList.add(dtoIn.getTruckNumber() + "/" + dtoIn.getDriverName());
+                }
+            }
+            StringBuffer result = new StringBuffer();
+            result.append("时间排程").append(newLineFlag)
+                    .append("栋号: ").append(buildingNumber).append(newLineFlag)
+                    .append("车入鸡场时间: ").append(enterPlantTime).append(newLineFlag)
+                    .append("卸筐起始时间: ").append(unloadBasketTime).append(newLineFlag)
+                    .append("装鸡完毕时间: ").append(loadChickenTime).append(newLineFlag)
+                    .append("车辆出场时间: ").append(outPlantTime).append(newLineFlag)
+                    .append("入屠宰场时间: ").append(enterSlaughterhouseTime).append(newLineFlag)
+                    .append("挂鸡开始时间: ").append(hangChickenTime).append(newLineFlag)
+                    .append(newLineFlag)
+                    .append("相邻司机").append(newLineFlag);
+            if (StringUtils.hasText(lastTruckNumber) && StringUtils.hasText(lastDriverName)) {
+                result.append("上一车: ").append(lastTruckNumber).append("/").append(lastDriverName).append(newLineFlag);
+            }
+            if (StringUtils.hasText(nextTruckNumber) && StringUtils.hasText(nextDriverName)) {
+                result.append("下一车: ").append(nextTruckNumber).append("/").append(nextDriverName).append(newLineFlag);
+            }
+            result.append(newLineFlag);
+            result.append("同栋司机(按顺序)").append(newLineFlag);
+            if (!CollectionUtils.isEmpty(sameBuildingList)) {
+                for (int i = 0; i < sameBuildingList.size(); i++) {
+                    result.append("第").append(i + 1).append("辆:").append(sameBuildingList.get(i)).append(newLineFlag);
+                }
+            }
+            dto.setNotes(result.toString());
         }
     }
 
@@ -2637,6 +2714,7 @@ public class WaybillServiceImpl implements WaybillService {
 
     /**
      * 解析毛鸡导入的内容
+     *
      * @param list
      * @param preImportChickenRecordDto
      * @return
@@ -2675,6 +2753,8 @@ public class WaybillServiceImpl implements WaybillService {
                 // 要求送达时间(入屠宰场时间)
                 Date requiredTime = sdf.parse(day + " " + cells[16]);
                 dto.setRequiredTime(requiredTime);
+                // 司机名称
+                dto.setDriverName(cells[7]);
                 // 货物数量(单车筐数)
                 String quantity = cells[20];
                 if (StringUtils.hasText(quantity)) {
@@ -2687,10 +2767,9 @@ public class WaybillServiceImpl implements WaybillService {
                     dto.setLoadSiteDeptId(showSiteById.getDeptId());
                 }
                 // 车牌号
-                parsingTruckNumber(cells[8],dto,orders.getGoodsType());
-                // 拼装运单备注信息
-                String notes = parsingNotes(i,cells,list,day);
-                dto.setNotes(notes);
+                parsingTruckNumber(cells[8], dto, orders.getGoodsType());
+                // 设置拼装备注需要的信息
+                parsingOthers(cells, day, dto);
                 chickenImportRecordDtoList.add(dto);
             }
             return chickenImportRecordDtoList;
@@ -2698,8 +2777,7 @@ public class WaybillServiceImpl implements WaybillService {
         return new ArrayList<>();
     }
 
-    private String parsingNotes(int index,String[] cells,List<String[]> list,String day){
-        String newLineFlag = "<br/>";
+    private void parsingOthers(String[] cells, String day, ChickenImportRecordDto dto) {
         // 栋号
         String buildingNumber = cells[4];
         // 车入鸡场时间
@@ -2714,58 +2792,23 @@ public class WaybillServiceImpl implements WaybillService {
         String enterSlaughterhouseTime = cells[16];
         // 挂鸡开始时间
         String hangChickenTime = cells[18];
-        // 上一辆车信息
-        String lastTruckNumber = "";
-        String lastDriverName = "";
-        // 下一辆车信息
-        String nextTruckNumber = "";
-        String nextDriverName = "";
-        // 同栋车辆信息
-        List<String> sameBuildingList = new ArrayList<>();
-        for (int i = 3; i < list.size(); i++) {
-            String[] cellsIn = list.get(i);
-            // 栋号
-            String buildingNumberIn = cellsIn[4];
-            if (i == index - 1){
-                lastTruckNumber = cellsIn[8];
-                lastDriverName = cellsIn[9];
-            }
-            if (i == index + 1){
-                lastTruckNumber = cellsIn[8];
-                lastDriverName = cellsIn[9];
-            }
-            if (buildingNumber.equals(buildingNumberIn)){
-                String truckInfo = cellsIn[8]+"/"+cellsIn[9];
-                sameBuildingList.add(truckInfo);
-            }
-        }
-        StringBuffer result = new StringBuffer();
-        result.append("时间排程").append(newLineFlag)
-                .append("栋号: ").append(buildingNumber).append(newLineFlag)
-                .append("车入鸡场时间: ").append(day).append(" ").append(enterPlantTime).append(newLineFlag)
-                .append("卸筐起始时间: ").append(day).append(" ").append(unloadBasketTime).append(newLineFlag)
-                .append("装鸡完毕时间: ").append(day).append(" ").append(loadChickenTime).append(newLineFlag)
-                .append("车辆出场时间: ").append(day).append(" ").append(outPlantTime).append(newLineFlag)
-                .append("入屠宰场时间: ").append(day).append(" ").append(enterSlaughterhouseTime).append(newLineFlag)
-                .append("挂鸡开始时间: ").append(day).append(" ").append(hangChickenTime).append(newLineFlag)
-                .append(newLineFlag)
-                .append("相邻司机").append(newLineFlag)
-                .append("上一车: ").append(lastTruckNumber).append("/").append(lastDriverName).append(newLineFlag)
-                .append("下一车: ").append(nextTruckNumber).append("/").append(nextDriverName).append(newLineFlag)
-                .append(newLineFlag)
-                .append("同栋司机(按顺序)");
-        for (int i = 0; i < sameBuildingList.size(); i++){
-            result.append("第").append(i+1).append("辆:").append(sameBuildingList.get(i));
-        }
-        return result.toString();
+        dto.setBuildingNumber(buildingNumber)
+                .setEnterPlantTime(day + " " + enterPlantTime)
+                .setUnloadBasketTime(day + " " + unloadBasketTime)
+                .setLoadChickenTime(day + " " + loadChickenTime)
+                .setOutPlantTime(day + " " + outPlantTime)
+                .setEnterSlaughterhouseTime(day + " " + enterSlaughterhouseTime)
+                .setHangChickenTime(day + " " + hangChickenTime);
     }
+
     /**
      * 车牌号转换及校验合法性
+     *
      * @param truckNumber
      * @param dto
      * @param goodsType
      */
-    private void parsingTruckNumber(String truckNumber,ChickenImportRecordDto dto,Integer goodsType){
+    private void parsingTruckNumber(String truckNumber, ChickenImportRecordDto dto, Integer goodsType) {
         // 去除车牌号中"大","中","小"
         String truckTypeBig = "大";
         String truckTypeMedium = "中";
@@ -2802,6 +2845,7 @@ public class WaybillServiceImpl implements WaybillService {
 
     /**
      * 判断订单是否可以做毛鸡导入
+     *
      * @param orderId
      */
     private void judgeOrderForChickenImport(Integer orderId) {
@@ -2820,6 +2864,7 @@ public class WaybillServiceImpl implements WaybillService {
 
     /**
      * 将毛鸡导入信息存入redis
+     *
      * @param chickenImportRecordDtoList
      */
     private void putChickenImportRecordToRedis(List<ChickenImportRecordDto> chickenImportRecordDtoList) {
@@ -2838,6 +2883,7 @@ public class WaybillServiceImpl implements WaybillService {
 
     /**
      * 将map信息解析成dto
+     *
      * @param map
      * @return
      */

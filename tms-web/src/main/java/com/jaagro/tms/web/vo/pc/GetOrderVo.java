@@ -36,6 +36,11 @@ public class GetOrderVo implements Serializable {
     private Integer goodsType;
 
     /**
+     * 饲料类型：1-散装 2-袋装 (仅饲料情况下)
+     */
+    private Integer feedType;
+
+    /**
      * 订单状态:
      */
     private String orderStatus;
