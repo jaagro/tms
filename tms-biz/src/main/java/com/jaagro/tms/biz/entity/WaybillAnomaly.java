@@ -103,6 +103,11 @@ public class WaybillAnomaly implements Serializable {
     private Integer networkId;
 
     /**
+     * 车牌号
+     */
+    private String truckNo;
+
+    /**
      * 逻辑删除
      */
     private Boolean enabled;

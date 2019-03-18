@@ -61,11 +61,6 @@ public class GetOrderGoodsDto implements Serializable {
     private Boolean joinDrug;
 
     /**
-     * 饲料类型：1-散装 2-袋装 (仅饲料情况下)
-     */
-    private Integer feedType;
-
-    /**
      * 是否有效
      */
     private Boolean enabled;

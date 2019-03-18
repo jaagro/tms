@@ -151,6 +151,11 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
                 if (null != orders) {
                     ShowCustomerDto showCustomerDto = customerClientService.getShowCustomerById(orders.getCustomerId());
                     waybillDto.setCustomer(showCustomerDto);
+                    //判断是否是牧原客户
+                    boolean flag = !StringUtils.isEmpty(showCustomerDto.getEnableDirectOrder()) && "y".equals(showCustomerDto.getEnableDirectOrder());
+                    if (flag) {
+                        waybillDto.setEnableDirectOrder(true);
+                    }
                 }
                 //货物信息
                 List<GetWaybillItemsAppDto> waybillItems = waybillDto.getWaybillItems();
@@ -322,7 +327,7 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             int value = readFromOCRTimes++;
             redisTemplate.opsForValue().getAndSet("readImageFromOCRTimes", String.valueOf(value));
             /**/
-            log.info("O waybillSupplementByOcr waybillOcr={}",waybillOcr);
+            log.info("O waybillSupplementByOcr waybillOcr={}", waybillOcr);
             if (CollectionUtils.isEmpty(waybillOcr.getGoodsItems()) || StringUtils.isEmpty(waybillOcr.getUnLoadSite())) {
                 log.error("R waybillSupplementByOcr OCR does not recognize valid data, error data: ", waybillOcr);
                 return;
@@ -335,8 +340,8 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
             //修改waybillItems信息
             String ls = waybillOcr.getUnLoadSite();
             ShowSiteDto showSiteDto = customerClientService.getSiteBySiteName(ls, 248).getData();
-            if (showSiteDto == null){
-                log.info("R waybillSupplementByOcr showSiteDto is null unloadSite={}",ls);
+            if (showSiteDto == null) {
+                log.info("R waybillSupplementByOcr showSiteDto is null unloadSite={}", ls);
             }
             List<WaybillItems> waybillItems = waybillItemsMapper.listWaybillItemsByWaybillId(waybillOcr.getWaybillId());
             GetWaybillItemDto cwd = new GetWaybillItemDto();
@@ -387,35 +392,35 @@ public class WaybillRefactorServiceImpl implements WaybillRefactorService {
     public PageInfo<ListTruckFeeDto> listTruckFeeByCriteria(ListTruckFeeCriteria criteria) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            PageHelper.startPage(criteria.getPageNum(),criteria.getPageSize());
-            if (StringUtils.hasText(criteria.getCompleteTimeStart())){
+            PageHelper.startPage(criteria.getPageNum(), criteria.getPageSize());
+            if (StringUtils.hasText(criteria.getCompleteTimeStart())) {
                 criteria.setCompleteTimeStart(criteria.getCompleteTimeStart());
             }
-            if (StringUtils.hasText(criteria.getCompleteTimeEnd())){
-                criteria.setCompleteTimeEnd(sdf.format(DateUtils.addDays(sdf.parse(criteria.getCompleteTimeEnd()),1)));
+            if (StringUtils.hasText(criteria.getCompleteTimeEnd())) {
+                criteria.setCompleteTimeEnd(sdf.format(DateUtils.addDays(sdf.parse(criteria.getCompleteTimeEnd()), 1)));
             }
             List<ListTruckFeeDto> truckFeeDtoList = waybillTruckFeeMapper.listTruckFeeByCriteria(criteria);
             // 去除重复的卸货地名称
             Set<String> unloadSiteSet = new HashSet<>();
             StringBuilder sb = new StringBuilder();
-            for (ListTruckFeeDto dto : truckFeeDtoList){
+            for (ListTruckFeeDto dto : truckFeeDtoList) {
                 String unloadSite = dto.getUnloadSite();
-                if (StringUtils.hasText(unloadSite) && unloadSite.contains(",")){
+                if (StringUtils.hasText(unloadSite) && unloadSite.contains(",")) {
                     String[] unloadSiteArray = unloadSite.split(",");
-                    for (int i=0;i<unloadSiteArray.length;i++){
+                    for (int i = 0; i < unloadSiteArray.length; i++) {
                         unloadSiteSet.add(unloadSiteArray[i]);
                     }
-                    unloadSiteSet.forEach(unloadSiteStr->sb.append(unloadSiteStr).append(","));
+                    unloadSiteSet.forEach(unloadSiteStr -> sb.append(unloadSiteStr).append(","));
                     sb.deleteCharAt(sb.lastIndexOf(","));
                     dto.setUnloadSite(sb.toString());
-                    sb.delete(0,sb.length());
+                    sb.delete(0, sb.length());
                     unloadSiteSet.clear();
                 }
                 dto.setTotalFee(dto.getAnomalyFee().add(dto.getTransportFee()));
             }
             return new PageInfo<>(truckFeeDtoList);
-        }catch (Exception ex){
-            log.error("O listTruckFeeByCriteria error,criteria="+criteria,ex);
+        } catch (Exception ex) {
+            log.error("O listTruckFeeByCriteria error,criteria=" + criteria, ex);
             throw new RuntimeException("查询运力费用列表出现异常了!");
         }
     }
