@@ -794,5 +794,4 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             }
         }
     }
-    
 }
