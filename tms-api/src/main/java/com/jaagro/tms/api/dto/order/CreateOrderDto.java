@@ -25,6 +25,11 @@ public class CreateOrderDto implements Serializable {
     private Integer goodsType;
 
     /**
+     * 饲料类型：1-散装 2-袋装 (仅饲料情况下)
+     */
+    private Integer feedType;
+
+    /**
      * 客户id
      */
     private Integer customerId;
