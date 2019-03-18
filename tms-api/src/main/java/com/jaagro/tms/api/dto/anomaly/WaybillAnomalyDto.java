@@ -138,4 +138,9 @@ public class WaybillAnomalyDto implements Serializable {
      * 项目部名称
      */
     private String projectDeptName;
+
+    /**
+     * 车牌号
+     */
+    private String truckNo;
 }
