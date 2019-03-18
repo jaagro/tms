@@ -155,4 +155,9 @@ public class ListWaybillAppDto implements Serializable {
      * 备注
      */
     private String notes;
+
+    /**
+     * 客户是否直接下单
+     */
+    private boolean enableDirectOrder;
 }
