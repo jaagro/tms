@@ -72,6 +72,11 @@ public class WaybillAnomalyCondition implements Serializable {
     private Integer audit;
 
     /**
+     * 车牌号
+     */
+    private String truckNo;
+
+    /**
      * 网点集合
      */
     private List<Integer> networkIds;

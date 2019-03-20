@@ -204,10 +204,10 @@
             and network_id = #{deptId}
         </if>
         <if test="createStartTime != null">
-            <![CDATA[and create_time >= #{createStartTime}]]>
+            <![CDATA[AND  DATE_FORMAT( create_time, '%Y-%m-%d' ) >= DATE_FORMAT( #{createStartTime}, '%Y-%m-%d' )]]>
         </if>
         <if test="createEndTime != null">
-            <![CDATA[and create_time <= #{createEndTime}]]>
+            <![CDATA[AND DATE_FORMAT( create_time, '%Y-%m-%d' ) <= DATE_FORMAT( #{createEndTime}, '%Y-%m-%d' )]]>
         </if>
         <if test="truckIds != null">
             and truck_id in

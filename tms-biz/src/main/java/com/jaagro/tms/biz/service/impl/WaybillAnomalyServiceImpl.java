@@ -90,11 +90,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         if (null == waybill) {
             throw new RuntimeException("该运单号删除或不存在！");
         }
-        if (CancelAnomalyWaybillType.CANCEL_WAYBILL.equals(dto.getAnomalyTypeId())) {
-            if (WaybillStatus.ACCOMPLISH.equals(waybill.getWaybillStatus())) {
-
-            }
-        }
         WaybillAnomalyCondition waybillAnomalyCondition = new WaybillAnomalyCondition();
         waybillAnomalyCondition
                 .setWaybillId(dto.getWaybillId())
@@ -108,6 +103,13 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         if (waybill.getNetworkId() != null) {
             waybillAnomaly
                     .setNetworkId(waybill.getNetworkId());
+        }
+        //获取车牌号
+        if (waybill != null && waybill.getTruckId() != null) {
+            ShowTruckDto truck = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
+            if (truck != null && truck.getTruckNumber() != null) {
+                waybillAnomaly.setTruckNo(truck.getTruckNumber());
+            }
         }
         waybillAnomaly
                 .setProcessingStatus(AnomalyStatus.TO_DO);
@@ -204,7 +206,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         //根据订单id 查询客户信息
         Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
         ShowCustomerDto customer = customerClientService.getShowCustomerById(orders.getCustomerId());
-        if (customer != null) {
+        if (customer != null && customer.getCustomerName() != null) {
             anomalyUserProfileDto.setCustomerName(customer.getCustomerName());
         }
         //根据运单查询司机相关信息
@@ -212,11 +214,17 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         DriverReturnDto driverByIdFeign = null;
         if (driverId != null) {
             driverByIdFeign = driverClientService.getDriverByIdFeign(driverId);
-            anomalyUserProfileDto.setDriverName(driverByIdFeign.getName());
+            if (driverByIdFeign != null && driverByIdFeign.getName() != null) {
+                anomalyUserProfileDto.setDriverName(driverByIdFeign.getName());
+            }
         }
         //查询该司机的车牌号
-        ShowTruckDto truckByIdReturnObject = truckClientService.getTruckByIdReturnObject(driverByIdFeign.getTruckId());
-        if (truckByIdReturnObject != null) {
+        ShowTruckDto truckByIdReturnObject = null;
+        if (driverByIdFeign != null && driverByIdFeign.getTruckId() != null) {
+            truckByIdReturnObject = truckClientService.getTruckByIdReturnObject(driverByIdFeign.getTruckId());
+
+        }
+        if (truckByIdReturnObject != null && truckByIdReturnObject.getTruckNumber() != null) {
             anomalyUserProfileDto.setTruckNumber(truckByIdReturnObject.getTruckNumber());
         }
         return anomalyUserProfileDto;

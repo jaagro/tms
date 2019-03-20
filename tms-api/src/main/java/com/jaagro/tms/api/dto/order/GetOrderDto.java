@@ -5,12 +5,10 @@ import com.jaagro.tms.api.dto.customer.CustomerContactsReturnDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerContractDto;
 import com.jaagro.tms.api.dto.customer.ShowCustomerDto;
 import com.jaagro.tms.api.dto.customer.ShowSiteDto;
-import com.jaagro.tms.api.dto.driverapp.ShowSiteAppDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +38,11 @@ public class GetOrderDto implements Serializable {
      * 货物类型
      */
     private Integer goodsType;
+
+    /**
+     * 饲料类型：1-散装 2-袋装 (仅饲料情况下)
+     */
+    private Integer feedType;
 
     /**
      * 订单状态:

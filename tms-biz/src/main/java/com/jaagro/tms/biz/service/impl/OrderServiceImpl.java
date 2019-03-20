@@ -3,6 +3,7 @@ package com.jaagro.tms.biz.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
+import com.jaagro.tms.api.constant.GoodsType;
 import com.jaagro.tms.api.constant.GoodsUnit;
 import com.jaagro.tms.api.constant.OrderStatus;
 import com.jaagro.tms.api.dto.base.ShowUserDto;
@@ -82,6 +83,11 @@ public class OrderServiceImpl implements OrderService {
                 throw new RuntimeException("装货地不存在");
             }
         }
+        /*if (GoodsType.FODDER.equals(orderDto.getGoodsType())) {
+            if (StringUtils.isEmpty(orderDto.getFeedType())) {
+                throw new NullPointerException("饲料类型不能为空");
+            }
+        }*/
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
         order.setCreatedUserId(currentUserService.getShowUser().getId());
