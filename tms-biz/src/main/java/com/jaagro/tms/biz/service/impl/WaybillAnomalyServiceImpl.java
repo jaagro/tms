@@ -163,7 +163,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         return waybillAnomalyTypeDtos;
     }
 
-
     @Override
     public List<WaybillAnomalyTypeDto> displayAnomalyType() {
 
@@ -178,7 +177,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         }
         return waybillAnomalyTypeDtos;
     }
-
 
     /**
      * 根据运单Id查询客户信息 司机信息
