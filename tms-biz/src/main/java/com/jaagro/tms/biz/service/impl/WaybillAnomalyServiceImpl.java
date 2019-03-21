@@ -163,13 +163,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         return waybillAnomalyTypeDtos;
     }
 
-    /**
-     * 兼容老版本
-     * *************************************************************
-     *
-     * @param
-     * @return
-     */
+
     @Override
     public List<WaybillAnomalyTypeDto> displayAnomalyType() {
 
@@ -181,13 +175,10 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             WaybillAnomalyTypeDto dto = new WaybillAnomalyTypeDto();
             BeanUtils.copyProperties(waybillAnomalyType, dto);
             waybillAnomalyTypeDtos.add(dto);
-            waybillAnomalyTypeDtos.add(dto);
         }
         return waybillAnomalyTypeDtos;
     }
-    /**
-     * *********************************************************************
-     */
+
 
     /**
      * 根据运单Id查询客户信息 司机信息
@@ -378,8 +369,7 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
         }
         List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(dto);
         if (CollectionUtils.isEmpty(waybillAnomalyDtos)) {
-            log.info("O anomalyManagementList: waybillAnomalyDtos is null {}", dto);
-            throw new NullPointerException("waybillAnomalyDtos must not be null");
+            return null;
         }
         List<Integer> driverList = new ArrayList<>();
         List<Integer> employeeList = new ArrayList<>();
