@@ -366,7 +366,6 @@ public class WaybillAnomalyServiceImpl implements WaybillAnomalyService {
             dto.setNetworkIds(downDepartment);
         }
         List<WaybillAnomalyDto> waybillAnomalyDtos = waybillAnomalyMapper.listWaybillAnomalyByCondition(dto);
-        
         List<Integer> driverList = new ArrayList<>();
         List<Integer> employeeList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(waybillAnomalyDtos)) {
