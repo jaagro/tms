@@ -83,11 +83,11 @@ public class OrderServiceImpl implements OrderService {
                 throw new RuntimeException("装货地不存在");
             }
         }
-        if (GoodsType.FODDER.equals(orderDto.getGoodsType())) {
+        /*if (GoodsType.FODDER.equals(orderDto.getGoodsType())) {
             if (StringUtils.isEmpty(orderDto.getFeedType())) {
                 throw new NullPointerException("饲料类型不能为空");
             }
-        }
+        }*/
         Orders order = new Orders();
         BeanUtils.copyProperties(orderDto, order);
         order.setCreatedUserId(currentUserService.getShowUser().getId());
