@@ -85,7 +85,7 @@
         GROUP BY
         f.waybill_id
         ORDER BY
-        f.create_time DESCs
+        f.create_time DESC
         ) temp_f
         WHERE
         temp_f.waybill_money > 0
