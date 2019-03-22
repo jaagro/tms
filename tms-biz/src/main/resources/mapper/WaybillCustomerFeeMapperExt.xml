@@ -84,8 +84,6 @@
         </if>
         GROUP BY
         f.waybill_id
-        ORDER BY
-        f.create_time DESCs
         ) temp_f
         WHERE
         temp_f.waybill_money > 0
