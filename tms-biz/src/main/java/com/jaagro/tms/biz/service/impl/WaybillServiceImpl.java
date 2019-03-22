@@ -1758,6 +1758,10 @@ public class WaybillServiceImpl implements WaybillService {
                         waybillDto.setCreatedUserId(userDto);
                     }
                 }
+                //司机
+                if (!StringUtils.isEmpty(waybill.getDriverId())) {
+                    waybillDto.setDriver(driverClientService.getDriverReturnObject(waybill.getDriverId()));
+                }
                 //数量 & 重量
                 WaybillGoods goods = waybillGoodsMapper.getUnFinishQuantityAndWeightByWaybillId(waybillDto.getId());
                 if (goods != null) {

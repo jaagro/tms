@@ -40,16 +40,16 @@
             and o.goods_type = #{goodsType}
         </if>
         <if test="createStartTime != null">
-            <![CDATA[and o.create_time >= #{createStartTime}]]>
+            <![CDATA[DATE_FORMAT( o.create_time, '%Y-%m-%d' ) >= DATE_FORMAT( #{createStartTime}, '%Y-%m-%d' )]]>
         </if>
         <if test="createEndTime != null">
-            <![CDATA[and o.create_time <= #{createEndTime}]]>
+            <![CDATA[DATE_FORMAT( o.create_time, '%Y-%m-%d' ) <= DATE_FORMAT( #{createEndTime}, '%Y-%m-%d' )]]>
         </if>
         <if test="loadStartTime != null">
-            <![CDATA[and o.load_time >= #{loadStartTime}]]>
+            <![CDATA[DATE_FORMAT( o.load_time, '%Y-%m-%d' ) >= DATE_FORMAT( #{loadStartTime}, '%Y-%m-%d' )]]>
         </if>
         <if test="loadEndTime != null">
-            <![CDATA[and o.load_time <= #{loadEndTime}]]>
+            <![CDATA[DATE_FORMAT( o.load_time, '%Y-%m-%d' ) <= DATE_FORMAT( #{loadEndTime}, '%Y-%m-%d' )]]>
         </if>
         <if test="departIds != null and departIds.size() > 0">
             and o.network_id in
