@@ -1746,10 +1746,11 @@ public class WaybillServiceImpl implements WaybillService {
                     if (customer != null) {
                         waybillDto.setCustomerName(customer.getCustomerName());
                     }
+                    if (!StringUtils.isEmpty(orders.getGoodsType())) {
+                        waybillDto.setGoodsType(orders.getGoodsType());
+                    }
                 }
-                if (null != orders.getGoodsType()) {
-                    waybillDto.setGoodsType(orders.getGoodsType());
-                }
+
                 if (waybill.getCreatedUserId() != null) {
                     UserInfo userInfo = this.authClientService.getUserInfoById(waybill.getCreatedUserId(), "employee");
                     if (userInfo != null) {

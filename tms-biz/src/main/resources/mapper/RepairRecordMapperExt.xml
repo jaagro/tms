@@ -7,7 +7,9 @@
         <include refid="Base_Column_List"/>
         from repair_record
         <where>
-            <if test="truckNumber != null and truckNumber != ''">truck_number = #{truckNumber}</if>
+            <if test="truckNumber != null and truckNumber != ''">
+               truck_number like concat(#{truckNumber},'%')
+            </if>
         </where>
         order by create_time desc
     </select>
