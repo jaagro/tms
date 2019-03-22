@@ -72,9 +72,9 @@
             and t.unload_id = #{customerId}
         </if>
         GROUP BY o.id
+        order by o.create_time desc
         <if test="differentiateStatus == null">
-            order by
-            CASE
+            , CASE
             WHEN o.order_status LIKE '%已下单%' THEN
             1
             WHEN o.order_status LIKE '%已配载%' THEN
@@ -85,11 +85,7 @@
             4
             WHEN o.order_status LIKE '%取消%' THEN
             5
-            END,
-            o.load_time desc
-        </if>
-        <if test="differentiateStatus != null and differentiateStatus == 'WeChat'">
-            order by o.create_time desc
+            END
         </if>
     </select>
     <select id="getOrderIdsByCustomerId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
