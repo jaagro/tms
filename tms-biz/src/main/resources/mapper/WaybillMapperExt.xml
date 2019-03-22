@@ -200,9 +200,6 @@
         <if test="orderId != null">
             and order_id = #{orderId}
         </if>
-        <if test="deptId != null">
-            and network_id = #{deptId}
-        </if>
         <if test="createStartTime != null">
             <![CDATA[AND  DATE_FORMAT( create_time, '%Y-%m-%d' ) >= DATE_FORMAT( #{createStartTime}, '%Y-%m-%d' )]]>
         </if>

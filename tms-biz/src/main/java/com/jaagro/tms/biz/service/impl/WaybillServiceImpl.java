@@ -1448,6 +1448,10 @@ public class WaybillServiceImpl implements WaybillService {
             redisLock.unLock("redisLock" + waybillId + dto.getReceiptStatus());
             return ServiceResult.toResult(ReceiptConstant.ALREADY_RECEIVED);
         }
+        if (WaybillStatus.SEND_TRUCK.equals(waybill.getWaybillStatus())) {
+            redisLock.unLock("redisLock" + waybillId + dto.getReceiptStatus());
+            return ServiceResult.toResult(ReceiptConstant.WITHDRAW);
+        }
         UserInfo currentUser = currentUserService.getCurrentUser();
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         GraWaybillConditionDto graWaybillConditionDto = new GraWaybillConditionDto();
@@ -1742,10 +1746,11 @@ public class WaybillServiceImpl implements WaybillService {
                     if (customer != null) {
                         waybillDto.setCustomerName(customer.getCustomerName());
                     }
+                    if (!StringUtils.isEmpty(orders.getGoodsType())) {
+                        waybillDto.setGoodsType(orders.getGoodsType());
+                    }
                 }
-                if (null != orders.getGoodsType()) {
-                    waybillDto.setGoodsType(orders.getGoodsType());
-                }
+
                 if (waybill.getCreatedUserId() != null) {
                     UserInfo userInfo = this.authClientService.getUserInfoById(waybill.getCreatedUserId(), "employee");
                     if (userInfo != null) {

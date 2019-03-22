@@ -17,9 +17,10 @@ public final class ReceiptConstant {
     /**
      * 服务请求中
      */
-    public static final String SERVICE_REQUEST="SERVICE_REQUEST";
+    public static final String SERVICE_REQUEST = "SERVICE_REQUEST";
 
-
-
-
+    /**
+     * 该运单已被撤单
+     */
+    public static final String WITHDRAW = "WITHDRAW";
 }
