@@ -40,16 +40,16 @@
             and o.goods_type = #{goodsType}
         </if>
         <if test="createStartTime != null">
-            <![CDATA[and o.create_time >= #{createStartTime}]]>
+            <![CDATA[and DATE_FORMAT( o.create_time, '%Y-%m-%d' ) >= DATE_FORMAT( #{createStartTime}, '%Y-%m-%d' ) ]]>
         </if>
         <if test="createEndTime != null">
-            <![CDATA[and o.create_time <= #{createEndTime}]]>
+            <![CDATA[and DATE_FORMAT( o.create_time, '%Y-%m-%d' ) <= DATE_FORMAT( #{createEndTime}, '%Y-%m-%d' ) ]]>
         </if>
         <if test="loadStartTime != null">
-            <![CDATA[and o.load_time >= #{loadStartTime}]]>
+            <![CDATA[and DATE_FORMAT( o.load_time, '%Y-%m-%d' ) >= DATE_FORMAT( #{loadStartTime}, '%Y-%m-%d' )]]>
         </if>
         <if test="loadEndTime != null">
-            <![CDATA[and o.load_time <= #{loadEndTime}]]>
+            <![CDATA[and DATE_FORMAT( o.load_time, '%Y-%m-%d' ) <= DATE_FORMAT( #{loadEndTime}, '%Y-%m-%d' )]]>
         </if>
         <if test="departIds != null and departIds.size() > 0">
             and o.network_id in
@@ -72,9 +72,9 @@
             and t.unload_id = #{customerId}
         </if>
         GROUP BY o.id
+        order by o.create_time desc
         <if test="differentiateStatus == null">
-            order by
-            CASE
+            , CASE
             WHEN o.order_status LIKE '%已下单%' THEN
             1
             WHEN o.order_status LIKE '%已配载%' THEN
@@ -85,11 +85,7 @@
             4
             WHEN o.order_status LIKE '%取消%' THEN
             5
-            END,
-            o.load_time desc
-        </if>
-        <if test="differentiateStatus != null and differentiateStatus == 'WeChat'">
-            order by o.create_time desc
+            END
         </if>
     </select>
     <select id="getOrderIdsByCustomerId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
