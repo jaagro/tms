@@ -1450,7 +1450,7 @@ public class WaybillServiceImpl implements WaybillService {
         }
         if (WaybillStatus.SEND_TRUCK.equals(waybill.getWaybillStatus())) {
             redisLock.unLock("redisLock" + waybillId + dto.getReceiptStatus());
-            throw new RuntimeException("当前运单已被撤销");
+            return ServiceResult.toResult(ReceiptConstant.WITHDRAW);
         }
         UserInfo currentUser = currentUserService.getCurrentUser();
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
