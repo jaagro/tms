@@ -1595,9 +1595,9 @@ public class WaybillServiceImpl implements WaybillService {
             if (null == truckClientService.getTruckByIdReturnObject(truckId)) {
                 return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), truckId + " ：id不正确");
             }
-
             //1.更新订单状态：从已配载(STOWAGE)改为运输中(TRANSPORT)
             Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
+            updateWaybillNote(waybill, orders);
             orders.setId(waybill.getOrderId());
             orders.setOrderStatus(OrderStatus.TRANSPORT);
             orders.setModifyTime(new Date());
@@ -1683,6 +1683,29 @@ public class WaybillServiceImpl implements WaybillService {
             grabWaybillRecordMapper.deleteByWaybillId(waybillId);
         }
         return ServiceResult.toResult("派单成功");
+    }
+
+    /**
+     * 20190325
+     *
+     * @param waybill
+     * @param orders
+     * @Author gavin 增加重新派单的备注信息
+     */
+    private void updateWaybillNote(Waybill waybill, Orders orders) {
+        if (WaybillStatus.REJECT.equals(waybill.getWaybillStatus())) {
+            String newLineFlag = "\n";
+            String notes;
+            WaybillTracking tracking = waybillTrackingMapper.getLatestAssignTracking(waybill.getId());
+            if (orders.getGoodsType().equals(GoodsType.CHICKEN)) {
+                String oldNotes = waybill.getNotes() == null ? "" : waybill.getNotes();
+                notes = "重新派单运单" + newLineFlag + "原派单时间为：" + tracking.getCreateTime() + oldNotes;
+            } else {
+                notes = "重新派单运单" + newLineFlag + "原派单时间为：" + tracking.getCreateTime();
+            }
+            waybill.setNotes(notes);
+            waybillMapper.updateByPrimaryKeySelective(waybill);
+        }
     }
 
     /**
