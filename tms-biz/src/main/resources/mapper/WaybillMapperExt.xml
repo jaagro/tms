@@ -270,7 +270,12 @@
         WHEN waybill_status LIKE '%已作废%' THEN
         11
         END
-        ,create_time DESC
+        <if test="sortCriteria == null or sortCriteria == 1">
+            ,create_time DESC
+        </if>
+        <if test="sortCriteria != null and sortCriteria == 2">
+            ,send_time DESC
+        </if>
     </select>
     <select id="listWaybillWaitByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
