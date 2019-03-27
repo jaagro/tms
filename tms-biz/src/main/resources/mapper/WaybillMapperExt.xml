@@ -186,7 +186,7 @@
             11
             WHEN waybill_status LIKE '%已补录%' THEN
             12
-        END
+        END,id
     </select>
     <select id="listWaybillByCriteria" parameterType="com.jaagro.tms.api.dto.waybill.ListWaybillCriteriaDto"
             resultMap="ReturnMap">
