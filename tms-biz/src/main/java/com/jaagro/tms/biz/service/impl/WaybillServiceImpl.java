@@ -2603,7 +2603,7 @@ public class WaybillServiceImpl implements WaybillService {
             String newLineFlag = "\n";
             // 上辆车车牌号
             String lastTruckNumber = "";
-            // 上辆车四季名城
+            // 上辆司机名称
             String lastDriverName = "";
             // 下辆车车牌号
             String nextTruckNumber = "";
@@ -2763,7 +2763,7 @@ public class WaybillServiceImpl implements WaybillService {
                 Date requiredTime = sdf.parse(day + " " + cells[16]);
                 dto.setRequiredTime(requiredTime);
                 // 司机名称
-                dto.setDriverName(cells[7]);
+                dto.setDriverName(cells[9]);
                 // 货物数量(单车筐数)
                 String quantity = cells[20];
                 if (StringUtils.hasText(quantity)) {
