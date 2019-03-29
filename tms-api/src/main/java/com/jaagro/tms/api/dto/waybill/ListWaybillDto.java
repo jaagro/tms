@@ -100,4 +100,9 @@ public class ListWaybillDto implements Serializable {
      *
      */
     private Integer networkId;
+
+    /**
+     * 需求车型
+     */
+    private Integer needTruckType;
 }
