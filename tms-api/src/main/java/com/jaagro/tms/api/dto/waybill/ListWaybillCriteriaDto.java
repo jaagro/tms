@@ -83,4 +83,9 @@ public class ListWaybillCriteriaDto implements Serializable {
      * 回单补录状态 0-未回单,1-已补录实提,2-已补录实卸
      */
     private Integer receiptStatus;
+
+    /**
+     * 排序 1-默认排序 2-派单时间
+     */
+    private Integer sortCriteria;
 }

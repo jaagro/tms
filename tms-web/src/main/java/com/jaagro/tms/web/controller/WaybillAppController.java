@@ -69,6 +69,7 @@ public class WaybillAppController {
     @ApiOperation("运单轨迹更新")
     @PostMapping("/updateWaybillTruckingApp")
     public BaseResponse updateWaybillTruckingApp(@RequestBody GetWaybillTruckingParamDto dto) {
+        log.info("O updateWaybillTruckingApp dto={}", dto);
         if (dto == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单单参数不能为空");
         }
