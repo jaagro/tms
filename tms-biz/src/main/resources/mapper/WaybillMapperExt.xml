@@ -245,36 +245,35 @@
         <if test="receiptStatus != null and receiptStatus != ''">
             and receipt_status=#{receiptStatus}
         </if>
-        order by
-        CASE
-        WHEN waybill_status LIKE '%待派单%' THEN
-        1
-        WHEN waybill_status LIKE '%待接单%' THEN
-        2
-        WHEN waybill_status LIKE '%待出发%' THEN
-        3
-        WHEN waybill_status LIKE '%前往装货地%' THEN
-        4
-        WHEN waybill_status LIKE '%待装货%' THEN
-        5
-        WHEN waybill_status LIKE '%待送达%' THEN
-        6
-        WHEN waybill_status LIKE '%待签收%' THEN
-        7
-        WHEN waybill_status LIKE '%已拒单%' THEN
-        8
-        WHEN waybill_status LIKE '%已完成%' THEN
-        9
-        WHEN waybill_status LIKE '%已取消%' THEN
-        10
-        WHEN waybill_status LIKE '%已作废%' THEN
-        11
-        END
         <if test="sortCriteria == null or sortCriteria == 1">
-            ,create_time DESC
+            order by
+            CASE
+            WHEN waybill_status LIKE '%待派单%' THEN
+            1
+            WHEN waybill_status LIKE '%待接单%' THEN
+            2
+            WHEN waybill_status LIKE '%待出发%' THEN
+            3
+            WHEN waybill_status LIKE '%前往装货地%' THEN
+            4
+            WHEN waybill_status LIKE '%待装货%' THEN
+            5
+            WHEN waybill_status LIKE '%待送达%' THEN
+            6
+            WHEN waybill_status LIKE '%待签收%' THEN
+            7
+            WHEN waybill_status LIKE '%已拒单%' THEN
+            8
+            WHEN waybill_status LIKE '%已完成%' THEN
+            9
+            WHEN waybill_status LIKE '%已取消%' THEN
+            10
+            WHEN waybill_status LIKE '%已作废%' THEN
+            11
+            END,create_time DESC
         </if>
         <if test="sortCriteria != null and sortCriteria == 2">
-            ,send_time DESC
+            order by send_time DESC
         </if>
     </select>
     <select id="listWaybillWaitByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
