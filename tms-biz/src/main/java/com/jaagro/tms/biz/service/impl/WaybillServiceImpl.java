@@ -1701,7 +1701,7 @@ public class WaybillServiceImpl implements WaybillService {
             String trackTime = sdFormat.format(tracking.getCreateTime());
             if (orders.getGoodsType().equals(GoodsType.CHICKEN)) {
                 String oldNotes = waybill.getNotes() == null ? "" : waybill.getNotes();
-                notes = "重新派单运单" + newLineFlag + "原派单时间为：" + trackTime + oldNotes;
+                notes = "重新派单运单" + newLineFlag + "原派单时间为：" + trackTime + newLineFlag + oldNotes;
             } else {
                 notes = "重新派单运单" + newLineFlag + "原派单时间为：" + trackTime;
             }
