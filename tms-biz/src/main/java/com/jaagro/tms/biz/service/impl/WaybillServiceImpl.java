@@ -1697,11 +1697,13 @@ public class WaybillServiceImpl implements WaybillService {
             String newLineFlag = "\n";
             String notes;
             WaybillTracking tracking = waybillTrackingMapper.getLatestAssignTracking(waybill.getId());
+            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            String trackTime = sdFormat.format(tracking.getCreateTime());
             if (orders.getGoodsType().equals(GoodsType.CHICKEN)) {
                 String oldNotes = waybill.getNotes() == null ? "" : waybill.getNotes();
-                notes = "重新派单运单" + newLineFlag + "原派单时间为：" + tracking.getCreateTime() + oldNotes;
+                notes = "重新派单运单" + newLineFlag + "原派单时间为：" + trackTime + newLineFlag + oldNotes;
             } else {
-                notes = "重新派单运单" + newLineFlag + "原派单时间为：" + tracking.getCreateTime();
+                notes = "重新派单运单" + newLineFlag + "原派单时间为：" + trackTime;
             }
             waybill.setNotes(notes);
             waybillMapper.updateByPrimaryKeySelective(waybill);
