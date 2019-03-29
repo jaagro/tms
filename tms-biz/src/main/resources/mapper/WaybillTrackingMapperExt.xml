@@ -47,6 +47,13 @@
         where enabled=1 and waybill_id=#{waybillId} and new_status in ('待出发','前往装货地','待装货','待送达','待签收','已完成') order by
         id desc
     </select>
+
+    <select id="getLatestAssignTracking" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from waybill_tracking
+        where enabled=1 and waybill_id=#{waybillId} and new_status in ('待接单') order by id desc limit 1
+    </select>
     <delete id="deleteByWaybillIdAndTrackingType">
         delete from waybill_tracking
         where waybill_id=#{waybillId}
