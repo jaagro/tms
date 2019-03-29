@@ -1697,7 +1697,7 @@ public class WaybillServiceImpl implements WaybillService {
             String newLineFlag = "\n";
             String notes;
             WaybillTracking tracking = waybillTrackingMapper.getLatestAssignTracking(waybill.getId());
-            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             String trackTime = sdFormat.format(tracking.getCreateTime());
             if (orders.getGoodsType().equals(GoodsType.CHICKEN)) {
                 String oldNotes = waybill.getNotes() == null ? "" : waybill.getNotes();
