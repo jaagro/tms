@@ -2410,46 +2410,46 @@ public class WaybillServiceImpl implements WaybillService {
         if (null == waybillData) {
             throw new NullPointerException("运单不存在");
         }
-        //1.只有带派单的运单才可以作废
-        if (!waybillData.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK)) {
-            throw new RuntimeException("只有【待派单】的运单才可以作废");
-        }
-
         if (!waybillData.getEnabled()) {
             throw new RuntimeException("该运单已删除");
         }
-        //2.把运单状态修改为作废
-        waybillData.setWaybillStatus(WaybillStatus.ABANDON);
-        waybillMapper.updateByPrimaryKeySelective(waybillData);
+        //1.只有带派单和已拒单的运单才可以作废
+        if (waybillData.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK) || waybillData.getWaybillStatus().equals(WaybillStatus.REJECT)) {
+            //2.把运单状态修改为作废
+            waybillData.setWaybillStatus(WaybillStatus.ABANDON);
+            waybillMapper.updateByPrimaryKeySelective(waybillData);
 
-        //3.更新订单的状态为"已完成"
-        List<Waybill> waybillList = waybillMapper.listWaybillByOrderId(waybillData.getOrderId());
-        boolean canChangeFlag = true;
-        for (Waybill waybill : waybillList) {
-            boolean flag = waybill.getWaybillStatus().equals(WaybillStatus.RECEIVE) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.DEPART) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.REJECT) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.SIGN) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.LOAD_PRODUCT) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.DELIVERY) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.CANCEL) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.DELIVERY) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.ARRIVE_LOAD_SITE);
-            if (flag) {
-                canChangeFlag = false;
-                break;
+            //3.更新订单的状态为"已完成"
+            List<Waybill> waybillList = waybillMapper.listWaybillByOrderId(waybillData.getOrderId());
+            boolean canChangeFlag = true;
+            for (Waybill waybill : waybillList) {
+                boolean flag = waybill.getWaybillStatus().equals(WaybillStatus.RECEIVE) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.DEPART) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.REJECT) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.SIGN) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.LOAD_PRODUCT) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.DELIVERY) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.CANCEL) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.DELIVERY) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.ARRIVE_LOAD_SITE);
+                if (flag) {
+                    canChangeFlag = false;
+                    break;
+                }
             }
-        }
-        //4.只有订单下所有的运单的状态变成"已完成"或者"已作废"
-        if (canChangeFlag) {
-            Orders order = ordersMapper.selectByPrimaryKey(waybillData.getOrderId());
-            order.setOrderStatus(OrderStatus.ACCOMPLISH);
-            ordersMapper.updateByPrimaryKeySelective(order);
+            //4.只有订单下所有的运单的状态变成"已完成"或者"已作废"
+            if (canChangeFlag) {
+                Orders order = ordersMapper.selectByPrimaryKey(waybillData.getOrderId());
+                order.setOrderStatus(OrderStatus.ACCOMPLISH);
+                ordersMapper.updateByPrimaryKeySelective(order);
 
+            }
+            //5.删除抢单记录
+            grabWaybillRecordMapper.deleteByWaybillId(waybillId);
+        } else {
+            throw new RuntimeException("只有【待派单】和【已拒单】的运单才可以作废");
         }
-        //5.删除抢单记录
-        grabWaybillRecordMapper.deleteByWaybillId(waybillId);
         return true;
     }
 
