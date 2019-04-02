@@ -21,6 +21,7 @@ import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.entity.ChickenImportRecord;
+import com.jaagro.tms.api.enums.AbandonReasonEnum;
 import com.jaagro.tms.api.service.*;
 import com.jaagro.tms.biz.config.RabbitMqConfig;
 import com.jaagro.tms.biz.entity.*;
@@ -2404,7 +2405,7 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean abandonWaybill(Integer waybillId) {
+    public boolean abandonWaybill(Integer waybillId,Integer reasonId) {
 
         Waybill waybillData = waybillMapper.selectByPrimaryKey(waybillId);
         if (null == waybillData) {
@@ -2417,6 +2418,7 @@ public class WaybillServiceImpl implements WaybillService {
         if (waybillData.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK) || waybillData.getWaybillStatus().equals(WaybillStatus.REJECT)) {
             //2.把运单状态修改为作废
             waybillData.setWaybillStatus(WaybillStatus.ABANDON);
+            waybillData.setNotes(AbandonReasonEnum.getDescByCode(reasonId));
             waybillMapper.updateByPrimaryKeySelective(waybillData);
 
             //3.更新订单的状态为"已完成"
