@@ -8,17 +8,17 @@ import org.mybatis.generator.config.Configuration;
 import org.mybatis.generator.config.xml.ConfigurationParser;
 import org.mybatis.generator.internal.DefaultShellCallback;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.ws.rs.core.Application;
+//import javax.ws.rs.core.Application;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
+//@SpringBootTest(classes = Application.class)
 public class TmsApplicationTests {
 
     @Autowired
