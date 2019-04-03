@@ -21,6 +21,7 @@ import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
 import com.jaagro.tms.api.dto.truck.*;
 import com.jaagro.tms.api.dto.waybill.*;
 import com.jaagro.tms.api.entity.ChickenImportRecord;
+import com.jaagro.tms.api.enums.AbandonReasonEnum;
 import com.jaagro.tms.api.service.*;
 import com.jaagro.tms.biz.config.RabbitMqConfig;
 import com.jaagro.tms.biz.entity.*;
@@ -1576,6 +1577,10 @@ public class WaybillServiceImpl implements WaybillService {
             redisLock.unLock("redisLock" + waybillId + dto.getReceiptStatus());
             return ServiceResult.toResult(ReceiptConstant.ALREADY_RECEIVED);
         }
+        if (WaybillStatus.SEND_TRUCK.equals(waybill.getWaybillStatus())) {
+            redisLock.unLock("redisLock" + waybillId + dto.getReceiptStatus());
+            return ServiceResult.toResult(ReceiptConstant.WITHDRAW);
+        }
         UserInfo currentUser = currentUserService.getCurrentUser();
         ShowTruckDto truckByToken = truckClientService.getTruckByToken();
         GraWaybillConditionDto graWaybillConditionDto = new GraWaybillConditionDto();
@@ -1756,9 +1761,9 @@ public class WaybillServiceImpl implements WaybillService {
             if (null == truckClientService.getTruckByIdReturnObject(truckId)) {
                 return ServiceResult.error(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), truckId + " ：id不正确");
             }
-
             //1.更新订单状态：从已配载(STOWAGE)改为运输中(TRANSPORT)
             Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
+            updateWaybillNote(waybill, orders);
             orders.setId(waybill.getOrderId());
             orders.setOrderStatus(OrderStatus.TRANSPORT);
             orders.setModifyTime(new Date());
@@ -1849,6 +1854,31 @@ public class WaybillServiceImpl implements WaybillService {
     }
 
     /**
+     * 20190325
+     *
+     * @param waybill
+     * @param orders
+     * @Author gavin 增加重新派单的备注信息
+     */
+    private void updateWaybillNote(Waybill waybill, Orders orders) {
+        if (WaybillStatus.REJECT.equals(waybill.getWaybillStatus())) {
+            String newLineFlag = "\n";
+            String notes;
+            WaybillTracking tracking = waybillTrackingMapper.getLatestAssignTracking(waybill.getId());
+            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            String trackTime = sdFormat.format(tracking.getCreateTime());
+            if (orders.getGoodsType().equals(GoodsType.CHICKEN)) {
+                String oldNotes = waybill.getNotes() == null ? "" : waybill.getNotes();
+                notes = "重新派单运单" + newLineFlag + "原派单时间为：" + trackTime + newLineFlag + oldNotes;
+            } else {
+                notes = "重新派单运单" + newLineFlag + "原派单时间为：" + trackTime;
+            }
+            waybill.setNotes(notes);
+            waybillMapper.updateByPrimaryKeySelective(waybill);
+        }
+    }
+
+    /**
      * 分页查询运单
      *
      * @param criteriaDto
@@ -1909,10 +1939,11 @@ public class WaybillServiceImpl implements WaybillService {
                     if (customer != null) {
                         waybillDto.setCustomerName(customer.getCustomerName());
                     }
+                    if (!StringUtils.isEmpty(orders.getGoodsType())) {
+                        waybillDto.setGoodsType(orders.getGoodsType());
+                    }
                 }
-                if (null != orders.getGoodsType()) {
-                    waybillDto.setGoodsType(orders.getGoodsType());
-                }
+
                 if (waybill.getCreatedUserId() != null) {
                     UserInfo userInfo = this.authClientService.getUserInfoById(waybill.getCreatedUserId(), "employee");
                     if (userInfo != null) {
@@ -1920,6 +1951,10 @@ public class WaybillServiceImpl implements WaybillService {
                         userDto.setUserName(userInfo.getName());
                         waybillDto.setCreatedUserId(userDto);
                     }
+                }
+                //司机
+                if (!StringUtils.isEmpty(waybill.getDriverId())) {
+                    waybillDto.setDriver(driverClientService.getDriverReturnObject(waybill.getDriverId()));
                 }
                 //数量 & 重量
                 WaybillGoods goods = waybillGoodsMapper.getUnFinishQuantityAndWeightByWaybillId(waybillDto.getId());
@@ -2539,52 +2574,53 @@ public class WaybillServiceImpl implements WaybillService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public boolean abandonWaybill(Integer waybillId) {
+    public boolean abandonWaybill(Integer waybillId,Integer reasonId) {
 
         Waybill waybillData = waybillMapper.selectByPrimaryKey(waybillId);
         if (null == waybillData) {
             throw new NullPointerException("运单不存在");
         }
-        //1.只有带派单的运单才可以作废
-        if (!waybillData.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK)) {
-            throw new RuntimeException("只有【待派单】的运单才可以作废");
-        }
-
         if (!waybillData.getEnabled()) {
             throw new RuntimeException("该运单已删除");
         }
-        //2.把运单状态修改为作废
-        waybillData.setWaybillStatus(WaybillStatus.ABANDON);
-        waybillMapper.updateByPrimaryKeySelective(waybillData);
+        //1.只有带派单和已拒单的运单才可以作废
+        if (waybillData.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK) || waybillData.getWaybillStatus().equals(WaybillStatus.REJECT)) {
+            //2.把运单状态修改为作废
+            waybillData.setWaybillStatus(WaybillStatus.ABANDON);
+            waybillData.setNotes(AbandonReasonEnum.getDescByCode(reasonId));
+            waybillMapper.updateByPrimaryKeySelective(waybillData);
 
-        //3.更新订单的状态为"已完成"
-        List<Waybill> waybillList = waybillMapper.listWaybillByOrderId(waybillData.getOrderId());
-        boolean canChangeFlag = true;
-        for (Waybill waybill : waybillList) {
-            boolean flag = waybill.getWaybillStatus().equals(WaybillStatus.RECEIVE) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.DEPART) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.REJECT) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.SIGN) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.LOAD_PRODUCT) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.DELIVERY) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.CANCEL) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.DELIVERY) ||
-                    waybill.getWaybillStatus().equals(WaybillStatus.ARRIVE_LOAD_SITE);
-            if (flag) {
-                canChangeFlag = false;
-                break;
+            //3.更新订单的状态为"已完成"
+            List<Waybill> waybillList = waybillMapper.listWaybillByOrderId(waybillData.getOrderId());
+            boolean canChangeFlag = true;
+            for (Waybill waybill : waybillList) {
+                boolean flag = waybill.getWaybillStatus().equals(WaybillStatus.RECEIVE) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.SEND_TRUCK) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.DEPART) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.REJECT) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.SIGN) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.LOAD_PRODUCT) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.DELIVERY) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.CANCEL) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.DELIVERY) ||
+                        waybill.getWaybillStatus().equals(WaybillStatus.ARRIVE_LOAD_SITE);
+                if (flag) {
+                    canChangeFlag = false;
+                    break;
+                }
             }
-        }
-        //4.只有订单下所有的运单的状态变成"已完成"或者"已作废"
-        if (canChangeFlag) {
-            Orders order = ordersMapper.selectByPrimaryKey(waybillData.getOrderId());
-            order.setOrderStatus(OrderStatus.ACCOMPLISH);
-            ordersMapper.updateByPrimaryKeySelective(order);
+            //4.只有订单下所有的运单的状态变成"已完成"或者"已作废"
+            if (canChangeFlag) {
+                Orders order = ordersMapper.selectByPrimaryKey(waybillData.getOrderId());
+                order.setOrderStatus(OrderStatus.ACCOMPLISH);
+                ordersMapper.updateByPrimaryKeySelective(order);
 
+            }
+            //5.删除抢单记录
+            grabWaybillRecordMapper.deleteByWaybillId(waybillId);
+        } else {
+            throw new RuntimeException("只有【待派单】和【已拒单】的运单才可以作废");
         }
-        //5.删除抢单记录
-        grabWaybillRecordMapper.deleteByWaybillId(waybillId);
         return true;
     }
 
@@ -2763,7 +2799,7 @@ public class WaybillServiceImpl implements WaybillService {
             String newLineFlag = "\n";
             // 上辆车车牌号
             String lastTruckNumber = "";
-            // 上辆车四季名城
+            // 上辆司机名称
             String lastDriverName = "";
             // 下辆车车牌号
             String nextTruckNumber = "";
@@ -2923,7 +2959,7 @@ public class WaybillServiceImpl implements WaybillService {
                 Date requiredTime = sdf.parse(day + " " + cells[16]);
                 dto.setRequiredTime(requiredTime);
                 // 司机名称
-                dto.setDriverName(cells[7]);
+                dto.setDriverName(cells[9]);
                 // 货物数量(单车筐数)
                 String quantity = cells[20];
                 if (StringUtils.hasText(quantity)) {

@@ -125,4 +125,8 @@ public class GetWaybillDto implements Serializable {
      * 客户网点
      */
     private Integer networkId;
+    /**
+     * 备注:包括作废理由
+     */
+    private String notes;
 }

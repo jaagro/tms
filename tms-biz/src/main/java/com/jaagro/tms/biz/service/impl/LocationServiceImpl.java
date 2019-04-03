@@ -16,6 +16,7 @@ import com.jaagro.tms.biz.mapper.OrdersMapperExt;
 import com.jaagro.tms.biz.mapper.WaybillMapperExt;
 import com.jaagro.tms.biz.service.TruckClientService;
 import lombok.extern.log4j.Log4j;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @Log4j
@@ -61,8 +62,11 @@ public class LocationServiceImpl implements LocationService {
                 locationDto.setTruckId(truckDto.getId());
             }
         }
-
-        int count = locationMapper.insertBatch(list);
+        int count = 0;
+        if (!CollectionUtils.isEmpty(list)) {
+            Collections.sort(list, Comparator.comparing(LocationDto::getLocationTime));
+            count = locationMapper.insertBatch(list);
+        }
 
         return count;
     }
@@ -100,9 +104,10 @@ public class LocationServiceImpl implements LocationService {
     @RabbitListener(queues = RabbitMqConfig.LOCATION_SEND_QUEUE)
     private void receiveMessage(List<LocationDto> locationList) {
         try {
+            Collections.sort(locationList, Comparator.comparing(LocationDto::getLocationTime));
             locationMapper.insertBatch(locationList);
-        }catch (Exception ex){
-            log.error("R LocationServiceImpl.receiveMessage params error{}",ex);
+        } catch (Exception ex) {
+            log.error("R LocationServiceImpl.receiveMessage params error{}", ex);
         }
     }
 
@@ -127,7 +132,7 @@ public class LocationServiceImpl implements LocationService {
             if (StringUtils.isEmpty(locationListJson)) {
                 locationDtos = locationMapper.listLocationsByWaybillId(waybillId, interval);
                 if (!CollectionUtils.isEmpty(locationDtos)) {
-                    redis.set(key, JsonUtils.objectToJson(locationDtos), 2000);
+                    redis.set(key, JsonUtils.objectToJson(locationDtos), 300);
                 }
             } else {
                 locationDtos = JsonUtils.jsonToList(locationListJson, ShowLocationDto.class);
@@ -136,10 +141,32 @@ public class LocationServiceImpl implements LocationService {
             locationDtos = locationMapper.listLocationsByWaybillId(waybillId, interval);
         }
 
-
         return locationDtos;
 
     }
 
+    public static void main(String[] args) {
+        List<LocationDto> locationList = new ArrayList<>();
+        LocationDto dto1 = new LocationDto();
+        dto1.setWaybillId(1);
+        dto1.setLocationTime(DateUtils.addSeconds(new Date(), 0));
+        LocationDto dto2 = new LocationDto();
+        dto2.setLocationTime(DateUtils.addSeconds(new Date(), 20));
+        dto2.setWaybillId(2);
+        LocationDto dto3 = new LocationDto();
+        dto3.setLocationTime(DateUtils.addSeconds(new Date(), 4));
+        dto3.setWaybillId(1);
+        LocationDto dto4 = new LocationDto();
+        dto4.setLocationTime(DateUtils.addSeconds(new Date(), 1));
+        dto4.setWaybillId(3);
+        locationList.add(dto3);
+        locationList.add(dto2);
+        locationList.add(dto1);
+        locationList.add(dto4);
+        Collections.sort(locationList, Comparator.comparing(LocationDto::getLocationTime));
+        for (LocationDto locationDto : locationList) {
+            System.out.println(locationDto.getWaybillId() + "===" + locationDto.getLocationTime());
 
+        }
+    }
 }

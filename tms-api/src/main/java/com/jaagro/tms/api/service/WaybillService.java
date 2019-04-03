@@ -210,10 +210,11 @@ public interface WaybillService {
      * 20181116
      *
      * @param waybillId
+     * @param reasonId 作废原因id
      * @return
      * @Author gavin
      */
-    boolean abandonWaybill(Integer waybillId);
+    boolean abandonWaybill(Integer waybillId,Integer reasonId);
 
     /**
      * 根据订单id查询待派单的运单

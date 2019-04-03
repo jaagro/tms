@@ -108,7 +108,7 @@
             AND w.id = #{waybillId}
         </if>
         <if test="truckNumber != null and truckNumber !=''">
-            AND t.truck_number = #{truckNumber}
+            <![CDATA[AND (t.truck_number like concat(#{truckNumber},'%') )]]>
         </if>
         <if test="completeTimeStart != null and completeTimeStart != ''">
             AND w.modify_time &gt;= #{completeTimeStart}
