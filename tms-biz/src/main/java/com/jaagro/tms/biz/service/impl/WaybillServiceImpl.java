@@ -2586,6 +2586,7 @@ public class WaybillServiceImpl implements WaybillService {
             //2.把运单状态修改为作废
             waybillData.setWaybillStatus(WaybillStatus.ABANDON);
             waybillData.setNotes(AbandonReasonEnum.getDescByCode(reasonId));
+            waybillData.setModifyTime(new Date());
             waybillMapper.updateByPrimaryKeySelective(waybillData);
 
             //3.更新订单的状态为"已完成"
