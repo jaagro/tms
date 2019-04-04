@@ -983,7 +983,8 @@ public class WaybillServiceImpl implements WaybillService {
             if (!CollectionUtils.isEmpty(unLoadSiteConfirmProductDtos) && null != unLoadSiteConfirmProductDtos.get(0)) {
                 showSiteById = customerClientService.getShowSiteById(unLoadSiteConfirmProductDtos.get(0).getUnLoadSiteId());
             }
-
+            // 发送站内消息通知调度客户已签收 add by yj 20190403
+            waybillSignedInformDispatcher(waybill,orders,currentUser,showSiteById);
             //查询出卸货地未签收的
             WaybillItems waybillItemsCondition = new WaybillItems();
             waybillItemsCondition
@@ -1084,8 +1085,6 @@ public class WaybillServiceImpl implements WaybillService {
                 }
                 return ServiceResult.toResult(SignStatusConstant.SIGN_ALL);
             }
-            // 发送站内消息通知调度客户已签收 add by yj 20190403
-            waybillSignedInformDispatcher(waybill,orders,currentUser,showSiteById);
             return ServiceResult.toResult("操作成功");
         }
         return ServiceResult.toResult("操作异常");
