@@ -1,10 +1,10 @@
 package com.jaagro.tms.api.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jaagro.tms.api.dto.Message.CreateMessageDto;
-import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
-import com.jaagro.tms.api.dto.Message.ListUnReadMsgCriteriaDto;
-import com.jaagro.tms.api.dto.Message.MessageReturnDto;
+import com.jaagro.tms.api.dto.message.CreateMessageDto;
+import com.jaagro.tms.api.dto.message.ListMessageCriteriaDto;
+import com.jaagro.tms.api.dto.message.ListUnReadMsgCriteriaDto;
+import com.jaagro.tms.api.dto.message.MessageReturnDto;
 
 import java.util.List;
 
