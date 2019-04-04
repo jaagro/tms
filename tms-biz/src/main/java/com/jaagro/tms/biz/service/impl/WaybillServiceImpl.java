@@ -5,9 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.*;
-import com.jaagro.tms.api.dto.message.CreateMessageDto;
-import com.jaagro.tms.api.dto.message.ListMessageCriteriaDto;
-import com.jaagro.tms.api.dto.message.MessageReturnDto;
 import com.jaagro.tms.api.dto.account.QueryAccountDto;
 import com.jaagro.tms.api.dto.base.DictionaryDto;
 import com.jaagro.tms.api.dto.base.ListTruckTypeDto;
@@ -15,6 +12,9 @@ import com.jaagro.tms.api.dto.base.ShowUserDto;
 import com.jaagro.tms.api.dto.customer.*;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.fee.ReturnWaybillCustomerFeeDto;
+import com.jaagro.tms.api.dto.message.CreateMessageDto;
+import com.jaagro.tms.api.dto.message.ListMessageCriteriaDto;
+import com.jaagro.tms.api.dto.message.MessageReturnDto;
 import com.jaagro.tms.api.dto.order.*;
 import com.jaagro.tms.api.dto.receipt.UpdateWaybillGoodsDto;
 import com.jaagro.tms.api.dto.receipt.UploadReceiptImageDto;
@@ -50,7 +50,6 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1864,7 +1863,7 @@ public class WaybillServiceImpl implements WaybillService {
             String newLineFlag = "\n";
             String notes;
             WaybillTracking tracking = waybillTrackingMapper.getLatestAssignTracking(waybill.getId());
-            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String trackTime = sdFormat.format(tracking.getCreateTime());
             if (orders.getGoodsType().equals(GoodsType.CHICKEN)) {
                 String oldNotes = waybill.getNotes() == null ? "" : waybill.getNotes();
@@ -2587,6 +2586,7 @@ public class WaybillServiceImpl implements WaybillService {
             //2.把运单状态修改为作废
             waybillData.setWaybillStatus(WaybillStatus.ABANDON);
             waybillData.setNotes(AbandonReasonEnum.getDescByCode(reasonId));
+            waybillData.setModifyTime(new Date());
             waybillMapper.updateByPrimaryKeySelective(waybillData);
 
             //3.更新订单的状态为"已完成"
