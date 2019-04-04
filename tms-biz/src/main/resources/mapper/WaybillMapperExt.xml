@@ -414,4 +414,63 @@
         </if>
         )tab order by create_time DESC
     </select>
+    <select id="listToStartInform" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM waybill
+        WHERE
+        enabled = 1
+        AND waybill_status = '待出发'
+        AND load_time &lt;= DATE_ADD(NOW(), INTERVAL 1 HOUR)
+        AND load_time &gt; NOW();
+    </select>
+    <select id="listWaybillLoadLate" resultMap="BaseResultMap">
+        SELECT
+        w.*
+        FROM
+        waybill w
+        INNER  JOIN waybill_tracking wt ON w.id = wt.waybill_id
+        WHERE
+        w.enabled = 1
+        AND w.waybill_status = '前往装货地'
+        AND wt.enabled = 1
+        AND wt.new_status = '待装货'
+        AND wt.create_time &gt; w.load_time
+        UNION
+        SELECT
+        w.*
+        FROM
+        waybill w
+        LEFT JOIN waybill_tracking wt ON w.id = wt.waybill_id AND wt.enabled = 1 AND wt.new_status = '待装货'
+        WHERE
+        w.enabled = 1
+        AND w.waybill_status = '前往装货地'
+        AND w.load_time &lt; NOW()
+        AND wt.id is NULL
+    </select>
+    <select id="listWaybillUnLoadLate" resultMap="BaseResultMap">
+        SELECT
+        w.*
+        FROM
+        waybill w
+        INNER JOIN waybill_tracking wt ON w.id = wt.waybill_id
+        INNER JOIN waybill_items wai ON w.id = wai.waybill_id
+        WHERE
+        w.enabled = 1
+        AND w.waybill_status = '待送达'
+        AND wt.enabled = 1
+        AND wt.new_status = '待签收'
+        AND wt.create_time &gt; wai.required_time
+        UNION
+        SELECT
+        w.*
+        FROM
+        waybill w
+        INNER JOIN waybill_items wai on w.id = wai.waybill_id
+        LEFT JOIN waybill_tracking wt ON w.id = wt.waybill_id AND wt.enabled = 1 AND wt.new_status = '待签收'
+        WHERE
+        w.enabled = 1
+        AND w.waybill_status = '待送达'
+        AND wai.required_time &lt; NOW()
+        AND wt.id is NULL;
+    </select>
 </mapper>

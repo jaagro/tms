@@ -6,10 +6,10 @@ import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.constant.MsgCategory;
 import com.jaagro.tms.api.constant.MsgStatusConstant;
 import com.jaagro.tms.api.constant.MsgType;
-import com.jaagro.tms.api.dto.Message.CreateMessageDto;
-import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
-import com.jaagro.tms.api.dto.Message.ListUnReadMsgCriteriaDto;
-import com.jaagro.tms.api.dto.Message.MessageReturnDto;
+import com.jaagro.tms.api.dto.message.CreateMessageDto;
+import com.jaagro.tms.api.dto.message.ListMessageCriteriaDto;
+import com.jaagro.tms.api.dto.message.ListUnReadMsgCriteriaDto;
+import com.jaagro.tms.api.dto.message.MessageReturnDto;
 import com.jaagro.tms.api.service.MessageService;
 import com.jaagro.tms.biz.entity.Message;
 import com.jaagro.tms.biz.mapper.MessageMapperExt;
@@ -17,14 +17,9 @@ import com.jaagro.tms.biz.mapper.WaybillTrackingMapperExt;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -51,19 +46,11 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public PageInfo<MessageReturnDto> listMessageByCriteriaDto(ListMessageCriteriaDto criteriaDto) {
         PageHelper.startPage(criteriaDto.getPageNum(), criteriaDto.getPageSize());
-        criteriaDto.setToUserId(currentUserService.getCurrentUser() == null ? null : currentUserService.getCurrentUser().getId());
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        Integer currentUserId = currentUser == null ? null : currentUser.getId();
+        criteriaDto.setToUserId(currentUserId);
         List<MessageReturnDto> messageList = messageMapperExt.listMessageByCriteriaDto(criteriaDto);
-        for (MessageReturnDto messageReturnDto : messageList) {
-            if (StringUtils.isEmpty(messageReturnDto.getCategory())) {
-                if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)) {
-                    messageReturnDto.setCategory(MsgCategory.WARNING);
-                    messageReturnDto.setMsgCategory(MsgCategory.WARNING);
-                } else {
-                    messageReturnDto.setCategory(MsgCategory.INFORM);
-                    messageReturnDto.setMsgCategory(MsgCategory.INFORM);
-                }
-            }
-        }
+        generateCategory(messageList);
         return new PageInfo<>(messageList);
     }
 
@@ -100,17 +87,30 @@ public class MessageServiceImpl implements MessageService {
         criteriaDto.setToUserId(currentUserId);
         ListMessageCriteriaDto dto = new ListMessageCriteriaDto();
         BeanUtils.copyProperties(criteriaDto, dto);
-        List<MessageReturnDto> messageReturnDtos = messageMapperExt.listMessageByCriteriaDto(dto);
-        for (MessageReturnDto messageReturnDto : messageReturnDtos) {
-            if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)) {
-                messageReturnDto.setMsgCategory(MsgCategory.WARNING);
-            } else {
-                messageReturnDto.setMsgCategory(MsgCategory.INFORM);
-            }
-        }
-        return messageReturnDtos;
+        List<MessageReturnDto> messageReturnDtoList = messageMapperExt.listMessageByCriteriaDto(dto);
+        generateCategory(messageReturnDtoList);
+        return messageReturnDtoList;
     }
 
+    private void generateCategory(List<MessageReturnDto> messageReturnDtoList){
+        for (MessageReturnDto messageReturnDto : messageReturnDtoList) {
+            if (StringUtils.isEmpty(messageReturnDto.getCategory())) {
+                if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)) {
+                    messageReturnDto.setCategory(MsgCategory.INFORM);
+                    messageReturnDto.setMsgCategory(MsgCategory.INFORM);
+                } else {
+                    messageReturnDto.setCategory(MsgCategory.WARNING);
+                    messageReturnDto.setMsgCategory(MsgCategory.WARNING);
+                }
+            }else {
+                if (messageReturnDto.getMsgType().equals(MsgType.SYSTEM)) {
+                    messageReturnDto.setMsgCategory(MsgCategory.INFORM);
+                } else {
+                    messageReturnDto.setMsgCategory(MsgCategory.WARNING);
+                }
+            }
+        }
+    }
     /**
      * 创建消息
      *

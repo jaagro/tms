@@ -160,6 +160,8 @@ public class GrabWaybillServiceImpl implements GrabWaybillService {
                     appMessage.setCreateUserId(getUserId());
                     appMessage.setFromUserId(getUserId());
                     appMessage.setToUserId(driver.getId());
+                    appMessage.setFromUserType(FromUserType.EMPLOYEE);
+                    appMessage.setToUserType(ToUserType.DRIVER);
                     messageMapper.insertSelective(appMessage);
                 }
             }

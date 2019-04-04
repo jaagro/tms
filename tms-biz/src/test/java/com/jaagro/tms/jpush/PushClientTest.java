@@ -49,7 +49,7 @@ public class PushClientTest extends BaseTest {
             LOG.error("Error response from JPush server. Should review and fix it. ", e);
             LOG.info("HTTP Status: " + e.getStatus());
             LOG.info("Error Code: " + e.getErrorCode());
-            LOG.info("Error Message: " + e.getErrorMessage());
+            LOG.info("Error message: " + e.getErrorMessage());
             LOG.info("Msg ID: " + e.getMsgId());
             LOG.error("Sendno: " + payload.getSendno());
         }
@@ -142,7 +142,7 @@ public class PushClientTest extends BaseTest {
             LOG.error("Error response from JPush server. Should review and fix it. ", e);
             LOG.info("HTTP Status: " + e.getStatus());
             LOG.info("Error Code: " + e.getErrorCode());
-            LOG.info("Error Message: " + e.getErrorMessage());
+            LOG.info("Error message: " + e.getErrorMessage());
         }
     }
 
@@ -159,7 +159,7 @@ public class PushClientTest extends BaseTest {
             LOG.error("Error response from JPush server. Should review and fix it. ", e);
             LOG.info("HTTP Status: " + e.getStatus());
             LOG.info("Error Code: " + e.getErrorCode());
-            LOG.info("Error Message: " + e.getErrorMessage());
+            LOG.info("Error message: " + e.getErrorMessage());
         }
     }
 

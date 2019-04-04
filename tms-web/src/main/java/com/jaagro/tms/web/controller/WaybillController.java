@@ -207,9 +207,9 @@ public class WaybillController {
      * 20181116
      */
     @ApiOperation("运单作废")
-    @PostMapping("/abandonWaybill/{waybillId}")
-    public BaseResponse abandonWaybill(@PathVariable("waybillId") Integer waybillId) {
-        boolean result = waybillService.abandonWaybill(waybillId);
+    @PostMapping("/abandonWaybill/{waybillId}/{reasonId}")
+    public BaseResponse abandonWaybill(@PathVariable("waybillId") Integer waybillId,@PathVariable("reasonId") Integer reasonId) {
+        boolean result = waybillService.abandonWaybill(waybillId,reasonId);
         if (!result) {
             return BaseResponse.errorInstance("失败");
         }
