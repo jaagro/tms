@@ -66,6 +66,7 @@ public class WaybillMessageTask {
         if (opsForValue.setIfAbsent(uniqueKey, value)) {
             List<Waybill> waybillList = waybillMapper.listToStartInform();
             if (!CollectionUtils.isEmpty(waybillList)) {
+                log.info("startInform waybillList size="+waybillList.size());
                 for (Waybill waybill : waybillList) {
                     try {
                         waybillStartInformDriver(waybill);
@@ -74,7 +75,7 @@ public class WaybillMessageTask {
                     }
                 }
             }
-            //stringRedisTemplate.expire(uniqueKey, 9, TimeUnit.MINUTES);
+            stringRedisTemplate.expire(uniqueKey, 50, TimeUnit.SECONDS);
         }
         long end = System.currentTimeMillis();
         log.info("startInform end use time =" + (end - begin));
@@ -92,11 +93,12 @@ public class WaybillMessageTask {
         if (opsForValue.setIfAbsent(uniqueKey, value)) {
             List<Waybill> waybillList = waybillMapper.listWaybillLoadLate();
             if (!CollectionUtils.isEmpty(waybillList)) {
+                log.info("waybillLoadLateProcess waybillList size="+waybillList.size());
                 for (Waybill waybill : waybillList) {
                     waybillLoadLateInformDispatcher(waybill);
                 }
             }
-            //stringRedisTemplate.expire(uniqueKey, 9, TimeUnit.MINUTES);
+            stringRedisTemplate.expire(uniqueKey, 50, TimeUnit.SECONDS);
         }
         long end = System.currentTimeMillis();
         log.info("waybillLoadLateProcess end use time =" + (end - begin));
@@ -114,11 +116,12 @@ public class WaybillMessageTask {
         if (opsForValue.setIfAbsent(uniqueKey, value)) {
             List<Waybill> waybillList = waybillMapper.listWaybillUnLoadLate();
             if (!CollectionUtils.isEmpty(waybillList)) {
+                log.info("waybillUnloadLateProcess waybillList size="+waybillList.size());
                 for (Waybill waybill : waybillList) {
                     waybillUnLoadLateInformDispatcher(waybill);
                 }
             }
-            //stringRedisTemplate.expire(uniqueKey, 9, TimeUnit.MINUTES);
+            stringRedisTemplate.expire(uniqueKey, 50, TimeUnit.SECONDS);
         }
         long end = System.currentTimeMillis();
         log.info("waybillUnloadLateProcess end use time =" + (end - begin));
