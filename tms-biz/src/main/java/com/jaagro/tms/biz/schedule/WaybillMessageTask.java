@@ -57,7 +57,7 @@ public class WaybillMessageTask {
     /**
      * 司机出发超时提醒司机
      */
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     public void startInform() {
         log.info("startInform begin");
         long begin = System.currentTimeMillis();
@@ -75,7 +75,7 @@ public class WaybillMessageTask {
                     }
                 }
             }
-            stringRedisTemplate.expire(uniqueKey, 50, TimeUnit.SECONDS);
+            stringRedisTemplate.expire(uniqueKey, 1, TimeUnit.MINUTES);
         }
         long end = System.currentTimeMillis();
         log.info("startInform end use time =" + (end - begin));
@@ -84,7 +84,7 @@ public class WaybillMessageTask {
     /**
      * 司机到达装货地超时提醒调度
      */
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     public void waybillLoadLateProcess() {
         log.info("waybillLoadLateProcess begin");
         long begin = System.currentTimeMillis();
@@ -98,7 +98,7 @@ public class WaybillMessageTask {
                     waybillLoadLateInformDispatcher(waybill);
                 }
             }
-            stringRedisTemplate.expire(uniqueKey, 50, TimeUnit.SECONDS);
+            stringRedisTemplate.expire(uniqueKey, 1, TimeUnit.MINUTES);
         }
         long end = System.currentTimeMillis();
         log.info("waybillLoadLateProcess end use time =" + (end - begin));
@@ -107,7 +107,7 @@ public class WaybillMessageTask {
     /**
      * 司机到达卸货地超时提醒调度
      */
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     public void waybillUnloadLateProcess() {
         log.info("waybillUnloadLateProcess begin");
         long begin = System.currentTimeMillis();
@@ -121,7 +121,7 @@ public class WaybillMessageTask {
                     waybillUnLoadLateInformDispatcher(waybill);
                 }
             }
-            stringRedisTemplate.expire(uniqueKey, 50, TimeUnit.SECONDS);
+            stringRedisTemplate.expire(uniqueKey, 1, TimeUnit.MINUTES);
         }
         long end = System.currentTimeMillis();
         log.info("waybillUnloadLateProcess end use time =" + (end - begin));
