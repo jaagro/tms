@@ -37,11 +37,8 @@
         <if test="msgSource != null">
             and msg_source=#{msgSource}
         </if>
-        <if test="msgCategory == 2">
-            and msg_type=1
-        </if>
-        <if test="msgCategory == 1">
-            and msg_type!=1
+        <if test="msgCategory != null">
+            and category=#{msgCategory}
         </if>
         <if test="referId != null">
             and refer_id=#{referId}
