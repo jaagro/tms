@@ -27,7 +27,7 @@ public class ListUnReadMsgCriteriaDto implements Serializable{
     private Integer msgSource;
 
     /**
-     * 类别: 1-通知 2-公告
+     * 类别: 1-通知 2-提醒
      */
     @Min(value=1,message="{msgCategory.Min}")
     private Integer msgCategory;

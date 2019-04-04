@@ -129,4 +129,8 @@ public class GetWaybillDto implements Serializable {
      * 备注:包括作废理由
      */
     private String notes;
+    /**
+     * 修改时间
+     */
+    private Date modifyTime;
 }

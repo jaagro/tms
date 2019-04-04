@@ -471,6 +471,6 @@
         w.enabled = 1
         AND w.waybill_status = '待送达'
         AND wai.required_time &lt; NOW()
-        AND wt.id is NULL;
+        AND wt.id is NULL
     </select>
 </mapper>
