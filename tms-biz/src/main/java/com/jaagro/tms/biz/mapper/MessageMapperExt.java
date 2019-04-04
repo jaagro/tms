@@ -1,19 +1,22 @@
 package com.jaagro.tms.biz.mapper;
 
-import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
-import com.jaagro.tms.api.dto.Message.MessageReturnDto;
+import com.jaagro.tms.api.dto.message.ListMessageCriteriaDto;
+import com.jaagro.tms.api.dto.message.MessageReturnDto;
 import com.jaagro.tms.biz.entity.Message;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * @author yj
+ */
 public interface MessageMapperExt extends  MessageMapper{
    /**
     * 根据条件查消息(app端)
     * @param message
     * @return
     */
-   List<Message> listMessageByCondtion(Message message);
+   List<Message> listMessageByCondition(Message message);
 
    /**
     * 根据条件查消息
