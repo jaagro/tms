@@ -527,6 +527,7 @@ public class WaybillServiceImpl implements WaybillService {
         if (null == waybill) {
             throw new NullPointerException(id + ": 无效");
         }
+        GetWaybillDto getWaybillDto = new GetWaybillDto();
         //拿到装货地对象
         ShowSiteDto loadSiteDto = customerClientService.getShowSiteById(waybill.getLoadSiteId());
 
@@ -541,10 +542,24 @@ public class WaybillServiceImpl implements WaybillService {
             showDriverDto = driverClientService.getDriverReturnObject(waybill.getDriverId());
         }
         //车辆对象
-        ShowTruckDto truckDto = null;
-        if (!StringUtils.isEmpty(waybill.getTruckId())) {
-            truckDto = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
+        List<ShowTruckDto> showTruckDtos = new ArrayList<>();
+        List<GrabWaybillRecord> grabWaybillByWaybillId = grabWaybillRecordMapper.getGrabWaybillByWaybillId(id);
+        if (!CollectionUtils.isEmpty(grabWaybillByWaybillId)) {
+            getWaybillDto.setGrabWaybillStatus(true);
+            for (GrabWaybillRecord grabWaybillRecord : grabWaybillByWaybillId) {
+                if (grabWaybillRecord.getTruckId() != null) {
+                    ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
+                    showTruckDtos.add(truckDto);
+                }
+            }
+        } else {
+            if (waybill.getTruckId() != null) {
+                ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
+                showTruckDtos.add(truckDto);
+            }
         }
+
+
         //派单人
         ShowUserDto userDto = new ShowUserDto();
         if (!StringUtils.isEmpty(waybill.getCreatedUserId())) {
@@ -624,14 +639,12 @@ public class WaybillServiceImpl implements WaybillService {
             getTrackingDto.setImageList(imageList);
         }
         Orders ordersData = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
-        GetWaybillDto getWaybillDto = new GetWaybillDto();
         getWaybillDto.setTracking(getTrackingDtos);
         BeanUtils.copyProperties(waybill, getWaybillDto);
         getWaybillDto
                 .setLoadSite(loadSiteDto)
                 .setNetworkId(waybill.getNetworkId())
                 .setNeedTruckType(truckTypeDto)
-                .setTruckId(truckDto)
                 .setDriverId(showDriverDto)
                 .setCreatedUserId(userDto)
                 .setWaybillItems(getWaybillItemsDtoList)
@@ -676,10 +689,7 @@ public class WaybillServiceImpl implements WaybillService {
         List<GetWaybillDto> getWaybillDtoList = new ArrayList<>(12);
         for (Integer waybillId : waybillIds) {
             GetWaybillDto getWaybillDto = this.getWaybillById(waybillId);
-            GrabWaybillRecord grabWaybill = grabWaybillRecordMapper.getGrabWaybillByWaybillId(waybillId);
-            if (grabWaybill != null) {
-                getWaybillDto.setGrabWaybillStatus(true);
-            }
+
             //运单状态为已拒单填充拒单理由(取时间倒序 limit 1)
             if (getWaybillDto.getWaybillStatus().equals(WaybillStatus.REJECT)) {
                 GetRefuseTrackingDto trackingDto = new GetRefuseTrackingDto();
