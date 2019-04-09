@@ -553,7 +553,7 @@ public class WaybillServiceImpl implements WaybillService {
             getWaybillDto.setGrabWaybillStatus(true);
             for (GrabWaybillRecord grabWaybillRecord : grabWaybillByWaybillId) {
                 if (grabWaybillRecord.getTruckId() != null) {
-                    ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(waybill.getTruckId());
+                    ShowTruckDto truckDto = truckClientService.getTruckByIdReturnObject(grabWaybillRecord.getTruckId());
                     showTruckDtos.add(truckDto);
                 }
             }
@@ -646,6 +646,7 @@ public class WaybillServiceImpl implements WaybillService {
         BeanUtils.copyProperties(waybill, getWaybillDto);
         getWaybillDto
                 .setLoadSite(loadSiteDto)
+                .setShowTruckDtos(showTruckDtos)
                 .setNetworkId(waybill.getNetworkId())
                 .setNeedTruckType(truckTypeDto)
                 .setDriverId(showDriverDto)
