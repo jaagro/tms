@@ -563,8 +563,6 @@ public class WaybillServiceImpl implements WaybillService {
                 showTruckDtos.add(truckDto);
             }
         }
-
-
         //派单人
         ShowUserDto userDto = new ShowUserDto();
         if (!StringUtils.isEmpty(waybill.getCreatedUserId())) {
