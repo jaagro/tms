@@ -245,36 +245,35 @@
         <if test="receiptStatus != null and receiptStatus != ''">
             and receipt_status=#{receiptStatus}
         </if>
-        order by
-        CASE
-        WHEN waybill_status LIKE '%待派单%' THEN
-        1
-        WHEN waybill_status LIKE '%待接单%' THEN
-        2
-        WHEN waybill_status LIKE '%待出发%' THEN
-        3
-        WHEN waybill_status LIKE '%前往装货地%' THEN
-        4
-        WHEN waybill_status LIKE '%待装货%' THEN
-        5
-        WHEN waybill_status LIKE '%待送达%' THEN
-        6
-        WHEN waybill_status LIKE '%待签收%' THEN
-        7
-        WHEN waybill_status LIKE '%已拒单%' THEN
-        8
-        WHEN waybill_status LIKE '%已完成%' THEN
-        9
-        WHEN waybill_status LIKE '%已取消%' THEN
-        10
-        WHEN waybill_status LIKE '%已作废%' THEN
-        11
-        END
         <if test="sortCriteria == null or sortCriteria == 1">
-            ,create_time DESC
+            order by
+            CASE
+            WHEN waybill_status LIKE '%待派单%' THEN
+            1
+            WHEN waybill_status LIKE '%待接单%' THEN
+            2
+            WHEN waybill_status LIKE '%待出发%' THEN
+            3
+            WHEN waybill_status LIKE '%前往装货地%' THEN
+            4
+            WHEN waybill_status LIKE '%待装货%' THEN
+            5
+            WHEN waybill_status LIKE '%待送达%' THEN
+            6
+            WHEN waybill_status LIKE '%待签收%' THEN
+            7
+            WHEN waybill_status LIKE '%已拒单%' THEN
+            8
+            WHEN waybill_status LIKE '%已完成%' THEN
+            9
+            WHEN waybill_status LIKE '%已取消%' THEN
+            10
+            WHEN waybill_status LIKE '%已作废%' THEN
+            11
+            END,create_time DESC
         </if>
         <if test="sortCriteria != null and sortCriteria == 2">
-            ,send_time DESC
+            order by send_time DESC
         </if>
     </select>
     <select id="listWaybillWaitByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
@@ -414,5 +413,64 @@
             and gwr.driver_id=#{driverId}
         </if>
         )tab order by create_time DESC
+    </select>
+    <select id="listToStartInform" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM waybill
+        WHERE
+        enabled = 1
+        AND waybill_status = '待出发'
+        AND load_time &lt;= DATE_ADD(NOW(), INTERVAL 1 HOUR)
+        AND load_time &gt; NOW();
+    </select>
+    <select id="listWaybillLoadLate" resultMap="BaseResultMap">
+        SELECT
+        w.*
+        FROM
+        waybill w
+        INNER  JOIN waybill_tracking wt ON w.id = wt.waybill_id
+        WHERE
+        w.enabled = 1
+        AND w.waybill_status = '前往装货地'
+        AND wt.enabled = 1
+        AND wt.new_status = '待装货'
+        AND wt.create_time &gt; w.load_time
+        UNION
+        SELECT
+        w.*
+        FROM
+        waybill w
+        LEFT JOIN waybill_tracking wt ON w.id = wt.waybill_id AND wt.enabled = 1 AND wt.new_status = '待装货'
+        WHERE
+        w.enabled = 1
+        AND w.waybill_status = '前往装货地'
+        AND w.load_time &lt; NOW()
+        AND wt.id is NULL
+    </select>
+    <select id="listWaybillUnLoadLate" resultMap="BaseResultMap">
+        SELECT
+        w.*
+        FROM
+        waybill w
+        INNER JOIN waybill_tracking wt ON w.id = wt.waybill_id
+        INNER JOIN waybill_items wai ON w.id = wai.waybill_id
+        WHERE
+        w.enabled = 1
+        AND w.waybill_status = '待送达'
+        AND wt.enabled = 1
+        AND wt.new_status = '待签收'
+        AND wt.create_time &gt; wai.required_time
+        UNION
+        SELECT
+        w.*
+        FROM
+        waybill w
+        INNER JOIN waybill_items wai on w.id = wai.waybill_id
+        LEFT JOIN waybill_tracking wt ON w.id = wt.waybill_id AND wt.enabled = 1 AND wt.new_status = '待签收'
+        WHERE
+        w.enabled = 1
+        AND w.waybill_status = '待送达'
+        AND wai.required_time &lt; NOW()
+        AND wt.id is NULL
     </select>
 </mapper>

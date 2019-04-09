@@ -38,6 +38,13 @@ public interface WaybillTrackingMapperExt extends WaybillTrackingMapper {
     List<ShowTrackingDto> getWaybillTrackingByWaybillId(Integer waybillId);
 
     /**
+     * 获取最新派单记录表
+     * @param waybillId
+     * @return
+     */
+    WaybillTracking getLatestAssignTracking(Integer waybillId);
+
+    /**
      * 根据运单号轨迹类型物理删除运单轨迹
      *
      * @param waybillId

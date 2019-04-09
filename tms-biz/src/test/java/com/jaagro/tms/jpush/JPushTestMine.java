@@ -70,7 +70,7 @@ public class JPushTestMine {
             // fix it. ", e);
             // log.info("HTTP Status: " + e.getStatus());
             // log.info("Error Code: " + e.getErrorCode());
-            // log.info("Error Message: " + e.getErrorMessage());
+            // log.info("Error message: " + e.getErrorMessage());
             // log.info("policeId: " + policeId);
             // log.info("alertid: " + alertid);
             // log.info("alert: " + alert);

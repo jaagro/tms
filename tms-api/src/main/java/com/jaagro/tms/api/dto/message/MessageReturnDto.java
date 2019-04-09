@@ -1,4 +1,4 @@
-package com.jaagro.tms.api.dto.Message;
+package com.jaagro.tms.api.dto.message;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

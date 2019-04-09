@@ -178,4 +178,22 @@ public interface WaybillMapperExt extends WaybillMapper {
      * @return
      */
     List<GetWaybillAppDto> listWaybillByStatus(ReceiptListParamDto param);
+
+    /**
+     * 查询需要提醒司机出发的运单
+     * @return
+     */
+    List<Waybill> listToStartInform();
+
+    /**
+     * 司机到达装货地超时的运单
+     * @return
+     */
+    List<Waybill> listWaybillLoadLate();
+
+    /**
+     * 司机到达卸货地超时的运单
+     * @return
+     */
+    List<Waybill> listWaybillUnLoadLate();
 }

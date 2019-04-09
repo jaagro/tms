@@ -1,13 +1,12 @@
 package com.jaagro.tms.web.controller;
 
 import com.github.pagehelper.PageInfo;
-import com.jaagro.tms.api.dto.Message.CreateMessageDto;
-import com.jaagro.tms.api.dto.Message.ListMessageCriteriaDto;
-import com.jaagro.tms.api.dto.Message.ListUnReadMsgCriteriaDto;
-import com.jaagro.tms.api.dto.Message.MessageReturnDto;
+import com.jaagro.tms.api.dto.message.CreateMessageDto;
+import com.jaagro.tms.api.dto.message.ListMessageCriteriaDto;
+import com.jaagro.tms.api.dto.message.ListUnReadMsgCriteriaDto;
+import com.jaagro.tms.api.dto.message.MessageReturnDto;
 import com.jaagro.tms.api.service.MessageService;
 import com.jaagro.utils.BaseResponse;
-import com.jaagro.utils.ResponseStatusCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -58,8 +57,8 @@ public class MessageController {
     @ApiOperation("获取未读消息")
     public BaseResponse listUnreadMessages(@RequestBody @Validated ListUnReadMsgCriteriaDto criteriaDto){
         log.info("O listUnreadMessages criteriaDto={}",criteriaDto);
-        List<MessageReturnDto> messageReturnDtos = messageService.listUnreadMessages(criteriaDto);
-        return BaseResponse.successInstance(messageReturnDtos);
+        List<MessageReturnDto> messageReturnDtoList = messageService.listUnreadMessages(criteriaDto);
+        return BaseResponse.successInstance(messageReturnDtoList);
     }
 
     @PostMapping("/createMessage")
