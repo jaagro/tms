@@ -128,7 +128,7 @@ public class OrderServiceImpl implements OrderService {
         } else {
             throw new RuntimeException("订单明细不能为空");
         }
-        return ServiceResult.toResult("创建成功");
+        return ServiceResult.toResult(order);
     }
 
     /**
