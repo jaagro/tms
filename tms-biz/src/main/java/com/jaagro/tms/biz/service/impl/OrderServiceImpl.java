@@ -67,7 +67,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Map<String, Object> createOrder(CreateOrderDto orderDto) {
+    public ReturnOrderDto createOrder(CreateOrderDto orderDto) {
         ShowCustomerDto customerDto = customerService.getShowCustomerById(orderDto.getCustomerId());
 
         if (customerDto == null) {
@@ -128,7 +128,9 @@ public class OrderServiceImpl implements OrderService {
         } else {
             throw new RuntimeException("订单明细不能为空");
         }
-        return ServiceResult.toResult(order);
+        ReturnOrderDto returnOrderDto = new ReturnOrderDto();
+        BeanUtils.copyProperties(order, returnOrderDto);
+        return returnOrderDto;
     }
 
     /**
