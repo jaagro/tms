@@ -95,6 +95,6 @@ public interface TruckClientService {
      * @param id
      * @return
      */
-    @GetMapping("getTruckTeamContractById/{id}")
-    TruckTeamContractReturnDto getTruckTeamContractById(@PathVariable Integer id);
+    @GetMapping("/getTruckTeamContractById/{id}")
+    TruckTeamContractReturnDto getTruckTeamContractById(@PathVariable("id") Integer id);
 }
