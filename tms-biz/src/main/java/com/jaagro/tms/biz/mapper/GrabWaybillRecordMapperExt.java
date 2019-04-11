@@ -60,10 +60,11 @@ public interface GrabWaybillRecordMapperExt extends GrabWaybillRecordMapper {
      * @param waybillId
      * @return
      */
-    GrabWaybillRecord getGrabWaybillByWaybillId(@Param("waybillId") Integer waybillId);
+    List<GrabWaybillRecord> getGrabWaybillByWaybillId(@Param("waybillId") Integer waybillId);
 
     /**
      * 根据运单id 删除抢单记录表
+     *
      * @param waybillId
      */
     void deleteByWaybillId(@Param("waybillId") Integer waybillId);

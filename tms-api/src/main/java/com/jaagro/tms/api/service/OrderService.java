@@ -1,10 +1,8 @@
 package com.jaagro.tms.api.service;
 
 import com.github.pagehelper.PageInfo;
-import com.jaagro.tms.api.dto.order.CreateOrderDto;
-import com.jaagro.tms.api.dto.order.GetOrderDto;
-import com.jaagro.tms.api.dto.order.ListOrderCriteriaDto;
-import com.jaagro.tms.api.dto.order.UpdateOrderDto;
+import com.jaagro.tms.api.dto.order.*;
+import com.sun.org.apache.xpath.internal.operations.Or;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +18,7 @@ public interface OrderService {
      * @param orderDto 入参json
      * @return
      */
-    Map<String, Object> createOrder(CreateOrderDto orderDto);
+    ReturnOrderDto createOrder(CreateOrderDto orderDto);
 
     /**
      * 修改订单
