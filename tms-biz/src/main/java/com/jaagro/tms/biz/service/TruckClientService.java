@@ -89,4 +89,12 @@ public interface TruckClientService {
      */
     @PostMapping("/getContractByContractDto")
     ContractDto getContractByContractDto(@RequestBody @Validated ContractDto contractDto);
+
+    /**
+     *根据车队合同id查询车队合同
+     * @param id
+     * @return
+     */
+    @GetMapping("getTruckTeamContractById/{id}")
+    TruckTeamContractReturnDto getTruckTeamContractById(@PathVariable Integer id);
 }
