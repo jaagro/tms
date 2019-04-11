@@ -92,7 +92,6 @@
         <if test="waybillId!=null">
             and waybill_Id=#{waybillId}
         </if>
-        limit 1
     </select>
     <delete id="deleteByWaybillId" parameterType="java.lang.Integer">
     delete from grab_waybill_record
