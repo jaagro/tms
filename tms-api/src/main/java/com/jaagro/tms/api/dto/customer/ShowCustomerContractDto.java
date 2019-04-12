@@ -23,4 +23,9 @@ public class ShowCustomerContractDto implements Serializable {
      * 合同类型
      */
     private Integer type;
+
+    /**
+     * 结算类型(1-按提货重量计价,2-按卸货重量计价)
+     */
+    private Integer settleType;
 }
