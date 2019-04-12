@@ -415,7 +415,8 @@
         )tab order by create_time DESC
     </select>
     <select id="listToStartInform" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/>
+        SELECT
+        <include refid="Base_Column_List"/>
         FROM waybill
         WHERE
         enabled = 1
@@ -472,5 +473,19 @@
         AND w.waybill_status = '待送达'
         AND wai.required_time &lt; NOW()
         AND wt.id is NULL
+    </select>
+    <select id="listSettleManageWaybillFee" resultType="com.jaagro.tms.api.dto.settlemanage.ReturnWaybillFeeDto"
+            parameterType="com.jaagro.tms.api.dto.settlemanage.WaybillFeeCriteria">
+        select wb.id waybillId,wb.load_site_id loadSiteId,wb.truck_id truckId,os.customer_id customerId from waybill wb
+        inner join orders os on (wb.order_id=os.id)
+        <where>
+            wb.enabled = 1
+            <if test="waybillId!=null">
+                wb.id=#{waybillId}
+            </if>
+            <if test="goodsType!=null">
+                wb.goodsType=#{goodsType}
+            </if>
+        </where>
     </select>
 </mapper>

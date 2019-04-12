@@ -39,6 +39,7 @@ public interface WaybillTrackingMapperExt extends WaybillTrackingMapper {
 
     /**
      * 获取最新派单记录表
+     *
      * @param waybillId
      * @return
      */
@@ -92,5 +93,22 @@ public interface WaybillTrackingMapperExt extends WaybillTrackingMapper {
      * @return
      */
     WaybillTracking getRefuseTrackingByWaybillId(@Param("waybillId") Integer waybillId);
+
+    /**
+     * 获取装货地信息
+     *
+     * @param waybillId
+     * @return
+     */
+    WaybillTracking getUnLoadSiteInfoByWaybillId(@Param("waybillId") Integer waybillId);
+
+    /**
+     * 获取装货地信息
+     *
+     * @param waybillId
+     * @return
+     */
+    WaybillTracking getLoadSiteInfoByWaybillId(@Param("waybillId") Integer waybillId);
+
 
 }

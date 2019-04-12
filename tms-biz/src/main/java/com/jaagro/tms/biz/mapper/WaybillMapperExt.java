@@ -2,6 +2,8 @@ package com.jaagro.tms.biz.mapper;
 
 import com.jaagro.tms.api.dto.driverapp.GetWaybillAppDto;
 import com.jaagro.tms.api.dto.driverapp.ListWaybillAppDto;
+import com.jaagro.tms.api.dto.settlemanage.ReturnWaybillFeeDto;
+import com.jaagro.tms.api.dto.settlemanage.WaybillFeeCriteria;
 import com.jaagro.tms.api.dto.waybill.ListWaybillCriteriaDto;
 import com.jaagro.tms.api.dto.waybill.ListWaybillDto;
 import com.jaagro.tms.api.dto.waybill.ListWebChatWaybillCriteriaDto;
@@ -174,6 +176,7 @@ public interface WaybillMapperExt extends WaybillMapper {
 
     /**
      * 根据查询条件查询运单接单列表
+     *
      * @param param
      * @return
      */
@@ -181,19 +184,30 @@ public interface WaybillMapperExt extends WaybillMapper {
 
     /**
      * 查询需要提醒司机出发的运单
+     *
      * @return
      */
     List<Waybill> listToStartInform();
 
     /**
      * 司机到达装货地超时的运单
+     *
      * @return
      */
     List<Waybill> listWaybillLoadLate();
 
     /**
      * 司机到达卸货地超时的运单
+     *
      * @return
      */
     List<Waybill> listWaybillUnLoadLate();
+
+    /**
+     * 查询运单结算
+     *
+     * @param criteria
+     * @return
+     */
+    List<ReturnWaybillFeeDto> listSettleManageWaybillFee(WaybillFeeCriteria criteria);
 }

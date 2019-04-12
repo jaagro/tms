@@ -879,6 +879,7 @@ public class WaybillServiceImpl implements WaybillService {
                 .setLatitude(dto.getLongitude())
                 .setCreateTime(new Date())
                 .setEnabled(true);
+        
         //司机出发
         if (WaybillStatus.DEPART.equals(dto.getWaybillStatus())) {
             Waybill wb = new Waybill();
