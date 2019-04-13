@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author gavin
@@ -57,4 +58,10 @@ public class TruckTeamContractReturnDto implements Serializable {
      * 合同状态(0-待审核 1-审核通过)
      */
     private Integer contractStatus;
+
+    /**
+     * 结算类型(1-按提货重量计价,2-按卸货重量计价)
+     */
+    private Integer settleType;
+
 }

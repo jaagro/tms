@@ -55,7 +55,7 @@ public class GetWaybillDto implements Serializable {
     /**
      * 车辆id
      */
-    private ShowTruckDto truckId;
+    List<ShowTruckDto> showTruckDtos;
 
     /**
      * 司机id
