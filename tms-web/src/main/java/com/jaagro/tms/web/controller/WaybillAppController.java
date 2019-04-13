@@ -1,11 +1,13 @@
 package com.jaagro.tms.web.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.jaagro.constant.UserInfo;
 import com.jaagro.tms.api.dto.driverapp.*;
 import com.jaagro.tms.api.dto.waybill.GetReceiptMessageParamDto;
 import com.jaagro.tms.api.dto.waybill.WaybillImageChangeParamDto;
 import com.jaagro.tms.api.service.WaybillRefactorService;
 import com.jaagro.tms.api.service.WaybillService;
+import com.jaagro.tms.biz.service.impl.CurrentUserService;
 import com.jaagro.tms.biz.service.impl.WaybillServiceImpl;
 import com.jaagro.utils.BaseResponse;
 import com.jaagro.utils.ResponseStatusCode;
@@ -31,6 +33,8 @@ public class WaybillAppController {
     private WaybillService waybillService;
     @Autowired
     private WaybillRefactorService waybillRefactorService;
+    @Autowired
+    private CurrentUserService currentUserService;
     private static final Logger log = LoggerFactory.getLogger(WaybillServiceImpl.class);
 
     @ApiOperation("我的运单")
@@ -69,7 +73,8 @@ public class WaybillAppController {
     @ApiOperation("运单轨迹更新")
     @PostMapping("/updateWaybillTruckingApp")
     public BaseResponse updateWaybillTruckingApp(@RequestBody GetWaybillTruckingParamDto dto) {
-        log.info("O updateWaybillTruckingApp dto={}", dto);
+        UserInfo currentUser = currentUserService.getCurrentUser();
+        log.info("O updateWaybillTruckingApp dto={},currentUserId={}", dto, currentUser == null ? null : currentUser.getId());
         if (dto == null) {
             return BaseResponse.errorInstance(ResponseStatusCode.QUERY_DATA_ERROR.getCode(), "运单单参数不能为空");
         }

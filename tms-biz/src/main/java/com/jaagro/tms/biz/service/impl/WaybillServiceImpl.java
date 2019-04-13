@@ -879,6 +879,12 @@ public class WaybillServiceImpl implements WaybillService {
                 .setLatitude(dto.getLongitude())
                 .setCreateTime(new Date())
                 .setEnabled(true);
+        if (waybill == null) {
+            throw new RuntimeException("当前运单不存在");
+        }
+        if (!waybill.getDriverId().equals(currentUser.getId())) {
+            return ServiceResult.toResult(ReceiptConstant.ALREADY_RECEIVED);
+        }
         //司机出发
         if (WaybillStatus.DEPART.equals(dto.getWaybillStatus())) {
             Waybill wb = new Waybill();
@@ -2869,12 +2875,18 @@ public class WaybillServiceImpl implements WaybillService {
         if (!CollectionUtils.isEmpty(waybillIds)) {
             List<CalculatePaymentDto> paymentDtoList = new ArrayList<>();
             for (Integer waybillId : waybillIds) {
-                BigDecimal unloadWeight = new BigDecimal(0.00);
-                Integer unloadQuantity = 0;
+                BigDecimal customerCalWeight = new BigDecimal(0.00);
+                Integer customerCalQuantity = 0;
+                BigDecimal driverCalWeight = new BigDecimal(0.00);
+                Integer driverCalQuantity = 0;
                 Waybill waybill = waybillMapper.selectByPrimaryKey(waybillId);
                 if (waybill != null && waybill.getWaybillStatus().equals(WaybillStatus.ACCOMPLISH)) {
                     CalculatePaymentDto calculatePaymentDto = new CalculatePaymentDto();
                     Orders orders = ordersMapper.selectByPrimaryKey(waybill.getOrderId());
+                    if (orders == null) {
+                        log.info("O getCalculatePaymentDtoList orders not exist orderId={}", waybill.getOrderId());
+                        continue;
+                    }
                     // 合同未审核通过不算报价
                     if (orders != null) {
                         calculatePaymentDto.setWaybillId(waybillId);
@@ -2896,20 +2908,46 @@ public class WaybillServiceImpl implements WaybillService {
                         }
                         List<GetWaybillGoodsDto> waybillGoodsDtos = waybillGoodsMapper.listGoodsByWaybillId(waybillId);
                         if (!CollectionUtils.isEmpty(waybillGoodsDtos)) {
+                            ShowCustomerContractDto contractDto = customerClientService.getShowCustomerContractById(orders.getCustomerContractId());
+                            if (contractDto == null) {
+                                log.info("O getCalculatePaymentDtoList waybillId={},customerContractId={} customerContract not exist", waybillId, orders.getCustomerContractId());
+                            }
+                            TruckTeamContractReturnDto truckTeamContract = truckClientService.getTruckTeamContractById(waybill.getTruckTeamContractId());
+                            if (truckTeamContract == null) {
+                                log.info("O getCalculatePaymentDtoList waybillId={},truckTeamContractId={} truckTeamContract not exist", waybillId, waybill.getTruckTeamContractId());
+                            }
                             for (GetWaybillGoodsDto waybillGoodsDto : waybillGoodsDtos) {
                                 if (orders.getGoodsType().equals(GoodsType.CHICKEN) || orders.getGoodsType().equals(GoodsType.FODDER)) {
-                                    unloadWeight = unloadWeight.add(waybillGoodsDto.getUnloadWeight());
+                                    if (contractDto != null && ContractSettleType.USE_LOAD.equals(contractDto.getSettleType())) {
+                                        customerCalWeight = customerCalWeight.add(waybillGoodsDto.getLoadWeight());
+                                    } else {
+                                        customerCalWeight = customerCalWeight.add(waybillGoodsDto.getUnloadWeight());
+                                    }
+                                    if (truckTeamContract != null && ContractSettleType.USE_LOAD.equals(truckTeamContract.getSettleType())) {
+                                        driverCalWeight = driverCalWeight.add(waybillGoodsDto.getLoadWeight());
+                                    } else {
+                                        driverCalWeight = driverCalWeight.add(waybillGoodsDto.getUnloadWeight());
+                                    }
                                 } else {
-                                    unloadQuantity = unloadQuantity + waybillGoodsDto.getUnloadQuantity();
+                                    if (contractDto != null && ContractSettleType.USE_LOAD.equals(contractDto.getSettleType())) {
+                                        customerCalQuantity = customerCalQuantity + waybillGoodsDto.getLoadQuantity();
+                                    } else {
+                                        customerCalQuantity = customerCalQuantity + waybillGoodsDto.getUnloadQuantity();
+                                    }
+                                    if (truckTeamContract != null && ContractSettleType.USE_LOAD.equals(truckTeamContract.getSettleType())) {
+                                        driverCalQuantity = driverCalQuantity + waybillGoodsDto.getLoadQuantity();
+                                    } else {
+                                        driverCalQuantity = driverCalQuantity + waybillGoodsDto.getUnloadQuantity();
+                                    }
                                 }
                             }
                         }
                         if (orders.getGoodsType().equals(GoodsType.CHICKEN) || orders.getGoodsType().equals(GoodsType.FODDER)) {
-
-                            calculatePaymentDto.setUnloadWeight(unloadWeight);
-
+                            calculatePaymentDto.setCustomerCalWeight(customerCalWeight);
+                            calculatePaymentDto.setDriverCalWeight(driverCalWeight);
                         } else {
-                            calculatePaymentDto.setUnloadQuantity(unloadQuantity);
+                            calculatePaymentDto.setCustomerCalQuantity(customerCalQuantity);
+                            calculatePaymentDto.setDriverCalQuantity(driverCalQuantity);
                         }
                     }
                     paymentDtoList.add(calculatePaymentDto);

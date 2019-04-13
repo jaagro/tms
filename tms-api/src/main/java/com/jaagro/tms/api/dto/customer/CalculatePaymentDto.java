@@ -64,14 +64,24 @@ public class CalculatePaymentDto implements Serializable {
     private Integer truckTypeId;
 
     /**
-     * 结算重量（吨）
+     * 客户结算重量（吨）
      */
-    private BigDecimal unloadWeight;
+    private BigDecimal customerCalWeight;
 
     /**
-     * 需计算的数量(头)
+     * 客户需计算的数量(头)
      */
-    private Integer unloadQuantity;
+    private Integer customerCalQuantity;
+
+    /**
+     * 运力结算重量（吨）
+     */
+    private BigDecimal driverCalWeight;
+
+    /**
+     * 运力需计算的数量(头)
+     */
+    private Integer driverCalQuantity;
 
     /**
      * 实际的里程
