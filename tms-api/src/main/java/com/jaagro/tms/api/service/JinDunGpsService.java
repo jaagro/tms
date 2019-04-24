@@ -9,6 +9,12 @@ public interface JinDunGpsService {
      * 金盾系统登录
      * @return
      */
-    String jinDunLogin();
+    String jinDunLogin(boolean expiresType);
+
+    /**
+     * 获取车辆历史轨迹
+     */
+    void listHistoricalTrack();
+
 
 }

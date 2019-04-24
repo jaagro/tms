@@ -24,6 +24,11 @@ public class LocationDto implements Serializable {
     private Integer deviceType;
 
     /**
+     * 车牌号
+     */
+    private String truckNumber;
+
+    /**
      * 设备信息(IMEI等)
      */
     private String deviceInfo;

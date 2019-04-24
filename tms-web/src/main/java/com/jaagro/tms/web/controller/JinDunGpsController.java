@@ -1,6 +1,8 @@
 package com.jaagro.tms.web.controller;
 
+
 import com.jaagro.tms.api.service.JinDunGpsService;
+import com.jaagro.utils.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +26,14 @@ public class JinDunGpsController {
 
     @ApiOperation("金盾系统登录")
     @PostMapping("/jinDunLogin")
-    public void jinDunLogin() {
-        jinDunGpsService.jinDunLogin();
+    public BaseResponse jinDunLogin() {
+        return BaseResponse.successInstance(jinDunGpsService.jinDunLogin(false));
+    }
+
+    @ApiOperation("金盾车辆历史轨迹")
+    @PostMapping("/listHistoricalTrack")
+    public BaseResponse listHistoricalTrack() {
+        jinDunGpsService.listHistoricalTrack();
+        return BaseResponse.successInstance(null);
     }
 }

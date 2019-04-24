@@ -3,13 +3,13 @@
 <mapper namespace="com.jaagro.tms.biz.mapper.LocationMapperExt">
 
     <insert id="insertBatch" parameterType="com.jaagro.tms.biz.entity.Location">
-        insert into location (device_type, device_info,
+        insert into location (device_type,truck_number, device_info,
         driver_id, truck_id, waybill_id,
         waybill_status, latitude, longitude,
         speed, angle, location_time)
         VALUES
         <foreach collection="list" item="loc" separator=",">
-            (#{loc.deviceType,jdbcType=INTEGER}, #{loc.deviceInfo,jdbcType=VARCHAR},
+            (#{loc.deviceType,jdbcType=INTEGER} ,#{loc.truckNumber,jdbcType=VARCHAR}, #{loc.deviceInfo,jdbcType=VARCHAR},
             #{loc.driverId,jdbcType=INTEGER}, #{loc.truckId,jdbcType=INTEGER}, #{loc.waybillId,jdbcType=INTEGER},
             #{loc.waybillStatus,jdbcType=VARCHAR}, #{loc.latitude,jdbcType=DECIMAL}, #{loc.longitude,jdbcType=DECIMAL},
             #{loc.speed,jdbcType=DECIMAL}, #{loc.angle,jdbcType=DECIMAL}, #{loc.locationTime,jdbcType=TIMESTAMP})
