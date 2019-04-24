@@ -94,6 +94,9 @@ public class JinDunGpsServiceImpl implements JinDunGpsService {
                 }
                 if (!CollectionUtils.isEmpty(jindunGspInfoDtos)) {
                     for (JindunGspInfoDto jindunGspInfoDto : jindunGspInfoDtos) {
+                        if (jindunGspInfoDto.getLat() == null || jindunGspInfoDto == null) {
+                            continue;
+                        }
                         LocationDto locationDto = new LocationDto();
                         locationDto
                                 .setDeviceType(2)

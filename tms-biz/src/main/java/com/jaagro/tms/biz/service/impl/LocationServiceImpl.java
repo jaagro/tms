@@ -105,7 +105,9 @@ public class LocationServiceImpl implements LocationService {
     private void receiveMessage(List<LocationDto> locationList) {
         try {
             Collections.sort(locationList, Comparator.comparing(LocationDto::getLocationTime));
-            locationMapper.insertBatch(locationList);
+            if (!CollectionUtils.isEmpty(locationList)) {
+                locationMapper.insertBatch(locationList);
+            }
         } catch (Exception ex) {
             log.error("R LocationServiceImpl.receiveMessage params error{}", ex);
         }
